@@ -1,6 +1,8 @@
+.idea
+.gradle
+.project
+classes/
+build/
+bin/
+*.iml
 *.class
-
-# Package Files #
-*.jar
-*.war
-*.ear

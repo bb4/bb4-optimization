@@ -1,0 +1,24 @@
+// Copyright by Barry G. Becker, 2013. Licensed under MIT License: http://www.opensource.org/licenses/MIT
+
+apply from: 'https://raw.github.com/barrybecker4/bb4-common/master/bb4.gradle'
+
+description = 'A library project containing a collection of heuristic optimization algorithms.'
+group = 'com.barrybecker4'
+version = '1.1'
+project.archivesBaseName = 'bb4-optimization'
+mainClassName = "com.barrybecker4.optimization.viewer.OptimizerEvalFrame"
+
+dependencies {
+   compile 'com.barrybecker4:bb4-ui:1.1'
+}
+
+jar {
+    archiveName = 'bb4-optimization-' + version + '.jar'
+    manifest {
+        attributes 'Implementation-Title': 'Optimization library',
+            'Implementation-Version': version,
+            provider: 'gradle',
+            'Main-Class': mainClassName
+    }
+}
+
