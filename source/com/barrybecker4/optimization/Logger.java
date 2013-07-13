@@ -22,7 +22,7 @@ public class Logger {
      * Constructor
      */
     public Logger(String sLogFile) {
-        assert sLogFile!=null;
+        assert sLogFile != null;
         sLogFile_ = sLogFile;
     }
 

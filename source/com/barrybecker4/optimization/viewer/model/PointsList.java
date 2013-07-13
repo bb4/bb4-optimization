@@ -77,7 +77,7 @@ public class PointsList implements NavigationListener {
     public void addPoint(ParameterArray params) {
 
         Parameter xParam = params.get(0);
-        Parameter yParam = params.get(1);
+        Parameter yParam = (params.size() > 1) ? params.get(1):  params.get(0);
 
         if (rangeX == null) {
             rangeX = new Range(xParam.getMinValue(), xParam.getMaxValue());
