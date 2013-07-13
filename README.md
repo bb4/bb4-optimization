@@ -6,6 +6,7 @@ The algorithms are implemented mostly as described by Michalewicz and Fogel in [
 ### How to Build
 Type 'gradle build' at the root. This is mainly a library project, but there are several interesting test cases that can be viewed visually.
 If you want to open the source in Intellij, then first run 'gradle idea'.
+There is a simple visualization of a trivial optimization problem that can be viewed by running 'gradle run'.
 
 When there is a new release, versioned artifacts will be published by Barry Becker to [Sonatype](https://oss.sonatype.org).
 
