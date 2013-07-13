@@ -16,7 +16,7 @@ public abstract class OptimizerTestCase extends TestCase {
 
     /** Where the log files will go */
     public static final String LOG_FILE_HOME =
-            FileUtil.PROJECT_HOME + "performance/test_optimizer/";  // NN_NLS
+            FileUtil.PROJECT_HOME + "test/performance/test_optimizer/";  // NN_NLS
 
     @Override
     public void setUp() {
