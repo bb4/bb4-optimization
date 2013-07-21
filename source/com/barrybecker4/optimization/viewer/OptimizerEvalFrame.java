@@ -3,9 +3,9 @@ package com.barrybecker4.optimization.viewer;
 
 import com.barrybecker4.optimization.Optimizer;
 import com.barrybecker4.optimization.optimizees.OptimizeeProblem;
-import com.barrybecker4.optimization.parameter.NumericParameterArray;
-import com.barrybecker4.optimization.parameter.ParameterArray;
+import com.barrybecker4.optimization.optimizees.TrivialProblem;
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
+import com.barrybecker4.ui.application.ApplicationFrame;
 
 import javax.swing.*;
 import javax.vecmath.Point2d;
@@ -18,7 +18,7 @@ import java.awt.event.ActionListener;
  *
  * @author Barry Becker
  */
-public class OptimizerEvalFrame extends JFrame implements ActionListener {
+public class OptimizerEvalFrame extends ApplicationFrame implements ActionListener {
 
     private OptimizerEvalPanel evalPanel;
     private JComboBox strategyDropDown;
@@ -35,7 +35,7 @@ public class OptimizerEvalFrame extends JFrame implements ActionListener {
                               OptimizationStrategyType initialStrategy,
                               OptimizeeProblem testProblem) {
 
-        this.setTitle("Optimization Animation of " + optimizer.getOptimizee().getName());
+        super("Optimization Animation of " + optimizer.getOptimizee().getName());
         this.setSize(OptimizerEvalPanel.SIZE);
 
         this.optimizer = optimizer;
@@ -105,59 +105,11 @@ public class OptimizerEvalFrame extends JFrame implements ActionListener {
      */
     public static void main(String[] args) {
 
-        final double SOLUTION_VALUE = 0.4;
-
-        OptimizeeProblem testProblem = new OptimizeeProblem() {
-
-            private final ParameterArray EXACT_SOLUTION =  new NumericParameterArray(
-                        new double[] {SOLUTION_VALUE},
-                        new double[] {0.0},
-                        new double[] {1.0},
-                    new String[] {"param1"});
-
-            @Override
-            public ParameterArray getExactSolution() {
-                return EXACT_SOLUTION;
-            }
-
-            @Override
-            public ParameterArray getInitialGuess() {
-                return new NumericParameterArray(
-                        new double[] {0.5},
-                        new double[] {0.0},
-                        new double[] {1.0},
-                        new String[] {"param1"});
-            }
-
-            @Override
-            public double getFitnessRange() {
-                return 1.0;
-            }
-
-            @Override
-            public String getName() {
-                return "Trivial Test Problem";
-            }
-
-            @Override
-            public boolean evaluateByComparison() {
-                return false;
-            }
-
-            @Override
-            public double evaluateFitness(ParameterArray params) {
-                return 1 - EXACT_SOLUTION.distance(params);
-            }
-
-            @Override
-            public double compareFitness(ParameterArray params1, ParameterArray params2) {
-                return 0;
-            }
-        };
+        OptimizeeProblem testProblem = new TrivialProblem();
 
         Optimizer optimizer = new Optimizer(testProblem, "test/temp.txt");
 
-        Point2d solutionPosition = new Point2d(SOLUTION_VALUE, SOLUTION_VALUE);
+        Point2d solutionPosition = new Point2d(TrivialProblem.SOLUTION_VALUE, TrivialProblem.SOLUTION_VALUE);
         OptimizationStrategyType strategy = OptimizationStrategyType.GLOBAL_SAMPLING;
 
         new OptimizerEvalFrame(optimizer, solutionPosition, strategy, testProblem);
