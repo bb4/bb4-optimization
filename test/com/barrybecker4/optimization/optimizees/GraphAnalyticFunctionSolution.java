@@ -5,7 +5,6 @@ import com.barrybecker4.common.util.FileUtil;
 import com.barrybecker4.optimization.Optimizer;
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
 import com.barrybecker4.optimization.viewer.OptimizerEvalFrame;
-import com.barrybecker4.ui.util.GUIUtil;
 
 import javax.vecmath.Point2d;
 
@@ -20,7 +19,7 @@ public class GraphAnalyticFunctionSolution extends AnalyticFunctionProblem {
 
     /** Place to put performance results from the tests */
     private static final String PERFORMANCE_DIR =
-            FileUtil.PROJECT_HOME + "optimization/test/results/poly_optimization.txt";
+            FileUtil.getHomeDir() + "optimization/test/results/poly_optimization.txt";
 
     /** Constructor */
     public GraphAnalyticFunctionSolution(AnalyticVariation v) {

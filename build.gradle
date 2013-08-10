@@ -14,7 +14,7 @@ dependencies {
 }
 
 jar {
-    archiveName = 'bb4-optimization-' + version + '.jar'
+    archiveName = "${archivesBaseName}-${version}.jar"
     manifest {
         attributes 'Implementation-Title': 'Optimization library',
             'Implementation-Version': version,
@@ -23,3 +23,4 @@ jar {
     }
 }
 
+apply from: 'https://raw.github.com/barrybecker4/bb4-common/master/bb4-publish.gradle'
