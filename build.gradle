@@ -2,7 +2,7 @@
 
 description = 'A library project containing a collection of heuristic optimization algorithms.'
 group = 'com.barrybecker4'
-version = '1.1.2'
+version = '1.2-SNAPSHOT'
 
 apply from: 'https://raw.github.com/barrybecker4/bb4-common/master/bb4.gradle'
 
@@ -10,7 +10,7 @@ project.archivesBaseName = 'bb4-optimization'
 mainClassName = "com.barrybecker4.optimization.viewer.OptimizerEvalFrame"
 
 dependencies {
-   compile 'com.barrybecker4:bb4-ui:1.1.2'
+   compile 'com.barrybecker4:bb4-ui:1.2-SNAPSHOT'
 }
 
 jar {
