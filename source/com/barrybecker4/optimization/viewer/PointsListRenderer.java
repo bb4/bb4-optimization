@@ -13,9 +13,6 @@ import java.awt.*;
  */
 public class PointsListRenderer {
 
-    private static final int EDGE_SIZE = 1000;
-    public static final Dimension SIZE = new Dimension(EDGE_SIZE, EDGE_SIZE);
-
     private static final int POINT_RADIUS = 7;
     private static final Color VECTOR_COLOR = new Color(10, 40, 255);
 

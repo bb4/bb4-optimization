@@ -31,7 +31,6 @@ public class OptimizerEvalPanel extends JPanel
     static final Dimension SIZE = new Dimension(EDGE_SIZE, EDGE_SIZE);
     private static final Color BG_COLOR = new Color(240, 241, 242);
 
-    private Point2d solutionPosition;
     private PointsList pointsList;
     private PointsListRenderer renderer;
 
@@ -39,10 +38,8 @@ public class OptimizerEvalPanel extends JPanel
 
     /**
      * Constructor
-     * @param solutionPosition where we hope to wind up at.
      */
-    public OptimizerEvalPanel(Point2d solutionPosition) {
-        this.solutionPosition = solutionPosition;
+    public OptimizerEvalPanel() {
 
         this.setPreferredSize(SIZE);
         this.addMouseListener(this);
@@ -50,7 +47,7 @@ public class OptimizerEvalPanel extends JPanel
         renderer = new PointsListRenderer();
     }
 
-    public void doTest(OptimizationStrategyType optType, Optimizer optimizer,
+    public void doTest(OptimizationStrategyType optType, Optimizer optimizer, Point2d solutionPosition,
                        ParameterArray initialGuess, double fitnessRange) {
 
         pointsList = new PointsList(solutionPosition, EDGE_SIZE);
@@ -61,6 +58,7 @@ public class OptimizerEvalPanel extends JPanel
             // allow continuing if the strategy has simply not been implemented yet.
             e.printStackTrace();
         }
+        this.repaint();
 
         System.out.println( "\n************************************************************************" );
         System.out.println( "The solution to the ("

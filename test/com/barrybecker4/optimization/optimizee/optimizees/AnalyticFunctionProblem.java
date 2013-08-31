@@ -10,10 +10,10 @@ import com.barrybecker4.optimization.parameter.ParameterArray;
  *   z = 1 - (1 - p1)^2 - (2 - p2)^2
  *
  * Normally we have no idea what the real function is that we are trying to optimize.
- * Nor is a real hab function likely to be as well behaved as this one is.
+ * Nor is a real life function likely to be as well behaved as this one is.
  * This function is very smooth (actually infinitely differentiable) - which is a
  * feature that makes hill-climbing algorithms work very well on.
- * But for this simple case I intentionally use a simple polynomial function with only
+ * For this simple case, I intentionally use a simple polynomial function with only
  * 2 parameters so that I can solve it analytically and compare it to the optimization results.
  * For this function the global maximum is 1 and it occurs only when p1 = 1 and p2 = 2.
  * There are no other local maxima. The shape of the surface formed by this function
@@ -74,6 +74,11 @@ public class AnalyticFunctionProblem extends OptimizeeProblem {
     @Override
     public double getFitnessRange() {
         return FITNESS_RANGE;
+    }
+
+    @Override
+    public String toString() {
+        return getName();
     }
 
 }
