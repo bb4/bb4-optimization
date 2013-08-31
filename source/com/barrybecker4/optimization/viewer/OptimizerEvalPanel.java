@@ -3,6 +3,7 @@ package com.barrybecker4.optimization.viewer;
 
 import com.barrybecker4.optimization.OptimizationListener;
 import com.barrybecker4.optimization.Optimizer;
+import com.barrybecker4.optimization.optimizee.optimizees.OptimizeeProblem;
 import com.barrybecker4.optimization.parameter.ParameterArray;
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
 import com.barrybecker4.optimization.viewer.model.PointsList;
@@ -25,7 +26,7 @@ import java.awt.event.MouseMotionListener;
  * @author Barry Becker
  */
 public class OptimizerEvalPanel extends JPanel
-        implements OptimizationListener, NavigationListener, MouseListener, MouseMotionListener {
+        implements OptimizationListener, OptimizationViewable, MouseListener, MouseMotionListener {
 
     private static final int EDGE_SIZE = 1000;
     static final Dimension SIZE = new Dimension(EDGE_SIZE, EDGE_SIZE);
@@ -75,6 +76,20 @@ public class OptimizerEvalPanel extends JPanel
      */
     public void optimizerChanged(ParameterArray params) {
         pointsList.addPoint(params);
+    }
+
+    public void showOptimization(OptimizationStrategyType strategy, OptimizeeProblem testProblem, String logFile) {
+
+        ParameterArray params = testProblem.getExactSolution();
+        double xVal = params.get(0).getValue();
+        double yVal = (params.size() > 1) ? params.get(1).getValue() : xVal;
+        Point2d solutionPosition = new Point2d(xVal, yVal);
+
+        Optimizer optimizer = new Optimizer(testProblem, logFile);
+        optimizer.setListener(this);
+
+        doTest(strategy, optimizer, solutionPosition,
+               testProblem.getInitialGuess(), testProblem.getFitnessRange());
     }
 
     @Override

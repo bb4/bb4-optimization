@@ -2,7 +2,6 @@
 package com.barrybecker4.optimization.optimizee.optimizees;
 
 import com.barrybecker4.common.util.FileUtil;
-import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
 import com.barrybecker4.optimization.viewer.OptimizerEvalFrame;
 
 /**
@@ -31,8 +30,6 @@ public class GraphAnalyticFunctionSolution {
             testProblems[i++] = new AnalyticFunctionProblem(v);
         }
 
-        OptimizationStrategyType strategy = OptimizationStrategyType.GLOBAL_SAMPLING;
-
-        new OptimizerEvalFrame(PERFORMANCE_LOG, strategy, testProblems);
+        new OptimizerEvalFrame(PERFORMANCE_LOG, testProblems);
     }
 }

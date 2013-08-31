@@ -17,8 +17,6 @@ import java.util.List;
  */
 public class PointsList implements NavigationListener {
 
-    /** pan by 10% of the extent */
-    private static final double PAN_INCREMENT = 0.1;
 
     /** zoom in increment */
     private static final double ZOOM_IN_INCREMENT = 0.2;
@@ -43,7 +41,7 @@ public class PointsList implements NavigationListener {
      * @param solutionPosition where we hope to wind up at.
      */
     public PointsList(Point2d solutionPosition, int edgeSize) {
-        rawPoints_ = new ArrayList<Point2d>();
+        rawPoints_ = new ArrayList<>();
         rawSolutionPosition_ = solutionPosition;
 
         this.edgeSize = edgeSize;
@@ -84,25 +82,6 @@ public class PointsList implements NavigationListener {
         }
 
         rawPoints_.add(new Point2d(xParam.getValue(), yParam.getValue()));
-    }
-
-    public void pan(Direction direction) {
-        double xOffset = PAN_DIRECTION * PAN_INCREMENT * rangeX.getExtent();
-        double yOffset = PAN_DIRECTION * PAN_INCREMENT * rangeY.getExtent();
-        switch (direction) {
-            case LEFT :
-                adjustXRange(xOffset);
-                break;
-            case RIGHT :
-                adjustXRange(-xOffset);
-                break;
-            case UP :
-                adjustYRange(yOffset);
-                break;
-            case DOWN :
-                adjustYRange(-yOffset);
-                break;
-        }
     }
 
     public void pan(Point2d offset) {

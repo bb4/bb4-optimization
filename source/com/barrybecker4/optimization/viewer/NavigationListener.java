@@ -9,8 +9,6 @@ import javax.vecmath.Point2d;
  */
 public interface NavigationListener {
 
-    enum Direction {UP, DOWN, LEFT, RIGHT}
-
     void pan(Point2d offset);
     void zoomIn();
     void zoomOut();

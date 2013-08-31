@@ -26,14 +26,14 @@ public class NavigationBar extends TexturedToolBar  {
     private GradientButton zoomInButton_;
     private GradientButton zoomOutButton_;
 
-    private NavigationListener navListener;
+    private OptimizationViewable navListener;
 
 
     /**
-     * Button clicks get translated to NavigationListener api calls.
+     * Button clicks get translated to OptimizationViewable api calls.
      * @param listener the thing that will consume the navigation events for panning and zooming.
      */
-    public NavigationBar(NavigationListener listener) {
+    public NavigationBar(OptimizationViewable listener) {
 
         super(GUIUtil.getIcon(IMAGE_PATH + "ocean_trans_10.png"));
         setListener(new NavBarListener());
