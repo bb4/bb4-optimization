@@ -2,7 +2,7 @@
 package com.barrybecker4.optimization.parameter;
 
 import com.barrybecker4.optimization.Improvement;
-import com.barrybecker4.optimization.Optimizee;
+import com.barrybecker4.optimization.optimizee.Optimizee;
 import com.barrybecker4.optimization.parameter.types.Parameter;
 
 import java.util.List;

@@ -2,7 +2,7 @@
 package com.barrybecker4.optimization.strategy;
 
 import com.barrybecker4.common.format.FormatUtil;
-import com.barrybecker4.optimization.Optimizee;
+import com.barrybecker4.optimization.optimizee.Optimizee;
 import com.barrybecker4.optimization.parameter.ParameterArray;
 
 import java.util.Random;
@@ -89,7 +89,7 @@ public class SimulatedAnnealingStrategy extends OptimizationStrategy {
              currentParams = bestParams;
 
              do {
-                 currentParams = findNeighbor(currentParams, ct, temperature, fitnessRange);
+                 currentParams = findNeighbor(currentParams, ct, temperature);
 
                  if (currentParams.getFitness() > bestParams.getFitness()) {
                      bestParams = currentParams.copy();
@@ -117,9 +117,9 @@ public class SimulatedAnnealingStrategy extends OptimizationStrategy {
      * @param params current location in the parameter space.
      * @param ct iteration count.
      * @param temperature current temperature. Gets cooler with every successive temperature iteration.
-     * @return  neighboring point that is hopefully better than params.
+     * @return neighboring point that is hopefully better than params.
      */
-     private ParameterArray findNeighbor(ParameterArray params, int ct, double temperature, double fitnessRange) {
+     private ParameterArray findNeighbor(ParameterArray params, int ct, double temperature) {
 
         //double r = (tempMax_/5.0+temperature) / (8.0*(N/5.0+ct)*tempMax_);
         double r = temperature / ((N + ct) * tempMax_);

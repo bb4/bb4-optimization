@@ -1,13 +1,14 @@
 /** Copyright by Barry G. Becker, 2000-2011. Licensed under MIT License: http://www.opensource.org/licenses/MIT  */
-package com.barrybecker4.optimization.optimizees;
+package com.barrybecker4.optimization.optimizee.optimizees;
 
 import com.barrybecker4.optimization.Optimizer;
-import static com.barrybecker4.optimization.OptimizerTestCase.LOG_FILE_HOME;
 import com.barrybecker4.optimization.parameter.NumericParameterArray;
 import com.barrybecker4.optimization.parameter.ParameterArray;
 import com.barrybecker4.optimization.parameter.types.IntegerParameter;
 import com.barrybecker4.optimization.parameter.types.Parameter;
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
+
+import static com.barrybecker4.optimization.OptimizerTestCase.LOG_FILE_HOME;
 
 /**
  * This is a simple search space to test the optimization package.

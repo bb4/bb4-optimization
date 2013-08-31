@@ -1,8 +1,8 @@
 /** Copyright by Barry G. Becker, 2000-2011. Licensed under MIT License: http://www.opensource.org/licenses/MIT  */
 package com.barrybecker4.optimization;
 
-import com.barrybecker4.optimization.optimizees.OptimizeeProblem;
-import com.barrybecker4.optimization.optimizees.SevenElevenProblem;
+import com.barrybecker4.optimization.optimizee.optimizees.OptimizeeProblem;
+import com.barrybecker4.optimization.optimizee.optimizees.SevenElevenProblem;
 import com.barrybecker4.optimization.parameter.ParameterArray;
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
 

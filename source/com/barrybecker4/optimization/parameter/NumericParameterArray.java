@@ -5,7 +5,7 @@ import com.barrybecker4.common.math.MathUtil;
 import com.barrybecker4.common.math.MultiArray;
 import com.barrybecker4.common.math.Vector;
 import com.barrybecker4.optimization.Improvement;
-import com.barrybecker4.optimization.Optimizee;
+import com.barrybecker4.optimization.optimizee.Optimizee;
 import com.barrybecker4.optimization.parameter.types.DoubleParameter;
 import com.barrybecker4.optimization.parameter.types.Parameter;
 

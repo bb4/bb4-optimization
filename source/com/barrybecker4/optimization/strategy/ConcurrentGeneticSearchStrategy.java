@@ -2,7 +2,7 @@
 package com.barrybecker4.optimization.strategy;
 
 import com.barrybecker4.common.concurrency.Parallelizer;
-import com.barrybecker4.optimization.Optimizee;
+import com.barrybecker4.optimization.optimizee.Optimizee;
 import com.barrybecker4.optimization.parameter.ParameterArray;
 
 import java.util.ArrayList;

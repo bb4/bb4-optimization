@@ -1,7 +1,6 @@
 /** Copyright by Barry G. Becker, 2000-2011. Licensed under MIT License: http://www.opensource.org/licenses/MIT  */
-package com.barrybecker4.optimization.optimizees;
+package com.barrybecker4.optimization.optimizee.optimizees;
 
-import com.barrybecker4.common.util.FileUtil;
 import com.barrybecker4.optimization.Optimizer;
 import com.barrybecker4.optimization.parameter.ParameterArray;
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType;

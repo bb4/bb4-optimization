@@ -2,9 +2,9 @@
 package com.barrybecker4.optimization;
 
 import com.barrybecker4.common.math.MathUtil;
-import com.barrybecker4.optimization.optimizees.AnalyticFunctionProblem;
-import com.barrybecker4.optimization.optimizees.AnalyticVariation;
-import com.barrybecker4.optimization.optimizees.OptimizeeProblem;
+import com.barrybecker4.optimization.optimizee.optimizees.AnalyticFunctionProblem;
+import com.barrybecker4.optimization.optimizee.optimizees.AnalyticVariation;
+import com.barrybecker4.optimization.optimizee.optimizees.OptimizeeProblem;
 import com.barrybecker4.optimization.parameter.ParameterArray;
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
 

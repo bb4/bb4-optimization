@@ -2,8 +2,8 @@
 package com.barrybecker4.optimization.viewer;
 
 import com.barrybecker4.optimization.Optimizer;
-import com.barrybecker4.optimization.optimizees.OptimizeeProblem;
-import com.barrybecker4.optimization.optimizees.TrivialProblem;
+import com.barrybecker4.optimization.optimizee.optimizees.OptimizeeProblem;
+import com.barrybecker4.optimization.optimizee.optimizees.TrivialProblem;
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
 import com.barrybecker4.ui.application.ApplicationFrame;
 
