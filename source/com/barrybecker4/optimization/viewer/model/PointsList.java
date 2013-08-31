@@ -7,13 +7,12 @@ import com.barrybecker4.optimization.parameter.types.Parameter;
 import com.barrybecker4.optimization.viewer.NavigationListener;
 
 import javax.vecmath.Point2d;
-import java.awt.*;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Panel for showing the optimization visually.
- * TODO: add pan and zoom capability based on right click menu.
  * @author Barry Becker
  */
 public class PointsList implements NavigationListener {
@@ -92,18 +91,31 @@ public class PointsList implements NavigationListener {
         double yOffset = PAN_DIRECTION * PAN_INCREMENT * rangeY.getExtent();
         switch (direction) {
             case LEFT :
-                rangeX = new Range(rangeX.getMin() + xOffset, rangeX.getMax() + xOffset);
+                adjustXRange(xOffset);
                 break;
             case RIGHT :
-                rangeX = new Range(rangeX.getMin() - xOffset, rangeX.getMax() - xOffset);
+                adjustXRange(-xOffset);
                 break;
             case UP :
-                rangeY = new Range(rangeY.getMin() + yOffset, rangeY.getMax() + yOffset);
+                adjustYRange(yOffset);
                 break;
             case DOWN :
-                rangeY = new Range(rangeY.getMin() - yOffset, rangeY.getMax() - yOffset);
+                adjustYRange(-yOffset);
                 break;
         }
+    }
+
+    public void pan(Point2d offset) {
+        adjustXRange(offset.x * rangeX.getExtent());
+        adjustYRange(offset.y * rangeY.getExtent());
+    }
+
+    private void adjustXRange(double xOffset) {
+        rangeX = new Range(rangeX.getMin() + xOffset, rangeX.getMax() + xOffset);
+    }
+
+    private void adjustYRange(double yOffset) {
+        rangeY = new Range(rangeY.getMin() + yOffset, rangeY.getMax() + yOffset);
     }
 
     public void zoomIn() {

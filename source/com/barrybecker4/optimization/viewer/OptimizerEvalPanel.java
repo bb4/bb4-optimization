@@ -1,4 +1,4 @@
-/** Copyright by Barry G. Becker, 2000-2011. Licensed under MIT License: http://www.opensource.org/licenses/MIT  */
+/** Copyright by Barry G. Becker, 2000-2013. Licensed under MIT License: http://www.opensource.org/licenses/MIT  */
 package com.barrybecker4.optimization.viewer;
 
 import com.barrybecker4.optimization.OptimizationListener;
@@ -7,16 +7,25 @@ import com.barrybecker4.optimization.parameter.ParameterArray;
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
 import com.barrybecker4.optimization.viewer.model.PointsList;
 
-import javax.swing.*;
+import javax.swing.JPanel;
 import javax.vecmath.Point2d;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 
 /**
  * Panel for showing the optimization visually.
- * TODO: add pan and zoom capability based on right click menu.
+ * To zoom, click buttons at the top.
+ * To pan, simply click and drag.
  * @author Barry Becker
  */
-public class OptimizerEvalPanel extends JPanel implements OptimizationListener, NavigationListener {
+public class OptimizerEvalPanel extends JPanel
+        implements OptimizationListener, NavigationListener, MouseListener, MouseMotionListener {
 
     private static final int EDGE_SIZE = 1000;
     static final Dimension SIZE = new Dimension(EDGE_SIZE, EDGE_SIZE);
@@ -26,6 +35,8 @@ public class OptimizerEvalPanel extends JPanel implements OptimizationListener, 
     private PointsList pointsList;
     private PointsListRenderer renderer;
 
+    private Point dragStartPosition;
+
     /**
      * Constructor
      * @param solutionPosition where we hope to wind up at.
@@ -34,6 +45,8 @@ public class OptimizerEvalPanel extends JPanel implements OptimizationListener, 
         this.solutionPosition = solutionPosition;
 
         this.setPreferredSize(SIZE);
+        this.addMouseListener(this);
+        this.addMouseMotionListener(this);
         renderer = new PointsListRenderer();
     }
 
@@ -79,8 +92,8 @@ public class OptimizerEvalPanel extends JPanel implements OptimizationListener, 
         renderer.render(pointsList, g2);
     }
 
-    public void pan(Direction direction) {
-        pointsList.pan(direction);
+    public void pan(Point2d offset) {
+        pointsList.pan(offset);
         repaint();
     }
 
@@ -92,5 +105,44 @@ public class OptimizerEvalPanel extends JPanel implements OptimizationListener, 
     public void zoomOut() {
         pointsList.zoomOut();
         repaint();
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+        doPan(e.getPoint());
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {}
+    @Override
+    public void mouseClicked(MouseEvent e) {}
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+
+        dragStartPosition = e.getPoint();
+        System.out.println("mouse pressed at "+ dragStartPosition);
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        doPan(e.getPoint());
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {}
+    @Override
+    public void mouseExited(MouseEvent e) {}
+
+    private void doPan(Point currentPos) {
+        if (!dragStartPosition.equals(currentPos)) {
+            double xOffset = (dragStartPosition.getX() - currentPos.getX()) / getWidth();
+            double yOffset = (dragStartPosition.getY() - currentPos.getY()) / getHeight();
+            Point2d offset = new Point2d(xOffset, yOffset);
+            pointsList.pan(offset);
+            this.repaint();
+        }
+
+        dragStartPosition = currentPos;
     }
 }

@@ -13,8 +13,6 @@ import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
  */
 public class TestAnalyticFunctionProblem extends OptimizerTestCase {
 
-
-
     @Override
     protected void doTest(OptimizationStrategyType optimizationType) {
 

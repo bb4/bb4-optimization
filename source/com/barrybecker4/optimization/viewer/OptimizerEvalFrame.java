@@ -1,4 +1,4 @@
-/** Copyright by Barry G. Becker, 2000-2011. Licensed under MIT License: http://www.opensource.org/licenses/MIT  */
+/** Copyright by Barry G. Becker, 2000-2013. Licensed under MIT License: http://www.opensource.org/licenses/MIT  */
 package com.barrybecker4.optimization.viewer;
 
 import com.barrybecker4.optimization.Optimizer;
@@ -26,6 +26,7 @@ public class OptimizerEvalFrame extends ApplicationFrame implements ActionListen
     private Optimizer optimizer;
     private OptimizeeProblem testProblem;
     private OptimizationStrategyType initialStrategy;
+
     /**
      * Constructor
      * @param optimizer to show iterations of
