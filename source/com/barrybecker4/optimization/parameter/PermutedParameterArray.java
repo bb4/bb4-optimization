@@ -2,7 +2,7 @@
 package com.barrybecker4.optimization.parameter;
 
 import com.barrybecker4.common.math.MathUtil;
-import com.barrybecker4.optimization.Improvement;
+import com.barrybecker4.optimization.parameter.improvement.Improvement;
 import com.barrybecker4.optimization.optimizee.Optimizee;
 import com.barrybecker4.optimization.parameter.types.Parameter;
 
@@ -67,7 +67,7 @@ public class PermutedParameterArray extends AbstractParameterArray {
 
     /**
      * The amount of difference can be used as a measure of distance
-     * @param pa
+     * @param pa parameter array
      * @return the amount of difference between pa and ourselves.
      */
     public double difference(ParameterArray pa)  {

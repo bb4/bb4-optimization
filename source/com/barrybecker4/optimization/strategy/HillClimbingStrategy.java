@@ -1,7 +1,7 @@
 /** Copyright by Barry G. Becker, 2000-2011. Licensed under MIT License: http://www.opensource.org/licenses/MIT  */
 package com.barrybecker4.optimization.strategy;
 
-import com.barrybecker4.optimization.Improvement;
+import com.barrybecker4.optimization.parameter.improvement.Improvement;
 import com.barrybecker4.optimization.optimizee.Optimizee;
 import com.barrybecker4.optimization.parameter.ParameterArray;
 
@@ -66,7 +66,7 @@ public class HillClimbingStrategy extends OptimizationStrategy {
         cache.add(currentParams);
 
         Improvement improvement = null;
-        boolean improved = true;
+        boolean improved;
 
         // iterate until there is no significant improvement between iterations,
         // of the jumpSize is too small (below some threshold).

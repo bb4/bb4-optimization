@@ -1,7 +1,7 @@
 // Copyright by Barry G. Becker, 2012. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.parameter;
 
-import com.barrybecker4.optimization.Improvement;
+import com.barrybecker4.optimization.parameter.improvement.Improvement;
 import com.barrybecker4.optimization.optimizee.Optimizee;
 import com.barrybecker4.optimization.parameter.types.Parameter;
 

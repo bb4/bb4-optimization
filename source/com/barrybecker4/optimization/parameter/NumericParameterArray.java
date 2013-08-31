@@ -4,8 +4,10 @@ package com.barrybecker4.optimization.parameter;
 import com.barrybecker4.common.math.MathUtil;
 import com.barrybecker4.common.math.MultiArray;
 import com.barrybecker4.common.math.Vector;
-import com.barrybecker4.optimization.Improvement;
+import com.barrybecker4.optimization.parameter.improvement.Improvement;
 import com.barrybecker4.optimization.optimizee.Optimizee;
+import com.barrybecker4.optimization.parameter.improvement.ImprovementIteration;
+import com.barrybecker4.optimization.parameter.improvement.ImprovementStep;
 import com.barrybecker4.optimization.parameter.types.DoubleParameter;
 import com.barrybecker4.optimization.parameter.types.Parameter;
 
@@ -58,7 +60,7 @@ public class NumericParameterArray extends AbstractParameterArray {
 
     /**
      * Use this constructor if you have mixed types of parameters.
-     * @param params
+     * @param params params in array
      */
     public NumericParameterArray(List<Parameter> params) {
         super(params);

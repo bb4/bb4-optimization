@@ -1,16 +1,19 @@
 /** Copyright by Barry G. Becker, 2000-2011. Licensed under MIT License: http://www.opensource.org/licenses/MIT  */
-package com.barrybecker4.optimization.parameter;
+package com.barrybecker4.optimization.parameter.improvement;
 
 
 import com.barrybecker4.common.math.MathUtil;
 import com.barrybecker4.common.math.Vector;
 import com.barrybecker4.optimization.optimizee.Optimizee;
+import com.barrybecker4.optimization.parameter.Direction;
+import com.barrybecker4.optimization.parameter.NumericParameterArray;
+import com.barrybecker4.optimization.parameter.ParameterArray;
 import com.barrybecker4.optimization.parameter.types.Parameter;
 
 /**
  * private utility class for maintaining the data vectors for the iteration.
  */
-class ImprovementIteration {
+public class ImprovementIteration {
 
     private Vector delta;
     private Vector fitnessDelta;
@@ -22,7 +25,7 @@ class ImprovementIteration {
      * @param params current parameters
      * @param oldGradient the old steepest ascent gradient if we know it.
      */
-    ImprovementIteration(NumericParameterArray params, Vector oldGradient) {
+    public ImprovementIteration(NumericParameterArray params, Vector oldGradient) {
         delta = params.asVector();
         fitnessDelta = params.asVector();
         gradient = params.asVector();
@@ -40,11 +43,11 @@ class ImprovementIteration {
         }
     }
 
-    Vector getGradient() {
+    public Vector getGradient() {
         return gradient;
     }
 
-    Vector getOldGradient() {
+    public Vector getOldGradient() {
         return oldGradient;
     }
 
@@ -52,7 +55,7 @@ class ImprovementIteration {
      * Compute the squares in one of the iteration directions and add it to the running sum.
      * @return the sum of squares in one of the iteration directions.
      */
-    double incSumOfSqs(int i, double sumOfSqs, Optimizee optimizee,
+    public double incSumOfSqs(int i, double sumOfSqs, Optimizee optimizee,
                        ParameterArray params, ParameterArray testParams) {
 
         double fwdFitness;
@@ -79,14 +82,14 @@ class ImprovementIteration {
      * @return the incremental change in fitness
      */
     private double findFitnessDelta(Optimizee optimizee, ParameterArray params, ParameterArray testParams) {
-        double incFintess;
+        double incFitness;
         if (optimizee.evaluateByComparison()) {
-            incFintess = optimizee.compareFitness( testParams, params );
+            incFitness = optimizee.compareFitness( testParams, params );
         }
         else{
-            incFintess = optimizee.evaluateFitness( testParams );
+            incFitness = optimizee.evaluateFitness( testParams );
         }
-        return incFintess;
+        return incFitness;
     }
 
     /**
