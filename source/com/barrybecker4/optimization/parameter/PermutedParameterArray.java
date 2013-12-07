@@ -72,7 +72,7 @@ public class PermutedParameterArray extends AbstractParameterArray {
      */
     public double difference(ParameterArray pa)  {
 
-        List<Integer> runLengths = new LinkedList<Integer>();
+        List<Integer> runLengths = new LinkedList<>();
         int len = params_.length;
         int i = 0;
 
@@ -95,7 +95,7 @@ public class PermutedParameterArray extends AbstractParameterArray {
         int k;
         int ii = i;
         k = 1;
-        int j = findCorresspondingEntryIndex(pa, len, get(i));
+        int j = findCorrespondingEntryIndex(pa, len, get(i));
 
         boolean matchFound = false;
         boolean matched;
@@ -119,7 +119,7 @@ public class PermutedParameterArray extends AbstractParameterArray {
      * @return  the entry in pa that corresponds to param.
      * @throws AssertionError if not there. It must be there.
      */
-    private int findCorresspondingEntryIndex(ParameterArray pa, int len, Parameter param) {
+    private int findCorrespondingEntryIndex(ParameterArray pa, int len, Parameter param) {
         int j=0;
         while (j<len && !param.equals(pa.get(j)) ) {
             j++;
@@ -197,7 +197,7 @@ public class PermutedParameterArray extends AbstractParameterArray {
             numSamples = (int)(closeFactor * numPermutations);
         }
 
-        List<ParameterArray> globalSamples = new ArrayList<ParameterArray>(numSamples);
+        List<ParameterArray> globalSamples = new ArrayList<>(numSamples);
 
         while (globalSamples.size() < numSamples) {
 

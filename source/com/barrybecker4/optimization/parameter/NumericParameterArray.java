@@ -96,7 +96,7 @@ public class NumericParameterArray extends AbstractParameterArray {
 
         int samplingRate = (int)Math.pow((double)requestedNumSamples, 1.0/numDims);
         int numSamples = determineNumSamples(dims, samplingRate);
-        //System.out.println("dims="+Arrays.toString(dims) + " samplingRate="  + samplingRate);
+
         MultiArray samples = new MultiArray( dims );
         List<ParameterArray> globalSamples = new ArrayList<ParameterArray>(numSamples);
 
@@ -115,7 +115,6 @@ public class NumericParameterArray extends AbstractParameterArray {
         return globalSamples;
     }
 
-
     private int determineNumSamples(int[] dims, int samplingRate) {
         int i;
         int numSamples = 1;
@@ -132,7 +131,6 @@ public class NumericParameterArray extends AbstractParameterArray {
      */
     public Improvement findIncrementalImprovement(Optimizee optimizee, double jumpSize,
                                                   Improvement lastImprovement, Set<ParameterArray> cache) {
-
         NumericParameterArray currentParams = this;
         double oldFitness = currentParams.getFitness();
         Vector oldGradient = null;
@@ -248,7 +246,8 @@ public class NumericParameterArray extends AbstractParameterArray {
              Parameter newPar = nbr.get(k);
              newPar.setValue(newPar.getMinValue() + MathUtil.RANDOM.nextDouble() * newPar.getRange());
              assert (newPar.getValue() < newPar.getMaxValue() && newPar.getValue() > newPar.getMinValue()):
-                     "newPar "+newPar.getValue()+" not between "+newPar.getMinValue()+" and  "+newPar.getMaxValue();
+                     "newPar "+newPar.getValue() + " not between " + newPar.getMinValue()
+                             + " and  " + newPar.getMaxValue();
          }
 
          return nbr;

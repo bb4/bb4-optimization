@@ -14,9 +14,10 @@ import java.util.List;
  */
 public abstract class AbstractParameterArray implements ParameterArray {
 
-    /** but never exceed this amount  */
+    /** Never exceed this amount  */
     private static final int POPULATION_MAX = 4000;
 
+    // change this to list instead of array
     protected Parameter[] params_;
 
     /** assign a fitness (evaluation value) to this set of parameters */
@@ -35,7 +36,7 @@ public abstract class AbstractParameterArray implements ParameterArray {
 
     /**
      * Use this constructor if you have mixed types of parameters.
-     * @param params
+     * @param params list of parameters
      */
     public AbstractParameterArray(List<Parameter> params) {
         int len = params.size();

@@ -13,7 +13,7 @@ import static com.barrybecker4.optimization.optimizee.optimizees.AnalyticFunctio
  *
  * @author Barry Becker
  */
-public enum AnalyticVariation {
+public enum AnalyticVariation implements IProblemVariation {
 
     PARABOLA {
         /**
@@ -104,6 +104,11 @@ public enum AnalyticVariation {
      * @return error tolerance percent
      */
     public abstract double getErrorTolerancePercent(OptimizationStrategyType opt);
+
+    @Override
+    public ParameterArray getExactSolution() {
+        return AnalyticFunctionConsts.EXACT_SOLUTION;
+    }
 
     protected double getErrorTolerancePercent(OptimizationStrategyType opt, double[] percentValues) {
 

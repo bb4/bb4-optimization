@@ -8,23 +8,26 @@ import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
 import static com.barrybecker4.optimization.OptimizerTestCase.LOG_FILE_HOME;
 
 /**
- * This is a simple search space to test the optimization package.
+ * See these references to help understand the problem of finding dominating sets given a graph.
+ * http://csunplugged.org/dominating-sets (this is where I got the inspiration to add this class)
+ * http://en.wikipedia.org/wiki/Dominating_set
+ * This is a simple search example to help test the optimization package.
  *
  * @author Barry Becker
  */
-public class TravelingSalesmanProblem extends OptimizeeProblem {
+public class DominatingSetProblem extends OptimizeeProblem {
 
-    private TravelingSalesmanVariation variation_ = TravelingSalesmanVariation.SIMPLE;
+    private DominatingSetVariation variation_ = DominatingSetVariation.SIMPLE;
 
 
     /** constructor */
-    public TravelingSalesmanProblem(TravelingSalesmanVariation variation) {
+    public DominatingSetProblem(DominatingSetVariation variation) {
         variation_ = variation;
     }
 
     @Override
     public String getName() {
-        return "Traveling Salesman Problem";
+        return "Dominating Set Problem";
     }
 
     /**
@@ -65,14 +68,15 @@ public class TravelingSalesmanProblem extends OptimizeeProblem {
         return variation_.getFitnessRange();
     }
 
+
     /**
      * This finds the solution for the above optimization problem.
      */
     public static void main(String[] args) {
-        TravelingSalesmanVariation v = TravelingSalesmanVariation.SIMPLE;
-        OptimizeeProblem problem = new TravelingSalesmanProblem(v);
+        DominatingSetVariation v = DominatingSetVariation.SIMPLE;
+        OptimizeeProblem problem = new DominatingSetProblem(v);
         Optimizer optimizer =
-                new Optimizer(problem, LOG_FILE_HOME + "tsp_optimization.txt");
+                new Optimizer(problem, LOG_FILE_HOME + "domSet_optimization.txt");
 
         ParameterArray initialGuess = problem.getInitialGuess();
 

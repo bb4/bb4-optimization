@@ -15,9 +15,6 @@ import static com.barrybecker4.optimization.optimizee.optimizees.AnalyticFunctio
  */
 public class AnalyticVariationTest extends TestCase {
 
-    /** instance under test */
-    private AnalyticVariation variation;
-
     public void testVariationMaximum() {
         for (AnalyticVariation variant : AnalyticVariation.values()) {
             ParameterArray param = NumericParameterArrayTest.createParamArray(P1, P2);

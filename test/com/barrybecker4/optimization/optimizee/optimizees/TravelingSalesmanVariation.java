@@ -16,7 +16,7 @@ import static com.barrybecker4.optimization.optimizee.optimizees.AnalyticFunctio
  *
  * @author Barry Becker
  */
-public enum TravelingSalesmanVariation {
+public enum TravelingSalesmanVariation implements IProblemVariation {
 
     SIMPLE {
         /**
@@ -117,9 +117,6 @@ public enum TravelingSalesmanVariation {
     public abstract int getNumCities();
 
 
-    /** An optimal ordering of the cities to visit such that cost is minimized. */
-    public abstract PermutedParameterArray getExactSolution();
-
     /** Some random initial permutation of the cities */
     public ParameterArray getInitialGuess() {
         int num = this.getNumCities();
@@ -144,8 +141,8 @@ public enum TravelingSalesmanVariation {
 
     /**
      * We assume that the parameter array contains 0 based integers
-     * @param params
-     * @param matrix
+     * @param params parameter array
+     * @param matrix adjacency matrix
      * @return the total cost of the path represented by param.
      */
     protected double computeCost(ParameterArray params, double[][] matrix) {
