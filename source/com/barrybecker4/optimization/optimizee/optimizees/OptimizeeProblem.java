@@ -1,4 +1,4 @@
-/** Copyright by Barry G. Becker, 2000-2011. Licensed under MIT License: http://www.opensource.org/licenses/MIT  */
+/** Copyright by Barry G. Becker, 2000-2013. Licensed under MIT License: http://www.opensource.org/licenses/MIT  */
 package com.barrybecker4.optimization.optimizee.optimizees;
 
 import com.barrybecker4.optimization.optimizee.Optimizee;
@@ -11,18 +11,13 @@ import com.barrybecker4.optimization.parameter.ParameterArray;
  */
 public abstract class OptimizeeProblem implements Optimizee {
 
-    /**
-     * @return  the exact solution for this problem.
-     */
+    /** @return  the exact solution for this problem. */
     public abstract ParameterArray getExactSolution();
 
-    /**
-     * @return  the exact solution for this problem.
-     */
+    /** @return  the exact solution for this problem. */
     public abstract ParameterArray getInitialGuess();
 
     /**
-     *
      * @param sol solution
      * @return distance from the exact solution as the error.
      */

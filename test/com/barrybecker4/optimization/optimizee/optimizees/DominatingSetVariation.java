@@ -59,7 +59,7 @@ public enum DominatingSetVariation implements IProblemVariation {
                 Arrays.asList(2, 4, 7),
                 Arrays.asList(1, 3, 5, 7),
                 Arrays.asList(2, 5, 8, 9),
-                Arrays.asList(1, 6, 7, 12),  // 4
+                Arrays.asList(1, 6, 12),  // 4
                 Arrays.asList(2, 3, 8, 13),
                 Arrays.asList(4, 10, 11, 12),
                 Arrays.asList(1, 2, 12, 13),
@@ -101,7 +101,7 @@ public enum DominatingSetVariation implements IProblemVariation {
         @Override
         public double getErrorTolerancePercent(OptimizationStrategyType opt) {
             return getErrorTolerancePercent(opt, new double[] {
-                    4.0, 1.0, 1.0, 12.0,   1.0,   1.0,  1.0, 1.0
+                    4.0, 1.0, 1.0, 12.0,   1.0,   2.0,  2.0, 1.0
             });
         }
     };

@@ -37,7 +37,7 @@ public enum OptimizationStrategyType {
             return new HillClimbingStrategy(optimizee);
         }
     },
-    SIMULATED_ANNEALING ("Marches in the general direction of improvement, but can excape local optima.") {
+    SIMULATED_ANNEALING ("Marches in the general direction of improvement, but can escape local optima.") {
         @Override
         public OptimizationStrategy getStrategy(Optimizee optimizee, double fitnessRange) {
             SimulatedAnnealingStrategy strategy = new SimulatedAnnealingStrategy(optimizee);

@@ -26,7 +26,6 @@ public abstract class OptimizationStrategy {
     /** listen for optimization changed events. useful for debugging.  */
     protected OptimizationListener listener_;
 
-
     /**
      * Constructor
      * @param optimizee the thing to be optimized.
@@ -49,13 +48,11 @@ public abstract class OptimizationStrategy {
     }
 
     /**
-     *
      * @param initialParams the initial guess at the solution.
      * @param fitnessRange the approximate absolute value of the fitnessRange.
      * @return optimized parameters.
      */
     public abstract ParameterArray doOptimization(ParameterArray initialParams, double fitnessRange);
-
 
     public void setListener(OptimizationListener listener) {
         listener_ = listener;

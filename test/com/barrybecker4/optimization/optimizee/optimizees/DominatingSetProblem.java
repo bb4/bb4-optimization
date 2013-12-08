@@ -1,4 +1,4 @@
-/** Copyright by Barry G. Becker, 2000-2011. Licensed under MIT License: http://www.opensource.org/licenses/MIT  */
+/** Copyright by Barry G. Becker, 2013. Licensed under MIT License: http://www.opensource.org/licenses/MIT  */
 package com.barrybecker4.optimization.optimizee.optimizees;
 
 import com.barrybecker4.optimization.Optimizer;
@@ -61,7 +61,6 @@ public class DominatingSetProblem extends OptimizeeProblem {
     public double getFitnessRange() {
         return variation_.getFitnessRange();
     }
-
 
     /**
      * This finds the solution for the above optimization problem.
