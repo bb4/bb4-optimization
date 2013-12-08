@@ -21,7 +21,7 @@ public enum TravelingSalesmanVariation implements IProblemVariation {
     SIMPLE {
         /**
          * Trivial example.
-         * There are three cities, A, B, C. This is the adjacency cost matrix.
+         * There are 4 cities, A, B, C, C. This is the adjacency cost matrix.
          */
         private final double[][] COST_MATRIX =  {
                 {0, 3, 2, 1},
@@ -41,19 +41,21 @@ public enum TravelingSalesmanVariation implements IProblemVariation {
         }
 
         public PermutedParameterArray getExactSolution() {
-            PermutedParameterArray solution =  createSolution(new int[] {0, 2, 1, 3});
-            solution.setFitness(getShortestPathLength());
+            PermutedParameterArray solution = createSolution(new int[] {0, 2, 1, 3});
+            solution.setFitness(0);
             return solution;
         }
 
         @Override
         public double getFitnessRange() {
-            return 8.0;
+            return 9.0;
         }
 
         @Override
-        public double evaluateFitness(ParameterArray a) {
-            return getShortestPathLength() - computeCost(a, COST_MATRIX);
+        public double evaluateFitness(ParameterArray paramArray) {
+            double c = computeCost(paramArray, COST_MATRIX) - getShortestPathLength();
+            System.out.println("cost for " + paramArray + " is " + c);
+            return c;
         }
 
         @Override
@@ -89,7 +91,7 @@ public enum TravelingSalesmanVariation implements IProblemVariation {
 
         public PermutedParameterArray getExactSolution() {
             PermutedParameterArray solution = createSolution(new int[] {2, 4, 0, 1, 3});
-            solution.setFitness(getShortestPathLength());
+            solution.setFitness(0);
             return solution;
         }
 
@@ -100,7 +102,7 @@ public enum TravelingSalesmanVariation implements IProblemVariation {
 
         @Override
         public double evaluateFitness(ParameterArray a) {
-            return getShortestPathLength() - computeCost(a, COST_MATRIX);
+            return computeCost(a, COST_MATRIX) - getShortestPathLength();
         }
 
         @Override
@@ -120,9 +122,11 @@ public enum TravelingSalesmanVariation implements IProblemVariation {
         int num = this.getNumCities();
         IntegerParameter[] params = new IntegerParameter[num];
         for (int i=0; i<num; i++) {
-            params[i] = new IntegerParameter(i, 0, num-1, "p" + i);
+            params[i] = new IntegerParameter(i, 0, num - 1, "p" + i);
         }
-        return new PermutedParameterArray(params);
+        ParameterArray guess = new PermutedParameterArray(params);
+        guess.setFitness(10000000);
+        return guess;
     }
 
     /** Approximate value of maxCost - minCost */
@@ -153,7 +157,7 @@ public enum TravelingSalesmanVariation implements IProblemVariation {
             lastLocation = currentLocation;
         }
         // and back home again
-        totalCost +=  matrix[(int)lastLocation.getValue()][(int)params.get(0).getValue()];
+        totalCost += matrix[(int)lastLocation.getValue()][(int)params.get(0).getValue()];
         return totalCost ;
     }
 
@@ -181,7 +185,7 @@ public enum TravelingSalesmanVariation implements IProblemVariation {
     }
 
     /**
-     * Creat the solution based on the ordered list of cities.
+     * Create the solution based on the ordered list of cities.
      * @param cityList optimal ordering of city indices.
      * @return optimal solution (to compare against at the end of the test).
      */

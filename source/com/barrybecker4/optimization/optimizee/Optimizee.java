@@ -28,7 +28,7 @@ public interface Optimizee {
      *  Attributes a measure of fitness to the specified set of parameters.
      *  This method must return a value greater than or equal to 0.
      *  This method is used if evaluateByComparison returns false.
-     *  Higher values imply better fitness.
+     *  Zero is considered optimal. Higher values imply lesser fitness.
      *  @param params the set of parameters to misc
      *  @return the fitness measure. The higher the better
      */

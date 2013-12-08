@@ -67,8 +67,8 @@ public abstract class OptimizationStrategy {
      */
     protected boolean isOptimalFitnessReached(ParameterArray currentBest) {
         boolean optimalFitnessReached = false;
-        if (optimizee_.getOptimalFitness() > 0 && !optimizee_.evaluateByComparison()) {
-             optimalFitnessReached = currentBest.getFitness() >= optimizee_.getOptimalFitness();
+        if (optimizee_.getOptimalFitness() >= 0 && !optimizee_.evaluateByComparison()) {
+             optimalFitnessReached = currentBest.getFitness() <= optimizee_.getOptimalFitness();
         }
         return optimalFitnessReached;
     }

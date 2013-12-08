@@ -91,7 +91,7 @@ public class SimulatedAnnealingStrategy extends OptimizationStrategy {
              do {
                  currentParams = findNeighbor(currentParams, ct, temperature);
 
-                 if (currentParams.getFitness() > bestParams.getFitness()) {
+                 if (currentParams.getFitness() < bestParams.getFitness()) {
                      bestParams = currentParams.copy();
                      notifyOfChange(bestParams);
                  }
@@ -134,7 +134,7 @@ public class SimulatedAnnealingStrategy extends OptimizationStrategy {
         else {
             newFitness = optimizee_.evaluateFitness(newParams);
             newParams.setFitness(newFitness);
-            deltaFitness = newFitness - params.getFitness();
+            deltaFitness = params.getFitness() - newFitness;
         }
 
         double probability = Math.pow(Math.E, tempMax_ * deltaFitness / temperature);

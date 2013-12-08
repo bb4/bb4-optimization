@@ -22,15 +22,15 @@ public class AnalyticFunctionConsts {
 
     public static final ParameterArray EXACT_SOLUTION = new NumericParameterArray(EXACT_SOLUTION_PARAMS);
     static {
-        EXACT_SOLUTION.setFitness(1001.0);
+        EXACT_SOLUTION.setFitness(0.0);
     }
 
     // define the initialGuess in some bounded region of the 2-dimensional search space.
-    private static final double[] vals    = {  6.81,  7.93};   // initialGuess
-    private static final double[] minVals = {-10.0, -10.0};
-    private static final double[] maxVals = { 10.0,  10.0};
-    private static final String[] names   = {"p1",   "p2"};
-    public static final ParameterArray INITIAL_GUESS = new NumericParameterArray(vals, minVals, maxVals, names);
+    private static final double[] VALUES = {  6.81,  7.93};   // initialGuess
+    private static final double[] MIN_VALS = {-10.0, -10.0};
+    private static final double[] MAX_VALS = { 10.0,  10.0};
+    private static final String[] PARAM_NAMES = {"p1",   "p2"};
+    public static final ParameterArray INITIAL_GUESS = new NumericParameterArray(VALUES, MIN_VALS, MAX_VALS, PARAM_NAMES);
 
 
     public static final double BASE_TOLERANCE = 0.0002;

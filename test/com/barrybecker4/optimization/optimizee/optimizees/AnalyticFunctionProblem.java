@@ -47,12 +47,6 @@ public class AnalyticFunctionProblem extends OptimizeeProblem {
         return false;
     }
 
-    // not used
-    @Override
-    public double compareFitness(ParameterArray a, ParameterArray b) {
-        return 0.0;
-    }
-
     /**
      * @param a the position on the parabolic surface given the specified values of p1 and p2
      * @return fitness value

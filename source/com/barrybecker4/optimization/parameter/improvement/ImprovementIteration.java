@@ -79,6 +79,9 @@ public class ImprovementIteration {
     }
 
     /**
+     * @param optimizee the thing being optimized
+     * @param params the current parameters
+     * @param testParams the new set of parameters being evaluated.
      * @return the incremental change in fitness
      */
     private double findFitnessDelta(Optimizee optimizee, ParameterArray params, ParameterArray testParams) {
@@ -87,7 +90,7 @@ public class ImprovementIteration {
             incFitness = optimizee.compareFitness( testParams, params );
         }
         else{
-            incFitness = optimizee.evaluateFitness( testParams );
+            incFitness = params.getFitness() - optimizee.evaluateFitness( testParams );
         }
         return incFitness;
     }

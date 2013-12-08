@@ -280,7 +280,7 @@ public class VariableLengthIntArray extends AbstractParameterArray {
                     fitnessDelta = optimizee.compareFitness(nbr, this);
                 } else {
                     double fitness = optimizee.evaluateFitness(nbr);
-                    fitnessDelta = fitness - getFitness();
+                    fitnessDelta = getFitness() - fitness;
                     nbr.setFitness(fitness);
                 }
 

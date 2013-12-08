@@ -27,7 +27,6 @@ public abstract class OptimizerTestCase  {
 
     @Test
     public void testGlobalSampling() {
-
         doTest(OptimizationStrategyType.GLOBAL_SAMPLING);
     }
 
@@ -89,8 +88,8 @@ public abstract class OptimizerTestCase  {
                 error < errorThresh);
 
         System.out.println( "\n************************************************************************" );
-        System.out.println( "The solution to the Problem using "+optType+" is :\n"+solution );
-        System.out.println( "Which evaluates to: "+ optimizer.getOptimizee().evaluateFitness(solution));
+        System.out.println( "The solution to the Problem using " + optType + " is :\n" + solution );
+        System.out.println( "Which evaluates to: " + optimizer.getOptimizee().evaluateFitness(solution));
     }
 
 }

@@ -89,7 +89,7 @@ public class GeneticSearchStrategy extends OptimizationStrategy {
          desiredPopulationSize_ = params.getSamplePopulationSize();
 
          // create an initial population based on params and POPULATION_SIZE-1 other random candidate solutions.
-         List<ParameterArray> population = new LinkedList<ParameterArray>();
+         List<ParameterArray> population = new LinkedList<>();
          population.add(params);
 
          for (int i = 1; i < desiredPopulationSize_; i++) {
@@ -133,7 +133,7 @@ public class GeneticSearchStrategy extends OptimizationStrategy {
             notifyOfChange(currentBest);
             ct++;
 
-        } while ( (deltaFitness > improvementEpsilon_ || optimizee_.getOptimalFitness() > 0 )
+        } while ( (deltaFitness > improvementEpsilon_ )
                 && !isOptimalFitnessReached(currentBest)
                 && (ct < MAX_ITERATIONS));
 
@@ -158,8 +158,8 @@ public class GeneticSearchStrategy extends OptimizationStrategy {
     private double computeFitnessDelta(ParameterArray params, ParameterArray lastBest,
                                        ParameterArray currentBest, int ct) {
         double deltaFitness;
-        deltaFitness = (currentBest.getFitness() - lastBest.getFitness());
-        assert (deltaFitness >=0) :
+        deltaFitness = (lastBest.getFitness() - currentBest.getFitness());
+        assert (deltaFitness >= 0) :
                 "We must never get worse in a new generation. Old fitness="
                         + lastBest.getFitness() + " New Fitenss = " + currentBest.getFitness() + ".";
 
@@ -171,7 +171,7 @@ public class GeneticSearchStrategy extends OptimizationStrategy {
     }
 
     /**
-     * Remove all but the best candidates
+     * Remove all but the best candidates. Better candidates have lower values.
      * @param population the whole population. It will be reduced in size.
      * @return the number of members that were retained.
      */
@@ -179,12 +179,11 @@ public class GeneticSearchStrategy extends OptimizationStrategy {
 
         // sort the population according to the fitness of members.
         Collections.sort(population);
-        Collections.reverse(population);
 
         // throw out the bottom CULL_FACTOR*desiredPopulationSize_ members - keeping the cream of the crop.
         // then replace those culled with unary variations of those (now parents) that remain.
         // @@ add option to do cross-over variations too.
-        int keepSize = Math.max(1,  (int)(population.size() *(1.0 - CULL_FACTOR)));
+        int keepSize = Math.max(1, (int)(population.size() * (1.0 - CULL_FACTOR)));
 
         int size = population.size();
         for (int j = size-1; j >= keepSize; j--) {
@@ -195,7 +194,7 @@ public class GeneticSearchStrategy extends OptimizationStrategy {
 
     /**
      * Replace the members of the population that were removed with variations of the ones that we kept.
-     * @param population
+     * @param population population
      * @param keepSize the number that were kept
      */
     private void replaceCulledWithKeeperVariants(List<ParameterArray> population, int keepSize) {
@@ -209,7 +208,7 @@ public class GeneticSearchStrategy extends OptimizationStrategy {
 
             // do the best one twice to avoid terminating too quickly
             // in the event that we got a very good fitness score on an early iteration.
-            if (keeperIndex == keepSize-1) {
+            if (keeperIndex == keepSize - 1) {
                 keeperIndex = 0;
             }
             ParameterArray p = population.get(keeperIndex);
@@ -249,9 +248,8 @@ public class GeneticSearchStrategy extends OptimizationStrategy {
             } else {
                 fitness = optimizee_.evaluateFitness(p);
             }
-            System.out.println("f="+fitness);
             p.setFitness(fitness);
-            if (fitness > bestFitness.getFitness()) {
+            if (fitness < bestFitness.getFitness()) {
                 bestFitness = p;
                 // show it if better than what we had before
                 notifyOfChange(p);

@@ -35,6 +35,11 @@ public abstract class OptimizeeProblem implements Optimizee {
         return 0;
     }
 
+    @Override
+    public double compareFitness(ParameterArray a, ParameterArray b) {
+        return 0.0;
+    }
+
     /**
      *
      * @return  approximate range of fitness values (usually 0 to this number).

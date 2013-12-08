@@ -66,12 +66,6 @@ public class SevenElevenProblem extends OptimizeeProblem {
         return false;
     }
 
-    // not used
-    @Override
-    public double compareFitness(ParameterArray a, ParameterArray b) {
-        return 0.0;
-    }
-
     @Override
     public String getName() {
         return "Zeven Eleven Problem";
@@ -79,9 +73,11 @@ public class SevenElevenProblem extends OptimizeeProblem {
     /**
      *  The choice of fitness function here is somewhat arbitrary.
      *  I chose to use:
-     *    -abs( p1 + p2 + p3 + p4 - 711)^3  - abs(711000000 - p1 * p2 * p3 * p4)
+     *    -bs( p1 + p2 + p3 + p4 - 711)^3  + abs(711000000 - p1 * p2 * p3 * p4)
      *    or
-     *    -abs(711 - sum) - abs(711000000 - product)/1000000
+     *    abs(711 - sum) + abs(711000000 - product)/1000000
+     *  This is 0 when the constraints are satisfied.
+     *
      * @param a the position in the search space given values of p1, p2, p4, p4.
      * @return fitness value
      */
@@ -91,7 +87,7 @@ public class SevenElevenProblem extends OptimizeeProblem {
         double sum = a.get(0).getValue() + a.get(1).getValue() + a.get(2).getValue() + a.get(3).getValue();
         double product = a.get(0).getValue() * a.get(1).getValue() * a.get(2).getValue() * a.get(3).getValue();
 
-        return -Math.abs(711.0 - sum) - Math.abs(711000000.0 - product) / 1000000.0;
+        return Math.abs(711.0 - sum) + Math.abs(711000000.0 - product) / 1000000.0;
     }
 
 
@@ -109,6 +105,7 @@ public class SevenElevenProblem extends OptimizeeProblem {
     public double getFitnessRange() {
         return FITNESS_RANGE;
     }
+
     /**
      * This finds the solution for the above optimization problem.
      */
@@ -123,9 +120,6 @@ public class SevenElevenProblem extends OptimizeeProblem {
         ParameterArray solution =
                 optimizer.doOptimization(OptimizationStrategyType.GLOBAL_SAMPLING, initialGuess, FITNESS_RANGE);
 
-        System.out.println( "\n************************************************************************" );
-        System.out.println( "The solution to the 7-11 Test Problem is :\n"+solution );
-        System.out.println( "Which evaluates to: "+ problem.evaluateFitness(solution));
-        System.out.println( "We expected to get exactly 711000000:  p1-4 = {316, 125, 120, 150} " );
+        showSolution(problem, solution);
     }
 }

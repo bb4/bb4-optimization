@@ -16,13 +16,11 @@ import static com.barrybecker4.optimization.optimizee.optimizees.AnalyticFunctio
 public enum AnalyticVariation implements IProblemVariation {
 
     PARABOLA {
-        /**
-         * Smooth inverted parabola with max at 1000.0.
-         */
+        /** Smooth parabola with min at 0.0 at P1, P2 */
         @Override
         public double evaluateFitness(ParameterArray a) {
-            return  1000 + ((1.0 - Math.pow(P1 - a.get(0).getValue(), 2)
-                                 - Math.pow(P2 - a.get(1).getValue(), 2)));
+            return  (Math.pow(P1 - a.get(0).getValue(), 2)
+                   + Math.pow(P2 - a.get(1).getValue(), 2));
         }
 
         @Override
@@ -130,8 +128,12 @@ public enum AnalyticVariation implements IProblemVariation {
         double p2 = 1.975;
         System.out.println("f("+p1+", "+ p2 +")="
                 + PARABOLA.evaluateFitness(NumericParameterArrayTest.createParamArray(p1, p2)));
+        for (AnalyticVariation variation : AnalyticVariation.values())  {
+            System.out.println(variation.name() + " f("+P1+", "+ P2 +")="
+                + variation.evaluateFitness(NumericParameterArrayTest.createParamArray(P1, P2)));
+        }
 
-        //Which evaluates to: 1001.4977043582815
+        //Which evaluates to: 1.0011111
     }
 
 

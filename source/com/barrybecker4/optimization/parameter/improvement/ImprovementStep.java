@@ -113,10 +113,10 @@ public class ImprovementStep {
         }
         else {
             currentParams.setFitness(optimizee_.evaluateFitness(currentParams));
-            if (currentParams.getFitness() <= oldFitness) {
+            if (currentParams.getFitness() >= oldFitness) {
                 improved = false;
             }
-            improvement = currentParams.getFitness() - oldFitness;
+            improvement =  oldFitness - currentParams.getFitness();
         }
 
         if (!improved) {

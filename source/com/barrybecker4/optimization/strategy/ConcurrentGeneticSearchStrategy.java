@@ -43,10 +43,9 @@ public class ConcurrentGeneticSearchStrategy extends GeneticSearchStrategy {
     protected ParameterArray evaluatePopulation(List<ParameterArray> population, ParameterArray previousBest) {
         ParameterArray bestFitness = previousBest;
 
-        Parallelizer<EvaluationWorker> parallelizer =
-                new Parallelizer<EvaluationWorker>();
+        Parallelizer<EvaluationWorker> parallelizer = new Parallelizer<>();
 
-        List<Runnable> workers = new ArrayList<Runnable>(population.size());
+        List<Runnable> workers = new ArrayList<>(population.size());
 
         for (ParameterArray candidate : population) {
             workers.add(new EvaluationWorker(candidate, previousBest));
@@ -59,7 +58,7 @@ public class ConcurrentGeneticSearchStrategy extends GeneticSearchStrategy {
 
             EvaluationWorker eworker = (EvaluationWorker)worker;
             double fitness = eworker.getResult();
-            if (fitness > bestFitness.getFitness()) {
+            if (fitness < bestFitness.getFitness()) {
                 bestFitness = eworker.getCandidate();
             }
         }
@@ -98,7 +97,6 @@ public class ConcurrentGeneticSearchStrategy extends GeneticSearchStrategy {
             return candidate;
         }
     }
-
 }
 
 

@@ -62,7 +62,7 @@ public class GlobalSampleStrategy extends OptimizationStrategy {
     public ParameterArray doOptimization( ParameterArray params, double fitnessRange ) {
 
         List<ParameterArray> samples = params.findGlobalSamples(numSamples_);
-        double bestFitness = -Double.MAX_VALUE;
+        double bestFitness = Double.MAX_VALUE;
         ParameterArray bestParams = params.copy();
 
         for (ParameterArray sample : samples) {
@@ -72,8 +72,10 @@ public class GlobalSampleStrategy extends OptimizationStrategy {
                 fitness = optimizee_.compareFitness( sample, params );
             else
                 fitness = optimizee_.evaluateFitness( sample );
+            sample.setFitness(fitness);
+
             //System.out.println( "key = " + hashKey + '\n' + testParams + "\n  fitness=" + fitness );
-            if ( fitness > bestFitness ) {
+            if ( fitness < bestFitness ) {
                 bestFitness = fitness;
                 notifyOfChange(sample);
                 bestParams = sample.copy();
@@ -83,5 +85,4 @@ public class GlobalSampleStrategy extends OptimizationStrategy {
         }
         return bestParams;
     }
-
 }

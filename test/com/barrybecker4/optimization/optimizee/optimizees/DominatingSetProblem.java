@@ -38,12 +38,6 @@ public class DominatingSetProblem extends OptimizeeProblem {
         return false;
     }
 
-    // not used
-    @Override
-    public double compareFitness(ParameterArray a, ParameterArray b) {
-        return 0.0;
-    }
-
     /**
      * Use the cost matrix for the TSP variation to determine this.
      * @return fitness value
