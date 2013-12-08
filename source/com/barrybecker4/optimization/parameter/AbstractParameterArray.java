@@ -4,7 +4,8 @@ package com.barrybecker4.optimization.parameter;
 import com.barrybecker4.common.format.FormatUtil;
 import com.barrybecker4.optimization.parameter.types.Parameter;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -18,7 +19,7 @@ public abstract class AbstractParameterArray implements ParameterArray {
     private static final int POPULATION_MAX = 4000;
 
     // change this to list instead of array
-    protected Parameter[] params_;
+    protected List<Parameter> params_;
 
     /** assign a fitness (evaluation value) to this set of parameters */
     private double fitness_ = 0;
@@ -31,7 +32,8 @@ public abstract class AbstractParameterArray implements ParameterArray {
      * @param params an array of params to initialize with.
      */
     public AbstractParameterArray(Parameter[] params) {
-        params_ = params;
+        params_ = new ArrayList<>();
+        Collections.addAll(params_, params);
     }
 
     /**
@@ -39,11 +41,7 @@ public abstract class AbstractParameterArray implements ParameterArray {
      * @param params list of parameters
      */
     public AbstractParameterArray(List<Parameter> params) {
-        int len = params.size();
-        params_ = new Parameter[len];
-        for (int i=0; i<len; i++) {
-            params_[i] = params.get(i);
-        }
+        params_ = params;
     }
 
     public int getSamplePopulationSize()  {
@@ -59,7 +57,7 @@ public abstract class AbstractParameterArray implements ParameterArray {
      * @return the number of parameters in the array.
      */
     public int size() {
-        return params_.length;
+        return params_.size();
     }
 
     public void setFitness(double value) {
@@ -74,9 +72,9 @@ public abstract class AbstractParameterArray implements ParameterArray {
      * @return a copy of ourselves.
      */
     public AbstractParameterArray copy() {
-        Parameter[] newParams = new Parameter[params_.length];
-        for ( int k = 0; k < params_.length; k++ ) {
-            newParams[k] = params_[k].copy();
+        List<Parameter> newParams = new ArrayList<>(size());
+        for ( int k = 0; k < size(); k++ ) {
+            newParams.add(get(k).copy());
         }
 
         AbstractParameterArray pa = createInstance();
@@ -91,15 +89,15 @@ public abstract class AbstractParameterArray implements ParameterArray {
      * @return the ith parameter in the array.
      */
     public Parameter get( int i ) {
-        return params_[i];
+        return params_.get(i);
     }
 
     public String toString() {
         StringBuilder sb = new StringBuilder("fitness = "+this.getFitness()+'\n');
-        sb.append("parameter[0] = ").append(params_[0].toString());
-        for ( int i = 1; i < params_.length; i++ ) {
+        sb.append("parameter[0] = ").append(get(0).toString());
+        for ( int i = 1; i < size(); i++ ) {
             sb.append( '\n' );
-            sb.append("parameter[").append(i).append("] = ").append(params_[i].toString()).append("; ");
+            sb.append("parameter[").append(i).append("] = ").append(get(i).toString()).append("; ");
         }
         return sb.toString();
     }
@@ -109,10 +107,10 @@ public abstract class AbstractParameterArray implements ParameterArray {
      */
     public String toCSVString() {
         StringBuilder sb = new StringBuilder("");
-        for ( int i = 0; i < params_.length-1; i++ ) {
-            sb.append(FormatUtil.formatNumber(params_[i].getValue())).append(", ");
+        for ( int i = 0; i < size()-1; i++ ) {
+            sb.append(FormatUtil.formatNumber(get(i).getValue())).append(", ");
         }
-        sb.append(FormatUtil.formatNumber(params_[params_.length - 1].getValue()) );
+        sb.append(FormatUtil.formatNumber(get(size() - 1).getValue()) );
         return sb.toString();
     }
 
@@ -134,11 +132,11 @@ public abstract class AbstractParameterArray implements ParameterArray {
         if (o == null || getClass() != o.getClass()) return false;
 
         AbstractParameterArray that = (AbstractParameterArray) o;
-        return Arrays.equals(params_, that.params_);
+        return params_.equals(that.params_);
     }
 
     @Override
     public int hashCode() {
-        return params_ != null ? Arrays.hashCode(params_) : 0;
+        return params_ != null ? params_.hashCode() : 0;
     }
 }

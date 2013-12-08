@@ -44,7 +44,7 @@ public class NumericParameterArray extends AbstractParameterArray {
     }
 
     /**
-     * Constructor if all the params are DoubleParameters
+     * Constructor if all the parameters are DoubleParameters
      * @param vals the values for each parameter.
      * @param minVals the minimum value allowed for each parameter respectively.
      * @param maxVals the maximum value allowed for each parameter respectively.
@@ -52,9 +52,9 @@ public class NumericParameterArray extends AbstractParameterArray {
      */
     public NumericParameterArray(double[] vals, double[] minVals, double[] maxVals, String names[]) {
         int len = vals.length;
-        params_ = new Parameter[len];
+        params_ = new ArrayList<>(len);
         for (int i=0; i<len; i++)  {
-            params_[i] = new DoubleParameter(vals[i], minVals[i], maxVals[i], names[i]);
+            params_.add(new DoubleParameter(vals[i], minVals[i], maxVals[i], names[i]));
         }
     }
 
@@ -191,10 +191,10 @@ public class NumericParameterArray extends AbstractParameterArray {
      * sqrt(sum of squares)
      */
     public double distance( ParameterArray pa )  {
-        assert ( params_.length == pa.size() );
+        assert ( size() == pa.size() );
         double sumOfSq = 0.0;
-        for ( int k = 0; k < params_.length; k++ ) {
-            double dif = pa.get( k ).getValue() - params_[k].getValue();
+        for ( int k = 0; k < size(); k++ ) {
+            double dif = pa.get( k ).getValue() - get(k).getValue();
             sumOfSq += dif * dif;
         }
         return Math.sqrt( sumOfSq );
@@ -206,18 +206,19 @@ public class NumericParameterArray extends AbstractParameterArray {
      */
     public void add( Vector vec ) {
 
-        assert ( vec.size() == params_.length): "Parameter vec has magnitude " + vec.size()+ ", expecting " + params_.length ;
-        for ( int i = 0; i < params_.length; i++ ) {
-            params_[i].setValue(params_[i].getValue() + vec.get(i));
-            if ( params_[i].getValue() > params_[i].getMaxValue() ) {
-                System.out.println( "Warning param " + params_[i].getName() +
-                        " is exceeding is maximum value. It is being pegged to that maximum of " + params_[i].getMaxValue() );
-                params_[i].setValue(params_[i].getMaxValue());
+        assert ( vec.size() == size()): "Parameter vec has magnitude " + vec.size()+ ", expecting " + size();
+        for ( int i = 0; i < size(); i++ ) {
+            Parameter param = get(i);
+            param.setValue(param.getValue() + vec.get(i));
+            if ( param.getValue() > param.getMaxValue() ) {
+                System.out.println( "Warning param " + param.getName() +
+                        " is exceeding is maximum value. It is being pegged to that maximum of " + param.getMaxValue() );
+                param.setValue(param.getMaxValue());
             }
-            if ( params_[i].getValue() < params_[i].getMinValue() ) {
-                System.out.println( "Warning param " + params_[i].getName() +
-                        " is exceeding is minimum value. It is being pegged to that minimum of " + params_[i].getMinValue() );
-                params_[i].setValue(params_[i].getMinValue());
+            if ( param.getValue() < param.getMinValue() ) {
+                System.out.println( "Warning param " + param.getName() +
+                        " is exceeding is minimum value. It is being pegged to that minimum of " + param.getMinValue() );
+                param.setValue(param.getMinValue());
             }
         }
     }
@@ -229,7 +230,7 @@ public class NumericParameterArray extends AbstractParameterArray {
      */
      public NumericParameterArray getRandomNeighbor(double radius) {
          NumericParameterArray nbr = this.copy();
-         for ( int k = 0; k < params_.length; k++ ) {
+         for ( int k = 0; k < size(); k++ ) {
              Parameter param = nbr.get(k);
              param.tweakValue(radius, MathUtil.RANDOM);
          }
@@ -242,14 +243,13 @@ public class NumericParameterArray extends AbstractParameterArray {
      */
     public NumericParameterArray getRandomSample() {
          NumericParameterArray nbr = this.copy();
-         for ( int k = 0; k < params_.length; k++ ) {
+         for ( int k = 0; k < size(); k++ ) {
              Parameter newPar = nbr.get(k);
              newPar.setValue(newPar.getMinValue() + MathUtil.RANDOM.nextDouble() * newPar.getRange());
              assert (newPar.getValue() < newPar.getMaxValue() && newPar.getValue() > newPar.getMinValue()):
                      "newPar "+newPar.getValue() + " not between " + newPar.getMinValue()
                              + " and  " + newPar.getMaxValue();
          }
-
          return nbr;
     }
 

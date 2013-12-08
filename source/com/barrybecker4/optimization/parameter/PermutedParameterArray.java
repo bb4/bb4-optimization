@@ -2,12 +2,11 @@
 package com.barrybecker4.optimization.parameter;
 
 import com.barrybecker4.common.math.MathUtil;
-import com.barrybecker4.optimization.parameter.improvement.Improvement;
 import com.barrybecker4.optimization.optimizee.Optimizee;
+import com.barrybecker4.optimization.parameter.improvement.Improvement;
 import com.barrybecker4.optimization.parameter.types.Parameter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,6 +33,14 @@ public class PermutedParameterArray extends AbstractParameterArray {
         super(params);
     }
 
+    /**
+     * Constructor
+     * @param params an list of params to initialize with.
+     */
+    public PermutedParameterArray(List<Parameter> params) {
+        super(params);
+    }
+
     @Override
     protected PermutedParameterArray createInstance() {
         return new PermutedParameterArray();
@@ -44,9 +51,9 @@ public class PermutedParameterArray extends AbstractParameterArray {
         int len = size();
 
         for (int i=0; i<len/2; i++) {
-            Parameter temp = paramCopy.params_[i];
-            paramCopy.params_[i] = paramCopy.params_[len - i - 1];
-            paramCopy.params_[len - i - 1] = temp;
+            Parameter temp = paramCopy.params_.get(i);
+            paramCopy.params_.set(i, paramCopy.params_.get(len - i - 1));
+            paramCopy.params_.set(len - i - 1, temp);
         }
         return paramCopy;
     }
@@ -59,7 +66,7 @@ public class PermutedParameterArray extends AbstractParameterArray {
      * @return the distance between this parameter array and another.
      */
     public double distance( ParameterArray pa )  {
-        assert ( params_.length == pa.size() );
+        assert ( size() == pa.size() );
 
         ParameterArray paReverse = ((PermutedParameterArray) pa).reverse();
         return Math.min(difference(pa), difference(paReverse));
@@ -73,18 +80,14 @@ public class PermutedParameterArray extends AbstractParameterArray {
     public double difference(ParameterArray pa)  {
 
         List<Integer> runLengths = new LinkedList<>();
-        int len = params_.length;
+        int len = size();
         int i = 0;
 
         while (i < len) {
             int runLength = determineRunLength(pa, len, i, runLengths);
             i += runLength;
         }
-        //System.out.println("runLengths="+ runLengths);
-        double diff = calcDistance(runLengths);
-        //System.out.println("diff="+ diff);
-
-        return diff;
+        return calcDistance(runLengths);
     }
 
     /**
@@ -167,11 +170,10 @@ public class PermutedParameterArray extends AbstractParameterArray {
             while (index2 == index1) {
                 index2 = MathUtil.RANDOM.nextInt(size());
             }
-            Parameter temp =  nbr.params_[index1];
-            nbr.params_[index1] = nbr.params_[index2];
-            nbr.params_[index2] = temp;
+            Parameter temp =  nbr.params_.get(index1);
+            nbr.params_.set(index1, nbr.params_.get(index2));
+            nbr.params_.set(index2, temp);
         }
-
         return nbr;
     }
 
@@ -250,13 +252,12 @@ public class PermutedParameterArray extends AbstractParameterArray {
      */
     public ParameterArray getRandomSample() {
 
-        List<Parameter> theParams = Arrays.asList(params_);
+        List<Parameter> theParams = new ArrayList<>(params_);
         Collections.shuffle(theParams, MathUtil.RANDOM);
 
-        Parameter[] newParams = new Parameter[params_.length];
-        for ( int k = 0; k < params_.length; k++ ) {
-            Parameter newParam = theParams.get(k).copy();
-            newParams[k] = newParam;
+        List<Parameter> newParams = new ArrayList<>(size());
+        for (Parameter p : theParams) {
+            newParams.add(p.copy());
         }
 
         return new PermutedParameterArray(newParams);

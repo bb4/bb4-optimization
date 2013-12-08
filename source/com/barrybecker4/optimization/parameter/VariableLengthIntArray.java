@@ -25,7 +25,6 @@ public class VariableLengthIntArray extends AbstractParameterArray {
     /** the maximum number of params in the array that is possible */
     private int maxLength;
 
-
     /** Default constructor */
     protected VariableLengthIntArray() {}
 
@@ -49,11 +48,11 @@ public class VariableLengthIntArray extends AbstractParameterArray {
      * There are two ways in which instance can differ, and the weighting assigned to each may depend on the problem.
      *  - the length of the parameter array
      *  - the set of values in the parameter array.
-     *  Generally, the distance is greater if the number of params is different.
+     * Generally, the distance is greater the greater the number of parameters that is different.
      * @return the distance between this parameter array and another.
      */
-    public double distance( ParameterArray pa )  {
-        int thisLength = params_.length;
+    public double distance(ParameterArray pa)  {
+        int thisLength = size();
         int thatLength = pa.size();
 
         List<Integer> theseValues = new ArrayList<>(thisLength);
@@ -159,11 +158,11 @@ public class VariableLengthIntArray extends AbstractParameterArray {
     private void removeRandomParam(VariableLengthIntArray nbr) {
         int indexToRemove = MathUtil.RANDOM.nextInt(size());
         assert nbr.size() > 0;
-        Parameter[] newParams = new Parameter[nbr.size()-1];
-        int ct = 0;
+        List<Parameter> newParams = new ArrayList<Parameter>(nbr.size()-1);
+
         for (int i=0; i < nbr.size(); i++) {
             if (i != indexToRemove) {
-                newParams[ct++] = nbr.get(i);
+                newParams.add(nbr.get(i));
             }
         }
         nbr.params_ = newParams;
@@ -173,25 +172,23 @@ public class VariableLengthIntArray extends AbstractParameterArray {
 
         List<Integer> freeNodes = getFreeNodes(nbr);
         int newSize = nbr.size() + 1;
-        int ct = 0;
         assert newSize <= maxLength;
-        Parameter[] newParams = new Parameter[newSize];
+        List<Parameter> newParams = new ArrayList<>(newSize);
         for (Parameter p : nbr.params_) {
-            newParams[ct++] = p;
+            newParams.add(p);
         }
         int value = freeNodes.get(MathUtil.RANDOM.nextInt(freeNodes.size()));
-        newParams[ct] = new IntegerParameter(value, 0, maxLength-1, "p" + value);
+        newParams.add(new IntegerParameter(value, 0, maxLength - 1, "p" + value));
         nbr.params_ = newParams;
     }
 
     /**
      * select num free nodes randomly and and swap them with num randomly selected marked nodes.
-     * @param numNodesToMove
+     * @param numNodesToMove number of nodes to move to new locations
      * @param nbr neighbor parameter array
      */
     private void moveNodes(int numNodesToMove, VariableLengthIntArray nbr) {
         List<Integer> freeNodes = getFreeNodes(nbr);
-
         List<Integer> swapNodes = selectRandomNodes(numNodesToMove, freeNodes);
 
         for (int i=0; i<numNodesToMove; i++) {
