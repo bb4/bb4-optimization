@@ -85,7 +85,7 @@ public abstract class OptimizerTestCase  {
                 + ". \nError = " + error + "\n The Test Solution was " + solution
                 + "\n but we expected to get something very close to the exact solution:\n "
                 + problem.getExactSolution(),
-                error < errorThresh);
+                error <= errorThresh);
 
         System.out.println( "\n************************************************************************" );
         System.out.println( "The solution to the Problem using " + optType + " is :\n" + solution );

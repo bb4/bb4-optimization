@@ -23,7 +23,7 @@ public class SimulatedAnnealingStrategy extends OptimizationStrategy {
     private static final double TEMP_DROP_FACTOR = 0.5;
 
     /** the client should really set the tempMax using setTemperatureMax before running. */
-    private static final double DEFAULT_TEMP_MAX = 10000;
+    private static final double DEFAULT_TEMP_MAX = 1000;
     private double tempMax_ = DEFAULT_TEMP_MAX;
 
     /** deterministic randomness */

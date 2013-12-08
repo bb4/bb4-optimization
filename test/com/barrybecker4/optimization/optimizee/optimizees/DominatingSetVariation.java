@@ -11,10 +11,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.barrybecker4.optimization.optimizee.optimizees.AnalyticFunctionConsts.BASE_TOLERANCE;
-import static com.barrybecker4.optimization.optimizee.optimizees.AnalyticFunctionConsts.GLOB_SAMP_TOL;
-import static com.barrybecker4.optimization.optimizee.optimizees.AnalyticFunctionConsts.RELAXED_TOL;
-
 /**
  * An enum for different sorts of dominating set problems.
  * http://en.wikipedia.org/wiki/Dominating_set
@@ -30,13 +26,12 @@ public enum DominatingSetVariation implements IProblemVariation {
          */
         private final List<List<Integer>> ADJACENCIES = Arrays.asList(
                 Arrays.asList(1, 2),
-                Arrays.asList(0, 1),
-                Arrays.asList(0, 2)
+                Arrays.asList(0, 2),
+                Arrays.asList(0, 1)
         );
 
-        @Override
-        public int getNumNodes() {
-            return ADJACENCIES.size();
+        protected List<List<Integer>> getAdjacencies() {
+            return ADJACENCIES;
         }
 
         public ParameterArray getExactSolution() {
@@ -51,18 +46,12 @@ public enum DominatingSetVariation implements IProblemVariation {
         }
 
         @Override
-        public double evaluateFitness(ParameterArray a) {
-            return computeCost(a, ADJACENCIES);
-        }
-
-        @Override
         public double getErrorTolerancePercent(OptimizationStrategyType opt) {
             return getErrorTolerancePercent(opt, new double[] {
-                    GLOB_SAMP_TOL, BASE_TOLERANCE, BASE_TOLERANCE, 0.04,  RELAXED_TOL,  0.042,   0.042, BASE_TOLERANCE
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
             });
         }
     },
-
 
     TYPICAL {
         private final List<List<Integer>> ADJACENCIES = Arrays.asList(
@@ -94,9 +83,8 @@ public enum DominatingSetVariation implements IProblemVariation {
                 Arrays.asList(0, 23, 24)
         );
 
-        @Override
-        public int getNumNodes() {
-            return ADJACENCIES.size();
+        protected List<List<Integer>> getAdjacencies() {
+            return ADJACENCIES;
         }
 
         public ParameterArray getExactSolution() {
@@ -107,25 +95,24 @@ public enum DominatingSetVariation implements IProblemVariation {
 
         @Override
         public double getFitnessRange() {
-            return 40.0;
-        }
-
-        @Override
-        public double evaluateFitness(ParameterArray a) {
-            return computeCost(a, ADJACENCIES);
+            return 50.0;
         }
 
         @Override
         public double getErrorTolerancePercent(OptimizationStrategyType opt) {
             return getErrorTolerancePercent(opt, new double[] {
-                    GLOB_SAMP_TOL, BASE_TOLERANCE, BASE_TOLERANCE, 0.04,  RELAXED_TOL,  0.042,   0.042, BASE_TOLERANCE
+                    4.0, 1.0, 1.0, 12.0,   1.0,   1.0,  1.0, 1.0
             });
         }
     };
 
 
     /** @return the number of nodes in the graph */
-    public abstract int getNumNodes();
+    public int getNumNodes() {
+        return getAdjacencies().size();
+    }
+
+    protected abstract List<List<Integer>> getAdjacencies();
 
     /**
      * Some random initial set of marked nodes.
@@ -138,13 +125,21 @@ public enum DominatingSetVariation implements IProblemVariation {
         for (int i=0; i<num; i+=2) {
             params.add(new IntegerParameter(i, 0, num-1, "p" + i));
         }
-        ParameterArray pa = new VariableLengthIntArray(params, getNumNodes());
-        pa.setFitness(1);
+        VariableLengthIntArray pa = new VariableLengthIntArray(params, getNumNodes());
+        pa.setFitness(params.size() + getNumNotWithinOneHop(getMarked(pa), getAdjacencies()));
         return pa;
     }
 
+    private List<Integer> getMarked(VariableLengthIntArray pa) {
+        List<Integer> marked = new ArrayList<>(pa.size());
+        for (int i=0; i<pa.size(); i++) {
+           marked.add((int)pa.get(i).getValue());
+        }
+        return marked;
+    }
+
     public double getScore(List<Integer> marked, List<List<Integer>> adjacencies) {
-        return marked.size() + getNumNotWithinOneHop(marked, adjacencies);
+        return marked.size() + 0.5 * getNumNotWithinOneHop(marked, adjacencies);
     }
 
     protected int getNumNotWithinOneHop(List<Integer> marked, List<List<Integer>> adjacencies) {
@@ -174,10 +169,12 @@ public enum DominatingSetVariation implements IProblemVariation {
 
     /**
      * Evaluate fitness for the analytics function.
-     * @param a the position on the parabolic surface given the specified values of p1 and p2
+     * @param pa param array
      * @return fitness value
      */
-    public abstract double evaluateFitness(ParameterArray a);
+    public double evaluateFitness(ParameterArray pa) {
+        return computeCost(pa, getAdjacencies());
+    }
 
     /** Approximate value of maxCost - minCost */
     public abstract double getFitnessRange();

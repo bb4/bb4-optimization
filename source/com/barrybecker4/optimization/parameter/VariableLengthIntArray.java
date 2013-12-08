@@ -8,7 +8,6 @@ import com.barrybecker4.optimization.parameter.types.IntegerParameter;
 import com.barrybecker4.optimization.parameter.types.Parameter;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,6 +20,9 @@ import java.util.Set;
  *  @author Barry Becker
  */
 public class VariableLengthIntArray extends AbstractParameterArray {
+
+    /** don't try more than this many times to find improvement on any iteration */
+    private static final int MAX_TRIES = 1000;
 
     /** the maximum number of params in the array that is possible */
     private int maxLength;
@@ -52,6 +54,9 @@ public class VariableLengthIntArray extends AbstractParameterArray {
      * @return the distance between this parameter array and another.
      */
     public double distance(ParameterArray pa)  {
+        // if the fitness scores are the same, they are equivalent for all intents and purposes.
+        return Math.abs(pa.getFitness() - getFitness());
+        /*
         int thisLength = size();
         int thatLength = pa.size();
 
@@ -71,6 +76,7 @@ public class VariableLengthIntArray extends AbstractParameterArray {
         int valueDifferences = calcValueDifferences(theseValues, thoseValues);
 
         return Math.abs(thisLength - thatLength) + valueDifferences;
+        */
     }
 
     /**
@@ -122,7 +128,7 @@ public class VariableLengthIntArray extends AbstractParameterArray {
 
         if (size() <= 1) return this;
 
-        double probAddRemove = 1.0 -  2.0/(2.0 + radius);
+        double probAddRemove = 1.0/(1.0 + radius);
         boolean add = false;
         boolean remove = false;
         if (MathUtil.RANDOM.nextDouble() > probAddRemove) {
@@ -142,7 +148,7 @@ public class VariableLengthIntArray extends AbstractParameterArray {
         else {
             numNodesToMove = 1 + MathUtil.RANDOM.nextInt(1 + (int)radius);
         }
-        //System.out.println("adding = "+ add + " removing = "+ remove + " moving = "+ numNodesToMove);
+        //System.out.print("old num = " + nbr.size());
 
         if (remove) {
             removeRandomParam(nbr);
@@ -150,6 +156,7 @@ public class VariableLengthIntArray extends AbstractParameterArray {
         if (add) {
             addRandomParam(nbr);
         }
+        //System.out.println(" new= " + nbr.size() + " moving = "+ numNodesToMove + "   rad=" + radius);
         moveNodes(numNodesToMove, nbr);
 
         return nbr;
@@ -189,17 +196,18 @@ public class VariableLengthIntArray extends AbstractParameterArray {
      */
     private void moveNodes(int numNodesToMove, VariableLengthIntArray nbr) {
         List<Integer> freeNodes = getFreeNodes(nbr);
-        List<Integer> swapNodes = selectRandomNodes(numNodesToMove, freeNodes);
+        int numSelect = Math.min(freeNodes.size(), numNodesToMove);
+        List<Integer> swapNodes = selectRandomNodes(numSelect, freeNodes);
 
-        for (int i=0; i<numNodesToMove; i++) {
+        for (int i=0; i<numSelect; i++) {
             int index = MathUtil.RANDOM.nextInt(nbr.size());
             nbr.get(index).setValue(swapNodes.get(i));
         }
     }
 
-    private List<Integer> selectRandomNodes(int numNodes, List<Integer> freeNodes) {
+    private List<Integer> selectRandomNodes(int numNodesToSelect, List<Integer> freeNodes) {
         List<Integer> selected = new LinkedList<>();
-        for (int i=0; i<numNodes; i++) {
+        for (int i=0; i < numNodesToSelect; i++) {
             int node = freeNodes.get(MathUtil.RANDOM.nextInt(freeNodes.size()));
             selected.add(node);
             freeNodes.remove((Integer) node);
@@ -233,18 +241,18 @@ public class VariableLengthIntArray extends AbstractParameterArray {
 
         // Divide by 2 because it does not matter which param we start with.
         // See page 13 in How to Solve It.
-        long numPermutations = Long.MAX_VALUE;
-        if (maxLength <= 20)  {
-            numPermutations = MathUtil.factorial(maxLength) / 2;
+        long totalConfigurations = Long.MAX_VALUE;
+        if (maxLength <= 60)  {
+            totalConfigurations = (long)Math.pow(2.0, maxLength);
         }
 
         // if the requested number of samples is close to the total number of permutations,
         // then we could just enumerate the permutations.
-        double closeFactor = 0.7;
+        double closeFactor = 0.8;
         int numSamples = requestedNumSamples;
 
-        if (requestedNumSamples > closeFactor * numPermutations) {
-            numSamples = (int)(closeFactor * numPermutations);
+        if (requestedNumSamples > closeFactor * totalConfigurations) {
+            numSamples = (int)(closeFactor * totalConfigurations);
         }
 
         List<ParameterArray> globalSamples = new ArrayList<>(numSamples);
@@ -256,6 +264,7 @@ public class VariableLengthIntArray extends AbstractParameterArray {
                 globalSamples.add(nextSample);
             }
         }
+        System.out.println("rand samples = " + globalSamples);
         return globalSamples;
     }
 
@@ -265,9 +274,9 @@ public class VariableLengthIntArray extends AbstractParameterArray {
      */
     public Improvement findIncrementalImprovement(Optimizee optimizee, double jumpSize,
                                                   Improvement lastImprovement, Set<ParameterArray> cache) {
-        int maxTries = 1000;
         int numTries = 0;
         double fitnessDelta;
+        jumpSize *= 0.98;
         Improvement improvement = new Improvement(this, 0, jumpSize);
 
         do {
@@ -289,8 +298,11 @@ public class VariableLengthIntArray extends AbstractParameterArray {
                 }
             }
             numTries++;
+            jumpSize *= 1.001;
 
-        }  while (fitnessDelta <= 0 && numTries < maxTries);
+        }  while (fitnessDelta <= 0 && numTries < MAX_TRIES);
+        System.out.println("incremental improvement = " + improvement.getImprovement() + " numTries=" + numTries + " jumpSize=" + jumpSize
+                + "\n num nodes in improvedParams=" + improvement.getParams().size() + " fit=" + improvement.getParams().getFitness());
 
         return improvement;
     }
