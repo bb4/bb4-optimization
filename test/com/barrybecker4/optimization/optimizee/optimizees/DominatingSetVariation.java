@@ -40,7 +40,6 @@ public enum DominatingSetVariation implements IProblemVariation {
             return ADJACENCIES.size();
         }
 
-        @Override
         public ParameterArray getExactSolution() {
             VariableLengthIntArray solution = createSolution(new int[] {0});
             solution.setFitness(1);
@@ -63,7 +62,8 @@ public enum DominatingSetVariation implements IProblemVariation {
                     GLOB_SAMP_TOL, BASE_TOLERANCE, BASE_TOLERANCE, 0.04,  RELAXED_TOL,  0.042,   0.042, BASE_TOLERANCE
             });
         }
-    },
+    }; /*
+
 
     TYPICAL {
         private final List<List<Integer>> ADJACENCIES = Arrays.asList(
@@ -100,7 +100,6 @@ public enum DominatingSetVariation implements IProblemVariation {
             return ADJACENCIES.size();
         }
 
-        @Override
         public ParameterArray getExactSolution() {
             VariableLengthIntArray solution = createSolution(new int[] {6, 7, 8, 19, 21, 24});
             solution.setFitness(6);
@@ -123,7 +122,7 @@ public enum DominatingSetVariation implements IProblemVariation {
                     GLOB_SAMP_TOL, BASE_TOLERANCE, BASE_TOLERANCE, 0.04,  RELAXED_TOL,  0.042,   0.042, BASE_TOLERANCE
             });
         }
-    };
+    };     */
 
 
     /** @return the number of nodes in the graph */

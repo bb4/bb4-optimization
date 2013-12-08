@@ -40,7 +40,6 @@ public enum TravelingSalesmanVariation implements IProblemVariation {
             return 6.0;
         }
 
-        @Override
         public PermutedParameterArray getExactSolution() {
             PermutedParameterArray solution =  createSolution(new int[] {0, 2, 1, 3});
             solution.setFitness(getShortestPathLength());
@@ -88,7 +87,6 @@ public enum TravelingSalesmanVariation implements IProblemVariation {
             return 207.0;
         }
 
-        @Override
         public PermutedParameterArray getExactSolution() {
             PermutedParameterArray solution = createSolution(new int[] {2, 4, 0, 1, 3});
             solution.setFitness(getShortestPathLength());

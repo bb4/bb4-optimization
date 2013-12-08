@@ -83,6 +83,6 @@ public class DominatingSetProblem extends OptimizeeProblem {
         ParameterArray solution =
                 optimizer.doOptimization(OptimizationStrategyType.SIMULATED_ANNEALING, initialGuess, v.getFitnessRange());
 
-        showSolution(problem, solution, v);
+        showSolution(problem, solution);
     }
 }

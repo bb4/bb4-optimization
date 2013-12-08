@@ -61,7 +61,6 @@ public abstract class OptimizerTestCase  {
         doTest(OptimizationStrategyType.GLOBAL_HILL_CLIMBING);
     }
 
-
     /**
      * run test for given optimization type
      * @param optType the optimization type to use.

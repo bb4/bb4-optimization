@@ -105,7 +105,6 @@ public enum AnalyticVariation implements IProblemVariation {
      */
     public abstract double getErrorTolerancePercent(OptimizationStrategyType opt);
 
-    @Override
     public ParameterArray getExactSolution() {
         return AnalyticFunctionConsts.EXACT_SOLUTION;
     }

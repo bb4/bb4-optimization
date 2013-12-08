@@ -42,10 +42,10 @@ public abstract class OptimizeeProblem implements Optimizee {
     public abstract double getFitnessRange();
 
 
-    public static void showSolution(Optimizee problem, ParameterArray solution, IProblemVariation variation) {
+    public static void showSolution(OptimizeeProblem problem, ParameterArray solution) {
         System.out.println( "\n************************************************************************" );
         System.out.println( "The solution to the "+problem.getName() +"  Test Problem is :\n" + solution );
         System.out.println( "Which evaluates to: " + problem.evaluateFitness(solution));
-        System.out.println( "We expected to get exactly " + variation.getExactSolution());
+        System.out.println( "We expected to get exactly " + problem.getExactSolution());
     }
 }
