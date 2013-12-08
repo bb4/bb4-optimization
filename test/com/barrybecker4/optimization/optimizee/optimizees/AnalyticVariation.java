@@ -92,7 +92,7 @@ public enum AnalyticVariation implements IProblemVariation {
 
 
     /**
-     * Evaluate fitness for the analytics function.
+     * Evaluate fitness for the analytics function. Higher values are more fit.
      * @param a the position on the parabolic surface given the specified values of p1 and p2
      * @return fitness value
      */

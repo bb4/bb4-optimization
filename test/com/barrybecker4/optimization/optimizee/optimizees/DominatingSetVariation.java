@@ -16,9 +16,8 @@ import static com.barrybecker4.optimization.optimizee.optimizees.AnalyticFunctio
 import static com.barrybecker4.optimization.optimizee.optimizees.AnalyticFunctionConsts.RELAXED_TOL;
 
 /**
- * An enum for different sorts of traveling salesman problems (TSPs) that we might want to test.
- * The TSP is represented by an adjacency matrix that give weights to costs between vertices
- * in a graph. The graph may or may not be a directed graph depending on the problem you are modeling.
+ * An enum for different sorts of dominating set problems.
+ * http://en.wikipedia.org/wiki/Dominating_set
  *
  * @author Barry Becker
  */
@@ -42,7 +41,7 @@ public enum DominatingSetVariation implements IProblemVariation {
 
         public ParameterArray getExactSolution() {
             VariableLengthIntArray solution = createSolution(new int[] {0});
-            solution.setFitness(1);
+            solution.setFitness(7);
             return solution;
         }
 
@@ -62,7 +61,7 @@ public enum DominatingSetVariation implements IProblemVariation {
                     GLOB_SAMP_TOL, BASE_TOLERANCE, BASE_TOLERANCE, 0.04,  RELAXED_TOL,  0.042,   0.042, BASE_TOLERANCE
             });
         }
-    }; /*
+    },
 
 
     TYPICAL {
@@ -102,13 +101,13 @@ public enum DominatingSetVariation implements IProblemVariation {
 
         public ParameterArray getExactSolution() {
             VariableLengthIntArray solution = createSolution(new int[] {6, 7, 8, 19, 21, 24});
-            solution.setFitness(6);
+            solution.setFitness(32);
             return solution;
         }
 
         @Override
         public double getFitnessRange() {
-            return 40.0;
+            return 32.0;
         }
 
         @Override
@@ -122,7 +121,7 @@ public enum DominatingSetVariation implements IProblemVariation {
                     GLOB_SAMP_TOL, BASE_TOLERANCE, BASE_TOLERANCE, 0.04,  RELAXED_TOL,  0.042,   0.042, BASE_TOLERANCE
             });
         }
-    };     */
+    };
 
 
     /** @return the number of nodes in the graph */
@@ -139,7 +138,9 @@ public enum DominatingSetVariation implements IProblemVariation {
         for (int i=0; i<num; i+=2) {
             params.add(new IntegerParameter(i, 0, num-1, "p" + i));
         }
-        return new VariableLengthIntArray(params, getNumNodes());
+        ParameterArray pa = new VariableLengthIntArray(params, getNumNodes());
+        pa.setFitness(1);
+        return pa;
     }
 
     public double getScore(List<Integer> marked, List<List<Integer>> adjacencies) {
@@ -194,7 +195,7 @@ public enum DominatingSetVariation implements IProblemVariation {
             marked.add((int)node.getValue());
         }
 
-        return getScore(marked, adjacencies);
+        return getFitnessRange() - getScore(marked, adjacencies);
     }
 
     /**
