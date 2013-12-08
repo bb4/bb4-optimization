@@ -2,7 +2,7 @@
 package com.barrybecker4.optimization.optimizee.optimizees;
 
 import com.barrybecker4.optimization.parameter.ParameterArray;
-import com.barrybecker4.optimization.parameter.VariableLengthIntegerParameterArray;
+import com.barrybecker4.optimization.parameter.VariableLengthIntArray;
 import com.barrybecker4.optimization.parameter.types.IntegerParameter;
 import com.barrybecker4.optimization.parameter.types.Parameter;
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
@@ -42,7 +42,7 @@ public enum DominatingSetVariation implements IProblemVariation {
 
         @Override
         public ParameterArray getExactSolution() {
-            VariableLengthIntegerParameterArray solution = createSolution(new int[] {0});
+            VariableLengthIntArray solution = createSolution(new int[] {0});
             solution.setFitness(1);
             return solution;
         }
@@ -102,7 +102,7 @@ public enum DominatingSetVariation implements IProblemVariation {
 
         @Override
         public ParameterArray getExactSolution() {
-            VariableLengthIntegerParameterArray solution = createSolution(new int[] {6, 7, 8, 19, 21, 24});
+            VariableLengthIntArray solution = createSolution(new int[] {6, 7, 8, 19, 21, 24});
             solution.setFitness(6);
             return solution;
         }
@@ -140,7 +140,7 @@ public enum DominatingSetVariation implements IProblemVariation {
         for (int i=0; i<num; i+=2) {
             params.add(new IntegerParameter(i, 0, num-1, "p" + i));
         }
-        return new VariableLengthIntegerParameterArray(params, getNumNodes());
+        return new VariableLengthIntArray(params, getNumNodes());
     }
 
     public double getScore(List<Integer> marked, List<List<Integer>> adjacencies) {
@@ -226,12 +226,12 @@ public enum DominatingSetVariation implements IProblemVariation {
      * @param nodeList optimal dominating set of marked nodes. May not be unique.
      * @return optimal solution (to compare against at the end of the test).
      */
-    protected VariableLengthIntegerParameterArray createSolution(int[] nodeList) {
+    protected VariableLengthIntArray createSolution(int[] nodeList) {
         int numNodes = nodeList.length;
         List<Parameter> params = new ArrayList<>(numNodes);
         for (int i=0; i < nodeList.length; i++) {
             params.add(new IntegerParameter(nodeList[i], 0, getNumNodes() - 1, "p" + i));
         }
-        return new VariableLengthIntegerParameterArray(params, getNumNodes());
+        return new VariableLengthIntArray(params, getNumNodes());
     }
 }

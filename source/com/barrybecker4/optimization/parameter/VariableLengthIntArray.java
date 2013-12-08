@@ -20,27 +20,27 @@ import java.util.Set;
  *
  *  @author Barry Becker
  */
-public class VariableLengthIntegerParameterArray extends AbstractParameterArray {
+public class VariableLengthIntArray extends AbstractParameterArray {
 
     /** the maximum number of params in the array that is possible */
     private int maxLength;
 
 
     /** Default constructor */
-    protected VariableLengthIntegerParameterArray() {}
+    protected VariableLengthIntArray() {}
 
     /**
      * Constructor
      * @param params an array of params to initialize with.
      */
-    public VariableLengthIntegerParameterArray(List<Parameter> params, int max) {
+    public VariableLengthIntArray(List<Parameter> params, int max) {
         super(params);
         maxLength = max;
     }
 
     @Override
-    protected VariableLengthIntegerParameterArray createInstance() {
-        return new VariableLengthIntegerParameterArray();
+    protected VariableLengthIntArray createInstance() {
+        return new VariableLengthIntArray();
     }
 
     /**
@@ -119,7 +119,7 @@ public class VariableLengthIntegerParameterArray extends AbstractParameterArray 
      *   Change Math.min(1, 10 * radius * N/100) of the entries, where N is the number of params
      * @return the random nbr.
      */
-    public VariableLengthIntegerParameterArray getRandomNeighbor(double radius) {
+    public VariableLengthIntArray getRandomNeighbor(double radius) {
 
         if (size() <= 1) return this;
 
@@ -135,7 +135,7 @@ public class VariableLengthIntegerParameterArray extends AbstractParameterArray 
             }
         }
         int numNodesToMove = 0;
-        VariableLengthIntegerParameterArray nbr = (VariableLengthIntegerParameterArray)this.copy();
+        VariableLengthIntArray nbr = (VariableLengthIntArray)this.copy();
 
         if (add || remove) {
             numNodesToMove = MathUtil.RANDOM.nextInt(Math.min(size(), (int)(radius + 1)));
@@ -156,7 +156,7 @@ public class VariableLengthIntegerParameterArray extends AbstractParameterArray 
         return nbr;
     }
 
-    private void removeRandomParam(VariableLengthIntegerParameterArray nbr) {
+    private void removeRandomParam(VariableLengthIntArray nbr) {
         int indexToRemove = MathUtil.RANDOM.nextInt(size());
         assert nbr.size() > 0;
         Parameter[] newParams = new Parameter[nbr.size()-1];
@@ -169,7 +169,7 @@ public class VariableLengthIntegerParameterArray extends AbstractParameterArray 
         nbr.params_ = newParams;
     }
 
-    private void addRandomParam(VariableLengthIntegerParameterArray nbr) {
+    private void addRandomParam(VariableLengthIntArray nbr) {
 
         List<Integer> freeNodes = getFreeNodes(nbr);
         int newSize = nbr.size() + 1;
@@ -189,7 +189,7 @@ public class VariableLengthIntegerParameterArray extends AbstractParameterArray 
      * @param numNodesToMove
      * @param nbr neighbor parameter array
      */
-    private void moveNodes(int numNodesToMove, VariableLengthIntegerParameterArray nbr) {
+    private void moveNodes(int numNodesToMove, VariableLengthIntArray nbr) {
         List<Integer> freeNodes = getFreeNodes(nbr);
 
         List<Integer> swapNodes = selectRandomNodes(numNodesToMove, freeNodes);
@@ -210,7 +210,7 @@ public class VariableLengthIntegerParameterArray extends AbstractParameterArray 
         return selected;
     }
 
-    private List<Integer> getFreeNodes(VariableLengthIntegerParameterArray nbr) {
+    private List<Integer> getFreeNodes(VariableLengthIntArray nbr) {
         List<Integer> freeNodes = new ArrayList<>(maxLength);
         Set<Integer> markedNodes = new HashSet<>();
         for (Parameter p : nbr.params_) {
@@ -274,7 +274,7 @@ public class VariableLengthIntegerParameterArray extends AbstractParameterArray 
         Improvement improvement = new Improvement(this, 0, jumpSize);
 
         do {
-            VariableLengthIntegerParameterArray nbr = getRandomNeighbor(jumpSize);
+            VariableLengthIntArray nbr = getRandomNeighbor(jumpSize);
             fitnessDelta = 0;
 
             if (!cache.contains(nbr)) {
@@ -314,7 +314,7 @@ public class VariableLengthIntegerParameterArray extends AbstractParameterArray 
             newParams.add(new IntegerParameter(markedNode, 0, maxLength-1, "p" + markedNode));
         }
 
-        return new VariableLengthIntegerParameterArray(newParams, maxLength);
+        return new VariableLengthIntArray(newParams, maxLength);
     }
 
 
@@ -322,7 +322,7 @@ public class VariableLengthIntegerParameterArray extends AbstractParameterArray 
      * @return a copy of ourselves.
      */
     public AbstractParameterArray copy() {
-        VariableLengthIntegerParameterArray copy = (VariableLengthIntegerParameterArray) super.copy();
+        VariableLengthIntArray copy = (VariableLengthIntArray) super.copy();
         copy.maxLength = maxLength;
         return copy;
     }
