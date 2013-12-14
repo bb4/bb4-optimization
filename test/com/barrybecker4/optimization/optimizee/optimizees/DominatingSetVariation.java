@@ -36,13 +36,13 @@ public enum DominatingSetVariation implements IProblemVariation {
 
         public ParameterArray getExactSolution() {
             VariableLengthIntArray solution = createSolution(new int[] {0});
-            solution.setFitness(1);
+            solution.setFitness(0);
             return solution;
         }
 
         @Override
         public double getFitnessRange() {
-            return 8.0;
+            return 7.0;
         }
 
         @Override
@@ -89,7 +89,7 @@ public enum DominatingSetVariation implements IProblemVariation {
 
         public ParameterArray getExactSolution() {
             VariableLengthIntArray solution = createSolution(new int[] {6, 7, 8, 19, 21, 24});
-            solution.setFitness(6);
+            solution.setFitness(0);
             return solution;
         }
 
@@ -173,7 +173,7 @@ public enum DominatingSetVariation implements IProblemVariation {
      * @return fitness value
      */
     public double evaluateFitness(ParameterArray pa) {
-        return computeCost(pa, getAdjacencies());
+        return computeCost(pa, getAdjacencies()) - getExactSolution().size();
     }
 
     /** Approximate value of maxCost - minCost */

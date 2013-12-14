@@ -11,7 +11,8 @@ import com.barrybecker4.optimization.parameter.ParameterArray;
 import com.barrybecker4.optimization.parameter.types.Parameter;
 
 /**
- * private utility class for maintaining the data vectors for the iteration.
+ * Utility class for maintaining the data vectors for the iteration when hill climbing
+ * over a numerical parameter space.
  */
 public class ImprovementIteration {
 

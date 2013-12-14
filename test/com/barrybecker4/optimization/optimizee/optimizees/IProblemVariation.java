@@ -13,5 +13,4 @@ public interface IProblemVariation {
      * @return An optimal ordering of the cities to visit such that cost is minimized.
      */
     ParameterArray getExactSolution();
-
 }

@@ -2,10 +2,9 @@
 package com.barrybecker4.optimization.parameter;
 
 import com.barrybecker4.common.math.MathUtil;
-import com.barrybecker4.common.math.MultiArray;
 import com.barrybecker4.common.math.Vector;
-import com.barrybecker4.optimization.parameter.improvement.Improvement;
 import com.barrybecker4.optimization.optimizee.Optimizee;
+import com.barrybecker4.optimization.parameter.improvement.Improvement;
 import com.barrybecker4.optimization.parameter.improvement.ImprovementIteration;
 import com.barrybecker4.optimization.parameter.improvement.ImprovementStep;
 import com.barrybecker4.optimization.parameter.types.DoubleParameter;
@@ -23,11 +22,12 @@ import java.util.Set;
 public class NumericParameterArray extends AbstractParameterArray {
 
     /** default number of steps to go from the min to the max */
-    private static final int STEPS = 10;
-    private int numSteps_ = STEPS;
+    private static final int DEFAULT_NUM_STEPS = 10;
+    private int numSteps_ = DEFAULT_NUM_STEPS;
 
     /** If the dot product of the new gradient with the old is less than this, then decrease the jump size. */
     private static final double MIN_DOT_PRODUCT = 0.3;
+
     /** If the dot product of the new gradient with the old is greater than this, then increase the jump size. */
     private static final double MAX_DOT_PRODUCT = 0.98;
 
@@ -90,40 +90,8 @@ public class NumericParameterArray extends AbstractParameterArray {
      * @return some number of unique samples.
      */
     public List<ParameterArray> findGlobalSamples(int requestedNumSamples) {
-        int numDims = size();
-        int i;
-        int[] dims = new int[numDims];
-
-        int samplingRate = (int)Math.pow((double)requestedNumSamples, 1.0/numDims);
-        int numSamples = determineNumSamples(dims, samplingRate);
-
-        MultiArray samples = new MultiArray( dims );
-        List<ParameterArray> globalSamples = new ArrayList<ParameterArray>(numSamples);
-
-        for ( i = 0; i < samples.getNumValues(); i++ ) {
-            int[] index = samples.getIndexFromRaw( i );
-            NumericParameterArray nextSample = this.copy();
-
-            for ( int j = 0; j < nextSample.size(); j++ ) {
-                Parameter p = nextSample.get( j );
-                double increment = (p.getMaxValue() - p.getMinValue()) / samplingRate;
-                p.setValue(p.getMinValue() + increment / 2.0 + index[j] * increment);
-            }
-
-            globalSamples.add(nextSample);
-        }
-        return globalSamples;
-    }
-
-    private int determineNumSamples(int[] dims, int samplingRate) {
-        int i;
-        int numSamples = 1;
-
-        for ( i = 0; i < dims.length; i++ ) {
-            dims[i] = samplingRate;
-            numSamples *= dims[i];
-        }
-        return numSamples;
+        GlobalSampler sampler = new GlobalSampler(this);
+        return sampler.findGlobalSamples(requestedNumSamples);
     }
 
     /**
@@ -158,7 +126,7 @@ public class NumericParameterArray extends AbstractParameterArray {
         double improvement = step.getImprovement();
 
         double dotProduct = iter.getGradient().normalizedDot(iter.getOldGradient());
-        System.out.println("dot between " + iter.getGradient() + " and " + iter.getOldGradient()+ " is "+ dotProduct);
+        //System.out.println("dot between " + iter.getGradient() + " and " + iter.getOldGradient()+ " is "+ dotProduct);
         newJumpSize = findNewJumpSize(newJumpSize, dotProduct);
 
         iter.getGradient().copyFrom(iter.getOldGradient());

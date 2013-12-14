@@ -8,6 +8,7 @@ import com.barrybecker4.optimization.parameter.types.IntegerParameter;
 import com.barrybecker4.optimization.parameter.types.Parameter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -54,9 +55,7 @@ public class VariableLengthIntArray extends AbstractParameterArray {
      * @return the distance between this parameter array and another.
      */
     public double distance(ParameterArray pa)  {
-        // if the fitness scores are the same, they are equivalent for all intents and purposes.
-        return Math.abs(pa.getFitness() - getFitness());
-        /*
+
         int thisLength = size();
         int thatLength = pa.size();
 
@@ -76,7 +75,6 @@ public class VariableLengthIntArray extends AbstractParameterArray {
         int valueDifferences = calcValueDifferences(theseValues, thoseValues);
 
         return Math.abs(thisLength - thatLength) + valueDifferences;
-        */
     }
 
     /**

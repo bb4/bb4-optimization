@@ -28,7 +28,7 @@ public class ImprovementStep {
     /** continue optimization iteration until the improvement in fitness is less than this.  */
     protected static final double JUMP_SIZE_EPS = 0.000000001;
 
-    /** Increase the size of the radious by this multiplier */
+    /** Increase the size of the radius by this multiplier */
     private static final double RADIUS_EXPANDER = 1.5;
 
     public static final double JUMP_SIZE_INC_FACTOR = 1.3;

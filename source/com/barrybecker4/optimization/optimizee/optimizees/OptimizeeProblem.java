@@ -22,7 +22,8 @@ public abstract class OptimizeeProblem implements Optimizee {
      * @return distance from the exact solution as the error.
      */
     public double getError(ParameterArray sol) {
-        return 100.0 * sol.distance(getExactSolution()) / getFitnessRange();
+        return 100.0 * (sol.getFitness() - getOptimalFitness()) / getFitnessRange();
+        //return 100.0 * sol.distance(getExactSolution()) / getFitnessRange();
     }
 
     @Override
