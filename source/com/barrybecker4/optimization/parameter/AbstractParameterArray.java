@@ -37,7 +37,7 @@ public abstract class AbstractParameterArray implements ParameterArray {
     }
 
     /**
-     * Use this constructor if you have mixed types of parameters.
+     * Use this constructor if you a list of parameters.
      * @param params list of parameters
      */
     public AbstractParameterArray(List<Parameter> params) {

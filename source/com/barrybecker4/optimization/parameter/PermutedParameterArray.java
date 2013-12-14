@@ -1,4 +1,4 @@
-/** Copyright by Barry G. Becker, 2000-2011. Licensed under MIT License: http://www.opensource.org/licenses/MIT  */
+/** Copyright by Barry G. Becker, 2000-2013. Licensed under MIT License: http://www.opensource.org/licenses/MIT  */
 package com.barrybecker4.optimization.parameter;
 
 import com.barrybecker4.common.math.MathUtil;
@@ -9,7 +9,6 @@ import com.barrybecker4.optimization.parameter.types.Parameter;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -23,8 +22,11 @@ import java.util.Set;
  */
 public class PermutedParameterArray extends AbstractParameterArray {
 
+    private PermutedDistanceCalculator distanceCalculator = new PermutedDistanceCalculator();
+
     /** Default constructor */
-    protected PermutedParameterArray() {}
+    protected PermutedParameterArray() {
+    }
 
     /**
      * Constructor
@@ -67,89 +69,7 @@ public class PermutedParameterArray extends AbstractParameterArray {
      * @return the distance between this parameter array and another.
      */
     public double distance( ParameterArray pa )  {
-        assert ( size() == pa.size() );
-
-        ParameterArray paReverse = ((PermutedParameterArray) pa).reverse();
-        return Math.min(difference(pa), difference(paReverse));
-    }
-
-    /**
-     * The amount of difference can be used as a measure of distance
-     * @param pa parameter array
-     * @return the amount of difference between pa and ourselves.
-     */
-    public double difference(ParameterArray pa)  {
-
-        List<Integer> runLengths = new LinkedList<>();
-        int len = size();
-        int i = 0;
-
-        while (i < len) {
-            int runLength = determineRunLength(pa, len, i, runLengths);
-            i += runLength;
-        }
-        return calcDistance(runLengths);
-    }
-
-    /**
-     * Adds the computed runlength to the runLengths list.
-     * @return the computed runlength
-     */
-    private int determineRunLength(ParameterArray pa, int len, int i, List<Integer> runLengths) {
-        int k;
-        int ii = i;
-        k = 1;
-        int j = findCorrespondingEntryIndex(pa, len, get(i));
-
-        boolean matchFound = false;
-        boolean matched;
-        do {
-            ii = ++ii % len;
-            j = ++j % len;
-            k++;
-            matched = this.get(ii).equals(pa.get(j));
-            matchFound |= matched;
-        } while (matched && k<=len);
-
-        int runLength = k-1;
-
-        if (matchFound) {
-            runLengths.add(runLength);
-        }
-        return runLength;
-    }
-
-    /**
-     * @return  the entry in pa that corresponds to param.
-     * @throws AssertionError if not there. It must be there.
-     */
-    private int findCorrespondingEntryIndex(ParameterArray pa, int len, Parameter param) {
-        int j=0;
-        while (j<len && !param.equals(pa.get(j)) ) {
-            j++;
-        }
-        assert (j<len) : "Param "+  param +  " did not match any values in "+ pa;
-        return j;
-    }
-
-    /**
-     * Find the distance between two permutations that each have runs of the specified lengths.
-     * @param runLengths list of run lengths.
-     * @return the approximate distance between two permutations.
-     */
-    private double calcDistance(List<Integer> runLengths) {
-
-        // careful this could overflow if the run is really long.
-        // If it does we may need to switch to BigInteger.
-        double max = Math.pow(2, size());
-
-        if (runLengths.isEmpty()) return max;
-
-        double denom = 0;
-        for (int run : runLengths) {
-           denom += Math.pow(2, run-1);
-        }
-        return max / denom - 2.0;
+        return distanceCalculator.findDistance(this, (PermutedParameterArray)pa);
     }
 
     /**
@@ -237,5 +157,4 @@ public class PermutedParameterArray extends AbstractParameterArray {
 
         return new PermutedParameterArray(newParams);
     }
-
 }

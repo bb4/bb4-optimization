@@ -16,16 +16,19 @@ import java.util.Set;
 public interface ParameterArray extends Comparable<ParameterArray> {
 
     /**
+     * Some parameter arrays may have variable numbers of parameters.
      * @return the number of parameters in the array.
      */
     int size();
 
     /**
+     * Lower values are better.
      * @param value fitness value to assign to this parameter array.
      */
     void setFitness(double value);
 
     /**
+     * Lower values are better.
      * @return the fitness value.
      */
     double getFitness();
@@ -67,8 +70,9 @@ public interface ParameterArray extends Comparable<ParameterArray> {
                                            Improvement lastImprovement, Set<ParameterArray> cache);
 
     /**
-     * @return the distance between this parameter array and another.
-     * sqrt(sum of squares)
+     * Some measure of the distance between parameter arrays of the same type.
+     * The way this is computed is very dependent on the implementation of each sort of parameter array.
+     * @return a measure of the distance between this parameter array and another.
      */
     double distance(ParameterArray pa);
 

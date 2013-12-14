@@ -24,13 +24,13 @@ public enum DominatingSetVariation implements IProblemVariation {
          * Trivial example.
          * There are three nodes, A, B, C. And this list of lists defines the connectivity of the graph.
          */
-        private final List<List<Integer>> ADJACENCIES = Arrays.asList(
+        private final Graph ADJACENCIES = new Graph(
                 Arrays.asList(1, 2),
                 Arrays.asList(0, 2),
                 Arrays.asList(0, 1)
         );
 
-        protected List<List<Integer>> getAdjacencies() {
+        protected Graph getAdjacencies() {
             return ADJACENCIES;
         }
 
@@ -54,7 +54,7 @@ public enum DominatingSetVariation implements IProblemVariation {
     },
 
     TYPICAL {
-        private final List<List<Integer>> ADJACENCIES = Arrays.asList(
+        private final Graph ADJACENCIES = new Graph(
                 Arrays.asList(15, 21, 25),
                 Arrays.asList(2, 4, 7),
                 Arrays.asList(1, 3, 5, 7),
@@ -83,7 +83,7 @@ public enum DominatingSetVariation implements IProblemVariation {
                 Arrays.asList(0, 23, 24)
         );
 
-        protected List<List<Integer>> getAdjacencies() {
+        protected Graph getAdjacencies() {
             return ADJACENCIES;
         }
 
@@ -106,13 +106,13 @@ public enum DominatingSetVariation implements IProblemVariation {
         }
     };
 
-
     /** @return the number of nodes in the graph */
     public int getNumNodes() {
         return getAdjacencies().size();
     }
 
-    protected abstract List<List<Integer>> getAdjacencies();
+    /** The graph containing the node adjacency information */
+    protected abstract Graph getAdjacencies();
 
     /**
      * Some random initial set of marked nodes.
@@ -126,7 +126,7 @@ public enum DominatingSetVariation implements IProblemVariation {
             params.add(new IntegerParameter(i, 0, num-1, "p" + i));
         }
         VariableLengthIntArray pa = new VariableLengthIntArray(params, getNumNodes());
-        pa.setFitness(params.size() + getNumNotWithinOneHop(getMarked(pa), getAdjacencies()));
+        pa.setFitness(params.size() + getAdjacencies().getNumNotWithinOneHop(getMarked(pa)));
         return pa;
     }
 
@@ -138,33 +138,8 @@ public enum DominatingSetVariation implements IProblemVariation {
         return marked;
     }
 
-    public double getScore(List<Integer> marked, List<List<Integer>> adjacencies) {
-        return marked.size() + 0.5 * getNumNotWithinOneHop(marked, adjacencies);
-    }
-
-    protected int getNumNotWithinOneHop(List<Integer> marked, List<List<Integer>> adjacencies) {
-        int total = 0;
-        for (int i=0; i < adjacencies.size(); i++) {
-            if (!marked.contains(i)) {
-                 total += isNodeOneHopAway(i, marked, adjacencies) ? 0 : 1;
-            }
-        }
-        return total;
-    }
-
-    /**
-     * @param i node to start searching from
-     * @param marked list of marked nodes
-     * @return true if node i is only one hop from a marked node
-     */
-    protected boolean isNodeOneHopAway(int i, List<Integer> marked, List<List<Integer>> adjacencies) {
-        List<Integer> nbrs = adjacencies.get(i);
-        for (int j : marked) {
-            if (nbrs.contains(j)) {
-                return true;
-            }
-        }
-        return false;
+    public double getScore(List<Integer> marked) {
+        return marked.size() + 0.5 * getAdjacencies().getNumNotWithinOneHop(marked);
     }
 
     /**
@@ -173,7 +148,7 @@ public enum DominatingSetVariation implements IProblemVariation {
      * @return fitness value
      */
     public double evaluateFitness(ParameterArray pa) {
-        return computeCost(pa, getAdjacencies()) - getExactSolution().size();
+        return computeCost(pa) - getExactSolution().size();
     }
 
     /** Approximate value of maxCost - minCost */
@@ -184,7 +159,7 @@ public enum DominatingSetVariation implements IProblemVariation {
      * @param params last best guess at dominating set.
      * @return the total cost of the path represented by param.
      */
-    protected double computeCost(ParameterArray params, List<List<Integer>> adjacencies) {
+    protected double computeCost(ParameterArray params) {
 
         List<Integer> marked = new ArrayList<>();
         for (int i = 0; i < params.size(); i++)  {
@@ -192,7 +167,7 @@ public enum DominatingSetVariation implements IProblemVariation {
             marked.add((int)node.getValue());
         }
 
-        return getScore(marked, adjacencies);
+        return getScore(marked);
     }
 
     /**

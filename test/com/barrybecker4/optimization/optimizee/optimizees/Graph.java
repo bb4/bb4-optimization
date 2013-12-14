@@ -1,0 +1,49 @@
+package com.barrybecker4.optimization.optimizee.optimizees;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+/**
+ * A simple graph representation.
+ * Only connections between nodes are recorded, not the distance between them.
+ * The graph connections are defined by a list of lists.
+ * Assume that each node in the graph is assigned an integer number.
+ * Each list entry corresponds to a node with a number that matches the index in the array.
+ * The list entry contains the numbers of the nodes that are connected to it.
+ *
+ * @author Barry Becker
+ */
+public class Graph extends ArrayList<List<Integer>> {
+
+    @SafeVarargs
+    public Graph(List<Integer>... nodeNeighbors) {
+         super(Arrays.asList(nodeNeighbors));
+    }
+
+
+    int getNumNotWithinOneHop(List<Integer> marked) {
+        int total = 0;
+        for (int i=0; i < size(); i++) {
+            if (!marked.contains(i)) {
+                 total += isNodeOneHopAway(i, marked) ? 0 : 1;
+            }
+        }
+        return total;
+    }
+
+    /**
+     * @param i node to start searching from
+     * @param marked list of marked nodes
+     * @return true if node i is only one hop from a marked node
+     */
+    private boolean isNodeOneHopAway(int i, List<Integer> marked) {
+        List<Integer> nbrs = get(i);
+        for (int j : marked) {
+            if (nbrs.contains(j)) {
+                return true;
+            }
+        }
+        return false;
+    }
+}

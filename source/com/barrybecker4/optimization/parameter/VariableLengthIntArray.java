@@ -266,7 +266,7 @@ public class VariableLengthIntArray extends AbstractParameterArray {
 
     /**
      * {@inheritDoc}
-     * Try swapping parameters randomly until we find an improvement (if we can);
+     * Try swapping parameters randomly until we find an improvement (if we can).
      */
     public Improvement findIncrementalImprovement(Optimizee optimizee, double jumpSize,
                                                   Improvement lastImprovement, Set<ParameterArray> cache) {
