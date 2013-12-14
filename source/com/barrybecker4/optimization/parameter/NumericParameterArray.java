@@ -90,7 +90,7 @@ public class NumericParameterArray extends AbstractParameterArray {
      * @return some number of unique samples.
      */
     public List<ParameterArray> findGlobalSamples(int requestedNumSamples) {
-        GlobalSampler sampler = new GlobalSampler(this);
+        NumericGlobalSampler sampler = new NumericGlobalSampler(this);
         return sampler.findGlobalSamples(requestedNumSamples);
     }
 

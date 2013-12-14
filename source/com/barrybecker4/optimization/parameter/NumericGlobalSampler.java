@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author Barry Becker
  */
-public class GlobalSampler {
+public class NumericGlobalSampler {
 
     private NumericParameterArray params;
 
@@ -20,7 +20,7 @@ public class GlobalSampler {
      *  Constructor
      * @param params an array of params to initialize with.
      */
-    public GlobalSampler(NumericParameterArray params) {
+    public NumericGlobalSampler(NumericParameterArray params) {
         this.params = params;
     }
 

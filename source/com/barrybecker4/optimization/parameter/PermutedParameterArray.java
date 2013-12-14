@@ -3,6 +3,7 @@ package com.barrybecker4.optimization.parameter;
 
 import com.barrybecker4.common.math.MathUtil;
 import com.barrybecker4.optimization.optimizee.Optimizee;
+import com.barrybecker4.optimization.parameter.improvement.DiscreteImprovementFinder;
 import com.barrybecker4.optimization.parameter.improvement.Improvement;
 import com.barrybecker4.optimization.parameter.types.Parameter;
 
@@ -217,34 +218,8 @@ public class PermutedParameterArray extends AbstractParameterArray {
      */
     public Improvement findIncrementalImprovement(Optimizee optimizee, double jumpSize,
                                                   Improvement lastImprovement, Set<ParameterArray> cache) {
-        int maxTries = 1000;
-        int numTries = 0;
-        double fitnessDelta;
-        Improvement improvement = new Improvement(this, 0, jumpSize);
-
-        do {
-            PermutedParameterArray nbr = getRandomNeighbor(jumpSize);
-            fitnessDelta = 0;
-
-            if (!cache.contains(nbr)) {
-                cache.add(nbr);
-                if (optimizee.evaluateByComparison()) {
-                    fitnessDelta = optimizee.compareFitness(nbr, this);
-                } else {
-                    double fitness = optimizee.evaluateFitness(nbr);
-                    fitnessDelta = getFitness() - fitness;
-                    nbr.setFitness(fitness);
-                }
-
-                if (fitnessDelta > 0) {
-                    improvement = new Improvement(nbr, fitnessDelta, jumpSize);
-                }
-            }
-            numTries++;
-
-        }  while (fitnessDelta <= 0 && numTries < maxTries);
-
-        return improvement;
+        DiscreteImprovementFinder finder = new DiscreteImprovementFinder(this);
+        return finder.findIncrementalImprovement(optimizee, jumpSize, cache);
     }
 
     /**

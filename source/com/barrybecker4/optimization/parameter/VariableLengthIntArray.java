@@ -3,6 +3,7 @@ package com.barrybecker4.optimization.parameter;
 
 import com.barrybecker4.common.math.MathUtil;
 import com.barrybecker4.optimization.optimizee.Optimizee;
+import com.barrybecker4.optimization.parameter.improvement.DiscreteImprovementFinder;
 import com.barrybecker4.optimization.parameter.improvement.Improvement;
 import com.barrybecker4.optimization.parameter.types.IntegerParameter;
 import com.barrybecker4.optimization.parameter.types.Parameter;
@@ -21,9 +22,6 @@ import java.util.Set;
  *  @author Barry Becker
  */
 public class VariableLengthIntArray extends AbstractParameterArray {
-
-    /** don't try more than this many times to find improvement on any iteration */
-    private static final int MAX_TRIES = 1000;
 
     /** the maximum number of params in the array that is possible */
     private int maxLength;
@@ -272,37 +270,8 @@ public class VariableLengthIntArray extends AbstractParameterArray {
      */
     public Improvement findIncrementalImprovement(Optimizee optimizee, double jumpSize,
                                                   Improvement lastImprovement, Set<ParameterArray> cache) {
-        int numTries = 0;
-        double fitnessDelta;
-        jumpSize *= 0.98;
-        Improvement improvement = new Improvement(this, 0, jumpSize);
-
-        do {
-            VariableLengthIntArray nbr = getRandomNeighbor(jumpSize);
-            fitnessDelta = 0;
-
-            if (!cache.contains(nbr)) {
-                cache.add(nbr);
-                if (optimizee.evaluateByComparison()) {
-                    fitnessDelta = optimizee.compareFitness(nbr, this);
-                } else {
-                    double fitness = optimizee.evaluateFitness(nbr);
-                    fitnessDelta = getFitness() - fitness;
-                    nbr.setFitness(fitness);
-                }
-
-                if (fitnessDelta > 0) {
-                    improvement = new Improvement(nbr, fitnessDelta, jumpSize);
-                }
-            }
-            numTries++;
-            jumpSize *= 1.001;
-
-        }  while (fitnessDelta <= 0 && numTries < MAX_TRIES);
-        System.out.println("incremental improvement = " + improvement.getImprovement() + " numTries=" + numTries + " jumpSize=" + jumpSize
-                + "\n num nodes in improvedParams=" + improvement.getParams().size() + " fit=" + improvement.getParams().getFitness());
-
-        return improvement;
+        DiscreteImprovementFinder finder = new DiscreteImprovementFinder(this);
+        return finder.findIncrementalImprovement(optimizee, jumpSize, cache);
     }
 
     /**
