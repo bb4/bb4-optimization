@@ -16,6 +16,10 @@ import static com.barrybecker4.optimization.optimizee.optimizees.AnalyticFunctio
 public enum AnalyticVariation implements IProblemVariation {
 
     PARABOLA {
+        private final ErrorTolerances ERROR_TOLERANCES =
+                new ErrorTolerances(GLOB_SAMP_TOL, RELAXED_TOL, BASE_TOLERANCE,
+                    GLOB_SAMP_TOL,  0,  3 * GLOB_SAMP_TOL,  3 * GLOB_SAMP_TOL, BASE_TOLERANCE);
+
         /** Smooth parabola with min at 0.0 at P1, P2 */
         @Override
         public double evaluateFitness(ParameterArray a) {
@@ -24,14 +28,15 @@ public enum AnalyticVariation implements IProblemVariation {
         }
 
         @Override
-        public double getErrorTolerancePercent(OptimizationStrategyType opt) {
-            return getErrorTolerancePercent(opt, new double[] {
-                    GLOB_SAMP_TOL, RELAXED_TOL, BASE_TOLERANCE,
-                    GLOB_SAMP_TOL,  0,  3 * GLOB_SAMP_TOL,  3 * GLOB_SAMP_TOL, BASE_TOLERANCE
-            });
+        public ErrorTolerances getErrorTolerances() {
+            return ERROR_TOLERANCES;
         }
     },
     SINUSOIDAL {
+        private final ErrorTolerances ERROR_TOLERANCES =
+                new ErrorTolerances(GLOB_SAMP_TOL, RELAXED_TOL, 0.01, GLOB_SAMP_TOL,
+                        RELAXED_TOL, 0.072, 0.072, BASE_TOLERANCE);
+
         /**
          * This version introduces a bit of sinusoidal noise.
          * @param a the position on the parabolic surface given the specified values of p1 and p2
@@ -44,13 +49,15 @@ public enum AnalyticVariation implements IProblemVariation {
         }
 
         @Override
-        public double getErrorTolerancePercent(OptimizationStrategyType opt) {
-            return getErrorTolerancePercent(opt, new double[] {
-                    GLOB_SAMP_TOL, RELAXED_TOL, 0.01, GLOB_SAMP_TOL,  RELAXED_TOL, 0.072, 0.072, BASE_TOLERANCE
-            });
+        public ErrorTolerances getErrorTolerances() {
+            return ERROR_TOLERANCES;
         }
     },
     ABS_SINUSOIDAL {
+        private final ErrorTolerances ERROR_TOLERANCES =
+                new ErrorTolerances(GLOB_SAMP_TOL, 0.0128, 0.01, 2*GLOB_SAMP_TOL,
+                        RELAXED_TOL, 2*GLOB_SAMP_TOL,  3*GLOB_SAMP_TOL,  BASE_TOLERANCE);
+
         /**
          * This version introduces a bit of absolute value sinusoidal noise.
          * This means it will not be second order differentiable, making this type of search harder.
@@ -64,13 +71,15 @@ public enum AnalyticVariation implements IProblemVariation {
         }
 
         @Override
-        public double getErrorTolerancePercent(OptimizationStrategyType opt) {
-            return getErrorTolerancePercent(opt, new double[] {
-                    GLOB_SAMP_TOL, 0.0128, 0.01, 2*GLOB_SAMP_TOL,  RELAXED_TOL, 2*GLOB_SAMP_TOL,  3*GLOB_SAMP_TOL,  BASE_TOLERANCE
-            });
+        public ErrorTolerances getErrorTolerances() {
+            return ERROR_TOLERANCES;
         }
     },
     STEPPED  {
+        private final ErrorTolerances ERROR_TOLERANCES =
+                new ErrorTolerances(GLOB_SAMP_TOL, RELAXED_TOL, BASE_TOLERANCE, GLOB_SAMP_TOL,
+                        RELAXED_TOL,  0.06,  0.06, BASE_TOLERANCE);
+
         /**
          *  This version introduces a bit of step function noise.
          */
@@ -81,10 +90,8 @@ public enum AnalyticVariation implements IProblemVariation {
         }
 
         @Override
-        public double getErrorTolerancePercent(OptimizationStrategyType opt) {
-            return getErrorTolerancePercent(opt, new double[] {
-                    GLOB_SAMP_TOL, RELAXED_TOL, BASE_TOLERANCE, GLOB_SAMP_TOL, RELAXED_TOL,  0.06,  0.06, BASE_TOLERANCE
-            });
+        public ErrorTolerances getErrorTolerances() {
+            return ERROR_TOLERANCES;
         }
     };
 
@@ -96,32 +103,22 @@ public enum AnalyticVariation implements IProblemVariation {
      */
     public abstract double evaluateFitness(ParameterArray a);
 
-    /**
-     * Error tolerance for each search strategy and variation of the problem.
-     * @param opt optimization strategy.
-     * @return error tolerance percent
-     */
-    public abstract double getErrorTolerancePercent(OptimizationStrategyType opt);
 
     public ParameterArray getExactSolution() {
         return AnalyticFunctionConsts.EXACT_SOLUTION;
     }
 
-    protected double getErrorTolerancePercent(OptimizationStrategyType opt, double[] percentValues) {
-
-        double percent = 0;
-        switch (opt) {
-            case GLOBAL_SAMPLING : percent = percentValues[0]; break;
-            case GLOBAL_HILL_CLIMBING : percent = percentValues[1]; break;
-            case HILL_CLIMBING : percent = percentValues[2]; break;
-            case SIMULATED_ANNEALING : percent = percentValues[3]; break;
-            case TABU_SEARCH: percent = percentValues[4]; break;
-            case GENETIC_SEARCH : percent = percentValues[5]; break;
-            case CONCURRENT_GENETIC_SEARCH : percent = percentValues[6]; break;
-            case STATE_SPACE: percent = percentValues[7]; break;
-        }
-        return percent;
+    /** @return the error tolerance percent for a specific optimization strategy */
+    public double getErrorTolerancePercent(OptimizationStrategyType opt) {
+        return getErrorTolerances().getErrorTolerancePercent(opt);
     }
+
+    /**
+     * Error tolerance for each search strategy and variation of the problem.
+     * @return error tolerance percent
+     */
+    protected abstract ErrorTolerances getErrorTolerances();
+
 
     public static void main(String[] args) {
         double p1 = 0.97795;

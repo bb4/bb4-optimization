@@ -40,7 +40,6 @@ public class AnalyticFunctionProblem extends OptimizeeProblem {
         return variation_.name();
     }
 
-
     /** we evaluate directly not by comparing with a different trial.   */
     @Override
     public boolean evaluateByComparison() {

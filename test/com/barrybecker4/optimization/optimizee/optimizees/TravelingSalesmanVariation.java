@@ -30,6 +30,10 @@ public enum TravelingSalesmanVariation implements IProblemVariation {
                 {1, 2, 3, 0}
         };
 
+        private final ErrorTolerances ERROR_TOLERANCES = new ErrorTolerances(
+                GLOB_SAMP_TOL, BASE_TOLERANCE, BASE_TOLERANCE, 0.04,  RELAXED_TOL,  0.042,   0.042, BASE_TOLERANCE
+        );
+
         @Override
         public int getNumCities() {
             return 4;
@@ -59,10 +63,8 @@ public enum TravelingSalesmanVariation implements IProblemVariation {
         }
 
         @Override
-        public double getErrorTolerancePercent(OptimizationStrategyType opt) {
-            return getErrorTolerancePercent(opt, new double[] {
-                    GLOB_SAMP_TOL, BASE_TOLERANCE, BASE_TOLERANCE, 0.04,  RELAXED_TOL,  0.042,   0.042, BASE_TOLERANCE
-            });
+        public ErrorTolerances getErrorTolerances() {
+            return ERROR_TOLERANCES;
         }
     },
     STANDARD {
@@ -78,6 +80,9 @@ public enum TravelingSalesmanVariation implements IProblemVariation {
                 {92, 61, 45, 0, 67},
                 {24, 35, 23, 67, 0}
         };
+        private final ErrorTolerances ERROR_TOLERANCES = new ErrorTolerances(
+                GLOB_SAMP_TOL, RELAXED_TOL, 0.01, 0.04,  RELAXED_TOL, 0.042, 0.042, BASE_TOLERANCE
+        );
 
         @Override
         public int getNumCities() {
@@ -106,10 +111,8 @@ public enum TravelingSalesmanVariation implements IProblemVariation {
         }
 
         @Override
-        public double getErrorTolerancePercent(OptimizationStrategyType opt) {
-            return getErrorTolerancePercent(opt, new double[] {
-                    GLOB_SAMP_TOL, RELAXED_TOL, 0.01, 0.04,  RELAXED_TOL, 0.042, 0.042, BASE_TOLERANCE
-            });
+        public ErrorTolerances getErrorTolerances() {
+            return ERROR_TOLERANCES;
         }
     };
 
@@ -161,28 +164,16 @@ public enum TravelingSalesmanVariation implements IProblemVariation {
         return totalCost ;
     }
 
+    /** @return the error tolerance percent for a specific optimization strategy */
+    public double getErrorTolerancePercent(OptimizationStrategyType opt) {
+        return getErrorTolerances().getErrorTolerancePercent(opt);
+    }
+
     /**
      * Error tolerance for each search strategy and variation of the problem.
-     * @param opt optimization strategy.
      * @return error tolerance percent
      */
-    public abstract double getErrorTolerancePercent(OptimizationStrategyType opt);
-
-    protected double getErrorTolerancePercent(OptimizationStrategyType opt, double[] percentValues) {
-
-        double percent = 0;
-        switch (opt) {
-            case GLOBAL_SAMPLING : percent = percentValues[0]; break;
-            case GLOBAL_HILL_CLIMBING : percent = percentValues[1]; break;
-            case HILL_CLIMBING : percent = percentValues[2]; break;
-            case SIMULATED_ANNEALING : percent = percentValues[3]; break;
-            case TABU_SEARCH: percent = percentValues[4]; break;
-            case GENETIC_SEARCH : percent = percentValues[5]; break;
-            case CONCURRENT_GENETIC_SEARCH : percent = percentValues[6]; break;
-            case STATE_SPACE: percent = percentValues[7]; break;
-        }
-        return percent;
-    }
+    protected abstract ErrorTolerances getErrorTolerances();
 
     /**
      * Create the solution based on the ordered list of cities.

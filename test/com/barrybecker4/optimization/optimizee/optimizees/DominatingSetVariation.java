@@ -30,6 +30,8 @@ public enum DominatingSetVariation implements IProblemVariation {
                 Arrays.asList(0, 1)
         );
 
+        private final ErrorTolerances ERROR_TOLERANCES = new ErrorTolerances(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+
         protected Graph getAdjacencies() {
             return ADJACENCIES;
         }
@@ -46,10 +48,8 @@ public enum DominatingSetVariation implements IProblemVariation {
         }
 
         @Override
-        public double getErrorTolerancePercent(OptimizationStrategyType opt) {
-            return getErrorTolerancePercent(opt, new double[] {
-                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
-            });
+        public ErrorTolerances getErrorTolerances() {
+            return ERROR_TOLERANCES;
         }
     },
 
@@ -83,6 +83,9 @@ public enum DominatingSetVariation implements IProblemVariation {
                 Arrays.asList(0, 23, 24)
         );
 
+        private final ErrorTolerances ERROR_TOLERANCES =
+                new ErrorTolerances(4.0, 1.0, 1.0, 6.0,   1.0,   2.0,  2.0, 1.0);
+
         protected Graph getAdjacencies() {
             return ADJACENCIES;
         }
@@ -99,10 +102,8 @@ public enum DominatingSetVariation implements IProblemVariation {
         }
 
         @Override
-        public double getErrorTolerancePercent(OptimizationStrategyType opt) {
-            return getErrorTolerancePercent(opt, new double[] {
-                    4.0, 1.0, 1.0, 12.0,   1.0,   2.0,  2.0, 1.0
-            });
+        public ErrorTolerances getErrorTolerances() {
+            return ERROR_TOLERANCES;
         }
     };
 
@@ -122,7 +123,7 @@ public enum DominatingSetVariation implements IProblemVariation {
         int num = this.getNumNodes();
         List<Parameter> params = new ArrayList<>(num);
         // just add every second node
-        for (int i=0; i<num; i+=2) {
+        for (int i=0; i<num; i+=3) {
             params.add(new IntegerParameter(i, 0, num-1, "p" + i));
         }
         VariableLengthIntArray pa = new VariableLengthIntArray(params, getNumNodes());
@@ -170,28 +171,18 @@ public enum DominatingSetVariation implements IProblemVariation {
         return getScore(marked);
     }
 
+    /** @return the error tolerance percent for a specific optimization strategy */
+    public double getErrorTolerancePercent(OptimizationStrategyType opt) {
+        return getErrorTolerances().getErrorTolerancePercent(opt);
+    }
+
+
     /**
      * Error tolerance for each search strategy and variation of the problem.
-     * @param opt optimization strategy.
      * @return error tolerance percent
      */
-    public abstract double getErrorTolerancePercent(OptimizationStrategyType opt);
+    protected abstract ErrorTolerances getErrorTolerances();
 
-    protected double getErrorTolerancePercent(OptimizationStrategyType opt, double[] percentValues) {
-
-        double percent = 0;
-        switch (opt) {
-            case GLOBAL_SAMPLING : percent = percentValues[0]; break;
-            case GLOBAL_HILL_CLIMBING : percent = percentValues[1]; break;
-            case HILL_CLIMBING : percent = percentValues[2]; break;
-            case SIMULATED_ANNEALING : percent = percentValues[3]; break;
-            case TABU_SEARCH: percent = percentValues[4]; break;
-            case GENETIC_SEARCH : percent = percentValues[5]; break;
-            case CONCURRENT_GENETIC_SEARCH : percent = percentValues[6]; break;
-            case STATE_SPACE: percent = percentValues[7]; break;
-        }
-        return percent;
-    }
 
     /**
      * Create the solution based on the ordered list of cities.
