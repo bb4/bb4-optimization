@@ -70,7 +70,7 @@ public interface ParameterArray extends Comparable<ParameterArray> {
      * @return the distance between this parameter array and another.
      * sqrt(sum of squares)
      */
-    double distance( ParameterArray pa );
+    double distance(ParameterArray pa);
 
     /**
      * @param radius the size of the (1 std deviation) gaussian neighborhood to select a random nbr from

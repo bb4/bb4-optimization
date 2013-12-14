@@ -132,7 +132,7 @@ public abstract class AbstractParameterArray implements ParameterArray {
         if (o == null || getClass() != o.getClass()) return false;
 
         AbstractParameterArray that = (AbstractParameterArray) o;
-        return params_.equals(that.params_);
+        return params_ == that.params_ || params_.equals(that.params_);
     }
 
     @Override

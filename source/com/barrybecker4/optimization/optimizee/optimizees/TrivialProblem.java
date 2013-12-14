@@ -49,6 +49,6 @@ public class TrivialProblem extends OptimizeeProblem {
 
     @Override
     public double evaluateFitness(ParameterArray params) {
-        return 1 - EXACT_SOLUTION.distance(params);
+        return EXACT_SOLUTION.distance(params);
     }
 }
