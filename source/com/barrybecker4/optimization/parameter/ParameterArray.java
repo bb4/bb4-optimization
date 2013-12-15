@@ -1,11 +1,11 @@
 // Copyright by Barry G. Becker, 2012. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.parameter;
 
-import com.barrybecker4.optimization.parameter.improvement.Improvement;
 import com.barrybecker4.optimization.optimizee.Optimizee;
+import com.barrybecker4.optimization.parameter.improvement.Improvement;
 import com.barrybecker4.optimization.parameter.types.Parameter;
 
-import java.util.List;
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -50,12 +50,13 @@ public interface ParameterArray extends Comparable<ParameterArray> {
 
     /**
      * Globally sample the parameter space with a uniform distribution.
+     *
      * @param requestedNumSamples approximate number of samples to retrieve.
      *   If the problem space is small and requestedNumSamples is large, it may not be possible to return this
-     *   many unique samples.
-     * @return some number of unique samples.
+     *   many unique samples. In this case all possibilities will be returned.
+     * @return an iterator that is capable of producing the specified number of unique samples.
      */
-    List<? extends ParameterArray> findGlobalSamples(int requestedNumSamples);
+    Iterator<? extends ParameterArray> findGlobalSamples(long requestedNumSamples);
 
     /**
      * Try to find a parameterArray that is better than what we have now by evaluating using the optimizee passed in.

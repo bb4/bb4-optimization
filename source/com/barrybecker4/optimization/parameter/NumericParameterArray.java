@@ -11,6 +11,7 @@ import com.barrybecker4.optimization.parameter.types.DoubleParameter;
 import com.barrybecker4.optimization.parameter.types.Parameter;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -84,14 +85,14 @@ public class NumericParameterArray extends AbstractParameterArray {
 
     /**
      * Globally sample the parameter space with a uniform distribution.
+     *
      * @param requestedNumSamples approximate number of samples to retrieve.
      *   If the problem space is small and requestedNumSamples is large, it may not be possible to return this
      *   many unique samples.
      * @return some number of unique samples.
      */
-    public List<NumericParameterArray> findGlobalSamples(int requestedNumSamples) {
-        NumericGlobalSampler sampler = new NumericGlobalSampler(this);
-        return sampler.findGlobalSamples(requestedNumSamples);
+    public Iterator<NumericParameterArray> findGlobalSamples(long requestedNumSamples) {
+        return new NumericGlobalSampler(this, requestedNumSamples);
     }
 
     /**

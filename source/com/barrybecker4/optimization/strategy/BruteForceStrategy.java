@@ -8,37 +8,20 @@ import java.util.Iterator;
 
 
 /**
- *  Global sampling optimization strategy.
+ * A strategy which naively tries all possibilities.
+ * This will not be practical for problems with real valued parameters
+ * where the search space is infinite.
  *
  * @author Barry Becker
  */
-public class GlobalSampleStrategy extends OptimizationStrategy {
-
-    /** Some number of samples to try.  */
-    private static final int DEFAULT_NUM_SAMPLES = 10000;
-
-    /** the user should set this explicitly. */
-    int numSamples_;
-
+public class BruteForceStrategy extends OptimizationStrategy {
 
     /**
      * Constructor
-     * No log file specified in this constructor. (use this version if running in unsigned applet).
      * @param optimizee the thing to be optimized.
      */
-    public GlobalSampleStrategy( Optimizee optimizee ) {
-
+    public BruteForceStrategy(Optimizee optimizee) {
         super(optimizee);
-        numSamples_ = DEFAULT_NUM_SAMPLES;
-    }
-
-    /**
-     * @param samplingRate the rate at which to sample along each dimension when trying guesses globally.
-     */
-    public void setSamplingRate(int samplingRate) {
-
-        assert samplingRate > 0;
-        numSamples_ = samplingRate;
     }
 
     /**
@@ -61,12 +44,11 @@ public class GlobalSampleStrategy extends OptimizationStrategy {
     @Override
     public ParameterArray doOptimization( ParameterArray params, double fitnessRange ) {
 
-        Iterator<? extends ParameterArray> samples = params.findGlobalSamples(numSamples_);
+        Iterator<? extends ParameterArray> samples = params.findGlobalSamples(Long.MAX_VALUE);
         double bestFitness = Double.MAX_VALUE;
         ParameterArray bestParams = params.copy();
 
-        while (samples.hasNext()) {
-
+        while ( samples.hasNext()) {
             ParameterArray sample = samples.next();
             double fitness;
             if (optimizee_.evaluateByComparison())

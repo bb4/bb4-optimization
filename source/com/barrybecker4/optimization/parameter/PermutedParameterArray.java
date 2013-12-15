@@ -9,6 +9,7 @@ import com.barrybecker4.optimization.parameter.types.Parameter;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -100,12 +101,13 @@ public class PermutedParameterArray extends AbstractParameterArray {
 
     /**
      * Globally sample the parameter space.
+     *
      * @param requestedNumSamples approximate number of samples to retrieve.
      *   If the problem space is small and requestedNumSamples is large, it may not be possible to return this
      *   many unique samples.
      * @return some number of unique samples.
      */
-    public List<ParameterArray> findGlobalSamples(int requestedNumSamples) {
+    public Iterator<ParameterArray> findGlobalSamples(long requestedNumSamples) {
 
         // Divide by 2 because it does not matter which param we start with.
         // See page 13 in How to Solve It.
@@ -114,13 +116,13 @@ public class PermutedParameterArray extends AbstractParameterArray {
         // if the requested number of samples is close to the total number of permutations,
         // then we could just enumerate the permutations.
         double closeFactor = 0.7;
-        int numSamples = requestedNumSamples;
+        long numSamples = requestedNumSamples;
 
         if (requestedNumSamples > closeFactor *numPermutations) {
             numSamples = (int)(closeFactor * numPermutations);
         }
 
-        List<ParameterArray> globalSamples = new ArrayList<>(numSamples);
+        List<ParameterArray> globalSamples = new ArrayList<>();
 
         while (globalSamples.size() < numSamples) {
 
@@ -129,7 +131,7 @@ public class PermutedParameterArray extends AbstractParameterArray {
                 globalSamples.add(nextSample);
             }
         }
-        return globalSamples;
+        return globalSamples.iterator();
     }
 
     /**

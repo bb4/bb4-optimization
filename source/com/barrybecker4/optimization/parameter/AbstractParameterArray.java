@@ -18,7 +18,7 @@ public abstract class AbstractParameterArray implements ParameterArray {
     /** Never exceed this amount  */
     private static final int POPULATION_MAX = 4000;
 
-    // change this to list instead of array
+    /** the list of parameters */
     protected List<Parameter> params_;
 
     /** assign a fitness (evaluation value) to this set of parameters */

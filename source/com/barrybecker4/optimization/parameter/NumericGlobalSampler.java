@@ -4,75 +4,88 @@ package com.barrybecker4.optimization.parameter;
 import com.barrybecker4.common.math.MultiArray;
 import com.barrybecker4.optimization.parameter.types.Parameter;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * Finds a set of uniformly distributed global samples in a large numeric parameter space.
  *
  * @author Barry Becker
  */
-public class NumericGlobalSampler {
+public class NumericGlobalSampler implements Iterator<NumericParameterArray> {
 
     private NumericParameterArray params;
+
+    /** number of discrete samples to take along each parameter */
+    private int samplingRate;
+
+    private MultiArray samples;
+
+    /** becomes false when no more samples to iterate through */
+    private boolean hasNext = true;
+
+    /** counts up to the number of samples as we iterate */
+    private long counter = 0;
+
+    /**
+     * approximate number of samples to retrieve.
+     * If the problem space is small and requestedNumSamples is large, it may not be possible to return this
+     * many unique samples.
+     */
+    private long numSamples;
 
     /**
      *  Constructor
      * @param params an array of params to initialize with.
      */
-    public NumericGlobalSampler(NumericParameterArray params) {
+    public NumericGlobalSampler(NumericParameterArray params, long requestedNumSamples) {
         this.params = params;
-    }
 
-    /**
-     * Globally sample the parameter space with a uniform distribution.
-     * @@ it would be better to produce an iterator instead of a list so that
-     * the memory for the whole list (which could be enormous) would not have to allocated at the start.
-     *
-     * @param requestedNumSamples approximate number of samples to retrieve.
-     *   If the problem space is small and requestedNumSamples is large, it may not be possible to return this
-     *   many unique samples.
-     * @return some number of unique samples.
-     */
-    public List<NumericParameterArray> findGlobalSamples(int requestedNumSamples) {
-        int numDims = params.size();
-        int i;
-        int[] dims = new int[numDims];
-
-        int samplingRate = (int)Math.pow((double)requestedNumSamples, 1.0/numDims);
-        int numSamples = determineNumSamples(dims, samplingRate);
-
-        MultiArray samples = new MultiArray( dims );
-        List<NumericParameterArray> globalSamples = new ArrayList<>(numSamples);
-
-        for ( i = 0; i < samples.getNumValues(); i++ ) {
-            int[] index = samples.getIndexFromRaw( i );
-            NumericParameterArray nextSample = params.copy();
-
-            for ( int j = 0; j < nextSample.size(); j++ ) {
-                Parameter p = nextSample.get( j );
-                double increment = (p.getMaxValue() - p.getMinValue()) / samplingRate;
-                p.setValue(p.getMinValue() + increment / 2.0 + index[j] * increment);
-            }
-
-            globalSamples.add(nextSample);
-        }
-        return globalSamples;
-    }
-
-    /**
-     * @param dims array of dimensions
-     * @param samplingRate sampling rate along each numeric dimension.
-     * @return the number of global samples to find
-     */
-    private int determineNumSamples(int[] dims, int samplingRate) {
-        int i;
-        int numSamples = 1;
-
-        for ( i = 0; i < dims.length; i++ ) {
+        int[] dims = new int[params.size()];
+        samplingRate = determineSamplingRate(requestedNumSamples);
+        for (int i=0; i<dims.length; i++) {
             dims[i] = samplingRate;
-            numSamples *= dims[i];
         }
-        return numSamples;
+        // this potentially takes a lot of memory - may need to revisit
+        samples = new MultiArray(dims);
+
+        numSamples = samples.getNumValues();
     }
+
+    @Override
+    public boolean hasNext() {
+        return hasNext;
+    }
+
+    @Override
+    public NumericParameterArray next() {
+        if (counter >= numSamples) {
+            throw new NoSuchElementException("ran out of samples.");
+        }
+        if (counter == numSamples-1) {
+            hasNext = false;
+        }
+
+        int[] index = samples.getIndexFromRaw((int)counter);     // revisit
+        NumericParameterArray nextSample = params.copy();
+
+        for ( int j = 0; j < nextSample.size(); j++ ) {
+            Parameter p = nextSample.get( j );
+            double increment = (p.getMaxValue() - p.getMinValue()) / samplingRate;
+            p.setValue(p.getMinValue() + increment / 2.0 + index[j] * increment);
+        }
+        counter++;
+        return nextSample;
+    }
+
+    @Override
+    public void remove() {
+        throw new UnsupportedOperationException("cannot remove samples from the iterator");
+    }
+
+    private int determineSamplingRate(long requestedNumSamples) {
+        int numDims = params.size();
+        return (int)Math.pow((double)requestedNumSamples, 1.0 / numDims);
+    }
+
 }
