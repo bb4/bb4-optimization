@@ -53,7 +53,7 @@ public class NumericParameterArrayTest extends TestCase {
 
         params = createParamArray(.2, .3);
 
-        List<ParameterArray> samples = params.findGlobalSamples(1);
+        List<NumericParameterArray> samples = params.findGlobalSamples(1);
         assertEquals("Unexpected num samples", 1, samples.size());
 
         List<NumericParameterArray> expParams = Arrays.asList(createParamArray(0, 0.0));
@@ -64,7 +64,7 @@ public class NumericParameterArrayTest extends TestCase {
 
         params = createParamArray(.2, .3);
 
-        List<ParameterArray> samples = params.findGlobalSamples(2);
+        List<NumericParameterArray> samples = params.findGlobalSamples(2);
         assertEquals("Unexpected num samples", 1, samples.size());
     }
 
@@ -72,7 +72,7 @@ public class NumericParameterArrayTest extends TestCase {
 
         params = createParamArray(.2, .3);
 
-        List<ParameterArray> samples = params.findGlobalSamples(3);
+        List<NumericParameterArray> samples = params.findGlobalSamples(3);
         assertEquals("Unexpected num samples", 1, samples.size());
     }
 
@@ -80,7 +80,7 @@ public class NumericParameterArrayTest extends TestCase {
 
         params = createParamArray(.2, .3);
 
-        List<ParameterArray> samples = params.findGlobalSamples(4);
+        List<NumericParameterArray> samples = params.findGlobalSamples(4);
         assertEquals("Unexpected num samples", 4, samples.size());
 
         List<NumericParameterArray> expParams = Arrays.asList(
@@ -95,7 +95,7 @@ public class NumericParameterArrayTest extends TestCase {
 
         params = createParamArray(.2, .3);
 
-        List<ParameterArray> samples = params.findGlobalSamples(10);
+        List<NumericParameterArray> samples = params.findGlobalSamples(10);
         assertEquals("Unexpected num samples", 9, samples.size());
     }
 
@@ -103,7 +103,7 @@ public class NumericParameterArrayTest extends TestCase {
 
         params = createParamArray(.2, .3);
 
-        List<ParameterArray> samples = params.findGlobalSamples(97);
+        List<NumericParameterArray> samples = params.findGlobalSamples(97);
         assertEquals("Unexpected num samples", 81, samples.size());
     }
 
@@ -111,10 +111,9 @@ public class NumericParameterArrayTest extends TestCase {
 
         params = createParamArray(.2, .3);
 
-        List<ParameterArray> samples = params.findGlobalSamples(1000);
+        List<NumericParameterArray> samples = params.findGlobalSamples(1000);
         assertEquals("Unexpected num samples", 961, samples.size());
     }
-
 
     public static NumericParameterArray createParamArray(double value1, double value2) {
         assert value1 >= MIN_VALUE && value1 <= MAX_VALUE;

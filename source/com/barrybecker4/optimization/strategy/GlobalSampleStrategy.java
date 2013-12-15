@@ -61,7 +61,7 @@ public class GlobalSampleStrategy extends OptimizationStrategy {
     @Override
     public ParameterArray doOptimization( ParameterArray params, double fitnessRange ) {
 
-        List<ParameterArray> samples = params.findGlobalSamples(numSamples_);
+        List<? extends ParameterArray> samples = params.findGlobalSamples(numSamples_);
         double bestFitness = Double.MAX_VALUE;
         ParameterArray bestParams = params.copy();
 

@@ -116,13 +116,14 @@ public abstract class AbstractParameterArray implements ParameterArray {
 
     /**
      * Natural ordering based on the fitness evaluation assigned to this parameter array.
-     * @param p the parameter array to compare ourselves too.
-     * @return -1 if we are less than p, 1 if greater than p, 0 if equal.
+     * @param params the parameter array to compare ourselves too.
+     * @return -1 if we are less than params, 1 if greater than params, 0 if equal.
      */
-    public int compareTo(ParameterArray p) {
-        double diff = this.getFitness() - p.getFitness();
-        if (diff < 0)
+    public int compareTo(ParameterArray params) {
+        double diff = this.getFitness() - params.getFitness();
+        if (diff < 0) {
             return -1;
+        }
         return (diff > 0)? 1 :  0;
     }
 

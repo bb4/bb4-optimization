@@ -55,7 +55,7 @@ public interface ParameterArray extends Comparable<ParameterArray> {
      *   many unique samples.
      * @return some number of unique samples.
      */
-    List<ParameterArray> findGlobalSamples(int requestedNumSamples);
+    List<? extends ParameterArray> findGlobalSamples(int requestedNumSamples);
 
     /**
      * Try to find a parameterArray that is better than what we have now by evaluating using the optimizee passed in.

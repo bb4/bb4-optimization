@@ -132,6 +132,4 @@ public enum AnalyticVariation implements IProblemVariation {
 
         //Which evaluates to: 1.0011111
     }
-
-
 }

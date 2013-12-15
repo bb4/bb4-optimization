@@ -34,7 +34,7 @@ public class NumericGlobalSampler {
      *   many unique samples.
      * @return some number of unique samples.
      */
-    public List<ParameterArray> findGlobalSamples(int requestedNumSamples) {
+    public List<NumericParameterArray> findGlobalSamples(int requestedNumSamples) {
         int numDims = params.size();
         int i;
         int[] dims = new int[numDims];
@@ -43,7 +43,7 @@ public class NumericGlobalSampler {
         int numSamples = determineNumSamples(dims, samplingRate);
 
         MultiArray samples = new MultiArray( dims );
-        List<ParameterArray> globalSamples = new ArrayList<>(numSamples);
+        List<NumericParameterArray> globalSamples = new ArrayList<>(numSamples);
 
         for ( i = 0; i < samples.getNumValues(); i++ ) {
             int[] index = samples.getIndexFromRaw( i );
