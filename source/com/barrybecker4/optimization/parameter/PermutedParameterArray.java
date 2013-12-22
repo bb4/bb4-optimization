@@ -5,6 +5,7 @@ import com.barrybecker4.common.math.MathUtil;
 import com.barrybecker4.optimization.optimizee.Optimizee;
 import com.barrybecker4.optimization.parameter.improvement.DiscreteImprovementFinder;
 import com.barrybecker4.optimization.parameter.improvement.Improvement;
+import com.barrybecker4.optimization.parameter.sampling.PermutedGlobalSampler;
 import com.barrybecker4.optimization.parameter.types.Parameter;
 
 import java.util.ArrayList;
@@ -43,6 +44,20 @@ public class PermutedParameterArray extends AbstractParameterArray {
      */
     public PermutedParameterArray(List<Parameter> params) {
         super(params);
+    }
+
+    /**
+     * Permute the parameters according to the specified permutation
+     * of 0 based indices.
+     */
+    public void setPermutation(List<Integer> indices) {
+
+        assert indices.size() == size();
+        List<Parameter> newParams = new ArrayList<>(size());
+        for (int i : indices) {
+            newParams.add(get(i));
+        }
+        params_ = newParams;
     }
 
     @Override
@@ -107,31 +122,8 @@ public class PermutedParameterArray extends AbstractParameterArray {
      *   many unique samples.
      * @return some number of unique samples.
      */
-    public Iterator<ParameterArray> findGlobalSamples(long requestedNumSamples) {
-
-        // Divide by 2 because it does not matter which param we start with.
-        // See page 13 in How to Solve It.
-        long numPermutations = MathUtil.factorial(size()) / 2;
-
-        // if the requested number of samples is close to the total number of permutations,
-        // then we could just enumerate the permutations.
-        double closeFactor = 0.7;
-        long numSamples = requestedNumSamples;
-
-        if (requestedNumSamples > closeFactor *numPermutations) {
-            numSamples = (int)(closeFactor * numPermutations);
-        }
-
-        List<ParameterArray> globalSamples = new ArrayList<>();
-
-        while (globalSamples.size() < numSamples) {
-
-            ParameterArray nextSample = this.getRandomSample();
-            if (!globalSamples.contains(nextSample)) {
-                globalSamples.add(nextSample);
-            }
-        }
-        return globalSamples.iterator();
+    public Iterator<PermutedParameterArray> findGlobalSamples(long requestedNumSamples) {
+        return new PermutedGlobalSampler(this, requestedNumSamples);
     }
 
     /**

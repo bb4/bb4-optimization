@@ -25,24 +25,12 @@ public class ErrorTolerances {
         percentValues.put(GENETIC_SEARCH, geneticSearch);
         percentValues.put(CONCURRENT_GENETIC_SEARCH, concGenSearch);
         percentValues.put(STATE_SPACE, stateSpace);
+        // the error for brute force should always be 0.
+        percentValues.put(BRUTE_FORCE, 0.0);
     }
 
     protected double getErrorTolerancePercent(OptimizationStrategyType opt) {
 
         return percentValues.get(opt);
-        /**
-        double percent = 0;
-        switch (opt) {
-            case GLOBAL_SAMPLING : percent = percentValues[0]; break;
-            case GLOBAL_HILL_CLIMBING : percent = percentValues[1]; break;
-            case HILL_CLIMBING : percent = percentValues[2]; break;
-            case SIMULATED_ANNEALING : percent = percentValues[3]; break;
-            case TABU_SEARCH: percent = percentValues[4]; break;
-            case GENETIC_SEARCH : percent = percentValues[5]; break;
-            case CONCURRENT_GENETIC_SEARCH : percent = percentValues[6]; break;
-            case STATE_SPACE: percent = percentValues[7]; break;
-        }
-        return percent;
-         */
     }
 }

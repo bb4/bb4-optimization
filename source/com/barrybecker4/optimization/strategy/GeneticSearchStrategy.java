@@ -45,7 +45,7 @@ public class GeneticSearchStrategy extends OptimizationStrategy {
     private int desiredPopulationSize_;
 
     /** If crossover breeding of genetic material is used. */
-    private boolean useCrossOver_ = false;
+    //private boolean useCrossOver_ = false;
 
     /** if we don't improve by at least this amount between iterations, terminate.  */
     protected double improvementEpsilon_ = DEFAULT_IMPROVEMENT_EPS;
@@ -62,12 +62,11 @@ public class GeneticSearchStrategy extends OptimizationStrategy {
     }
 
     /**
+     * //@param useCrossOver if true then create new population members using genetic crossover between parents.
      *
-     * @param useCrossOver if true then create new population members using genetic crossover between parents.
-     */
     public void setUseCrossOver(boolean useCrossOver) {
          useCrossOver_ = useCrossOver;
-    }
+    }   */
 
     public void setImprovementEpsilon(double eps) {
         improvementEpsilon_ = eps;
@@ -163,9 +162,9 @@ public class GeneticSearchStrategy extends OptimizationStrategy {
                 "We must never get worse in a new generation. Old fitness="
                         + lastBest.getFitness() + " New Fitenss = " + currentBest.getFitness() + ".";
 
-        System.out.println(" ct="+ct+"  nbrRadius_=" + nbrRadius_ + " population size=" + desiredPopulationSize_
-                           +" deltaFitness=" + deltaFitness+"  currentBest = " + currentBest.getFitness()
-                           +"  lastBest=" + lastBest.getFitness());
+        System.out.println(" ct="+ct+"  nbrRadius = " + nbrRadius_ + "  population size =" + desiredPopulationSize_
+                           +"  deltaFitness = " + deltaFitness+"  currentBest = " + currentBest.getFitness()
+                           +"  lastBest = " + lastBest.getFitness());
         log(ct, currentBest.getFitness(), nbrRadius_, deltaFitness, params, "---");
         return deltaFitness;
     }

@@ -5,6 +5,7 @@ import com.barrybecker4.common.math.MathUtil;
 import com.barrybecker4.optimization.optimizee.Optimizee;
 import com.barrybecker4.optimization.parameter.improvement.DiscreteImprovementFinder;
 import com.barrybecker4.optimization.parameter.improvement.Improvement;
+import com.barrybecker4.optimization.parameter.sampling.VariableLengthGlobalSampler;
 import com.barrybecker4.optimization.parameter.types.IntegerParameter;
 import com.barrybecker4.optimization.parameter.types.Parameter;
 
@@ -17,7 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *  represents a 1 dimensional, variable length, array of unique integer parameters.
+ *  Represents a 1 dimensional, variable length, array of unique integer parameters.
  *  The order of the integers does not matter.
  *
  *  @author Barry Becker
@@ -37,6 +38,11 @@ public class VariableLengthIntArray extends AbstractParameterArray {
     public VariableLengthIntArray(List<Parameter> params, int max) {
         super(params);
         maxLength = max;
+    }
+
+    /** @return the maximum length of the variable length array */
+    public int getMaxLength() {
+        return maxLength;
     }
 
     @Override
@@ -136,7 +142,7 @@ public class VariableLengthIntArray extends AbstractParameterArray {
                 remove = true;
             }
         }
-        int numNodesToMove = 0;
+        int numNodesToMove;
         VariableLengthIntArray nbr = (VariableLengthIntArray)this.copy();
 
         if (add || remove) {
@@ -159,10 +165,77 @@ public class VariableLengthIntArray extends AbstractParameterArray {
         return nbr;
     }
 
+    public void setCombination(List<Integer> indices) {
+         assert indices.size() <= size();
+         List<Parameter> newParams = new ArrayList<>(size());
+         for (int i : indices) {
+             newParams.add(createParam(i));
+         }
+         params_ = newParams;
+    }
+
+    /**
+     * Globally sample the parameter space.
+     *
+     * @param requestedNumSamples approximate number of samples to retrieve.
+     * If the problem space is small and requestedNumSamples is large, it may not be possible to return this
+     * many unique samples.
+     * @return some number of unique samples.
+     */
+    public Iterator<VariableLengthIntArray> findGlobalSamples(long requestedNumSamples) {
+        return new VariableLengthGlobalSampler(this, requestedNumSamples);
+    }
+
+    /**
+     * {@inheritDoc}
+     * Try swapping parameters randomly until we find an improvement (if we can).
+     */
+    public Improvement findIncrementalImprovement(Optimizee optimizee, double jumpSize,
+                                                  Improvement lastImprovement, Set<ParameterArray> cache) {
+        DiscreteImprovementFinder finder = new DiscreteImprovementFinder(this);
+        return finder.findIncrementalImprovement(optimizee, jumpSize, cache);
+    }
+
+    /**
+     * @return get a completely random solution in the parameter space.
+     */
+    public ParameterArray getRandomSample() {
+
+        List<Integer> marked = new LinkedList<>();
+        for (int i=0; i<maxLength; i++) {
+            if (MathUtil.RANDOM.nextDouble() > 0.5) {
+                marked.add(i);
+            }
+        }
+        List<Parameter> newParams = new ArrayList<>();
+        for (int markedNode : marked) {
+            newParams.add(createParam(markedNode));
+        }
+
+        return new VariableLengthIntArray(newParams, maxLength);
+    }
+
+    /**
+     * @return a copy of ourselves.
+     */
+    public AbstractParameterArray copy() {
+        VariableLengthIntArray copy = (VariableLengthIntArray) super.copy();
+        copy.maxLength = maxLength;
+        return copy;
+    }
+
+    /**
+     * @param i the integer parameter's value
+     * @return a new integer parameter.
+     */
+    private Parameter createParam(int i) {
+        return  new IntegerParameter(i, 0, maxLength - 1, "p" + i);
+    }
+
     private void removeRandomParam(VariableLengthIntArray nbr) {
         int indexToRemove = MathUtil.RANDOM.nextInt(size());
         assert nbr.size() > 0;
-        List<Parameter> newParams = new ArrayList<Parameter>(nbr.size()-1);
+        List<Parameter> newParams = new ArrayList<>(nbr.size()-1);
 
         for (int i=0; i < nbr.size(); i++) {
             if (i != indexToRemove) {
@@ -182,7 +255,7 @@ public class VariableLengthIntArray extends AbstractParameterArray {
             newParams.add(p);
         }
         int value = freeNodes.get(MathUtil.RANDOM.nextInt(freeNodes.size()));
-        newParams.add(new IntegerParameter(value, 0, maxLength - 1, "p" + value));
+        newParams.add(createParam(value));
         nbr.params_ = newParams;
     }
 
@@ -226,83 +299,4 @@ public class VariableLengthIntArray extends AbstractParameterArray {
         }
         return freeNodes;
     }
-
-    /**
-     * Globally sample the parameter space.
-     *
-     * @param requestedNumSamples approximate number of samples to retrieve.
-     * If the problem space is small and requestedNumSamples is large, it may not be possible to return this
-     * many unique samples.
-     * @return some number of unique samples.
-     */
-    public Iterator<ParameterArray> findGlobalSamples(long requestedNumSamples) {
-
-        // Divide by 2 because it does not matter which param we start with.
-        // See page 13 in How to Solve It.
-        long totalConfigurations = Long.MAX_VALUE;
-        if (maxLength <= 60)  {
-            totalConfigurations = (long)Math.pow(2.0, maxLength);
-        }
-
-        // if the requested number of samples is close to the total number of permutations,
-        // then we could just enumerate the permutations.
-        double closeFactor = 0.8;
-        long numSamples = requestedNumSamples;
-
-        if (requestedNumSamples > closeFactor * totalConfigurations) {
-            numSamples = (int)(closeFactor * totalConfigurations);
-        }
-
-        List<ParameterArray> globalSamples = new ArrayList<>();
-
-        while (globalSamples.size() < numSamples) {
-
-            ParameterArray nextSample = this.getRandomSample();
-            if (!globalSamples.contains(nextSample)) {
-                globalSamples.add(nextSample);
-            }
-        }
-        System.out.println("rand samples = " + globalSamples);
-        return globalSamples.iterator();
-    }
-
-    /**
-     * {@inheritDoc}
-     * Try swapping parameters randomly until we find an improvement (if we can).
-     */
-    public Improvement findIncrementalImprovement(Optimizee optimizee, double jumpSize,
-                                                  Improvement lastImprovement, Set<ParameterArray> cache) {
-        DiscreteImprovementFinder finder = new DiscreteImprovementFinder(this);
-        return finder.findIncrementalImprovement(optimizee, jumpSize, cache);
-    }
-
-    /**
-     * @return get a completely random solution in the parameter space.
-     */
-    public ParameterArray getRandomSample() {
-
-        List<Integer> marked = new LinkedList<>();
-        for (int i=0; i<maxLength; i++) {
-            if (MathUtil.RANDOM.nextDouble() > 0.5) {
-                marked.add(i);
-            }
-        }
-        List<Parameter> newParams = new ArrayList<>();
-        for (int markedNode : marked) {
-            newParams.add(new IntegerParameter(markedNode, 0, maxLength-1, "p" + markedNode));
-        }
-
-        return new VariableLengthIntArray(newParams, maxLength);
-    }
-
-
-    /**
-     * @return a copy of ourselves.
-     */
-    public AbstractParameterArray copy() {
-        VariableLengthIntArray copy = (VariableLengthIntArray) super.copy();
-        copy.maxLength = maxLength;
-        return copy;
-    }
-
 }

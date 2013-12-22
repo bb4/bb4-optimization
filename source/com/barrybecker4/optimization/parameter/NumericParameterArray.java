@@ -7,6 +7,7 @@ import com.barrybecker4.optimization.optimizee.Optimizee;
 import com.barrybecker4.optimization.parameter.improvement.Improvement;
 import com.barrybecker4.optimization.parameter.improvement.ImprovementIteration;
 import com.barrybecker4.optimization.parameter.improvement.ImprovementStep;
+import com.barrybecker4.optimization.parameter.sampling.NumericGlobalSampler;
 import com.barrybecker4.optimization.parameter.types.DoubleParameter;
 import com.barrybecker4.optimization.parameter.types.Parameter;
 

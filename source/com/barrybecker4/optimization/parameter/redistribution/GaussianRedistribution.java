@@ -71,8 +71,8 @@ public class GaussianRedistribution extends AbstractRedistributionFunction {
 
     /**
      * 1/2 (1 + erf((x-mean)/(SQRT2 *stdDeviation))
-     * @param x
-     * @return
+     * @param x x coordinate position.
+     * @return cdf cumulative distribution function value
      */
     private double cdf(double x) {
 

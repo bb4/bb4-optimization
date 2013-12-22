@@ -28,7 +28,7 @@ public class GlobalHillClimbingStrategy extends OptimizationStrategy {
 
     /**
      * Perform the optimization of the optimizee.
-     * @param params
+     * @param params parameter array
      * @param fitnessRange the approximate absolute value of the fitnessRange.
      * @return optimized params
      */

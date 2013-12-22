@@ -6,12 +6,17 @@ import com.barrybecker4.optimization.optimizee.optimizees.TravelingSalesmanProbl
 import com.barrybecker4.optimization.optimizee.optimizees.TravelingSalesmanVariation;
 import com.barrybecker4.optimization.parameter.ParameterArray;
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
+import org.junit.Test;
 
 /**
  * @author Barry Becker
  */
 public class TestTravelingSalesmanProblem extends OptimizerTestCase {
 
+    @Test
+    public void testBruteForce() {
+        doTest(OptimizationStrategyType.BRUTE_FORCE);
+    }
 
     @Override
     protected void doTest(OptimizationStrategyType optimizationType) {

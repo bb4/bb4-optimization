@@ -6,11 +6,17 @@ import com.barrybecker4.optimization.optimizee.optimizees.DominatingSetVariation
 import com.barrybecker4.optimization.optimizee.optimizees.OptimizeeProblem;
 import com.barrybecker4.optimization.parameter.ParameterArray;
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
+import org.junit.Test;
 
 /**
  * @author Barry Becker
  */
 public class TestDominatingSetProblem extends OptimizerTestCase {
+
+    @Test
+    public void testBruteForce() {
+        doTest(OptimizationStrategyType.BRUTE_FORCE);
+    }
 
 
     @Override

@@ -59,19 +59,19 @@ public enum DominatingSetVariation implements IProblemVariation {
                 Arrays.asList(2, 4, 7),
                 Arrays.asList(1, 3, 5, 7),
                 Arrays.asList(2, 5, 8, 9),
-                Arrays.asList(1, 6, 12),  // 4
+                Arrays.asList(1, 6, 12),        // 4
                 Arrays.asList(2, 3, 8, 13),
                 Arrays.asList(4, 10, 11, 12),
                 Arrays.asList(1, 2, 12, 13),
-                Arrays.asList(3, 5, 9, 14),   // 8
+                Arrays.asList(3, 5, 9, 14),     // 8
                 Arrays.asList(3, 8, 15),
                 Arrays.asList(6, 11, 18),
                 Arrays.asList(6, 10, 16),
-                Arrays.asList(4, 6, 7, 16, 17),  // 12
+                Arrays.asList(4, 6, 7, 16, 17), // 12
                 Arrays.asList(5, 7, 14, 17),
                 Arrays.asList(8, 13, 15, 17),
                 Arrays.asList(0, 9, 14, 21),
-                Arrays.asList(11, 12, 19),  // 16
+                Arrays.asList(11, 12, 19),      // 16
                 Arrays.asList(12, 13, 14, 20, 21),
                 Arrays.asList(10, 19, 22, 24),
                 Arrays.asList(16, 18, 20),
@@ -79,17 +79,18 @@ public enum DominatingSetVariation implements IProblemVariation {
                 Arrays.asList(0, 15, 17, 23),
                 Arrays.asList(18, 20, 23, 24),
                 Arrays.asList(20, 21, 22, 25),
-                Arrays.asList(18, 22, 25),  // 24
+                Arrays.asList(18, 22, 25),      // 24
                 Arrays.asList(0, 23, 24)
         );
 
         private final ErrorTolerances ERROR_TOLERANCES =
-                new ErrorTolerances(4.0, 1.0, 1.0, 6.0,   1.0,   2.0,  2.0, 1.0);
+                new ErrorTolerances(4.0, 1.0, 1.0, 6.0, 1.0, 2.0, 2.0, 1.0);
 
         protected Graph getAdjacencies() {
             return ADJACENCIES;
         }
 
+        /** This is one of several possible solutions that gives an optimal fitness of 0 */
         public ParameterArray getExactSolution() {
             VariableLengthIntArray solution = createSolution(new int[] {6, 7, 8, 19, 21, 24});
             solution.setFitness(0);
@@ -176,13 +177,11 @@ public enum DominatingSetVariation implements IProblemVariation {
         return getErrorTolerances().getErrorTolerancePercent(opt);
     }
 
-
     /**
      * Error tolerance for each search strategy and variation of the problem.
      * @return error tolerance percent
      */
     protected abstract ErrorTolerances getErrorTolerances();
-
 
     /**
      * Create the solution based on the ordered list of cities.

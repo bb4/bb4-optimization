@@ -1,10 +1,10 @@
 /** Copyright by Barry G. Becker, 2013. Licensed under MIT License: http://www.opensource.org/licenses/MIT  */
-package com.barrybecker4.optimization.parameter;
+package com.barrybecker4.optimization.parameter.sampling;
 
-import com.barrybecker4.common.math.MultiArray;
+import com.barrybecker4.common.math.MultiDimensionalIndexer;
+import com.barrybecker4.optimization.parameter.NumericParameterArray;
 import com.barrybecker4.optimization.parameter.types.Parameter;
 
-import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
@@ -12,30 +12,18 @@ import java.util.NoSuchElementException;
  *
  * @author Barry Becker
  */
-public class NumericGlobalSampler implements Iterator<NumericParameterArray> {
+public class NumericGlobalSampler extends AbstractGlobalSampler<NumericParameterArray> {
 
     private NumericParameterArray params;
 
     /** number of discrete samples to take along each parameter */
     private int samplingRate;
 
-    private MultiArray samples;
+    private MultiDimensionalIndexer samples;
 
-    /** becomes false when no more samples to iterate through */
-    private boolean hasNext = true;
-
-    /** counts up to the number of samples as we iterate */
-    private long counter = 0;
 
     /**
-     * approximate number of samples to retrieve.
-     * If the problem space is small and requestedNumSamples is large, it may not be possible to return this
-     * many unique samples.
-     */
-    private long numSamples;
-
-    /**
-     *  Constructor
+     * Constructor
      * @param params an array of params to initialize with.
      */
     public NumericGlobalSampler(NumericParameterArray params, long requestedNumSamples) {
@@ -47,14 +35,9 @@ public class NumericGlobalSampler implements Iterator<NumericParameterArray> {
             dims[i] = samplingRate;
         }
         // this potentially takes a lot of memory - may need to revisit
-        samples = new MultiArray(dims);
+        samples = new MultiDimensionalIndexer(dims);
 
         numSamples = samples.getNumValues();
-    }
-
-    @Override
-    public boolean hasNext() {
-        return hasNext;
     }
 
     @Override
@@ -66,7 +49,7 @@ public class NumericGlobalSampler implements Iterator<NumericParameterArray> {
             hasNext = false;
         }
 
-        int[] index = samples.getIndexFromRaw((int)counter);     // revisit
+        int[] index = samples.getIndexFromRaw((int)counter);
         NumericParameterArray nextSample = params.copy();
 
         for ( int j = 0; j < nextSample.size(); j++ ) {
@@ -78,10 +61,6 @@ public class NumericGlobalSampler implements Iterator<NumericParameterArray> {
         return nextSample;
     }
 
-    @Override
-    public void remove() {
-        throw new UnsupportedOperationException("cannot remove samples from the iterator");
-    }
 
     private int determineSamplingRate(long requestedNumSamples) {
         int numDims = params.size();

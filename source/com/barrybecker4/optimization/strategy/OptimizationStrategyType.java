@@ -17,7 +17,7 @@ import com.barrybecker4.optimization.Optimizer;
  */
 public enum OptimizationStrategyType {
 
-    GLOBAL_SAMPLING ("Sparsely sample the space and return the best sample.") {
+    GLOBAL_SAMPLING("Sparsely sample the space and return the best sample.") {
         @Override
         public OptimizationStrategy getStrategy(Optimizee optimizee, double fitnessRange) {
             GlobalSampleStrategy gsStrategy = new GlobalSampleStrategy(optimizee);
@@ -25,19 +25,19 @@ public enum OptimizationStrategyType {
             return gsStrategy;
         }
     },
-    GLOBAL_HILL_CLIMBING ("Start with the best global sampling and hill climb from there.") {
+    GLOBAL_HILL_CLIMBING("Start with the best global sampling and hill climb from there.") {
         @Override
         public OptimizationStrategy getStrategy(Optimizee optimizee, double fitnessRange) {
             return new GlobalHillClimbingStrategy(optimizee);
         }
     },
-    HILL_CLIMBING ("Search method which always marches toward the direction of greatest improvement.") {
+    HILL_CLIMBING("Search method which always marches toward the direction of greatest improvement.") {
         @Override
         public OptimizationStrategy getStrategy(Optimizee optimizee, double fitnessRange) {
             return new HillClimbingStrategy(optimizee);
         }
     },
-    SIMULATED_ANNEALING ("Marches in the general direction of improvement, but can escape local optima.") {
+    SIMULATED_ANNEALING("Marches in the general direction of improvement, but can escape local optima.") {
         @Override
         public OptimizationStrategy getStrategy(Optimizee optimizee, double fitnessRange) {
             SimulatedAnnealingStrategy strategy = new SimulatedAnnealingStrategy(optimizee);
@@ -45,13 +45,13 @@ public enum OptimizationStrategyType {
             return strategy;
         }
     },
-    TABU_SEARCH ("Uses memory of past solutions to avoid searching them again as it marches toward an optimal solution.") {
+    TABU_SEARCH("Uses memory of past solutions to avoid searching them again as it marches toward an optimal solution.") {
         @Override
         public OptimizationStrategy getStrategy(Optimizee optimizee, double fitnessRange) {
             throw new AbstractMethodError("Tabu search not yet implemented");
         }
     },
-    GENETIC_SEARCH ("Uses a genetic algorithm to search for the best solution.") {
+    GENETIC_SEARCH("Uses a genetic algorithm to search for the best solution.") {
         @Override
         public OptimizationStrategy getStrategy(Optimizee optimizee, double fitnessRange) {
             GeneticSearchStrategy strategy = new GeneticSearchStrategy(optimizee);
@@ -59,7 +59,7 @@ public enum OptimizationStrategyType {
             return strategy;
         }
     },
-    CONCURRENT_GENETIC_SEARCH ("Uses a concurrent genetic algorithm to search for the best solution.") {
+    CONCURRENT_GENETIC_SEARCH("Uses a concurrent genetic algorithm to search for the best solution.") {
         @Override
         public OptimizationStrategy getStrategy(Optimizee optimizee, double fitnessRange) {
             ConcurrentGeneticSearchStrategy strategy = new ConcurrentGeneticSearchStrategy(optimizee);
@@ -67,10 +67,17 @@ public enum OptimizationStrategyType {
             return strategy;
         }
     },
-    STATE_SPACE ("Searches the state space to find an optima.") {
+    STATE_SPACE("Searches the state space to find an optima.") {
         @Override
         public OptimizationStrategy getStrategy(Optimizee optimizee, double fitnessRange) {
             throw new AbstractMethodError("State space search not yet implemented");
+        }
+    },
+    BRUTE_FORCE("Tries all possible combinations in order to find the best possible. " +
+            "Not possible if parameter space has real values.") {
+        @Override
+        public OptimizationStrategy getStrategy(Optimizee optimizee, double fitnessRange) {
+            return new BruteForceStrategy(optimizee);
         }
     };
 
