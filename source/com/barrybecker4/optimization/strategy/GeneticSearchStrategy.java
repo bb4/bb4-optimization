@@ -162,9 +162,9 @@ public class GeneticSearchStrategy extends OptimizationStrategy {
                 "We must never get worse in a new generation. Old fitness="
                         + lastBest.getFitness() + " New Fitenss = " + currentBest.getFitness() + ".";
 
-        System.out.println(" ct="+ct+"  nbrRadius = " + nbrRadius_ + "  population size =" + desiredPopulationSize_
-                           +"  deltaFitness = " + deltaFitness+"  currentBest = " + currentBest.getFitness()
-                           +"  lastBest = " + lastBest.getFitness());
+        //System.out.println(" ct="+ct+"  nbrRadius = " + nbrRadius_ + "  population size =" + desiredPopulationSize_
+        //                   +"  deltaFitness = " + deltaFitness+"  currentBest = " + currentBest.getFitness()
+        //                   +"  lastBest = " + lastBest.getFitness());
         log(ct, currentBest.getFitness(), nbrRadius_, deltaFitness, params, "---");
         return deltaFitness;
     }

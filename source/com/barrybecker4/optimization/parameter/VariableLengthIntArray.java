@@ -163,7 +163,7 @@ public class VariableLengthIntArray extends AbstractParameterArray {
     }
 
     public void setCombination(List<Integer> indices) {
-         assert indices.size() <= size() :
+         assert indices.size() <= getMaxLength() :
                 "The number of indices (" + indices.size() + ") was greater than the size (" + size() + ")";
          List<Parameter> newParams = new ArrayList<>(size());
          for (int i : indices) {

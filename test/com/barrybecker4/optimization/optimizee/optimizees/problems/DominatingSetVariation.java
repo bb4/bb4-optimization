@@ -84,7 +84,7 @@ public enum DominatingSetVariation implements IProblemVariation {
         );
 
         private final ErrorTolerances ERROR_TOLERANCES =
-                new ErrorTolerances(4.0, 1.0, 1.0, 6.0, 1.0, 2.0, 2.0, 1.0);
+                new ErrorTolerances(4.0, 1.0, 1.0, 6.0, 1.0, 1.0, 1.0, 1.0);
 
         protected Graph getAdjacencies() {
             return ADJACENCIES;

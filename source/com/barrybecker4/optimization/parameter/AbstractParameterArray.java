@@ -97,7 +97,7 @@ public abstract class AbstractParameterArray implements ParameterArray {
         sb.append("parameter[0] = ").append(get(0).toString());
         for ( int i = 1; i < size(); i++ ) {
             sb.append( '\n' );
-            sb.append("parameter[").append(i).append("] = ").append(get(i).toString()).append("; ");
+            sb.append("parameter[").append(i).append("] = ").append(get(i).toString());
         }
         return sb.toString();
     }

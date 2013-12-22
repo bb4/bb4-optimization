@@ -80,15 +80,15 @@ public abstract class AbstractParameter implements Parameter {
     public String toString() {
 
         StringBuilder sa = new StringBuilder( getName() );
-        sa.append( " =" );
+        sa.append( " = " );
         sa.append( FormatUtil.formatNumber(getValue()) );
         sa.append( " [" );
         sa.append( FormatUtil.formatNumber(getMinValue()) );
         sa.append( ", " );
         sa.append( FormatUtil.formatNumber(getMaxValue()) );
         sa.append( ']' );
-        if (this.redistributionFunction_ != null) {
-            sa.append(" redistributionFunction=").append(this.redistributionFunction_);
+        if (redistributionFunction_ != null) {
+            sa.append(" redistributionFunction=").append(redistributionFunction_);
         }
         return sa.toString();
     }

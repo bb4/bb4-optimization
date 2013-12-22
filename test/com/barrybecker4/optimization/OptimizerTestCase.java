@@ -3,6 +3,7 @@ package com.barrybecker4.optimization;
 
 import com.barrybecker4.common.math.MathUtil;
 import com.barrybecker4.common.util.FileUtil;
+import com.barrybecker4.optimization.optimizee.optimizees.IProblemVariation;
 import com.barrybecker4.optimization.optimizee.optimizees.OptimizeeProblem;
 import com.barrybecker4.optimization.parameter.ParameterArray;
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
@@ -19,6 +20,9 @@ public abstract class OptimizerTestCase  {
     /** Where the log files will go */
     public static final String LOG_FILE_HOME =
             FileUtil.getHomeDir() + "test/performance/test_optimizer/";  // NN_NLS
+
+    /** If the error is this percent less than the error threshold, let the user know so they can update the test */
+    private static final double THRESHOLD_SLACK_WARNING = 0.6;
 
     @Before
     public void setUp() {
@@ -66,6 +70,17 @@ public abstract class OptimizerTestCase  {
      */
     protected abstract void doTest(OptimizationStrategyType optType);
 
+    protected void verityProblem(OptimizeeProblem problem, IProblemVariation variation,
+                                 OptimizationStrategyType optType) {
+         String logFile = LOG_FILE_HOME + "analytic_" + variation + "_optimization.txt";
+
+         Optimizer optimizer = new Optimizer(problem, logFile);
+
+         ParameterArray initialGuess = problem.getInitialGuess();
+         verifyTest(optType, problem, initialGuess, optimizer, problem.getFitnessRange(),
+                    variation.getErrorTolerancePercent(optType), variation.toString());
+    }
+
     /**
      * Give an error if not withing errorThresh of the exact solution.
      */
@@ -86,6 +101,10 @@ public abstract class OptimizerTestCase  {
                 + "\n but we expected to get something very close to the exact solution:\n "
                 + problem.getExactSolution(),
                 error <= errorThresh);
+        if (error < THRESHOLD_SLACK_WARNING * errorThresh && error > 0.02) {
+            System.out.println("Heads up: The error threshold of " + errorThresh + " for "
+                    + optType + " is a bit slack. It could be reduced to " + error);
+        }
 
         System.out.println( "\n************************************************************************" );
         System.out.println( "The solution to the Problem using " + optType + " is :\n" + solution );
