@@ -1,4 +1,4 @@
-package com.barrybecker4.optimization.optimizee.optimizees;
+package com.barrybecker4.optimization.optimizee.optimizees.problems;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -29,7 +29,7 @@ public class ErrorTolerances {
         percentValues.put(BRUTE_FORCE, 0.0);
     }
 
-    protected double getErrorTolerancePercent(OptimizationStrategyType opt) {
+    public double getErrorTolerancePercent(OptimizationStrategyType opt) {
 
         return percentValues.get(opt);
     }

@@ -1,13 +1,15 @@
 /** Copyright by Barry G. Becker, 2000-2011. Licensed under MIT License: http://www.opensource.org/licenses/MIT  */
-package com.barrybecker4.optimization.optimizee.optimizees;
+package com.barrybecker4.optimization.optimizee.optimizees.problems;
 
+import com.barrybecker4.optimization.optimizee.optimizees.ErrorTolerances;
+import com.barrybecker4.optimization.optimizee.optimizees.IProblemVariation;
 import com.barrybecker4.optimization.parameter.ParameterArray;
 import com.barrybecker4.optimization.parameter.PermutedParameterArray;
 import com.barrybecker4.optimization.parameter.types.IntegerParameter;
 import com.barrybecker4.optimization.parameter.types.Parameter;
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
 
-import static com.barrybecker4.optimization.optimizee.optimizees.AnalyticFunctionConsts.*;
+import static com.barrybecker4.optimization.optimizee.optimizees.problems.AnalyticFunctionConsts.*;
 
 /**
  * An enum for different sorts of traveling salesman problems (TSPs) that we might want to test.

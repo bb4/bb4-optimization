@@ -151,7 +151,6 @@ public class VariableLengthIntArray extends AbstractParameterArray {
         else {
             numNodesToMove = 1 + MathUtil.RANDOM.nextInt(1 + (int)radius);
         }
-        //System.out.print("old num = " + nbr.size());
 
         if (remove) {
             removeRandomParam(nbr);
@@ -159,14 +158,13 @@ public class VariableLengthIntArray extends AbstractParameterArray {
         if (add) {
             addRandomParam(nbr);
         }
-        //System.out.println(" new= " + nbr.size() + " moving = "+ numNodesToMove + "   rad=" + radius);
         moveNodes(numNodesToMove, nbr);
-
         return nbr;
     }
 
     public void setCombination(List<Integer> indices) {
-         assert indices.size() <= size();
+         assert  indices.size() <= size() :
+                 "The number of indices ("+indices.size()+") was greater than the size ("+size()+")";
          List<Parameter> newParams = new ArrayList<>(size());
          for (int i : indices) {
              newParams.add(createParam(i));

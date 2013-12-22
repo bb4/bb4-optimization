@@ -2,6 +2,8 @@
 package com.barrybecker4.optimization.optimizee.optimizees;
 
 import com.barrybecker4.common.util.FileUtil;
+import com.barrybecker4.optimization.optimizee.optimizees.problems.AnalyticFunctionProblem;
+import com.barrybecker4.optimization.optimizee.optimizees.problems.AnalyticVariation;
 import com.barrybecker4.optimization.viewer.OptimizerEvalFrame;
 
 /**

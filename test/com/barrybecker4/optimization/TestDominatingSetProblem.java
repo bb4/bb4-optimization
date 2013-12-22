@@ -1,8 +1,8 @@
 /** Copyright by Barry G. Becker, 2000-2011. Licensed under MIT License: http://www.opensource.org/licenses/MIT  */
 package com.barrybecker4.optimization;
 
-import com.barrybecker4.optimization.optimizee.optimizees.DominatingSetProblem;
-import com.barrybecker4.optimization.optimizee.optimizees.DominatingSetVariation;
+import com.barrybecker4.optimization.optimizee.optimizees.problems.DominatingSetProblem;
+import com.barrybecker4.optimization.optimizee.optimizees.problems.DominatingSetVariation;
 import com.barrybecker4.optimization.optimizee.optimizees.OptimizeeProblem;
 import com.barrybecker4.optimization.parameter.ParameterArray;
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType;

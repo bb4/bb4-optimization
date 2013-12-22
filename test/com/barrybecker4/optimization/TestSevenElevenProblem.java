@@ -2,7 +2,7 @@
 package com.barrybecker4.optimization;
 
 import com.barrybecker4.optimization.optimizee.optimizees.OptimizeeProblem;
-import com.barrybecker4.optimization.optimizee.optimizees.SevenElevenProblem;
+import com.barrybecker4.optimization.optimizee.optimizees.problems.SevenElevenProblem;
 import com.barrybecker4.optimization.parameter.ParameterArray;
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
 
