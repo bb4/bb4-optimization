@@ -76,7 +76,7 @@ public abstract class OptimizerTestCase  {
                                      double errorThresh, String title) {
 
         System.out.println(title + "\nabout to apply "
-                + optType + " to " + problem.getName() + " with initial guess = " + initialGuess);
+                + optType + " to " + problem.getName() + " with initial guess = " + initialGuess + ".");
 
         ParameterArray solution = optimizer.doOptimization(optType, initialGuess, fitnessRange);
 

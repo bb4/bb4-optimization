@@ -23,7 +23,6 @@ public abstract class OptimizeeProblem implements Optimizee {
      */
     public double getError(ParameterArray sol) {
         return 100.0 * (sol.getFitness() - getOptimalFitness()) / getFitnessRange();
-        //return 100.0 * sol.distance(getExactSolution()) / getFitnessRange();
     }
 
     @Override
@@ -45,7 +44,7 @@ public abstract class OptimizeeProblem implements Optimizee {
 
     public static void showSolution(OptimizeeProblem problem, ParameterArray solution) {
         System.out.println( "\n************************************************************************" );
-        System.out.println( "The solution to the "+problem.getName() +"  Test Problem is :\n" + solution );
+        System.out.println( "The solution to the "+problem.getName() +" test problem is :\n" + solution );
         System.out.println( "Which evaluates to: " + problem.evaluateFitness(solution));
         System.out.println( "We expected to get exactly " + problem.getExactSolution());
     }

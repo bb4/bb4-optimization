@@ -25,8 +25,7 @@ import java.util.Set;
  */
 public class VariableLengthIntArray extends AbstractParameterArray {
 
-    /** the maximum number of params in the array that is possible */
-    private int maxLength;
+    private List<Integer> fullSet;
 
     /** Default constructor */
     protected VariableLengthIntArray() {}
@@ -34,15 +33,16 @@ public class VariableLengthIntArray extends AbstractParameterArray {
     /**
      * Constructor
      * @param params an array of params to initialize with.
+     * @param fullSet the full set of all integer parameters.
      */
-    public VariableLengthIntArray(List<Parameter> params, int max) {
+    public VariableLengthIntArray(List<Parameter> params, List<Integer> fullSet) {
         super(params);
-        maxLength = max;
+        this.fullSet = fullSet;
     }
 
     /** @return the maximum length of the variable length array */
     public int getMaxLength() {
-        return maxLength;
+        return fullSet.size();
     }
 
     @Override
@@ -135,7 +135,7 @@ public class VariableLengthIntArray extends AbstractParameterArray {
         boolean add = false;
         boolean remove = false;
         if (MathUtil.RANDOM.nextDouble() > probAddRemove) {
-            if ((MathUtil.RANDOM.nextDouble() > 0.5 || size() <= 1) && size() < maxLength-1 ) {
+            if ((MathUtil.RANDOM.nextDouble() > 0.5 || size() <= 1) && size() < getMaxLength()-1 ) {
                 add = true;
             }
             else {
@@ -163,11 +163,11 @@ public class VariableLengthIntArray extends AbstractParameterArray {
     }
 
     public void setCombination(List<Integer> indices) {
-         assert  indices.size() <= size() :
-                 "The number of indices ("+indices.size()+") was greater than the size ("+size()+")";
+         assert indices.size() <= size() :
+                "The number of indices (" + indices.size() + ") was greater than the size (" + size() + ")";
          List<Parameter> newParams = new ArrayList<>(size());
          for (int i : indices) {
-             newParams.add(createParam(i));
+             newParams.add(createParam(fullSet.get(i)));
          }
          params_ = newParams;
     }
@@ -200,9 +200,9 @@ public class VariableLengthIntArray extends AbstractParameterArray {
     public ParameterArray getRandomSample() {
 
         List<Integer> marked = new LinkedList<>();
-        for (int i=0; i<maxLength; i++) {
+        for (int i = 0; i < getMaxLength(); i++) {
             if (MathUtil.RANDOM.nextDouble() > 0.5) {
-                marked.add(i);
+                marked.add(fullSet.get(i));
             }
         }
         List<Parameter> newParams = new ArrayList<>();
@@ -210,7 +210,7 @@ public class VariableLengthIntArray extends AbstractParameterArray {
             newParams.add(createParam(markedNode));
         }
 
-        return new VariableLengthIntArray(newParams, maxLength);
+        return new VariableLengthIntArray(newParams, fullSet);
     }
 
     /**
@@ -218,7 +218,7 @@ public class VariableLengthIntArray extends AbstractParameterArray {
      */
     public AbstractParameterArray copy() {
         VariableLengthIntArray copy = (VariableLengthIntArray) super.copy();
-        copy.maxLength = maxLength;
+        copy.fullSet = this.fullSet;
         return copy;
     }
 
@@ -227,7 +227,7 @@ public class VariableLengthIntArray extends AbstractParameterArray {
      * @return a new integer parameter.
      */
     private Parameter createParam(int i) {
-        return  new IntegerParameter(i, 0, maxLength - 1, "p" + i);
+        return  new IntegerParameter(i, 0, getMaxLength() - 1, "p" + i);
     }
 
     private void removeRandomParam(VariableLengthIntArray nbr) {
@@ -247,7 +247,7 @@ public class VariableLengthIntArray extends AbstractParameterArray {
 
         List<Integer> freeNodes = getFreeNodes(nbr);
         int newSize = nbr.size() + 1;
-        assert newSize <= maxLength;
+        assert newSize <= getMaxLength();
         List<Parameter> newParams = new ArrayList<>(newSize);
         for (Parameter p : nbr.params_) {
             newParams.add(p);
@@ -284,14 +284,14 @@ public class VariableLengthIntArray extends AbstractParameterArray {
     }
 
     private List<Integer> getFreeNodes(VariableLengthIntArray nbr) {
-        List<Integer> freeNodes = new ArrayList<>(maxLength);
+        List<Integer> freeNodes = new ArrayList<>(getMaxLength());
         Set<Integer> markedNodes = new HashSet<>();
         for (Parameter p : nbr.params_) {
             markedNodes.add((int)p.getValue());
         }
 
-        for (int i = 0; i < maxLength; i++) {
-            if (!markedNodes.contains(i))   {
+        for (int i = 0; i < getMaxLength(); i++) {
+            if (!markedNodes.contains(fullSet.get(i)))   {
                 freeNodes.add(i);
             }
         }

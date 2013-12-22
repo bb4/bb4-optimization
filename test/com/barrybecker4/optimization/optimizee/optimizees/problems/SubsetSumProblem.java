@@ -9,26 +9,25 @@ import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
 import static com.barrybecker4.optimization.OptimizerTestCase.LOG_FILE_HOME;
 
 /**
- * See these references to help understand the problem of finding dominating sets given a graph.
- * http://csunplugged.org/dominating-sets (this is where I got the inspiration to add this class)
- * http://en.wikipedia.org/wiki/Dominating_set
- * This is a simple search example to help test the optimization package.
+ * Determining if a set of numbers has a subset that sums to 0 is NP-Complete.
+ * The only strategy that is guaranteed to find a solution if it exists is brute force search.
+ * http://en.wikipedia.org/wiki/Subset_sum_problem
  *
  * @author Barry Becker
  */
-public class DominatingSetProblem extends OptimizeeProblem {
+public class SubsetSumProblem extends OptimizeeProblem {
 
-    private DominatingSetVariation variation_;
+    private SubsetSumVariation variation_;
 
 
     /** constructor */
-    public DominatingSetProblem(DominatingSetVariation variation) {
+    public SubsetSumProblem(SubsetSumVariation variation) {
         variation_ = variation;
     }
 
     @Override
     public String getName() {
-        return "Dominating Set Problem";
+        return "Subset Sum Problem";
     }
 
     /**
@@ -67,15 +66,14 @@ public class DominatingSetProblem extends OptimizeeProblem {
      * This finds the solution for the above optimization problem.
      */
     public static void main(String[] args) {
-        DominatingSetVariation v = DominatingSetVariation.SIMPLE;
-        OptimizeeProblem problem = new DominatingSetProblem(v);
+        OptimizeeProblem problem = new SubsetSumProblem(SubsetSumVariation.TYPICAL);
         Optimizer optimizer =
                 new Optimizer(problem, LOG_FILE_HOME + "domSet_optimization.txt");
 
         ParameterArray initialGuess = problem.getInitialGuess();
 
         ParameterArray solution =
-                optimizer.doOptimization(OptimizationStrategyType.SIMULATED_ANNEALING, initialGuess, v.getFitnessRange());
+                optimizer.doOptimization(OptimizationStrategyType.SIMULATED_ANNEALING, initialGuess, problem.getFitnessRange());
 
         showSolution(problem, solution);
     }

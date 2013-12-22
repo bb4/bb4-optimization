@@ -14,37 +14,27 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * An enum for different sorts of dominating set problems.
- * http://en.wikipedia.org/wiki/Dominating_set
+ * An enum for different sorts of subset sum problems.
+ * http://en.wikipedia.org/wiki/Subset_sum_problem
  *
  * @author Barry Becker
  */
-public enum DominatingSetVariation implements IProblemVariation {
+public enum SubsetSumVariation implements IProblemVariation {
 
     SIMPLE {
-        /**
-         * Trivial example.
-         * There are three nodes, A, B, C. And this list of lists defines the connectivity of the graph.
-         */
-        private final Graph ADJACENCIES = new Graph(
-                Arrays.asList(1, 2),
-                Arrays.asList(0, 2),
-                Arrays.asList(0, 1)
-        );
+        private final ErrorTolerances ERROR_TOLERANCES = new ErrorTolerances(0.0, 0.0, 0.0, 0.0, 0.0, 17.0, 17.0, 0.0);
 
-        private final ErrorTolerances ERROR_TOLERANCES = new ErrorTolerances(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-
-        protected Graph getAdjacencies() {
-            return ADJACENCIES;
+        protected List<Integer> getNumberSet() {
+            return Arrays.asList(-7, -3, -2, 5, 8);
         }
 
         public ParameterArray getExactSolution() {
-            return createSolution(0);
+            return createSolution(-3, -2, 5);
         }
 
         @Override
         public double getFitnessRange() {
-            return 7.0;
+            return 12.0;
         }
 
         @Override
@@ -54,50 +44,21 @@ public enum DominatingSetVariation implements IProblemVariation {
     },
 
     TYPICAL {
-        private final Graph ADJACENCIES = new Graph(
-                Arrays.asList(15, 21, 25),
-                Arrays.asList(2, 4, 7),
-                Arrays.asList(1, 3, 5, 7),
-                Arrays.asList(2, 5, 8, 9),
-                Arrays.asList(1, 6, 12),        // 4
-                Arrays.asList(2, 3, 8, 13),
-                Arrays.asList(4, 10, 11, 12),
-                Arrays.asList(1, 2, 12, 13),
-                Arrays.asList(3, 5, 9, 14),     // 8
-                Arrays.asList(3, 8, 15),
-                Arrays.asList(6, 11, 18),
-                Arrays.asList(6, 10, 16),
-                Arrays.asList(4, 6, 7, 16, 17), // 12
-                Arrays.asList(5, 7, 14, 17),
-                Arrays.asList(8, 13, 15, 17),
-                Arrays.asList(0, 9, 14, 21),
-                Arrays.asList(11, 12, 19),      // 16
-                Arrays.asList(12, 13, 14, 20, 21),
-                Arrays.asList(10, 19, 22, 24),
-                Arrays.asList(16, 18, 20),
-                Arrays.asList(17, 19, 22, 23),  // 20
-                Arrays.asList(0, 15, 17, 23),
-                Arrays.asList(18, 20, 23, 24),
-                Arrays.asList(20, 21, 22, 25),
-                Arrays.asList(18, 22, 25),      // 24
-                Arrays.asList(0, 23, 24)
-        );
-
         private final ErrorTolerances ERROR_TOLERANCES =
-                new ErrorTolerances(4.0, 1.0, 1.0, 6.0, 1.0, 2.0, 2.0, 1.0);
+                new ErrorTolerances(0.0, 0.0, 1.0, 6.0, 1.0, 1.0, 1.0, 1.0);
 
-        protected Graph getAdjacencies() {
-            return ADJACENCIES;
+        protected List<Integer> getNumberSet() {
+            return Arrays.asList(-7, -33, -21, 5, 83, -29, -78, 213, 123, -34, -37, -41, 91, 7, -17);
         }
 
         /** This is one of several possible solutions that gives an optimal fitness of 0 */
         public ParameterArray getExactSolution() {
-            return createSolution(6, 7, 8, 19, 21, 24);
+            return createSolution(6, -6);
         }
 
         @Override
         public double getFitnessRange() {
-            return 50.0;
+            return 200.0;
         }
 
         @Override
@@ -107,44 +68,28 @@ public enum DominatingSetVariation implements IProblemVariation {
     };
 
     /** @return the number of nodes in the graph */
-    public List<Integer> getAllNodes() {
-        int num = getAdjacencies().size();
-        List<Integer> nodes = new ArrayList<>(num);
-        for (int i=0; i<num; i++) {
-            nodes.add(i);
-        }
-        return nodes;
+    public int getNumElements() {
+        return getNumberSet().size();
     }
 
     /** The graph containing the node adjacency information */
-    protected abstract Graph getAdjacencies();
+    protected abstract List<Integer> getNumberSet();
 
     /**
      * Some random initial set of marked nodes.
      * One half or one third of the nodes is probably a good starting point.
      */
     public ParameterArray getInitialGuess() {
-        int num = getAllNodes().size();
+        int num = this.getNumElements();
+        List<Integer> numSet = this.getNumberSet();
         List<Parameter> params = new ArrayList<>(num);
-        // just add some of the nodes
+
         for (int i=0; i<num; i+=3) {
-            params.add(new IntegerParameter(i, 0, num-1, "p" + i));
+            params.add(createParam(numSet.get(i)));
         }
-        VariableLengthIntArray pa = new VariableLengthIntArray(params, getAllNodes());
-        pa.setFitness(params.size() + getAdjacencies().getNumNotWithinOneHop(getMarked(pa)));
+        VariableLengthIntArray pa = new VariableLengthIntArray(params, getNumberSet());
+        pa.setFitness(computeCost(pa));
         return pa;
-    }
-
-    private List<Integer> getMarked(VariableLengthIntArray pa) {
-        List<Integer> marked = new ArrayList<>(pa.size());
-        for (int i=0; i<pa.size(); i++) {
-           marked.add((int)pa.get(i).getValue());
-        }
-        return marked;
-    }
-
-    public double getScore(List<Integer> marked) {
-        return marked.size() + 0.5 * getAdjacencies().getNumNotWithinOneHop(marked);
     }
 
     /**
@@ -153,7 +98,7 @@ public enum DominatingSetVariation implements IProblemVariation {
      * @return fitness value
      */
     public double evaluateFitness(ParameterArray pa) {
-        return computeCost(pa) - getExactSolution().size();
+        return computeCost(pa);
     }
 
     /** Approximate value of maxCost - minCost */
@@ -175,6 +120,14 @@ public enum DominatingSetVariation implements IProblemVariation {
         return getScore(marked);
     }
 
+    public double getScore(List<Integer> marked) {
+        int sum = 0;
+        for (int i : marked) {
+            sum += i;
+        }
+        return Math.abs(sum);
+    }
+
     /** @return the error tolerance percent for a specific optimization strategy */
     public double getErrorTolerancePercent(OptimizationStrategyType opt) {
         return getErrorTolerances().getErrorTolerancePercent(opt);
@@ -194,10 +147,13 @@ public enum DominatingSetVariation implements IProblemVariation {
     protected VariableLengthIntArray createSolution(int... nodeList) {
         int numNodes = nodeList.length;
         List<Parameter> params = new ArrayList<>(numNodes);
-        List<Integer> allNodes = getAllNodes();
-        for (int i=0; i < nodeList.length; i++) {
-            params.add(new IntegerParameter(nodeList[i], 0, allNodes.size() - 1, "p" + i));
+        for (int i : nodeList) {
+            params.add(createParam(i));
         }
-        return new VariableLengthIntArray(params, allNodes);
+        return new VariableLengthIntArray(params, getNumberSet());
+    }
+
+    private Parameter createParam(int i) {
+        return new IntegerParameter(i, 0, 100, "p" + i);
     }
 }
