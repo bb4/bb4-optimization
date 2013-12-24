@@ -17,6 +17,18 @@ public class ErrorTolerances {
     public ErrorTolerances(double globalSampling, double globalHillClimbing,
                            double hillClimbing, double simAnnealing, double tabuSearch,
                            double geneticSearch, double concGenSearch, double stateSpace)  {
+        this(globalSampling, globalHillClimbing, hillClimbing, simAnnealing, tabuSearch,
+             geneticSearch, concGenSearch, stateSpace, 0);
+    }
+
+    /**
+     * Constructor that take an error value for every possible optimization strategy.
+     * Different problems will have different error rates.
+     * The error rate is 100 * fitness / fitnessRage.
+     */
+    public ErrorTolerances(double globalSampling, double globalHillClimbing,
+                           double hillClimbing, double simAnnealing, double tabuSearch,
+                           double geneticSearch, double concGenSearch, double stateSpace, double bruteForce)  {
         percentValues.put(GLOBAL_SAMPLING, globalSampling);
         percentValues.put(GLOBAL_HILL_CLIMBING, globalHillClimbing);
         percentValues.put(HILL_CLIMBING, hillClimbing);
@@ -26,7 +38,7 @@ public class ErrorTolerances {
         percentValues.put(CONCURRENT_GENETIC_SEARCH, concGenSearch);
         percentValues.put(STATE_SPACE, stateSpace);
         // the error for brute force should always be 0.
-        percentValues.put(BRUTE_FORCE, 0.0);
+        percentValues.put(BRUTE_FORCE, bruteForce);
     }
 
     public double getErrorTolerancePercent(OptimizationStrategyType opt) {

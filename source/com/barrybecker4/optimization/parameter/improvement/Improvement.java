@@ -65,4 +65,11 @@ public class Improvement {
          return gradient;
     }
 
+    public String toString() {
+        StringBuilder bldr = new StringBuilder();
+        bldr.append("Improvement = ").append(getImprovement())
+                .append(" New jumpsize=").append(getNewJumpSize())
+                .append(" Gradient = ").append(getGradient());
+        return bldr.toString();
+    }
 }

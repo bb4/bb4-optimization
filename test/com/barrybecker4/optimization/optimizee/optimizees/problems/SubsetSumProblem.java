@@ -4,8 +4,8 @@ package com.barrybecker4.optimization.optimizee.optimizees.problems;
 import com.barrybecker4.optimization.Optimizer;
 import com.barrybecker4.optimization.optimizee.optimizees.OptimizeeProblem;
 import com.barrybecker4.optimization.parameter.ParameterArray;
+import com.barrybecker4.optimization.parameter.VariableLengthIntArray;
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
-
 import static com.barrybecker4.optimization.OptimizerTestCase.LOG_FILE_HOME;
 
 /**
@@ -66,14 +66,17 @@ public class SubsetSumProblem extends OptimizeeProblem {
      * This finds the solution for the above optimization problem.
      */
     public static void main(String[] args) {
-        OptimizeeProblem problem = new SubsetSumProblem(SubsetSumVariation.TYPICAL);
+        OptimizeeProblem problem = new SubsetSumProblem(SubsetSumVariation.NO_SOLUTION);
+
         Optimizer optimizer =
                 new Optimizer(problem, LOG_FILE_HOME + "domSet_optimization.txt");
 
         ParameterArray initialGuess = problem.getInitialGuess();
+        System.out.println("initial guess="+ initialGuess + " all=" + ((VariableLengthIntArray)initialGuess).getMaxLength());
 
         ParameterArray solution =
-                optimizer.doOptimization(OptimizationStrategyType.SIMULATED_ANNEALING, initialGuess, problem.getFitnessRange());
+                optimizer.doOptimization(OptimizationStrategyType.GLOBAL_HILL_CLIMBING,
+                        initialGuess, problem.getFitnessRange());
 
         showSolution(problem, solution);
     }

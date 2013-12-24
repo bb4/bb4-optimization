@@ -223,11 +223,11 @@ public class VariableLengthIntArray extends AbstractParameterArray {
     }
 
     /**
-     * @param i the integer parameter's value
+     * @param i the integer parameter's value. May be Negative
      * @return a new integer parameter.
      */
     private Parameter createParam(int i) {
-        return  new IntegerParameter(i, 0, getMaxLength() - 1, "p" + i);
+        return  new IntegerParameter(i, (i<0) ? i : 0, (i>=0) ? i : 0, "p" + i);
     }
 
     private void removeRandomParam(VariableLengthIntArray nbr) {
@@ -292,7 +292,7 @@ public class VariableLengthIntArray extends AbstractParameterArray {
 
         for (int i = 0; i < getMaxLength(); i++) {
             if (!markedNodes.contains(fullSet.get(i)))   {
-                freeNodes.add(i);
+                freeNodes.add(fullSet.get(i));
             }
         }
         return freeNodes;

@@ -51,6 +51,31 @@ public enum SubsetSumVariation implements IProblemVariation {
             return Arrays.asList(-7, -33, -21, 5, 83, -29, -78, 213, 123, -34, -37, -41, 91, 7, -17);
         }
 
+        // This is one of several possible solutions that gives an optimal fitness of 0
+        public ParameterArray getExactSolution() {
+            return createSolution(6, -6);
+        }
+
+        @Override
+        public double getFitnessRange() {
+            return 200.0;
+        }
+
+        @Override
+        public ErrorTolerances getErrorTolerances() {
+            return ERROR_TOLERANCES;
+        }
+    },
+
+    NO_SOLUTION {
+        // none of the errors will be 0 because there is not solution that sums to 0.
+        private final ErrorTolerances ERROR_TOLERANCES =
+                new ErrorTolerances(20.0, 1.0, 1.0, 6.0, 1.0, 2.5, 5.0, 1.0, 1.0);
+
+        protected List<Integer> getNumberSet() {
+            return Arrays.asList(-7, -33, -21, 5, -83, -29, -78, -113, -23, -34, -37, -41, -91, -9, -17);
+        }
+
         /** This is one of several possible solutions that gives an optimal fitness of 0 */
         public ParameterArray getExactSolution() {
             return createSolution(6, -6);
@@ -141,19 +166,19 @@ public enum SubsetSumVariation implements IProblemVariation {
 
     /**
      * Create the solution based on the ordered list of cities.
-     * @param nodeList optimal dominating set of marked nodes. May not be unique.
+     * @param numberList optimal dominating set of marked nodes. May not be unique.
      * @return optimal solution (to compare against at the end of the test).
      */
-    protected VariableLengthIntArray createSolution(int... nodeList) {
-        int numNodes = nodeList.length;
+    protected VariableLengthIntArray createSolution(int... numberList) {
+        int numNodes = numberList.length;
         List<Parameter> params = new ArrayList<>(numNodes);
-        for (int i : nodeList) {
+        for (int i : numberList) {
             params.add(createParam(i));
         }
         return new VariableLengthIntArray(params, getNumberSet());
     }
 
     private Parameter createParam(int i) {
-        return new IntegerParameter(i, 0, 100, "p" + i);
+        return new IntegerParameter(i, i<0? i:0, i>=0? i:0, "p" + i);
     }
 }
