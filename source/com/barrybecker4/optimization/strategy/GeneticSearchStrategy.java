@@ -20,10 +20,10 @@ import java.util.List;
  */
 public class GeneticSearchStrategy extends OptimizationStrategy {
 
-    // the amount to decimate the parent population by on each iteration
-    private static final double CULL_FACTOR = 0.8;
+    // Percent amount to decimate the parent population by on each iteration
+    private static final double CULL_FACTOR = 0.7;
     private static final double NBR_RADIUS = 0.08;
-    private static final double NBR_RADIUS_SHRINK_FACTOR = 0.9;
+    private static final double NBR_RADIUS_SHRINK_FACTOR = 0.95;
     private static final double NBR_RADIUS_EXPAND_FACTOR = 1.02;
     private static final double NBR_RADIUS_SOFTENER = 5.0;
     private static final double INITIAL_RADIUS = 1.0;
@@ -152,7 +152,7 @@ public class GeneticSearchStrategy extends OptimizationStrategy {
 
     /**
      * Computes the fitness delta, but also logs and asserts that it is not 0.
-     * @return  the different in fitness between current best and last best.
+     * @return the different in fitness between current best and last best.
      */
     private double computeFitnessDelta(ParameterArray params, ParameterArray lastBest,
                                        ParameterArray currentBest, int ct) {
@@ -199,7 +199,6 @@ public class GeneticSearchStrategy extends OptimizationStrategy {
     private void replaceCulledWithKeeperVariants(List<ParameterArray> population, int keepSize) {
 
         int k = keepSize;
-        //System.out.println(" pop.size="+ population.size() + " of desPopSize_=" + desiredPopulationSize_ + " keepsize="+ keepSize);
         while ( k < desiredPopulationSize_) {
 
             // loop over the keepers until all replacements found

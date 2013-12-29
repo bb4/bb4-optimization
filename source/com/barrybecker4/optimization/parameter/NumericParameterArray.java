@@ -152,7 +152,7 @@ public class NumericParameterArray extends AbstractParameterArray {
         else if ( dotProduct < MIN_DOT_PRODUCT ) {
             newJumpSize *= ImprovementStep.JUMP_SIZE_DEC_FACTOR;
         }
-        System.out.println( "dotProduct = " + dotProduct + " new jumpsize = " + jumpSize );
+        //System.out.println( "dotProduct = " + dotProduct + " new jumpsize = " + jumpSize );
         return newJumpSize;
     }
 
