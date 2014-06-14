@@ -32,7 +32,7 @@ public class DoubleParameterTest extends ParameterTst {
 
     @Override
     protected Double expectedNaturalValue() {
-        return new Double(1.0);
+        return 1.0;
     }
 
     @Override

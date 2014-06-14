@@ -130,7 +130,7 @@ public enum DominatingSetVariation implements IProblemVariation {
         for (int i=0; i<num; i+=3) {
             params.add(new IntegerParameter(i, 0, num-1, "p" + i));
         }
-        VariableLengthIntArray pa = new VariableLengthIntArray(params, getAllNodes());
+        VariableLengthIntArray pa = VariableLengthIntArray.createInstance(params, getAllNodes());
         pa.setFitness(params.size() + getAdjacencies().getNumNotWithinOneHop(getMarked(pa)));
         return pa;
     }
@@ -198,6 +198,6 @@ public enum DominatingSetVariation implements IProblemVariation {
         for (int i=0; i < nodeList.length; i++) {
             params.add(new IntegerParameter(nodeList[i], 0, allNodes.size() - 1, "p" + i));
         }
-        return new VariableLengthIntArray(params, allNodes);
+        return VariableLengthIntArray.createInstance(params, allNodes);
     }
 }

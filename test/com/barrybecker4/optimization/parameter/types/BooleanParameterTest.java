@@ -6,7 +6,6 @@ package com.barrybecker4.optimization.parameter.types;
  */
 public class BooleanParameterTest extends ParameterTst {
 
-
     @Override
     protected Parameter createParameter() {
         return new BooleanParameter(true, "boolean param");
@@ -21,6 +20,7 @@ public class BooleanParameterTest extends ParameterTst {
     protected double expectedMinValue() {
         return 0.0;
     }
+
     @Override
     protected double expectedMaxValue() {
         return 1.0;

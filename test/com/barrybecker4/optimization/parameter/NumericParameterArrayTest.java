@@ -2,17 +2,20 @@
 package com.barrybecker4.optimization.parameter;
 
 import com.barrybecker4.common.math.MathUtil;
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * @author Barry Becker
  */
-public class NumericParameterArrayTest extends TestCase {
+public class NumericParameterArrayTest {
 
     private static final double MIN_VALUE = -20.0;
     private static final double MAX_VALUE = 20.0;
@@ -20,11 +23,12 @@ public class NumericParameterArrayTest extends TestCase {
     /** instance under test */
     private NumericParameterArray params;
 
-    @Override
+    @Before
     public void setUp() {
         MathUtil.RANDOM.setSeed(0);
     }
 
+    @Test
     public void testGetNumSteps() {
 
         params = createParamArray(.2, .3);
@@ -32,6 +36,7 @@ public class NumericParameterArrayTest extends TestCase {
         assertEquals("Unexpected numSteps", 10, params.getNumSteps());
     }
 
+    @Test
     public void testGetSamplePopulationSize() {
 
         params = createParamArray(.2, .3);
@@ -39,18 +44,14 @@ public class NumericParameterArrayTest extends TestCase {
         assertEquals("Unexpected numSteps", 36, params.getSamplePopulationSize());
     }
 
+    @Test(expected=IllegalArgumentException.class)
     public void testFind0GlobalSamples() {
 
         params = createParamArray(.2, .3);
-
-        try {
-            params.findGlobalSamples(0);
-            fail();
-        } catch (IllegalArgumentException e) {
-            // success
-        }
+        params.findGlobalSamples(0);
     }
 
+    @Test
     public void testFind1GlobalSamples() {
 
         params = createParamArray(.2, .3);
@@ -62,6 +63,7 @@ public class NumericParameterArrayTest extends TestCase {
         assertEquals("Unexpected params", expParams, samples);
     }
 
+    @Test
     public void testFind2GlobalSamples() {
 
         params = createParamArray(.2, .3);
@@ -70,6 +72,7 @@ public class NumericParameterArrayTest extends TestCase {
         assertEquals("Unexpected num samples", 1, samples.size());
     }
 
+    @Test
     public void testFind3GlobalSamples() {
 
         params = createParamArray(.2, .3);
@@ -78,6 +81,7 @@ public class NumericParameterArrayTest extends TestCase {
         assertEquals("Unexpected num samples", 1, samples.size());
     }
 
+    @Test
     public void testFind4GlobalSamples() {
 
         params = createParamArray(.2, .3);
@@ -93,6 +97,7 @@ public class NumericParameterArrayTest extends TestCase {
         assertEquals("Unexpected params", expParams, samples);
     }
 
+    @Test
     public void testFind10GlobalSamples() {
 
         params = createParamArray(.2, .3);
@@ -101,6 +106,7 @@ public class NumericParameterArrayTest extends TestCase {
         assertEquals("Unexpected num samples", 9, samples.size());
     }
 
+    @Test
     public void testFind97GlobalSamples() {
 
         params = createParamArray(.2, .3);
@@ -109,6 +115,7 @@ public class NumericParameterArrayTest extends TestCase {
         assertEquals("Unexpected num samples", 81, samples.size());
     }
 
+    @Test
     public void testFind1000GlobalSamples() {
 
         params = createParamArray(.2, .3);

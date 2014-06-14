@@ -8,6 +8,7 @@ import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
 import org.junit.Test;
 
 /**
+ * The subset sum problem is NP-complete.
  * @author Barry Becker
  */
 public class TestSubsetSumProblem extends OptimizerTestCase {

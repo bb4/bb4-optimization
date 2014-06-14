@@ -3,6 +3,8 @@ package com.barrybecker4.optimization.parameter;
 
 import com.barrybecker4.common.math.MathUtil;
 import com.barrybecker4.optimization.optimizee.Optimizee;
+import com.barrybecker4.optimization.parameter.distancecalculators.DistanceCalculator;
+import com.barrybecker4.optimization.parameter.distancecalculators.MagnitudeIgnoredDistanceCalculator;
 import com.barrybecker4.optimization.parameter.improvement.DiscreteImprovementFinder;
 import com.barrybecker4.optimization.parameter.improvement.Improvement;
 import com.barrybecker4.optimization.parameter.sampling.VariableLengthGlobalSampler;
@@ -10,7 +12,6 @@ import com.barrybecker4.optimization.parameter.types.IntegerParameter;
 import com.barrybecker4.optimization.parameter.types.Parameter;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -30,15 +31,29 @@ public class VariableLengthIntArray extends AbstractParameterArray {
     /** Default constructor */
     protected VariableLengthIntArray() {}
 
+    private DistanceCalculator distCalculator;
+
     /**
      * Constructor
      * @param params an array of params to initialize with.
      * @param fullSet the full set of all integer parameters.
      */
-    public VariableLengthIntArray(List<Parameter> params, List<Integer> fullSet) {
+    public VariableLengthIntArray(List<Parameter> params, List<Integer> fullSet, DistanceCalculator distCalc) {
         super(params);
         this.fullSet = fullSet;
+        assert distCalc != null;
+        this.distCalculator = distCalc;
     }
+
+    public static VariableLengthIntArray createInstance(List<Parameter> params, List<Integer> fullSet) {
+        return createInstance(params, fullSet, new MagnitudeIgnoredDistanceCalculator());
+    }
+
+    public static VariableLengthIntArray createInstance(
+            List<Parameter> params, List<Integer> fullSet, DistanceCalculator distanceCalculator) {
+        return new VariableLengthIntArray(params, fullSet, distanceCalculator);
+    }
+
 
     /** @return the maximum length of the variable length array */
     public int getMaxLength() {
@@ -56,66 +71,11 @@ public class VariableLengthIntArray extends AbstractParameterArray {
      * There are two ways in which instance can differ, and the weighting assigned to each may depend on the problem.
      *  - the length of the parameter array
      *  - the set of values in the parameter array.
-     * Generally, the distance is greater the greater the number of parameters that is different.
+     * Generally, the distance is greater the greater the number of parameters that are different.
      * @return the distance between this parameter array and another.
      */
     public double distance(ParameterArray pa)  {
-
-        int thisLength = size();
-        int thatLength = pa.size();
-
-        List<Integer> theseValues = new ArrayList<>(thisLength);
-        List<Integer> thoseValues = new ArrayList<>(thatLength);
-
-        for (Parameter p : params_) {
-            theseValues.add((int)p.getValue());
-        }
-        for (int i=0; i< thatLength; i++) {
-            thoseValues.add((int)pa.get(i).getValue());
-        }
-
-        Collections.sort(theseValues);
-        Collections.sort(thoseValues);
-
-        int valueDifferences = calcValueDifferences(theseValues, thoseValues);
-
-        return Math.abs(thisLength - thatLength) + valueDifferences;
-    }
-
-    /**
-     * Perform a sort of merge sort on the two sorted lists of values to find matches.
-     * The more matches there are between the two lists, the more similar they are.
-     * The magnitude of the differences between values does not matter, only whether
-     * they are the same or different.
-     * @param theseValues first ordered list
-     * @param thoseValues second ordered list
-     * @return measure of the difference between the two sorted lists.
-     *   It will return 0 if the two lists are the same.
-     */
-    private int calcValueDifferences(List<Integer> theseValues, List<Integer> thoseValues) {
-
-        int thisLen = theseValues.size();
-        int thatLen = thoseValues.size();
-        int thisCounter = 0;
-        int thatCounter = 0;
-        int matchCount = 0;
-
-        while (thisCounter < thisLen && thatCounter < thatLen) {
-            double thisVal = theseValues.get(thisCounter);
-            double thatVal = thoseValues.get(thatCounter);
-            if (thisVal < thatVal) {
-                thisCounter++;
-            }
-            else if (thatVal > thisVal) {
-                thatCounter++;
-            }
-            else {  // they are the same
-                thisCounter++;
-                thatCounter++;
-                matchCount++;
-            }
-        }
-        return Math.max(thisLen, thatLen) - matchCount;
+        return distCalculator.calculateDistance(this, pa);
     }
 
     /**
@@ -210,7 +170,7 @@ public class VariableLengthIntArray extends AbstractParameterArray {
             newParams.add(createParam(markedNode));
         }
 
-        return new VariableLengthIntArray(newParams, fullSet);
+        return new VariableLengthIntArray(newParams, fullSet, distCalculator);
     }
 
     /**
@@ -219,6 +179,7 @@ public class VariableLengthIntArray extends AbstractParameterArray {
     public AbstractParameterArray copy() {
         VariableLengthIntArray copy = (VariableLengthIntArray) super.copy();
         copy.fullSet = this.fullSet;
+        copy.distCalculator = this.distCalculator;
         return copy;
     }
 

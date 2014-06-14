@@ -38,7 +38,7 @@ public class IntegerParameterTest extends ParameterTst {
 
     @Override
     protected Long expectedNaturalValue() {
-        return new Long(1);
+        return 1L;
     }
 
     @Override

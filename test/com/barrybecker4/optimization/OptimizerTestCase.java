@@ -28,7 +28,8 @@ public abstract class OptimizerTestCase  {
     public void setUp() {
         MathUtil.RANDOM.setSeed(0);
     }
-           /*
+
+
     @Test
     public void testGlobalSampling() {
         doTest(OptimizationStrategyType.GLOBAL_SAMPLING);
@@ -57,7 +58,7 @@ public abstract class OptimizerTestCase  {
 
         doTest(OptimizationStrategyType.HILL_CLIMBING);
     }
-            */
+
     @Test
     public void testGlobalHillClimbing() {
 

@@ -5,6 +5,7 @@ import com.barrybecker4.optimization.optimizee.optimizees.ErrorTolerances;
 import com.barrybecker4.optimization.optimizee.optimizees.IProblemVariation;
 import com.barrybecker4.optimization.parameter.ParameterArray;
 import com.barrybecker4.optimization.parameter.VariableLengthIntArray;
+import com.barrybecker4.optimization.parameter.distancecalculators.MagnitudeDistanceCalculator;
 import com.barrybecker4.optimization.parameter.types.IntegerParameter;
 import com.barrybecker4.optimization.parameter.types.Parameter;
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
@@ -17,12 +18,32 @@ import java.util.List;
  * An enum for different sorts of subset sum problems.
  * http://en.wikipedia.org/wiki/Subset_sum_problem
  *
+ * This is a handcrafted dynamic programming solution
+ * See http://www.geeksforgeeks.org/dynamic-programming-subset-sum-problem/
+ *
+ * // Returns true if there is a subset of set[] with sum equal to sum.
+ * bool isSubsetSum(int set[], int n, int sum)
+ * {
+ *    if (sum == 0) return true;
+ *    if (n == 0 && sum != 0)  return false;
+ *
+ *    // If last element is greater than sum, then ignore it
+ *    if (set[n-1] > sum) return isSubsetSum(set, n-1, sum);
+ *    // else, check if sum can be obtained by any of the following
+ *    // (a) including the last element
+ *    // (b) excluding the last element
+ *    return isSubsetSum(set, n-1, sum) || isSubsetSum(set, n-1, sum-set[n-1]);
+ * }
+ *
+ * call with isSubsetSum(set, set.size(), 0);
+ *
  * @author Barry Becker
  */
 public enum SubsetSumVariation implements IProblemVariation {
 
     SIMPLE {
-        private final ErrorTolerances ERROR_TOLERANCES = new ErrorTolerances(0.0, 0.0, 0.0, 0.0, 0.0, 17.0, 17.0, 0.0);
+        private final ErrorTolerances ERROR_TOLERANCES =
+                new ErrorTolerances(0.0, 0.0, 0.0, 0.0, 0.0, 17.0, 16.0, 0.0);
 
         protected List<Integer> getNumberSet() {
             return Arrays.asList(-7, -3, -2, 5, 8);
@@ -45,7 +66,7 @@ public enum SubsetSumVariation implements IProblemVariation {
 
     TYPICAL {
         private final ErrorTolerances ERROR_TOLERANCES =
-                new ErrorTolerances(0.0, 0.0, 1.0, 6.0, 1.0, 1.0, 1.0, 1.0);
+                new ErrorTolerances(0.0, 0.0, 1.0, 6.0, 1.0, 1.0, 1.0, 0.0);
 
         protected List<Integer> getNumberSet() {
             return Arrays.asList(-7, -33, -21, 5, 83, -29, -78, 213, 123, -34, -37, -41, 91, 7, -17);
@@ -112,7 +133,7 @@ public enum SubsetSumVariation implements IProblemVariation {
         for (int i=0; i<num; i+=3) {
             params.add(createParam(numSet.get(i)));
         }
-        VariableLengthIntArray pa = new VariableLengthIntArray(params, getNumberSet());
+        VariableLengthIntArray pa = new VariableLengthIntArray(params, getNumberSet(), new MagnitudeDistanceCalculator());
         pa.setFitness(computeCost(pa));
         return pa;
     }
@@ -130,27 +151,17 @@ public enum SubsetSumVariation implements IProblemVariation {
     public abstract double getFitnessRange();
 
     /**
-     * We assume that the parameter array contains 0 based integers
-     * @param params last best guess at dominating set.
-     * @return the total cost of the path represented by param.
+     * We assume that the parameter array contains 0 based integers.
+     * @param params last best guess at subset.
+     * @return the total cost of the subset represented by param.  In this case the sum of the marked values.
      */
     protected double computeCost(ParameterArray params) {
-
-        List<Integer> marked = new ArrayList<>();
+        int sum = 0;
         for (int i = 0; i < params.size(); i++)  {
             Parameter node = params.get(i);
-            marked.add((int)node.getValue());
+            sum += (int)node.getValue();
         }
-
-        return getScore(marked);
-    }
-
-    public double getScore(List<Integer> marked) {
-        int sum = 0;
-        for (int i : marked) {
-            sum += i;
-        }
-        return Math.abs(sum);
+        return sum;
     }
 
     /** @return the error tolerance percent for a specific optimization strategy */
@@ -175,10 +186,12 @@ public enum SubsetSumVariation implements IProblemVariation {
         for (int i : numberList) {
             params.add(createParam(i));
         }
-        return new VariableLengthIntArray(params, getNumberSet());
+        return new VariableLengthIntArray(params, getNumberSet(), new MagnitudeDistanceCalculator());
     }
 
     private Parameter createParam(int i) {
-        return new IntegerParameter(i, i<0? i:0, i>=0? i:0, "p" + i);
+        int min = i < 0 ? i : 0;
+        int max = i >= 0 ? i : 0;
+        return new IntegerParameter(i, min, max, "p" + i);
     }
 }
