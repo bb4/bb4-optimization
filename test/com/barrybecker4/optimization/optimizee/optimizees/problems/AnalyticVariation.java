@@ -19,8 +19,8 @@ public enum AnalyticVariation implements IProblemVariation {
 
     PARABOLA {
         private final ErrorTolerances ERROR_TOLERANCES =
-                new ErrorTolerances(GLOB_SAMP_TOL, RELAXED_TOL, BASE_TOLERANCE,
-                    GLOB_SAMP_TOL,  0,  3 * GLOB_SAMP_TOL,  3 * GLOB_SAMP_TOL, BASE_TOLERANCE);
+                new ErrorTolerances(0.009, RELAXED_TOL, BASE_TOLERANCE,
+                    GLOB_SAMP_TOL,  0,  RELAXED_TOL,  RELAXED_TOL, BASE_TOLERANCE);
 
         /** Smooth parabola with min at 0.0 at P1, P2 */
         @Override
@@ -36,8 +36,8 @@ public enum AnalyticVariation implements IProblemVariation {
     },
     SINUSOIDAL {
         private final ErrorTolerances ERROR_TOLERANCES =
-                new ErrorTolerances(GLOB_SAMP_TOL, RELAXED_TOL, 0.01, GLOB_SAMP_TOL,
-                        RELAXED_TOL, 0.072, 0.072, BASE_TOLERANCE);
+                new ErrorTolerances(0.009, RELAXED_TOL, 0.01, GLOB_SAMP_TOL,
+                        RELAXED_TOL, 0.0032, 0.0032, BASE_TOLERANCE);
 
         /**
          * This version introduces a bit of sinusoidal noise.
@@ -57,8 +57,8 @@ public enum AnalyticVariation implements IProblemVariation {
     },
     ABS_SINUSOIDAL {
         private final ErrorTolerances ERROR_TOLERANCES =
-                new ErrorTolerances(GLOB_SAMP_TOL, 0.0128, 0.01, 2*GLOB_SAMP_TOL,
-                        RELAXED_TOL, 2*GLOB_SAMP_TOL,  3*GLOB_SAMP_TOL,  BASE_TOLERANCE);
+                new ErrorTolerances(0.009, 0.0128, 0.01, GLOB_SAMP_TOL,
+                        RELAXED_TOL, 0.0032,  0.0032,  BASE_TOLERANCE);
 
         /**
          * This version introduces a bit of absolute value sinusoidal noise.
@@ -79,8 +79,8 @@ public enum AnalyticVariation implements IProblemVariation {
     },
     STEPPED  {
         private final ErrorTolerances ERROR_TOLERANCES =
-                new ErrorTolerances(GLOB_SAMP_TOL, RELAXED_TOL, BASE_TOLERANCE, GLOB_SAMP_TOL,
-                        RELAXED_TOL,  0.06,  0.06, BASE_TOLERANCE);
+                new ErrorTolerances(0.009, RELAXED_TOL, BASE_TOLERANCE, GLOB_SAMP_TOL,
+                        RELAXED_TOL,  0.03,  0.03, BASE_TOLERANCE);
 
         /**
          *  This version introduces a bit of step function noise.

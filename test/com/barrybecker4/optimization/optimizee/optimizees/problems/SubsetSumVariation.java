@@ -41,7 +41,7 @@ import java.util.List;
  */
 public enum SubsetSumVariation implements IProblemVariation {
 
-    SIMPLE {
+    SIMPLE_SS {
         private final ErrorTolerances ERROR_TOLERANCES =
                 new ErrorTolerances(0.0, 0.0, 0.0, 0.0, 0.0, 17.0, 16.0, 0.0);
 
@@ -64,7 +64,7 @@ public enum SubsetSumVariation implements IProblemVariation {
         }
     },
 
-    TYPICAL {
+    TYPICAL_SS {
         private final ErrorTolerances ERROR_TOLERANCES =
                 new ErrorTolerances(0.0, 0.0, 1.0, 6.0, 1.0, 1.0, 1.0, 0.0);
 

@@ -33,7 +33,7 @@ import static com.barrybecker4.optimization.OptimizerTestCase.LOG_FILE_HOME;
  */
 public class SevenElevenProblem extends OptimizeeProblem {
 
-  private static final Parameter[] INITIAL_GUESS_PARAMS =  {
+    private static final Parameter[] INITIAL_GUESS_PARAMS =  {
              new IntegerParameter(100, 0, 708, "p1"),
              new IntegerParameter(200, 0, 708, "p2"),
              new IntegerParameter(200, 0, 708, "p3"),

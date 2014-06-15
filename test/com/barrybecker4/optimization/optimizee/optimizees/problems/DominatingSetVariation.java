@@ -21,10 +21,10 @@ import java.util.List;
  */
 public enum DominatingSetVariation implements IProblemVariation {
 
-    SIMPLE {
+    SIMPLE_DS {
         /**
          * Trivial example.
-         * There are three nodes, A, B, C. And this list of lists defines the connectivity of the graph.
+         * There are three nodes, A, B, C. This list of lists defines the connectivity of the graph.
          */
         private final Graph ADJACENCIES = new Graph(
                 Arrays.asList(1, 2),
@@ -53,7 +53,7 @@ public enum DominatingSetVariation implements IProblemVariation {
         }
     },
 
-    TYPICAL {
+    TYPICAL_DS {
         private final Graph ADJACENCIES = new Graph(
                 Arrays.asList(15, 21, 25),
                 Arrays.asList(2, 4, 7),
@@ -84,7 +84,7 @@ public enum DominatingSetVariation implements IProblemVariation {
         );
 
         private final ErrorTolerances ERROR_TOLERANCES =
-                new ErrorTolerances(4.0, 1.0, 1.0, 6.0, 1.0, 1.0, 1.0, 1.0);
+                new ErrorTolerances(4.0, 1.0, 1.0, 2.0, 1.0, 5.0, 5.0, 1.0, 0);
 
         protected Graph getAdjacencies() {
             return ADJACENCIES;
@@ -131,7 +131,7 @@ public enum DominatingSetVariation implements IProblemVariation {
             params.add(new IntegerParameter(i, 0, num-1, "p" + i));
         }
         VariableLengthIntArray pa = VariableLengthIntArray.createInstance(params, getAllNodes());
-        pa.setFitness(params.size() + getAdjacencies().getNumNotWithinOneHop(getMarked(pa)));
+        pa.setFitness(getScore(getMarked(pa)));
         return pa;
     }
 

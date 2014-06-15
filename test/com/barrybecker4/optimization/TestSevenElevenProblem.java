@@ -17,7 +17,7 @@ public class TestSevenElevenProblem extends OptimizerTestCase {
 
     /** the tolerances for each for the search strategies. */
     private static final ErrorTolerances ERROR_TOLERANCES =
-            new ErrorTolerances(0.1, TOL/10.0, TOL/3.0, TOL/30.0, TOL, TOL/3.0, TOL/3.0, TOL);
+            new ErrorTolerances(0.1, TOL/10.0, TOL/3.0, TOL/10.0, TOL, TOL/3.0, TOL/3.0, TOL);
 
 
     @Override

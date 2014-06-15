@@ -34,7 +34,7 @@ public class AnalyticFunctionConsts {
 
 
     public static final double BASE_TOLERANCE = 0.0002;
-    public static final double RELAXED_TOL = 0.002;
+    public static final double RELAXED_TOL = 0.0032;
     /** Really relax this one because we do not expect it to ever get that close */
     public static final double GLOB_SAMP_TOL = 0.03;
 

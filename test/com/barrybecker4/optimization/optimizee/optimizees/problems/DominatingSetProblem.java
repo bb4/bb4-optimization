@@ -67,15 +67,15 @@ public class DominatingSetProblem extends OptimizeeProblem {
      * This finds the solution for the above optimization problem.
      */
     public static void main(String[] args) {
-        DominatingSetVariation v = DominatingSetVariation.SIMPLE;
+        DominatingSetVariation v = DominatingSetVariation.TYPICAL_DS;
         OptimizeeProblem problem = new DominatingSetProblem(v);
         Optimizer optimizer =
                 new Optimizer(problem, LOG_FILE_HOME + "domSet_optimization.txt");
 
         ParameterArray initialGuess = problem.getInitialGuess();
 
-        ParameterArray solution =
-                optimizer.doOptimization(OptimizationStrategyType.SIMULATED_ANNEALING, initialGuess, v.getFitnessRange());
+        ParameterArray solution = optimizer.doOptimization(
+            OptimizationStrategyType.SIMULATED_ANNEALING, initialGuess, v.getFitnessRange());
 
         showSolution(problem, solution);
     }

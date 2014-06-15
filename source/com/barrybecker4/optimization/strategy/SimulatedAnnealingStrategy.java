@@ -2,10 +2,9 @@
 package com.barrybecker4.optimization.strategy;
 
 import com.barrybecker4.common.format.FormatUtil;
+import com.barrybecker4.common.math.MathUtil;
 import com.barrybecker4.optimization.optimizee.Optimizee;
 import com.barrybecker4.optimization.parameter.ParameterArray;
-
-import java.util.Random;
 
 /**
  * Simulated annealing optimization strategy.
@@ -26,8 +25,6 @@ public class SimulatedAnnealingStrategy extends OptimizationStrategy {
     private static final double DEFAULT_TEMP_MAX = 1000;
     private double tempMax_ = DEFAULT_TEMP_MAX;
 
-    /** deterministic randomness */
-    private static final Random RAND = new Random(1);
 
     /**
      * Constructor.
@@ -138,7 +135,7 @@ public class SimulatedAnnealingStrategy extends OptimizationStrategy {
         }
 
         double probability = Math.pow(Math.E, tempMax_ * deltaFitness / temperature);
-        boolean useWorseSolution = RAND.nextDouble() < probability;
+        boolean useWorseSolution = MathUtil.RANDOM.nextDouble() < probability;
 
         if (deltaFitness > 0 || useWorseSolution )  {
             // we always select the solution if it has a better fitness,

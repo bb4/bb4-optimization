@@ -1,3 +1,4 @@
+/** Copyright by Barry G. Becker, 2013-2014. Licensed under MIT License: http://www.opensource.org/licenses/MIT  */
 package com.barrybecker4.optimization.optimizee.optimizees.problems;
 
 import java.util.ArrayList;
@@ -5,7 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * A simple graph representation.
+ * A simple undirected graph representation.
  * Only connections between nodes are recorded, not the distance between them.
  * The graph connections are defined by a list of lists.
  * Assume that each node in the graph is assigned an integer number.
@@ -21,7 +22,7 @@ public class Graph extends ArrayList<List<Integer>> {
          super(Arrays.asList(nodeNeighbors));
     }
 
-
+    /** @return the number of nodes that are more than one edge link away from the specified vertex */
     int getNumNotWithinOneHop(List<Integer> marked) {
         int total = 0;
         for (int i=0; i < size(); i++) {

@@ -10,6 +10,7 @@ import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -21,8 +22,15 @@ public abstract class OptimizerTestCase  {
     public static final String LOG_FILE_HOME =
             FileUtil.getHomeDir() + "test/performance/test_optimizer/";  // NN_NLS
 
-    /** If the error is this percent less than the error threshold, let the user know so they can update the test */
-    private static final double THRESHOLD_SLACK_WARNING = 0.6;
+    /** If the error is this percent less than the error threshold, let the user know */
+    private static final double THRESHOLD_SLACK_WARNING = 0.1;
+
+    /** If the error is this percent less than the error threshold, give an error so the test can be updated */
+    private static final double THRESHOLD_SLACK_ERROR = 0.2;
+
+    /** If the error is less than this, then it is considered acceptable, even if off by a lot from the thresh */
+    private static final double ACCEPTABLE_ERROR = 0.002;
+
 
     @Before
     public void setUp() {
@@ -73,13 +81,15 @@ public abstract class OptimizerTestCase  {
 
     protected void verityProblem(OptimizeeProblem problem, IProblemVariation variation,
                                  OptimizationStrategyType optType) {
-         String logFile = LOG_FILE_HOME + "analytic_" + variation + "_optimization.txt";
+        String logFile = LOG_FILE_HOME + "analytic_" + variation + "_optimization.txt";
 
-         Optimizer optimizer = new Optimizer(problem, logFile);
+        Optimizer optimizer = new Optimizer(problem, logFile);
 
-         ParameterArray initialGuess = problem.getInitialGuess();
-         verifyTest(optType, problem, initialGuess, optimizer, problem.getFitnessRange(),
-                    variation.getErrorTolerancePercent(optType), variation.toString());
+        ParameterArray initialGuess = problem.getInitialGuess();
+
+        double percent = variation.getErrorTolerancePercent(optType);
+        verifyTest(optType, problem, initialGuess, optimizer, problem.getFitnessRange(),
+                   percent, variation.toString());
     }
 
     /**
@@ -102,14 +112,17 @@ public abstract class OptimizerTestCase  {
                 + "\n but we expected to get something very close to the exact solution:\n "
                 + problem.getExactSolution(),
                 error <= errorThresh);
-        if (error < THRESHOLD_SLACK_WARNING * errorThresh && error > 0.02) {
-            System.out.println("Heads up: The error threshold of " + errorThresh + " for "
-                    + optType + " is a bit slack. It could be reduced to " + error);
+
+        if (error < (1.0 - THRESHOLD_SLACK_WARNING) * errorThresh && error > ACCEPTABLE_ERROR) {
+            String message = "The error threshold of " + errorThresh + " for "
+                    + optType + " is a bit slack. It could be reduced to " + error;
+            System.out.println(message);
+            assertFalse(message, error < (1.0 - THRESHOLD_SLACK_ERROR) * errorThresh);
         }
 
         System.out.println( "\n************************************************************************" );
-        System.out.println( "The solution to the Problem using " + optType + " is :\n" + solution );
-        System.out.println( "Which evaluates to: " + optimizer.getOptimizee().evaluateFitness(solution));
+        System.out.println( "The solution to the Problem using " + optType + " is :\n" + solution
+            + "\nWhich evaluates to: " + optimizer.getOptimizee().evaluateFitness(solution) + " with error= " + error);
     }
 
 }
