@@ -1,5 +1,6 @@
 package com.barrybecker4.optimization.viewer.projectors;
 
+import com.barrybecker4.common.math.Range;
 import com.barrybecker4.optimization.parameter.ParameterArray;
 
 import javax.vecmath.Point2d;
@@ -28,4 +29,26 @@ public class SimpleProjector implements IProjector {
         }
         return new Point2d(xVal, yVal);
     }
+
+    public Range getXRange(ParameterArray params) {
+        return getRange(params, 0);
+    }
+
+    public Range getYRange(ParameterArray params) {
+        return getRange(params, 1);
+    }
+
+    private Range getRange(ParameterArray params, int modulus) {
+        double min = 0;
+        double max = 0;
+
+        for (int i=0; i<params.size(); i++) {
+            if (i % 2 == modulus) {
+                min += params.get(i).getMinValue();
+                max += params.get(i).getMaxValue();
+            }
+        }
+        return new Range(min, max);
+    }
+
 }

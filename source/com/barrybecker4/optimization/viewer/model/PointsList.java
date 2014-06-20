@@ -3,8 +3,8 @@ package com.barrybecker4.optimization.viewer.model;
 
 import com.barrybecker4.common.math.Range;
 import com.barrybecker4.optimization.parameter.ParameterArray;
-import com.barrybecker4.optimization.parameter.types.Parameter;
 import com.barrybecker4.optimization.viewer.NavigationListener;
+import com.barrybecker4.optimization.viewer.projectors.IProjector;
 
 import javax.vecmath.Point2d;
 import java.awt.Point;
@@ -17,34 +17,29 @@ import java.util.List;
  */
 public class PointsList implements NavigationListener {
 
-
     /** zoom in increment */
     private static final double ZOOM_IN_INCREMENT = 0.2;
 
     /** zoom out by this much */
     private static final double ZOOM_OUT_INCREMENT = 1.05;
 
-    /**
-     * If -1, then pans like a camera (opposite camera direction);
-     * if 1, then moves the scene in the direction of the arrow.
-     */
-    private static final int PAN_DIRECTION = -1;
-
     private List<Point2d> rawPoints_;
 
     private Point2d rawSolutionPosition_;
     private int edgeSize;
     private Range rangeX, rangeY;
+    private IProjector projector;
 
     /**
      * Constructor
      * @param solutionPosition where we hope to wind up at.
      */
-    public PointsList(Point2d solutionPosition, int edgeSize) {
+    public PointsList(Point2d solutionPosition, int edgeSize, IProjector projector) {
         rawPoints_ = new ArrayList<>();
         rawSolutionPosition_ = solutionPosition;
 
         this.edgeSize = edgeSize;
+        this.projector = projector;
     }
 
     public Point getSolutionPosition() {
@@ -69,19 +64,16 @@ public class PointsList implements NavigationListener {
     /**
      * Called whenever the optimizer strategy moves incrementally toward the solution.
      * Does first time initialization.
-     * @param params we assume there is only two.
+     * @param params the paraemter array to add to the list.
      */
     public void addPoint(ParameterArray params) {
 
-        Parameter xParam = params.get(0);
-        Parameter yParam = (params.size() > 1) ? params.get(1):  params.get(0);
-
         if (rangeX == null) {
-            rangeX = new Range(xParam.getMinValue(), xParam.getMaxValue());
-            rangeY = new Range(yParam.getMinValue(), yParam.getMaxValue());
+            rangeX = projector.getXRange(params);
+            rangeY = projector.getYRange(params);
         }
 
-        rawPoints_.add(new Point2d(xParam.getValue(), yParam.getValue()));
+        rawPoints_.add(projector.project(params));
     }
 
     public void pan(Point2d offset) {

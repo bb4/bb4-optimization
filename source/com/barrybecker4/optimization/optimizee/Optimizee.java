@@ -25,7 +25,7 @@ public interface Optimizee {
     boolean evaluateByComparison();
 
     /**
-     *  Attributes a measure of fitness to the specified set of parameters.
+     *  Assigns a measure of fitness to the specified set of parameters.
      *  This method must return a value greater than or equal to 0.
      *  This method is used if evaluateByComparison returns false.
      *  Zero is considered optimal. Higher values imply lesser fitness.

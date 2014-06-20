@@ -43,6 +43,7 @@ public class SevenElevenProblem extends OptimizeeProblem {
     private static final int  P2 = 125;
     private static final int  P3 = 120;
     private static final int  P4 = 150;
+    /** these may be in any order, however */
     private static final Parameter[] EXACT_SOLUTION_PARAMS =  {
              new IntegerParameter(P1, 0, 708, "p1"),
              new IntegerParameter(P2, 0, 708, "p2"),
@@ -60,7 +61,7 @@ public class SevenElevenProblem extends OptimizeeProblem {
     }
 
     /**
-     * we evaluate directly not by comparing with a different trial.
+     * Evaluate directly, not by comparing with a different trial.
      */
     @Override
     public boolean evaluateByComparison() {
@@ -78,7 +79,7 @@ public class SevenElevenProblem extends OptimizeeProblem {
      *    -bs( p1 + p2 + p3 + p4 - 711)^3  + abs(711000000 - p1 * p2 * p3 * p4)
      *    or
      *    abs(711 - sum) + abs(711000000 - product)/1000000
-     *  This is 0 when the constraints are satisfied.
+     *  This is 0 when the constraints are satisfied, something greater than 0 when not.
      *
      * @param a the position in the search space given values of p1, p2, p4, p4.
      * @return fitness value

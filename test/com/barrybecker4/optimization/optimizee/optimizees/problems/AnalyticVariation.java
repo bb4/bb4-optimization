@@ -22,7 +22,7 @@ public enum AnalyticVariation implements IProblemVariation {
                 new ErrorTolerances(0.009, RELAXED_TOL, BASE_TOLERANCE,
                     GLOB_SAMP_TOL,  0,  RELAXED_TOL,  RELAXED_TOL, BASE_TOLERANCE);
 
-        /** Smooth parabola with min at 0.0 at P1, P2 */
+        /** Smooth parabola with min of 0.0 at P1, P2 */
         @Override
         public double evaluateFitness(ParameterArray a) {
             return  (Math.pow(P1 - a.get(0).getValue(), 2)
@@ -99,7 +99,7 @@ public enum AnalyticVariation implements IProblemVariation {
 
 
     /**
-     * Evaluate fitness for the analytics function. Higher values are more fit.
+     * Evaluate fitness for the analytics function. Lower values are more fit.
      * @param a the position on the parabolic surface given the specified values of p1 and p2
      * @return fitness value
      */

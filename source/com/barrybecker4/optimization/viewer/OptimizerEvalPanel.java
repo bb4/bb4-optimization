@@ -55,7 +55,7 @@ public class OptimizerEvalPanel extends JPanel
     public void doTest(OptimizationStrategyType optType, Optimizer optimizer, Point2d solutionPosition,
                        ParameterArray initialGuess, double fitnessRange) {
 
-        pointsList = new PointsList(solutionPosition, EDGE_SIZE);
+        pointsList = new PointsList(solutionPosition, EDGE_SIZE, projector);
         ParameterArray solution = null;
         try {
             solution = optimizer.doOptimization(optType, initialGuess, fitnessRange);
