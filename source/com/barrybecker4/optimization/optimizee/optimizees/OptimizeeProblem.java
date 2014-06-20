@@ -35,6 +35,11 @@ public abstract class OptimizeeProblem implements Optimizee {
         return 0.0;
     }
 
+    @Override
+    public String toString() {
+        return getName();
+    }
+
     /**
      *
      * @return  approximate range of fitness values (usually 0 to this number).

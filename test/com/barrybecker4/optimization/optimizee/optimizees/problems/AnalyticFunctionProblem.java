@@ -38,7 +38,7 @@ public class AnalyticFunctionProblem extends OptimizeeProblem {
 
     @Override
     public String getName() {
-        return variation_.name();
+        return "Analytic: " + variation_.name();
     }
 
     /** we evaluate directly not by comparing with a different trial.   */
@@ -71,9 +71,5 @@ public class AnalyticFunctionProblem extends OptimizeeProblem {
         return FITNESS_RANGE;
     }
 
-    @Override
-    public String toString() {
-        return getName();
-    }
 
 }

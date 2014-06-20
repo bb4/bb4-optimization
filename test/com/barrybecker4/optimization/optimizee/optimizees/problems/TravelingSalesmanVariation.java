@@ -163,7 +163,7 @@ public enum TravelingSalesmanVariation implements IProblemVariation {
         }
         // and back home again
         totalCost += matrix[(int)lastLocation.getValue()][(int)params.get(0).getValue()];
-        return totalCost ;
+        return totalCost;
     }
 
     /** @return the error tolerance percent for a specific optimization strategy */

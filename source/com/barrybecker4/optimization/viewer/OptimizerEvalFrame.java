@@ -15,7 +15,6 @@ import java.awt.BorderLayout;
  */
 public class OptimizerEvalFrame extends ApplicationFrame {
 
-    private OptimizerEvalPanel evalPanel;
     private String logFile;
 
     /**
@@ -46,7 +45,7 @@ public class OptimizerEvalFrame extends ApplicationFrame {
     private JPanel createContent(OptimizeeProblem[] testProblems) {
         JPanel mainPanel = new JPanel(new BorderLayout());
 
-        evalPanel = new OptimizerEvalPanel();
+        OptimizerEvalPanel evalPanel = new OptimizerEvalPanel();
         TopControls topControls = new TopControls(logFile, testProblems, evalPanel);
 
         mainPanel.add(topControls, BorderLayout.NORTH);
@@ -61,7 +60,6 @@ public class OptimizerEvalFrame extends ApplicationFrame {
     public static void main(String[] args) {
 
         OptimizeeProblem testProblem = new TrivialProblem();
-        //OptimizationStrategyType strategy = OptimizationStrategyType.GLOBAL_SAMPLING;
 
         new OptimizerEvalFrame("test/temp.txt",  testProblem);
     }

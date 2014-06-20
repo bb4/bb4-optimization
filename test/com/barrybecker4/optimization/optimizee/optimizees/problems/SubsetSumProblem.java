@@ -27,7 +27,7 @@ public class SubsetSumProblem extends OptimizeeProblem {
 
     @Override
     public String getName() {
-        return "Subset Sum Problem";
+        return "Subset Sum: " + variation_.name();
     }
 
     /**

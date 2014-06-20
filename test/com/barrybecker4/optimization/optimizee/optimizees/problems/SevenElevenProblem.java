@@ -69,8 +69,9 @@ public class SevenElevenProblem extends OptimizeeProblem {
 
     @Override
     public String getName() {
-        return "Zeven Eleven Problem";
+        return "Seven Eleven Problem";
     }
+
     /**
      *  The choice of fitness function here is somewhat arbitrary.
      *  I chose to use:

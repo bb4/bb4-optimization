@@ -4,7 +4,17 @@ package com.barrybecker4.optimization.optimizee.optimizees;
 import com.barrybecker4.common.util.FileUtil;
 import com.barrybecker4.optimization.optimizee.optimizees.problems.AnalyticFunctionProblem;
 import com.barrybecker4.optimization.optimizee.optimizees.problems.AnalyticVariation;
+import com.barrybecker4.optimization.optimizee.optimizees.problems.DominatingSetProblem;
+import com.barrybecker4.optimization.optimizee.optimizees.problems.DominatingSetVariation;
+import com.barrybecker4.optimization.optimizee.optimizees.problems.SevenElevenProblem;
+import com.barrybecker4.optimization.optimizee.optimizees.problems.SubsetSumProblem;
+import com.barrybecker4.optimization.optimizee.optimizees.problems.SubsetSumVariation;
+import com.barrybecker4.optimization.optimizee.optimizees.problems.TravelingSalesmanProblem;
+import com.barrybecker4.optimization.optimizee.optimizees.problems.TravelingSalesmanVariation;
 import com.barrybecker4.optimization.viewer.OptimizerEvalFrame;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * This is a simple search space to test the optimization package.
@@ -17,7 +27,7 @@ public class GraphAnalyticFunctionSolution {
 
     /** Place to put performance results from the tests */
     private static final String PERFORMANCE_LOG =
-            FileUtil.getHomeDir() + "optimization/test/results/poly_optimization.txt";
+            FileUtil.getHomeDir() + "test/results/poly_optimization.txt";
 
 
     /**
@@ -26,12 +36,28 @@ public class GraphAnalyticFunctionSolution {
      */
     public static void main(String[] args) {
 
-        OptimizeeProblem[] testProblems = new OptimizeeProblem[AnalyticVariation.values().length];
-        int i = 0;
-        for (AnalyticVariation v : AnalyticVariation.values()) {
-            testProblems[i++] = new AnalyticFunctionProblem(v);
-        }
+        new OptimizerEvalFrame(PERFORMANCE_LOG, getAllTestProblems());
+    }
 
-        new OptimizerEvalFrame(PERFORMANCE_LOG, testProblems);
+    /**
+     * @return an array of all the test problems to show in a droplist selector.
+     */
+    private static OptimizeeProblem[] getAllTestProblems() {
+        List<OptimizeeProblem> testProblems = new LinkedList<>();
+
+        for (AnalyticVariation v : AnalyticVariation.values()) {
+            testProblems.add(new AnalyticFunctionProblem(v));
+        }
+        for (DominatingSetVariation v : DominatingSetVariation.values()) {
+            testProblems.add(new DominatingSetProblem(v));
+        }
+        testProblems.add(new SevenElevenProblem());
+        for (SubsetSumVariation v : SubsetSumVariation.values()) {
+            testProblems.add(new SubsetSumProblem(v));
+        }
+        for (TravelingSalesmanVariation v : TravelingSalesmanVariation.values()) {
+            testProblems.add(new TravelingSalesmanProblem(v));
+        }
+        return testProblems.toArray(new OptimizeeProblem[testProblems.size()]);
     }
 }

@@ -28,7 +28,7 @@ public class DominatingSetProblem extends OptimizeeProblem {
 
     @Override
     public String getName() {
-        return "Dominating Set Problem";
+        return "Dominating Set: " + variation_.name();
     }
 
     /**

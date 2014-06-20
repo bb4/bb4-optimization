@@ -30,7 +30,7 @@ public class OptimizerEvalPanel extends JPanel
 
     private static final int EDGE_SIZE = 1000;
     static final Dimension SIZE = new Dimension(EDGE_SIZE, EDGE_SIZE);
-    private static final Color BG_COLOR = new Color(240, 241, 242);
+    private static final Color BG_COLOR = new Color(240, 245, 250);
 
     private PointsList pointsList;
     private PointsListRenderer renderer;

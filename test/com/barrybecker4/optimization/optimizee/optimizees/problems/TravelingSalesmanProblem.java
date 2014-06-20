@@ -25,8 +25,9 @@ public class TravelingSalesmanProblem extends OptimizeeProblem {
 
     @Override
     public String getName() {
-        return "Traveling Salesman Problem";
+        return "TSP: " + variation_.name();
     }
+
 
     /**
      * we evaluate directly not by comparing with a different trial.
