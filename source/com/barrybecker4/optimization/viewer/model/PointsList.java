@@ -24,6 +24,7 @@ public class PointsList implements NavigationListener {
     private static final double ZOOM_OUT_INCREMENT = 1.05;
 
     private List<Point2d> rawPoints_;
+    private List<ParameterArray> paramArrays_;
 
     private Point2d rawSolutionPosition_;
     private int edgeSize;
@@ -36,6 +37,7 @@ public class PointsList implements NavigationListener {
      */
     public PointsList(Point2d solutionPosition, int edgeSize, IProjector projector) {
         rawPoints_ = new ArrayList<>();
+        paramArrays_ = new ArrayList<>();
         rawSolutionPosition_ = solutionPosition;
 
         this.edgeSize = edgeSize;
@@ -51,10 +53,13 @@ public class PointsList implements NavigationListener {
         return rawPoints_.get(i);
     }
 
+    public ParameterArray getParamArrayForPoint(int i) {
+        return paramArrays_.get(i);
+    }
+
     public Point getScaledPoint(int i) {
         Point2d pt = rawPoints_.get(i);
         return new Point(getScaledXValue(pt.x), getScaledYValue(pt.y));
-        //return scaledPoints_.get(i);
     }
 
     public int size() {
@@ -64,7 +69,7 @@ public class PointsList implements NavigationListener {
     /**
      * Called whenever the optimizer strategy moves incrementally toward the solution.
      * Does first time initialization.
-     * @param params the paraemter array to add to the list.
+     * @param params the parameter array to add to the list.
      */
     public void addPoint(ParameterArray params) {
 
@@ -74,6 +79,7 @@ public class PointsList implements NavigationListener {
         }
 
         rawPoints_.add(projector.project(params));
+        paramArrays_.add(params);
     }
 
     public void pan(Point2d offset) {
