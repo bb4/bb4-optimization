@@ -7,6 +7,8 @@ import com.barrybecker4.optimization.optimizee.optimizees.OptimizeeProblem;
 import com.barrybecker4.optimization.parameter.ParameterArray;
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
 import com.barrybecker4.optimization.viewer.model.PointsList;
+import com.barrybecker4.optimization.viewer.projectors.IProjector;
+import com.barrybecker4.optimization.viewer.projectors.SimpleProjector;
 
 import javax.swing.JPanel;
 import javax.vecmath.Point2d;
@@ -36,6 +38,8 @@ public class OptimizerEvalPanel extends JPanel
     private PointsListRenderer renderer;
 
     private Point dragStartPosition;
+
+    private IProjector projector = new SimpleProjector();
 
     /**
      * Constructor
@@ -78,12 +82,15 @@ public class OptimizerEvalPanel extends JPanel
         pointsList.addPoint(params);
     }
 
+    /**
+     *
+     */
     public void showOptimization(OptimizationStrategyType strategy, OptimizeeProblem testProblem, String logFile) {
 
         ParameterArray params = testProblem.getExactSolution();
-        double xVal = params.get(0).getValue();
-        double yVal = (params.size() > 1) ? params.get(1).getValue() : xVal;
-        Point2d solutionPosition = new Point2d(xVal, yVal);
+
+        // have strategy for projecting n-dimensions down to two.
+        Point2d solutionPosition = projector.project(params);
 
         Optimizer optimizer = new Optimizer(testProblem, logFile);
         optimizer.setListener(this);
