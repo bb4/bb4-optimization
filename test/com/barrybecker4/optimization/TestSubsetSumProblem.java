@@ -7,6 +7,8 @@ import com.barrybecker4.optimization.optimizee.optimizees.problems.SubsetSumVari
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
 import org.junit.Test;
 
+import java.util.EnumSet;
+
 /**
  * The subset sum problem is NP-complete.
  * @author Barry Becker
@@ -22,10 +24,10 @@ public class TestSubsetSumProblem extends OptimizerTestCase {
     @Override
     protected void doTest(OptimizationStrategyType optimizationType) {
 
-        for (SubsetSumVariation variation : SubsetSumVariation.values()) {
+        for (SubsetSumVariation variation : EnumSet.of(SubsetSumVariation.NO_SOLUTION)) {
 
             OptimizeeProblem problem = new SubsetSumProblem(variation);
-            verityProblem(problem, variation, optimizationType);
+            verifyProblem(problem, variation, optimizationType);
         }
     }
 

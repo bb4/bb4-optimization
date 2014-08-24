@@ -23,7 +23,7 @@ public class TestTravelingSalesmanProblem extends OptimizerTestCase {
         for (TravelingSalesmanVariation variation : TravelingSalesmanVariation.values()) {
 
             OptimizeeProblem problem = new TravelingSalesmanProblem(variation);
-            verityProblem(problem, variation, optimizationType);
+            verifyProblem(problem, variation, optimizationType);
         }
     }
 

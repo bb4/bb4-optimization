@@ -74,12 +74,12 @@ public abstract class OptimizerTestCase  {
     }
 
     /**
-     * run test for given optimization type
+     * Run test for given optimization type
      * @param optType the optimization type to use.
      */
     protected abstract void doTest(OptimizationStrategyType optType);
 
-    protected void verityProblem(OptimizeeProblem problem, IProblemVariation variation,
+    protected void verifyProblem(OptimizeeProblem problem, IProblemVariation variation,
                                  OptimizationStrategyType optType) {
         String logFile = LOG_FILE_HOME + "analytic_" + variation + "_optimization.txt";
 

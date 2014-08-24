@@ -11,7 +11,7 @@ import com.barrybecker4.optimization.parameter.types.Parameter;
  *
  * @author Barry Becker
  */
-public class AnalyticFunctionConsts {
+public class ParabolaFunctionConsts {
 
     public static final double  P1 = 1.0;
     public static final double  P2 = 2.0;
@@ -38,5 +38,5 @@ public class AnalyticFunctionConsts {
     /** Really relax this one because we do not expect it to ever get that close */
     public static final double GLOB_SAMP_TOL = 0.03;
 
-    private AnalyticFunctionConsts() {}
+    private ParabolaFunctionConsts() {}
 }

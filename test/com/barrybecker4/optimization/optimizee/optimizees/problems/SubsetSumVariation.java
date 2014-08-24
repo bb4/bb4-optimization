@@ -43,7 +43,7 @@ public enum SubsetSumVariation implements IProblemVariation {
 
     SIMPLE_SS {
         private final ErrorTolerances ERROR_TOLERANCES =
-                new ErrorTolerances(0.0, 0.0, 0.0, 0.0, 0.0, 17.0, 16.0, 0.0);
+                new ErrorTolerances(0.0, 0.0, 9.0, 9.0, 0.0, 9.0, 9.0, 0.0);
 
         protected List<Integer> getNumberSet() {
             return Arrays.asList(-7, -3, -2, 5, 8);
@@ -66,7 +66,7 @@ public enum SubsetSumVariation implements IProblemVariation {
 
     TYPICAL_SS {
         private final ErrorTolerances ERROR_TOLERANCES =
-                new ErrorTolerances(0.0, 0.0, 1.0, 6.0, 1.0, 1.0, 1.0, 0.0);
+                new ErrorTolerances(0.0, 0.0, 0.5, 6.0, 1.0, 4.0, 4.0, 0.0);
 
         protected List<Integer> getNumberSet() {
             return Arrays.asList(-7, -33, -21, 5, 83, -29, -78, 213, 123, -34, -37, -41, 91, -8, -17);
@@ -89,17 +89,17 @@ public enum SubsetSumVariation implements IProblemVariation {
     },
 
     NO_SOLUTION {
-        // none of the errors will be 0 because there is not solution that sums to 0.
+        // none of the errors will be 0 because there is no solution that sums to 0.
         private final ErrorTolerances ERROR_TOLERANCES =
-                new ErrorTolerances(20.0, 1.0, 1.0, 6.0, 1.0, 2.5, 5.0, 1.0, 1.0);
+                new ErrorTolerances(20.0, 1.0, 1.0, 25.0, 1.0, 1.0, 1.0, 1.0, 1.0);
 
         protected List<Integer> getNumberSet() {
             return Arrays.asList(-7, -33, -21, 5, -83, -29, -78, -113, -23, -34, -37, -41, -91, -9, -17);
         }
 
-        /** This is one of several possible solutions that gives an optimal fitness of 0 */
+        /** There is no solution - i.e. no values that sum to 0. */
         public ParameterArray getExactSolution() {
-            return createSolution(6, -6);
+            return createSolution(-7);
         }
 
         @Override
@@ -182,6 +182,7 @@ public enum SubsetSumVariation implements IProblemVariation {
      */
     protected VariableLengthIntArray createSolution(int... numberList) {
         int numNodes = numberList.length;
+        assert numNodes>0 : "There must be some values in a valid solution.";
         List<Parameter> params = new ArrayList<>(numNodes);
         for (int i : numberList) {
             params.add(createParam(i));

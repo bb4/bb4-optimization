@@ -8,6 +8,7 @@ import java.util.Map;
 import static com.barrybecker4.optimization.strategy.OptimizationStrategyType.*;
 
 /**
+ * Collects together expected error tolerances for all the optimization strategies.
  * @author Barry Becker
  */
 public class ErrorTolerances {

@@ -24,7 +24,7 @@ public class TestDominatingSetProblem extends OptimizerTestCase {
         for (DominatingSetVariation variation : DominatingSetVariation.values()) {
 
             OptimizeeProblem problem = new DominatingSetProblem(variation);
-            verityProblem(problem, variation, optimizationType);
+            verifyProblem(problem, variation, optimizationType);
         }
     }
 

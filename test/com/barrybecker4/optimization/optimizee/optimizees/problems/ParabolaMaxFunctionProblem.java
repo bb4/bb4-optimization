@@ -25,14 +25,14 @@ import com.barrybecker4.optimization.parameter.ParameterArray;
  *
  * @author Barry Becker
  */
-public class AnalyticFunctionProblem extends OptimizeeProblem {
+public class ParabolaMaxFunctionProblem extends OptimizeeProblem {
 
     private static final double FITNESS_RANGE = 1000.0;
 
-    private AnalyticVariation variation_ = AnalyticVariation.PARABOLA;
+    private ParabolaMaxVariation variation_ = ParabolaMaxVariation.PARABOLA;
 
     /** Constructor */
-    public AnalyticFunctionProblem(AnalyticVariation v) {
+    public ParabolaMaxFunctionProblem(ParabolaMaxVariation v) {
         variation_ = v;
     }
 
@@ -58,12 +58,12 @@ public class AnalyticFunctionProblem extends OptimizeeProblem {
 
     @Override
     public ParameterArray getInitialGuess() {
-        return AnalyticFunctionConsts.INITIAL_GUESS;
+        return ParabolaFunctionConsts.INITIAL_GUESS;
     }
 
     @Override
     public ParameterArray getExactSolution() {
-        return AnalyticFunctionConsts.EXACT_SOLUTION;
+        return ParabolaFunctionConsts.EXACT_SOLUTION;
     }
 
     @Override

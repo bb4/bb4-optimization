@@ -7,7 +7,7 @@ import com.barrybecker4.optimization.parameter.NumericParameterArrayTest;
 import com.barrybecker4.optimization.parameter.ParameterArray;
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
 
-import static com.barrybecker4.optimization.optimizee.optimizees.problems.AnalyticFunctionConsts.*;
+import static com.barrybecker4.optimization.optimizee.optimizees.problems.ParabolaFunctionConsts.*;
 
 /**
  * An enum for different sorts of analytic functions that we might want to test.
@@ -15,7 +15,7 @@ import static com.barrybecker4.optimization.optimizee.optimizees.problems.Analyt
  *
  * @author Barry Becker
  */
-public enum AnalyticVariation implements IProblemVariation {
+public enum ParabolaMaxVariation implements IProblemVariation {
 
     PARABOLA {
         private final ErrorTolerances ERROR_TOLERANCES =
@@ -107,7 +107,7 @@ public enum AnalyticVariation implements IProblemVariation {
 
 
     public ParameterArray getExactSolution() {
-        return AnalyticFunctionConsts.EXACT_SOLUTION;
+        return ParabolaFunctionConsts.EXACT_SOLUTION;
     }
 
     /** @return the error tolerance percent for a specific optimization strategy */
@@ -127,7 +127,7 @@ public enum AnalyticVariation implements IProblemVariation {
         double p2 = 1.975;
         System.out.println("f("+p1+", "+ p2 +")="
                 + PARABOLA.evaluateFitness(NumericParameterArrayTest.createParamArray(p1, p2)));
-        for (AnalyticVariation variation : AnalyticVariation.values())  {
+        for (ParabolaMaxVariation variation : ParabolaMaxVariation.values())  {
             System.out.println(variation.name() + " f("+P1+", "+ P2 +")="
                 + variation.evaluateFitness(NumericParameterArrayTest.createParamArray(P1, P2)));
         }

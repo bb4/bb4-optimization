@@ -2,8 +2,8 @@
 package com.barrybecker4.optimization.optimizee.optimizees;
 
 import com.barrybecker4.common.util.FileUtil;
-import com.barrybecker4.optimization.optimizee.optimizees.problems.AnalyticFunctionProblem;
-import com.barrybecker4.optimization.optimizee.optimizees.problems.AnalyticVariation;
+import com.barrybecker4.optimization.optimizee.optimizees.problems.ParabolaMaxFunctionProblem;
+import com.barrybecker4.optimization.optimizee.optimizees.problems.ParabolaMaxVariation;
 import com.barrybecker4.optimization.optimizee.optimizees.problems.DominatingSetProblem;
 import com.barrybecker4.optimization.optimizee.optimizees.problems.DominatingSetVariation;
 import com.barrybecker4.optimization.optimizee.optimizees.problems.SevenElevenProblem;
@@ -45,8 +45,8 @@ public class GraphAnalyticFunctionSolution {
     private static OptimizeeProblem[] getAllTestProblems() {
         List<OptimizeeProblem> testProblems = new LinkedList<>();
 
-        for (AnalyticVariation v : AnalyticVariation.values()) {
-            testProblems.add(new AnalyticFunctionProblem(v));
+        for (ParabolaMaxVariation v : ParabolaMaxVariation.values()) {
+            testProblems.add(new ParabolaMaxFunctionProblem(v));
         }
         for (DominatingSetVariation v : DominatingSetVariation.values()) {
             testProblems.add(new DominatingSetProblem(v));

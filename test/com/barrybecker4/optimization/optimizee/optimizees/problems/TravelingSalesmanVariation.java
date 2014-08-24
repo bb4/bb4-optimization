@@ -9,7 +9,7 @@ import com.barrybecker4.optimization.parameter.types.IntegerParameter;
 import com.barrybecker4.optimization.parameter.types.Parameter;
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
 
-import static com.barrybecker4.optimization.optimizee.optimizees.problems.AnalyticFunctionConsts.*;
+import static com.barrybecker4.optimization.optimizee.optimizees.problems.ParabolaFunctionConsts.*;
 
 /**
  * An enum for different sorts of traveling salesman problems (TSPs) that we might want to test.
