@@ -19,7 +19,7 @@ import java.awt.RenderingHints;
 public class PointsListRenderer {
 
     private static final int POINT_DIAMETER = 8;
-    private static final Color VECTOR_COLOR = new Color(10, 40, 255);
+    private static final Color VECTOR_COLOR = new Color(10, 20, 255, 120);
     private static final Color POINT_COLOR = new Color(10, 0, 55);
     private static final Color FINAL_POINT_COLOR = new Color(255, 80, 0);
     private static final Color SOLUTION_COLOR = new Color(220, 0, 0);
@@ -48,7 +48,6 @@ public class PointsListRenderer {
         Point lastPoint, Point currentPoint, Point2d rawPoint, ParameterArray params, boolean isLast) {
 
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        //g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         g2.setStroke(LINE_STROKE);
         g2.setColor(VECTOR_COLOR);
         g2.drawLine(currentPoint.x, currentPoint.y, lastPoint.x, lastPoint.y);
@@ -63,7 +62,7 @@ public class PointsListRenderer {
         g2.setColor(TEXT_COLOR);
         //String label = "(" + FormatUtil.formatNumber(rawPoint.x) + ", " + FormatUtil.formatNumber(rawPoint.y) + ")";
 
-        String label = "(" + params.toString() + ")";
+        String label = "(" + params.toCSVString() + ")";
         g2.drawString(label, currentPoint.x - 10 - 5 * label.length(), currentPoint.y + 12);
     }
 
@@ -78,11 +77,11 @@ public class PointsListRenderer {
 
     private void drawOval(Point position, int rad, Graphics2D g2) {
          g2.drawOval((int)(position.x - rad / 2.0),  (int)(position.y - rad /2.0),
-                           rad, rad);
+                     rad, rad);
     }
 
     private void fillOval(Point position, int rad, Graphics2D g2) {
          g2.fillOval((int)(position.x - rad / 2.0),  (int)(position.y - rad /2.0),
-                           rad, rad);
+                     rad, rad);
     }
 }

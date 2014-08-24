@@ -69,17 +69,17 @@ public enum SubsetSumVariation implements IProblemVariation {
                 new ErrorTolerances(0.0, 0.0, 1.0, 6.0, 1.0, 1.0, 1.0, 0.0);
 
         protected List<Integer> getNumberSet() {
-            return Arrays.asList(-7, -33, -21, 5, 83, -29, -78, 213, 123, -34, -37, -41, 91, 7, -17);
+            return Arrays.asList(-7, -33, -21, 5, 83, -29, -78, 213, 123, -34, -37, -41, 91, -8, -17);
         }
 
         // This is one of several possible solutions that gives an optimal fitness of 0
         public ParameterArray getExactSolution() {
-            return createSolution(6, -6);
+            return createSolution(-33, -21, 5, -29, 123, -37, -8);
         }
 
         @Override
         public double getFitnessRange() {
-            return 200.0;
+            return 210.0;
         }
 
         @Override
@@ -153,7 +153,7 @@ public enum SubsetSumVariation implements IProblemVariation {
     /**
      * We assume that the parameter array contains 0 based integers.
      * @param params last best guess at subset.
-     * @return the total cost of the subset represented by param.  In this case the sum of the marked values.
+     * @return the total cost of the subset represented by param.  In this case the absolute sum of the marked values.
      */
     protected double computeCost(ParameterArray params) {
         int sum = 0;
@@ -161,7 +161,7 @@ public enum SubsetSumVariation implements IProblemVariation {
             Parameter node = params.get(i);
             sum += (int)node.getValue();
         }
-        return sum;
+        return Math.abs(sum);
     }
 
     /** @return the error tolerance percent for a specific optimization strategy */

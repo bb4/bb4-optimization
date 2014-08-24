@@ -13,7 +13,7 @@ public class FitnessColorMap extends ColorMap {
              0.0,
               0.1, 1.0, 10.0, 100.0, 1000.0, 10000.0};
     /** base transparency value.*/
-    private static final int CM_TRANS = 150;
+    private static final int CM_TRANS = 100;
 
     /** this colormap is used to show a spectrum of colors representing a group's health status.*/
     private static final Color[] myColors_ = {
