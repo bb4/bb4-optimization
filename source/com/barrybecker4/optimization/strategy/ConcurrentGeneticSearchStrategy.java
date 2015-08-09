@@ -1,7 +1,7 @@
 /** Copyright by Barry G. Becker, 2000-2011. Licensed under MIT License: http://www.opensource.org/licenses/MIT  */
 package com.barrybecker4.optimization.strategy;
 
-import com.barrybecker4.common.concurrency.Parallelizer;
+import com.barrybecker4.common.concurrency.RunnableParallelizer;
 import com.barrybecker4.optimization.optimizee.Optimizee;
 import com.barrybecker4.optimization.parameter.ParameterArray;
 
@@ -43,7 +43,7 @@ public class ConcurrentGeneticSearchStrategy extends GeneticSearchStrategy {
     protected ParameterArray evaluatePopulation(List<ParameterArray> population, ParameterArray previousBest) {
         ParameterArray bestFitness = previousBest;
 
-        Parallelizer<EvaluationWorker> parallelizer = new Parallelizer<>();
+        RunnableParallelizer parallelizer = new RunnableParallelizer();
 
         List<Runnable> workers = new ArrayList<>(population.size());
 

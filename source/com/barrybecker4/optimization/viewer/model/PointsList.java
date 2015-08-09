@@ -113,10 +113,12 @@ public class PointsList implements NavigationListener {
     }
 
     private  int getScaledXValue(double value) {
+        if (rangeX == null) return 0;
         return (int) (edgeSize * (value - rangeX.getMin()) / rangeX.getExtent());
     }
 
     private  int getScaledYValue(double value) {
+        if (rangeY == null) return 0;
         return (int) (edgeSize * (value - rangeY.getMin()) / rangeY.getExtent());
     }
 }
