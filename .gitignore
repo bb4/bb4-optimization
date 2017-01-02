@@ -1,4 +1,4 @@
-.idea
+.idea/
 .gradle
 .project
 classes/
@@ -6,3 +6,9 @@ build/
 bin/
 *.iml
 *.class
+bb4-optimization.ipr
+bb4-optimization.iws
+out/
+test/performance/
+test/results/
+test/temp.txt
