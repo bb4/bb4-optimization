@@ -83,7 +83,7 @@ public class OptimizerEvalPanel extends JPanel
     }
 
     /**
-     *
+     * show the optimization results in the ui.
      */
     public void showOptimization(OptimizationStrategyType strategy, OptimizeeProblem testProblem, String logFile) {
 
