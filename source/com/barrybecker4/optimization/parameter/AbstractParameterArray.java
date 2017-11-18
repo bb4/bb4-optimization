@@ -93,17 +93,17 @@ public abstract class AbstractParameterArray implements ParameterArray {
     }
 
     public String toString() {
-        StringBuilder sb = new StringBuilder("fitness = "+this.getFitness()+'\n');
-        sb.append("parameter[0] = ").append(get(0).toString());
-        for ( int i = 1; i < size(); i++ ) {
-            sb.append( '\n' );
+        StringBuilder sb = new StringBuilder();
+        for ( int i = 0; i < size(); i++ ) {
             sb.append("parameter[").append(i).append("] = ").append(get(i).toString());
+            sb.append('\n');
         }
+        sb.append("fitness = ").append(this.getFitness());
         return sb.toString();
     }
 
     /**
-     * @return  the parameters in a string of Comma Separated Values.
+     * @return the parameters in a string of Comma Separated Values.
      */
     public String toCSVString() {
         StringBuilder sb = new StringBuilder("");

@@ -71,7 +71,7 @@ public class OptimizerEvalPanel extends JPanel
                 + optType + " is :\n" + solution);
         System.out.println( "Which evaluates to: "+ optimizer.getOptimizee().evaluateFitness(solution));
         System.out.println( "We expected to get exactly p1 = "+ solutionPosition.x
-                + " and p2 = " + solutionPosition.x );
+                + " and p2 = " + solutionPosition.y );
     }
 
     /**
