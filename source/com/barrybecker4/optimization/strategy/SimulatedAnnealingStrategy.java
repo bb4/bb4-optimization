@@ -23,7 +23,7 @@ public class SimulatedAnnealingStrategy extends OptimizationStrategy {
 
     /** the client should really set the tempMax using setTemperatureMax before running. */
     private static final double DEFAULT_TEMP_MAX = 1000;
-    private double tempMax_ = DEFAULT_TEMP_MAX;
+    private double tempMax = DEFAULT_TEMP_MAX;
 
 
     /**
@@ -40,7 +40,7 @@ public class SimulatedAnnealingStrategy extends OptimizationStrategy {
      * @param tempMax the initial temperature at the start of the simulated annealing process (before cooling).
      */
     public void setMaxTemperature(double tempMax) {
-        tempMax_ = tempMax;
+        this.tempMax = tempMax;
     }
 
     /**
@@ -69,8 +69,8 @@ public class SimulatedAnnealingStrategy extends OptimizationStrategy {
     public ParameterArray doOptimization( ParameterArray params, double fitnessRange ) {
 
         int ct = 0;
-        double temperature = tempMax_;
-        double tempMin = tempMax_ / Math.pow(2.0, NUM_TEMP_ITERATIONS);
+        double temperature = tempMax;
+        double tempMin = tempMax / Math.pow(2.0, NUM_TEMP_ITERATIONS);
 
         if (!optimizee_.evaluateByComparison()) {
             double currentFitness = optimizee_.evaluateFitness(params);
@@ -118,8 +118,8 @@ public class SimulatedAnnealingStrategy extends OptimizationStrategy {
      */
      private ParameterArray findNeighbor(ParameterArray params, int ct, double temperature) {
 
-        //double r = (tempMax_/5.0+temperature) / (8.0*(N/5.0+ct)*tempMax_);
-        double r = temperature / ((N + ct) * tempMax_);
+        //double r = (tempMax/5.0+temperature) / (8.0*(N/5.0+ct)*tempMax);
+        double r = temperature / ((N + ct) * tempMax);
         ParameterArray newParams = params.getRandomNeighbor(r);
         double dist = params.distance(newParams);
 
@@ -134,7 +134,7 @@ public class SimulatedAnnealingStrategy extends OptimizationStrategy {
             deltaFitness = params.getFitness() - newFitness;
         }
 
-        double probability = Math.pow(Math.E, tempMax_ * deltaFitness / temperature);
+        double probability = Math.pow(Math.E, tempMax * deltaFitness / temperature);
         boolean useWorseSolution = MathUtil.RANDOM.nextDouble() < probability;
 
         if (deltaFitness > 0 || useWorseSolution )  {

@@ -18,7 +18,7 @@ public class GlobalSampleStrategy extends OptimizationStrategy {
     private static final int DEFAULT_NUM_SAMPLES = 10000;
 
     /** the user should set this explicitly. */
-    int numSamples_;
+    int numSample;
 
 
     /**
@@ -29,7 +29,7 @@ public class GlobalSampleStrategy extends OptimizationStrategy {
     public GlobalSampleStrategy( Optimizee optimizee ) {
 
         super(optimizee);
-        numSamples_ = DEFAULT_NUM_SAMPLES;
+        numSample = DEFAULT_NUM_SAMPLES;
     }
 
     /**
@@ -38,7 +38,7 @@ public class GlobalSampleStrategy extends OptimizationStrategy {
     public void setSamplingRate(int samplingRate) {
 
         assert samplingRate > 0;
-        numSamples_ = samplingRate;
+        numSample = samplingRate;
     }
 
     /**
@@ -61,7 +61,7 @@ public class GlobalSampleStrategy extends OptimizationStrategy {
     @Override
     public ParameterArray doOptimization( ParameterArray params, double fitnessRange ) {
 
-        Iterator<? extends ParameterArray> samples = params.findGlobalSamples(numSamples_);
+        Iterator<? extends ParameterArray> samples = params.findGlobalSamples(numSample);
         double bestFitness = Double.MAX_VALUE;
         ParameterArray bestParams = params.copy();
 
