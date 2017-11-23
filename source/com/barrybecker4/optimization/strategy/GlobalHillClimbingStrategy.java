@@ -22,7 +22,6 @@ public class GlobalHillClimbingStrategy extends OptimizationStrategy {
      * @param optimizee the thing to be optimized.
      */
     public GlobalHillClimbingStrategy( Optimizee optimizee ) {
-
         super(optimizee);
     }
 
