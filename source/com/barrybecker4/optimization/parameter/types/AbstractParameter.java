@@ -4,7 +4,7 @@ package com.barrybecker4.optimization.parameter.types;
 import com.barrybecker4.common.format.FormatUtil;
 import com.barrybecker4.optimization.parameter.redistribution.RedistributionFunction;
 
-import java.util.Random;
+import scala.util.Random;
 
 /**
  *  represents a general parameter to an algorithm
@@ -13,14 +13,14 @@ import java.util.Random;
  */
 public abstract class AbstractParameter implements Parameter {
 
-    protected double value_ = 0.0;
-    protected double minValue_ = 0.0;
-    private double maxValue_ = 0.0;
-    private double range_ = 0.0;
+    protected double value = 0.0;
+    protected double minValue = 0.0;
+    private double maxValue = 0.0;
+    private double range = 0.0;
     private String name_ = null;
-    private boolean integerOnly_ = false;
+    private boolean integerOnly = false;
 
-    protected RedistributionFunction redistributionFunction_;
+    protected RedistributionFunction redistributionFunction;
 
     /**
 
@@ -31,22 +31,22 @@ public abstract class AbstractParameter implements Parameter {
      * @param paramName of the parameter
      */
     public AbstractParameter( double val, double minVal, double maxVal, String paramName ) {
-        value_ = val;
-        minValue_ = minVal;
-        maxValue_ = maxVal;
-        range_ = maxVal - minVal;
+        value = val;
+        minValue = minVal;
+        maxValue = maxVal;
+        range = maxVal - minVal;
         name_ = paramName;
-        integerOnly_ = false;
+        integerOnly = false;
     }
 
     public AbstractParameter( double val, double minVal, double maxVal,
                               String paramName, boolean intOnly ) {
         this(val, minVal, maxVal, paramName);
-        integerOnly_ = intOnly;
+        integerOnly = intOnly;
     }
 
     public boolean isIntegerOnly() {
-        return integerOnly_;
+        return integerOnly;
     }
 
     /**
@@ -62,14 +62,14 @@ public abstract class AbstractParameter implements Parameter {
         }
 
         double change = (rand.nextGaussian() - 0.5) * r * getRange();
-        value_ += change;
-        if (value_ > getMaxValue()) {
-              value_ = getMaxValue();
+        value += change;
+        if (value > getMaxValue()) {
+              value = getMaxValue();
         }
-        else if (value_ < getMinValue()) {
-             value_ = getMinValue();
+        else if (value < getMinValue()) {
+             value = getMinValue();
         }
-        setValue(value_);
+        setValue(value);
    }
 
     public void randomizeValue(Random rand) {
@@ -87,8 +87,8 @@ public abstract class AbstractParameter implements Parameter {
         sa.append( ", " );
         sa.append( FormatUtil.formatNumber(getMaxValue()) );
         sa.append( ']' );
-        if (redistributionFunction_ != null) {
-            sa.append(" redistributionFunction=").append(redistributionFunction_);
+        if (redistributionFunction != null) {
+            sa.append(" redistributionFunction=").append(redistributionFunction);
         }
         return sa.toString();
     }
@@ -104,21 +104,21 @@ public abstract class AbstractParameter implements Parameter {
 
     public void setValue(double value) {
         validateRange(value);
-        this.value_ = value;
+        this.value = value;
         // if there is a redistribution function, we need to apply its inverse.
-        if (redistributionFunction_ != null) {
-            double v = (value - minValue_) / getRange();
-            this.value_=
-                    minValue_ + getRange() *redistributionFunction_.getInverseFunctionValue(v);
+        if (redistributionFunction != null) {
+            double v = (value - minValue) / getRange();
+            this.value =
+                    minValue + getRange() * redistributionFunction.getInverseFunctionValue(v);
         }
     }
 
     public double getValue() {
-        double value = value_;
-        if (redistributionFunction_ != null) {
-            double v = (value_ - minValue_) / getRange();
-            v = redistributionFunction_.getValue(v);
-            value = v * getRange() + minValue_;
+        double value = this.value;
+        if (redistributionFunction != null) {
+            double v = (this.value - minValue) / getRange();
+            v = redistributionFunction.getValue(v);
+            value = v * getRange() + minValue;
         }
         validateRange(value);
         return value;
@@ -126,15 +126,15 @@ public abstract class AbstractParameter implements Parameter {
 
 
     public double getMinValue() {
-        return minValue_;
+        return minValue;
     }
 
     public double getMaxValue() {
-        return maxValue_;
+        return maxValue;
     }
 
     public double getRange() {
-        return range_;
+        return range;
     }
 
     public String getName() {
@@ -142,12 +142,12 @@ public abstract class AbstractParameter implements Parameter {
     }
 
     public void setRedistributionFunction(RedistributionFunction function) {
-        redistributionFunction_ = function;
+        redistributionFunction = function;
     }
 
     private void validateRange(double value) {
-        assert (value >= minValue_ && value <= maxValue_) :
-            "Value " + value + " outside range [" + minValue_ +", " + maxValue_ + "] for parameter " + getName();
+        assert (value >= minValue && value <= maxValue) :
+            "Value " + value + " outside range [" + minValue +", " + maxValue + "] for parameter " + getName();
     }
 
     @Override
@@ -157,9 +157,9 @@ public abstract class AbstractParameter implements Parameter {
 
         AbstractParameter that = (AbstractParameter) o;
 
-        if (integerOnly_ != that.integerOnly_) return false;
-        if (Double.compare(that.maxValue_, maxValue_) != 0) return false;
-        if (Double.compare(that.minValue_, minValue_) != 0) return false;
+        if (integerOnly != that.integerOnly) return false;
+        if (Double.compare(that.maxValue, maxValue) != 0) return false;
+        if (Double.compare(that.minValue, minValue) != 0) return false;
         if (!that.getNaturalValue().equals(getNaturalValue())) return false;
         //if (name_ != null ? !name_.equals(that.name_) : that.name_ != null) return false;
 
@@ -172,12 +172,12 @@ public abstract class AbstractParameter implements Parameter {
         long temp;
         temp = getNaturalValue().hashCode();
         result = (int) (temp ^ (temp >>> 32));
-        temp = minValue_ != +0.0d ? Double.doubleToLongBits(minValue_) : 0L;
+        temp = minValue != +0.0d ? Double.doubleToLongBits(minValue) : 0L;
         result = 31 * result + (int) (temp ^ (temp >>> 32));
-        temp = maxValue_ != +0.0d ? Double.doubleToLongBits(maxValue_) : 0L;
+        temp = maxValue != +0.0d ? Double.doubleToLongBits(maxValue) : 0L;
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         result = 31 * result + (name_ != null ? name_.hashCode() : 0);
-        result = 31 * result + (integerOnly_ ? 1 : 0);
+        result = 31 * result + (integerOnly ? 1 : 0);
         return result;
     }
 

@@ -8,7 +8,7 @@ import com.barrybecker4.optimization.parameter.redistribution.DiscreteRedistribu
 import com.barrybecker4.optimization.parameter.ui.DoubleParameterWidget;
 import com.barrybecker4.optimization.parameter.ui.ParameterWidget;
 
-import java.util.Random;
+import scala.util.Random;
 
 /**
  *  represents an integer parameter in an algorithm
@@ -33,13 +33,13 @@ public class IntegerParameter extends AbstractParameter {
 
     public Parameter copy() {
         IntegerParameter p =  new IntegerParameter( (int)Math.round(getValue()), (int)getMinValue(), (int)getMaxValue(), getName() );
-        p.setRedistributionFunction(redistributionFunction_);
+        p.setRedistributionFunction(redistributionFunction);
         return p;
     }
 
     @Override
     public void randomizeValue(Random rand) {
-        value_ = getMinValue() + rand.nextDouble() * (getRange() + 1.0);
+        value = getMinValue() + rand.nextDouble() * (getRange() + 1.0);
     }
 
     @Override
@@ -69,29 +69,29 @@ public class IntegerParameter extends AbstractParameter {
     public double incrementByEps(Direction direction ) {
 
         double increment = direction.getMultiplier();
-        value_ = getValue() + increment;
+        value = getValue() + increment;
         return increment;
     }
 
     @Override
     public void setValue(double value) {
 
-        this.value_ = value;
+        this.value = value;
         // if there is a redistribution function, we need to apply its inverse.
-        if (redistributionFunction_ != null) {
-            double v = (value - minValue_) / (getRange() + 1.0);
-            this.value_=
-                    minValue_ + (getRange() + 1.0) *redistributionFunction_.getInverseFunctionValue(v);
+        if (redistributionFunction != null) {
+            double v = (value - minValue) / (getRange() + 1.0);
+            this.value =
+                    minValue + (getRange() + 1.0) * redistributionFunction.getInverseFunctionValue(v);
         }
     }
 
     @Override
     public double getValue() {
-        double value = value_;
-        if (redistributionFunction_ != null) {
-            double v = (value_ - minValue_) / (getRange() + 1.0);
-            double rv = redistributionFunction_.getValue(v);
-            value = rv * (getRange() + (1.0 - MathUtil.EPS)) + minValue_;
+        double value = this.value;
+        if (redistributionFunction != null) {
+            double v = (this.value - minValue) / (getRange() + 1.0);
+            double rv = redistributionFunction.getValue(v);
+            value = rv * (getRange() + (1.0 - MathUtil.EPS())) + minValue;
         }
         return Math.round(value);
     }

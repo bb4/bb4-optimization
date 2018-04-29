@@ -4,6 +4,7 @@ package com.barrybecker4.optimization.parameter.sampling;
 import com.barrybecker4.common.math.combinatorics.Combinater;
 import com.barrybecker4.optimization.parameter.ParameterArray;
 import com.barrybecker4.optimization.parameter.VariableLengthIntArray;
+import scala.collection.JavaConversions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,8 +93,7 @@ public class VariableLengthGlobalSampler extends AbstractGlobalSampler<VariableL
     private VariableLengthIntArray getNextExhaustiveSample() {
 
         VariableLengthIntArray vlParams = (VariableLengthIntArray) params.copy();
-
-        vlParams.setCombination(combinater.next());
+        vlParams.setCombination(JavaConversions.seqAsJavaList(combinater.next()));
 
         hasNext = combinater.hasNext();
         return vlParams;

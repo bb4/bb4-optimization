@@ -34,7 +34,7 @@ public class StringParameter extends IntegerParameter {
     @Override
     public Parameter copy() {
         StringParameter p = new StringParameter( (int)getValue(), values_, getName() );
-        p.setRedistributionFunction(redistributionFunction_);
+        p.setRedistributionFunction(redistributionFunction);
         return p;
     }
 

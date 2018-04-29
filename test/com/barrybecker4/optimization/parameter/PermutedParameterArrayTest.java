@@ -8,7 +8,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Barry Becker
@@ -19,7 +18,7 @@ public class PermutedParameterArrayTest  {
 
     @Before
     public void setUp() {
-        MathUtil.RANDOM.setSeed(0);
+        MathUtil.RANDOM().setSeed(0);
     }
 
     @Test
@@ -29,8 +28,7 @@ public class PermutedParameterArrayTest  {
         PermutedParameterArray nbrParams = params.getRandomNeighbor(1.0);
         PermutedParameterArray expNbr =  createPermParameterArray(new int[] {3, 1, 2, 0, 4});
 
-        assertTrue("Unexpected neighbor. expected " + expNbr +" but got "+ nbrParams,
-                expNbr.equals(nbrParams));
+        assertEquals("Unexpected neighbor. expected " + expNbr + " but got " + nbrParams, expNbr, nbrParams);
     }
 
     /**

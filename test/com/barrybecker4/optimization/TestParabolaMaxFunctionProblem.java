@@ -17,7 +17,7 @@ public class TestParabolaMaxFunctionProblem extends OptimizerTestCase {
 
         for (ParabolaMaxVariation variation : ParabolaMaxVariation.values()) {
 
-            MathUtil.RANDOM.setSeed(0);
+            MathUtil.RANDOM().setSeed(0);
             OptimizeeProblem problem = new ParabolaMaxFunctionProblem(variation);
             verifyProblem(problem, variation, optimizationType);
         }

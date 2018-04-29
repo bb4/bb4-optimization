@@ -68,12 +68,12 @@ public class UniformRedistribution extends AbstractRedistributionFunction {
 
              yValues[i2 + 2] = specialValues[i];
              if (i > 0) {
-                 xValues[i2 + 1] += MathUtil.EPS;
+                 xValues[i2 + 1] += MathUtil.EPS();
              }
              lastX = xValues[i2 + 2];
         }
         if (len == 2) {
-            xValues[2* len -  2] -= MathUtil.EPS_MEDIUM;
+            xValues[2* len -  2] -= MathUtil.EPS_MEDIUM();
         }
         xValues[2 * len + 1] = 1.0;
         yValues[2 * len + 1] = 1.0;

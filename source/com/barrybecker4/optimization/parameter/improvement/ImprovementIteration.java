@@ -101,7 +101,7 @@ public class ImprovementIteration {
      * Use EPS if the gradLength is 0.
      */
     void updateGradient(double jumpSize, double gradLength) {
-        double gradLen = gradLength ==0 ?  MathUtil.EPS_MEDIUM : gradLength;
+        double gradLen = gradLength ==0 ?  MathUtil.EPS_MEDIUM() : gradLength;
         for ( int i = 0; i < delta.size(); i++ ) {
             double denominator = delta.get(i) * gradLen;
             gradient.set(i, jumpSize * fitnessDelta.get(i) / denominator);

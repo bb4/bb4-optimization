@@ -5,6 +5,7 @@ import com.barrybecker4.common.math.MathUtil;
 import com.barrybecker4.common.math.combinatorics.Permuter;
 import com.barrybecker4.optimization.parameter.ParameterArray;
 import com.barrybecker4.optimization.parameter.PermutedParameterArray;
+import scala.collection.JavaConversions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +25,7 @@ public class PermutedGlobalSampler extends AbstractGlobalSampler<PermutedParamet
     private PermutedParameterArray params;
 
     /** used to cache the samples already tried so we do not repeat them if the requestedNumSamples is small */
-    List<ParameterArray> globalSamples = new ArrayList<>();
+    private List<ParameterArray> globalSamples = new ArrayList<>();
 
     /** Used to enumerate all possible permutations when doing exhaustive search */
     private Permuter permuter;
@@ -92,7 +93,7 @@ public class PermutedGlobalSampler extends AbstractGlobalSampler<PermutedParamet
     private PermutedParameterArray getNextExhaustiveSample() {
 
         PermutedParameterArray pParams = (PermutedParameterArray) params.copy();
-        pParams.setPermutation(permuter.next());
+        pParams.setPermutation(JavaConversions.seqAsJavaList(permuter.next()));
 
         hasNext = permuter.hasNext();
         return pParams;

@@ -19,7 +19,7 @@ public abstract class AbstractParameterArray implements ParameterArray {
     private static final int POPULATION_MAX = 4000;
 
     /** the list of parameters */
-    protected List<Parameter> params_;
+    protected List<Parameter> params;
 
     /** assign a fitness (evaluation value) to this set of parameters */
     private double fitness_ = 0;
@@ -32,8 +32,8 @@ public abstract class AbstractParameterArray implements ParameterArray {
      * @param params an array of params to initialize with.
      */
     public AbstractParameterArray(Parameter[] params) {
-        params_ = new ArrayList<>();
-        Collections.addAll(params_, params);
+        this.params = new ArrayList<>();
+        Collections.addAll(this.params, params);
     }
 
     /**
@@ -41,13 +41,13 @@ public abstract class AbstractParameterArray implements ParameterArray {
      * @param params list of parameters
      */
     public AbstractParameterArray(List<Parameter> params) {
-        params_ = params;
+        this.params = params;
     }
 
     public int getSamplePopulationSize()  {
         int pop = 1;
-        assert params_ != null;
-        for (Parameter param : params_) {
+        assert params != null;
+        for (Parameter param : params) {
             pop *= param.isIntegerOnly() ? 2 : 6;
         }
         return Math.min(POPULATION_MAX, pop);
@@ -57,7 +57,7 @@ public abstract class AbstractParameterArray implements ParameterArray {
      * @return the number of parameters in the array.
      */
     public int size() {
-        return params_.size();
+        return params.size();
     }
 
     public void setFitness(double value) {
@@ -78,7 +78,7 @@ public abstract class AbstractParameterArray implements ParameterArray {
         }
 
         AbstractParameterArray pa = createInstance();
-        pa.params_ = newParams;
+        pa.params = newParams;
         pa.setFitness(fitness_);
         return pa;
     }
@@ -89,7 +89,7 @@ public abstract class AbstractParameterArray implements ParameterArray {
      * @return the ith parameter in the array.
      */
     public Parameter get( int i ) {
-        return params_.get(i);
+        return params.get(i);
     }
 
     public String toString() {
@@ -133,11 +133,11 @@ public abstract class AbstractParameterArray implements ParameterArray {
         if (o == null || getClass() != o.getClass()) return false;
 
         AbstractParameterArray that = (AbstractParameterArray) o;
-        return params_ == that.params_ || params_.equals(that.params_);
+        return params == that.params || params.equals(that.params);
     }
 
     @Override
     public int hashCode() {
-        return params_ != null ? params_.hashCode() : 0;
+        return params != null ? params.hashCode() : 0;
     }
 }

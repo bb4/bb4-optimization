@@ -54,9 +54,9 @@ public class NumericParameterArray extends AbstractParameterArray {
      */
     public NumericParameterArray(double[] vals, double[] minVals, double[] maxVals, String names[]) {
         int len = vals.length;
-        params_ = new ArrayList<>(len);
+        params = new ArrayList<>(len);
         for (int i=0; i<len; i++)  {
-            params_.add(new DoubleParameter(vals[i], minVals[i], maxVals[i], names[i]));
+            params.add(new DoubleParameter(vals[i], minVals[i], maxVals[i], names[i]));
         }
     }
 
@@ -202,7 +202,7 @@ public class NumericParameterArray extends AbstractParameterArray {
          NumericParameterArray nbr = this.copy();
          for ( int k = 0; k < size(); k++ ) {
              Parameter param = nbr.get(k);
-             param.tweakValue(radius, MathUtil.RANDOM);
+             param.tweakValue(radius, MathUtil.RANDOM());
          }
 
          return nbr;
@@ -215,7 +215,7 @@ public class NumericParameterArray extends AbstractParameterArray {
          NumericParameterArray nbr = this.copy();
          for ( int k = 0; k < size(); k++ ) {
              Parameter newPar = nbr.get(k);
-             newPar.setValue(newPar.getMinValue() + MathUtil.RANDOM.nextDouble() * newPar.getRange());
+             newPar.setValue(newPar.getMinValue() + MathUtil.RANDOM().nextDouble() * newPar.getRange());
              assert (newPar.getValue() < newPar.getMaxValue() && newPar.getValue() > newPar.getMinValue()):
                      "newPar "+newPar.getValue() + " not between " + newPar.getMinValue()
                              + " and  " + newPar.getMaxValue();

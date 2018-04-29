@@ -43,7 +43,7 @@ public class ConcurrentGeneticSearchStrategy extends GeneticSearchStrategy {
     protected ParameterArray evaluatePopulation(List<ParameterArray> population, ParameterArray previousBest) {
         ParameterArray bestFitness = previousBest;
 
-        RunnableParallelizer parallelizer = new RunnableParallelizer();
+        RunnableParallelizer parallelizer = new RunnableParallelizer(Runtime.getRuntime().availableProcessors());
 
         List<Runnable> workers = new ArrayList<>(population.size());
 
@@ -74,7 +74,7 @@ public class ConcurrentGeneticSearchStrategy extends GeneticSearchStrategy {
         ParameterArray candidate;
         ParameterArray params;
 
-        public EvaluationWorker(ParameterArray candidate, ParameterArray params) {
+        EvaluationWorker(ParameterArray candidate, ParameterArray params) {
             this.params = params;
             this.candidate = candidate;
         }
@@ -89,11 +89,11 @@ public class ConcurrentGeneticSearchStrategy extends GeneticSearchStrategy {
             candidate.setFitness(fitness);
         }
 
-        public double getResult() {
+        double getResult() {
             return fitness;
         }
 
-        public ParameterArray getCandidate() {
+        ParameterArray getCandidate() {
             return candidate;
         }
     }

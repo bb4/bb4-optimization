@@ -29,7 +29,7 @@ public class VariableLengthIntArrayTest  {
 
     @Before
     public void setUp() {
-        MathUtil.RANDOM.setSeed(0);
+        MathUtil.RANDOM().setSeed(0);
     }
 
     @Test

@@ -29,7 +29,7 @@ public class VariableLengthIntArray extends AbstractParameterArray {
     private List<Integer> fullSet;
 
     /** Default constructor */
-    protected VariableLengthIntArray() {}
+    private VariableLengthIntArray() {}
 
     private DistanceCalculator distCalculator;
 
@@ -94,8 +94,8 @@ public class VariableLengthIntArray extends AbstractParameterArray {
         double probAddRemove = 1.0/(1.0 + radius);
         boolean add = false;
         boolean remove = false;
-        if (MathUtil.RANDOM.nextDouble() > probAddRemove) {
-            if ((MathUtil.RANDOM.nextDouble() > 0.5 || size() <= 1) && size() < getMaxLength()-1 ) {
+        if (MathUtil.RANDOM().nextDouble() > probAddRemove) {
+            if ((MathUtil.RANDOM().nextDouble() > 0.5 || size() <= 1) && size() < getMaxLength()-1 ) {
                 add = true;
             }
             else {
@@ -106,10 +106,10 @@ public class VariableLengthIntArray extends AbstractParameterArray {
         VariableLengthIntArray nbr = (VariableLengthIntArray)this.copy();
 
         if (add || remove) {
-            numNodesToMove = MathUtil.RANDOM.nextInt(Math.min(size(), (int)(radius + 1)));
+            numNodesToMove = MathUtil.RANDOM().nextInt(Math.min(size(), (int)(radius + 1)));
         }
         else {
-            numNodesToMove = 1 + MathUtil.RANDOM.nextInt(1 + (int)radius);
+            numNodesToMove = 1 + MathUtil.RANDOM().nextInt(1 + (int)radius);
         }
 
         if (remove) {
@@ -129,7 +129,7 @@ public class VariableLengthIntArray extends AbstractParameterArray {
          for (int i : indices) {
              newParams.add(createParam(fullSet.get(i)));
          }
-         params_ = newParams;
+         params = newParams;
     }
 
     /**
@@ -161,7 +161,7 @@ public class VariableLengthIntArray extends AbstractParameterArray {
 
         List<Integer> marked = new LinkedList<>();
         for (int i = 0; i < getMaxLength(); i++) {
-            if (MathUtil.RANDOM.nextDouble() > 0.5) {
+            if (MathUtil.RANDOM().nextDouble() > 0.5) {
                 marked.add(fullSet.get(i));
             }
         }
@@ -192,7 +192,7 @@ public class VariableLengthIntArray extends AbstractParameterArray {
     }
 
     private void removeRandomParam(VariableLengthIntArray nbr) {
-        int indexToRemove = MathUtil.RANDOM.nextInt(size());
+        int indexToRemove = MathUtil.RANDOM().nextInt(size());
         assert nbr.size() > 0;
         List<Parameter> newParams = new ArrayList<>(nbr.size()-1);
 
@@ -201,7 +201,7 @@ public class VariableLengthIntArray extends AbstractParameterArray {
                 newParams.add(nbr.get(i));
             }
         }
-        nbr.params_ = newParams;
+        nbr.params = newParams;
     }
 
     private void addRandomParam(VariableLengthIntArray nbr) {
@@ -210,12 +210,12 @@ public class VariableLengthIntArray extends AbstractParameterArray {
         int newSize = nbr.size() + 1;
         assert newSize <= getMaxLength();
         List<Parameter> newParams = new ArrayList<>(newSize);
-        for (Parameter p : nbr.params_) {
+        for (Parameter p : nbr.params) {
             newParams.add(p);
         }
-        int value = freeNodes.get(MathUtil.RANDOM.nextInt(freeNodes.size()));
+        int value = freeNodes.get(MathUtil.RANDOM().nextInt(freeNodes.size()));
         newParams.add(createParam(value));
-        nbr.params_ = newParams;
+        nbr.params = newParams;
     }
 
     /**
@@ -229,7 +229,7 @@ public class VariableLengthIntArray extends AbstractParameterArray {
         List<Integer> swapNodes = selectRandomNodes(numSelect, freeNodes);
 
         for (int i=0; i<numSelect; i++) {
-            int index = MathUtil.RANDOM.nextInt(nbr.size());
+            int index = MathUtil.RANDOM().nextInt(nbr.size());
             nbr.get(index).setValue(swapNodes.get(i));
         }
     }
@@ -237,7 +237,7 @@ public class VariableLengthIntArray extends AbstractParameterArray {
     private List<Integer> selectRandomNodes(int numNodesToSelect, List<Integer> freeNodes) {
         List<Integer> selected = new LinkedList<>();
         for (int i=0; i < numNodesToSelect; i++) {
-            int node = freeNodes.get(MathUtil.RANDOM.nextInt(freeNodes.size()));
+            int node = freeNodes.get(MathUtil.RANDOM().nextInt(freeNodes.size()));
             selected.add(node);
             freeNodes.remove((Integer) node);
         }
@@ -247,7 +247,7 @@ public class VariableLengthIntArray extends AbstractParameterArray {
     private List<Integer> getFreeNodes(VariableLengthIntArray nbr) {
         List<Integer> freeNodes = new ArrayList<>(getMaxLength());
         Set<Integer> markedNodes = new HashSet<>();
-        for (Parameter p : nbr.params_) {
+        for (Parameter p : nbr.params) {
             markedNodes.add((int)p.getValue());
         }
 

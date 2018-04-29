@@ -9,9 +9,9 @@ import com.barrybecker4.optimization.parameter.sampling.PermutedGlobalSampler;
 import com.barrybecker4.optimization.parameter.types.Parameter;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Set;
 
 /**
@@ -57,7 +57,7 @@ public class PermutedParameterArray extends AbstractParameterArray {
         for (int i : indices) {
             newParams.add(get(i));
         }
-        params_ = newParams;
+        params = newParams;
     }
 
     @Override
@@ -70,9 +70,9 @@ public class PermutedParameterArray extends AbstractParameterArray {
         int len = size();
 
         for (int i=0; i<len/2; i++) {
-            Parameter temp = paramCopy.params_.get(i);
-            paramCopy.params_.set(i, paramCopy.params_.get(len - i - 1));
-            paramCopy.params_.set(len - i - 1, temp);
+            Parameter temp = paramCopy.params.get(i);
+            paramCopy.params.set(i, paramCopy.params.get(len - i - 1));
+            paramCopy.params.set(len - i - 1, temp);
         }
         return paramCopy;
     }
@@ -102,14 +102,14 @@ public class PermutedParameterArray extends AbstractParameterArray {
 
         PermutedParameterArray nbr = (PermutedParameterArray)this.copy();
         for ( int k = 0; k < numToSwap; k++ ) {
-            int index1 = MathUtil.RANDOM.nextInt(size());
-            int index2 = MathUtil.RANDOM.nextInt(size());
+            int index1 = MathUtil.RANDOM().nextInt(size());
+            int index2 = MathUtil.RANDOM().nextInt(size());
             while (index2 == index1) {
-                index2 = MathUtil.RANDOM.nextInt(size());
+                index2 = MathUtil.RANDOM().nextInt(size());
             }
-            Parameter temp =  nbr.params_.get(index1);
-            nbr.params_.set(index1, nbr.params_.get(index2));
-            nbr.params_.set(index2, temp);
+            Parameter temp =  nbr.params.get(index1);
+            nbr.params.set(index1, nbr.params.get(index2));
+            nbr.params.set(index2, temp);
         }
         return nbr;
     }
@@ -141,8 +141,11 @@ public class PermutedParameterArray extends AbstractParameterArray {
      */
     public ParameterArray getRandomSample() {
 
-        List<Parameter> theParams = new ArrayList<>(params_);
-        Collections.shuffle(theParams, MathUtil.RANDOM);
+        List<Parameter> theParams = new ArrayList<>(params);
+        //MathUtil.RANDOM().shuffle(scala.collection.JavaConverters.asScalaIterator(params.iterator())).asJava(); //
+
+        //scala.collection.JavaConversions.seqAsJavaList
+        shuffle(theParams);
 
         List<Parameter> newParams = new ArrayList<>(size());
         for (Parameter p : theParams) {
@@ -150,5 +153,26 @@ public class PermutedParameterArray extends AbstractParameterArray {
         }
 
         return new PermutedParameterArray(newParams);
+    }
+
+    // temporary until scala upgrade
+    private static void shuffle(List<?> list) {
+        int size = list.size();
+        Object arr[] = list.toArray();
+
+        for (int i=size; i>1; i--)
+            swap(arr, i-1, MathUtil.RANDOM().nextInt(i));
+
+        // Dump array back into list
+        ListIterator it = list.listIterator();
+        for (Object anArr : arr) {
+            it.next();
+            it.set(anArr);
+        }
+    }
+    private static void swap(Object[] arr, int i, int j) {
+        Object tmp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = tmp;
     }
 }

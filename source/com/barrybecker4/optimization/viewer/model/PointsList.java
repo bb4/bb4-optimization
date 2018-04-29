@@ -88,11 +88,11 @@ public class PointsList implements NavigationListener {
     }
 
     private void adjustXRange(double xOffset) {
-        rangeX = new Range(rangeX.getMin() + xOffset, rangeX.getMax() + xOffset);
+        rangeX = new Range(rangeX.min() + xOffset, rangeX.max() + xOffset);
     }
 
     private void adjustYRange(double yOffset) {
-        rangeY = new Range(rangeY.getMin() + yOffset, rangeY.getMax() + yOffset);
+        rangeY = new Range(rangeY.min() + yOffset, rangeY.max() + yOffset);
     }
 
     public void zoomIn() {
@@ -108,17 +108,17 @@ public class PointsList implements NavigationListener {
     }
 
     private void adjustRanges(double xOffset, double yOffset) {
-        rangeX = new Range(rangeX.getMin() + xOffset, rangeX.getMax() - xOffset);
-        rangeY = new Range(rangeY.getMin() + yOffset, rangeY.getMax() - yOffset);
+        rangeX = new Range(rangeX.min() + xOffset, rangeX.max() - xOffset);
+        rangeY = new Range(rangeY.min() + yOffset, rangeY.max() - yOffset);
     }
 
     private  int getScaledXValue(double value) {
         if (rangeX == null) return 0;
-        return (int) (edgeSize * (value - rangeX.getMin()) / rangeX.getExtent());
+        return (int) (edgeSize * (value - rangeX.min()) / rangeX.getExtent());
     }
 
     private  int getScaledYValue(double value) {
         if (rangeY == null) return 0;
-        return (int) (edgeSize * (value - rangeY.getMin()) / rangeY.getExtent());
+        return (int) (edgeSize * (value - rangeY.min()) / rangeY.getExtent());
     }
 }

@@ -6,7 +6,7 @@ import com.barrybecker4.optimization.parameter.ParameterChangeListener;
 import com.barrybecker4.optimization.parameter.redistribution.RedistributionFunction;
 import com.barrybecker4.optimization.parameter.ui.ParameterWidget;
 
-import java.util.Random;
+import scala.util.Random;
 
 /**
  *  Interface to represent a general parameter of some type to an algorithm.

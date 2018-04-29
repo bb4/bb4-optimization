@@ -27,7 +27,7 @@ public class BooleanParameter extends IntegerParameter {
     @Override
     public Parameter copy() {
         BooleanParameter p =  new BooleanParameter( (Boolean)getNaturalValue(), getName() );
-        p.setRedistributionFunction(redistributionFunction_);
+        p.setRedistributionFunction(redistributionFunction);
         return p;
     }
 

@@ -63,14 +63,14 @@ public abstract class ParameterTst {
     public void testIncrementByEpsForward() {
         parameter.incrementByEps(Direction.FORWARD);
         assertEquals("Unexpected eps forward",
-                expectedForwardEpsChange(), parameter.getValue(), MathUtil.EPS_MEDIUM);
+                expectedForwardEpsChange(), parameter.getValue(), MathUtil.EPS_MEDIUM());
     }
 
     @Test
     public void testIncrementByEpsBackward() {
         parameter.incrementByEps(Direction.BACKWARD);
         assertEquals("Unexpected eps backward",
-                expectedBackwardEpsChange(), parameter.getValue(), MathUtil.EPS_MEDIUM);
+                expectedBackwardEpsChange(), parameter.getValue(), MathUtil.EPS_MEDIUM());
     }
 
     protected boolean expectedIsIntegerOnly() {

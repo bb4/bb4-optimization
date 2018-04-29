@@ -56,7 +56,7 @@ public class GaussianRedistribution extends AbstractRedistributionFunction {
                     -lowMissing * (double)(numMapValsm1-i)/numMapValsm1 +  highMissing * (double)i/numMapValsm1;
             cdfFunction[i] += aliasAllocation;
             if (cdfFunction[i] > 1.0 && i<NUM_MAP_VALUES-1) {
-                cdfFunction[i] = 1.0 - MathUtil.EPS;
+                cdfFunction[i] = 1.0 - MathUtil.EPS();
             }
         }
         double max = cdfFunction[NUM_MAP_VALUES-1];

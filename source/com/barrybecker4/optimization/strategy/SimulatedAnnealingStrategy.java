@@ -135,7 +135,7 @@ public class SimulatedAnnealingStrategy extends OptimizationStrategy {
         }
 
         double probability = Math.pow(Math.E, tempMax * deltaFitness / temperature);
-        boolean useWorseSolution = MathUtil.RANDOM.nextDouble() < probability;
+        boolean useWorseSolution = MathUtil.RANDOM().nextDouble() < probability;
 
         if (deltaFitness > 0 || useWorseSolution )  {
             // we always select the solution if it has a better fitness,
@@ -151,5 +151,4 @@ public class SimulatedAnnealingStrategy extends OptimizationStrategy {
         log(ct, params.getFitness(), r, dist, params, FormatUtil.formatNumber(temperature));
         return params;
     }
-
 }

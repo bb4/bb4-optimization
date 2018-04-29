@@ -50,7 +50,7 @@ public class DoubleParameter extends AbstractParameter {
 
     public Parameter copy() {
         DoubleParameter p =  new DoubleParameter( getValue(), getMinValue(), getMaxValue(), getName() );
-        p.setRedistributionFunction(redistributionFunction_);
+        p.setRedistributionFunction(redistributionFunction);
         return p;
     }
 
@@ -63,15 +63,15 @@ public class DoubleParameter extends AbstractParameter {
 
         double v = getValue();
         if ( (v + increment > getMaxValue())) {
-            value_ = getMaxValue();
+            value = getMaxValue();
             return 0;
         }
         else if (v+increment < getMinValue())  {
-            value_ = getMinValue();
+            value = getMinValue();
             return 0;
         }
         else {
-            value_ = (v + increment);
+            value = (v + increment);
             return increment;
         }
     }
