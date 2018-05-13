@@ -29,16 +29,16 @@ public class ParabolaMaxFunctionProblem extends OptimizeeProblem {
 
     private static final double FITNESS_RANGE = 1000.0;
 
-    private ParabolaMaxVariation variation_ = ParabolaMaxVariation.PARABOLA;
+    private ParabolaMaxVariation variation = ParabolaMaxVariation.PARABOLA;
 
     /** Constructor */
     public ParabolaMaxFunctionProblem(ParabolaMaxVariation v) {
-        variation_ = v;
+        variation = v;
     }
 
     @Override
     public String getName() {
-        return "Analytic: " + variation_.name();
+        return "Analytic: " + variation.name();
     }
 
     /** we evaluate directly not by comparing with a different trial.   */
@@ -53,7 +53,7 @@ public class ParabolaMaxFunctionProblem extends OptimizeeProblem {
      */
     @Override
     public double evaluateFitness(ParameterArray a) {
-        return variation_.evaluateFitness(a);
+        return variation.evaluateFitness(a);
     }
 
     @Override

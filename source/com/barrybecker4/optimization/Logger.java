@@ -14,7 +14,7 @@ import java.io.IOException;
  */
 public class Logger {
 
-    protected String sLogFile_ ;
+    protected String sLogFile;
     public static final String SEPARATOR = ",\t";
 
 
@@ -23,7 +23,7 @@ public class Logger {
      */
     public Logger(String sLogFile) {
         assert sLogFile != null;
-        sLogFile_ = sLogFile;
+        this.sLogFile = sLogFile;
     }
 
     /**
@@ -33,7 +33,7 @@ public class Logger {
     public void initialize(ParameterArray params) {
         try {
             // create the log file (destroying it if it already existed)
-            FileWriter logFile = new FileWriter( sLogFile_, false );
+            FileWriter logFile = new FileWriter(sLogFile, false );
 
             logFile.write( "iteration"+SEPARATOR );
             logFile.write( "fitness"+SEPARATOR );
@@ -68,13 +68,13 @@ public class Logger {
                        + params.toCSVString() + sep
                        + comment;
 
-        if (sLogFile_ == null) {
+        if (sLogFile == null) {
             System.out.println( "<no logfile>: "+rowText );
             return;
         }
         try {
             // append to existing log file.
-            FileWriter logFile = new FileWriter( sLogFile_, true );
+            FileWriter logFile = new FileWriter(sLogFile, true );
             logFile.write( rowText+'\n' );
             logFile.flush();
             logFile.close();

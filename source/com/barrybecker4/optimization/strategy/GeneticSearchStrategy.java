@@ -23,8 +23,8 @@ public class GeneticSearchStrategy extends OptimizationStrategy {
     // Percent amount to decimate the parent population by on each iteration
     private static final double CULL_FACTOR = 0.7;
     private static final double NBR_RADIUS = 0.08;
-    private static final double NBR_RADIUS_SHRINK_FACTOR = 0.95;
-    private static final double NBR_RADIUS_EXPAND_FACTOR = 1.02;
+    private static final double NBR_RADIUS_SHRINK_FACTOR = 0.7;
+    private static final double NBR_RADIUS_EXPAND_FACTOR = 1.1;
     private static final double NBR_RADIUS_SOFTENER = 5.0;
     private static final double INITIAL_RADIUS = 1.0;
 
@@ -44,7 +44,7 @@ public class GeneticSearchStrategy extends OptimizationStrategy {
      */
     private int desiredPopulationSize;
 
-    /** If crossover breeding of genetic material is used. */
+    /* If crossover breeding of genetic material is used. */
     //private boolean useCrossOver_ = false;
 
     /** if we don't improve by at least this amount between iterations, terminate.  */

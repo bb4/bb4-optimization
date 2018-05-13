@@ -91,7 +91,7 @@ public enum SubsetSumVariation implements IProblemVariation {
     NO_SOLUTION {
         // none of the errors will be 0 because there is no solution that sums to 0.
         private final ErrorTolerances ERROR_TOLERANCES =
-                new ErrorTolerances(20.0, 1.0, 1.0, 25.0, 1.0, 1.0, 1.0, 1.0, 1.0);
+                new ErrorTolerances(20.0, 1.0, 1.0, 25.0, 1.0, 6.0, 6.0, 1.0, 1.0);
 
         protected List<Integer> getNumberSet() {
             return Arrays.asList(-7, -33, -21, 5, -83, -29, -78, -113, -23, -34, -37, -41, -91, -9, -17);
