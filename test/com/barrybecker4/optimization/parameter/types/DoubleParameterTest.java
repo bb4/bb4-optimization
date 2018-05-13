@@ -9,7 +9,7 @@ public class DoubleParameterTest extends ParameterTst {
 
     @Override
     protected Parameter createParameter() {
-        return new DoubleParameter(1.0, 0.0, 5.0, "double param");
+        return new DoubleParameter(2.0, 0.0, 5.0, "double param");
     }
 
     @Override
@@ -27,23 +27,27 @@ public class DoubleParameterTest extends ParameterTst {
     }
     @Override
     protected double expectedValue() {
-        return 1.0;
+        return 2.0;
     }
 
     @Override
     protected Double expectedNaturalValue() {
-        return 1.0;
+        return 2.0;
     }
 
     @Override
     protected double expectedForwardEpsChange() {
-        return 1.16666666667;
+        return 2.16666666667;
     }
 
     @Override
     protected double expectedBackwardEpsChange() {
-        return 0.83333333333;
+        return 1.8333333333333333;
     }
 
+    @Override
+    protected Double[] expectedTweakedValues() {
+        return new Double[] {2.063847575097573, 1.9887453440192462, 0.042689875177752246, 0.0, 0.09535999327768793};
+    }
 
 }

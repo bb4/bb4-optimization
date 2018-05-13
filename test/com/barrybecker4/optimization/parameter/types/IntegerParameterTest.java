@@ -9,7 +9,7 @@ public class IntegerParameterTest extends ParameterTst {
 
     @Override
     protected Parameter createParameter() {
-        return new IntegerParameter(1, 0, 6, "integer param");
+        return new IntegerParameter(4, 3, 11, "integer param");
     }
 
     @Override
@@ -19,35 +19,40 @@ public class IntegerParameterTest extends ParameterTst {
 
     @Override
     protected double expectedMinValue() {
-        return 0.0;
+        return 3.0;
     }
     @Override
     protected double expectedMaxValue() {
-        return 6.0;
+        return 11.0;
     }
 
     @Override
     protected double expectedRange() {
-        return 6.0;
+        return 8.0;
     }
 
     @Override
     protected double expectedValue() {
-        return 1.0;
+        return 4.0;
     }
 
     @Override
     protected Long expectedNaturalValue() {
-        return 1L;
+        return 4L;
     }
 
     @Override
     protected double expectedForwardEpsChange() {
-        return 2.0;
+        return 5.0;
     }
 
     @Override
     protected double expectedBackwardEpsChange() {
-        return 0.0;
+        return 3.0;
+    }
+
+    @Override
+    protected Integer[] expectedTweakedValues() {
+        return new Integer[] {4, 5, 7, 3, 3};
     }
 }

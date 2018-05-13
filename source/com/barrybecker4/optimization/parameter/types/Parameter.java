@@ -31,7 +31,7 @@ public interface Parameter {
 
     /**
      * Modify the value of this parameter by a little bit.
-     * The amount that it changes depends on the size of r, which is the
+     * The amount that it changes by depends on the size of r, which is the
      * number of standard deviations of the gaussian probability distribution to use.
      *
      * @param r the size of the (1 std deviation) gaussian neighborhood to select a random nbr from

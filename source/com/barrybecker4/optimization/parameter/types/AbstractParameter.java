@@ -17,13 +17,12 @@ public abstract class AbstractParameter implements Parameter {
     protected double minValue = 0.0;
     private double maxValue = 0.0;
     private double range = 0.0;
-    private String name_ = null;
+    private String name = null;
     private boolean integerOnly = false;
 
     protected RedistributionFunction redistributionFunction;
 
     /**
-
      * Constructor
      * @param val the initial or assign parameter value
      * @param minVal the minimum value that this parameter is allowed to take on
@@ -35,7 +34,7 @@ public abstract class AbstractParameter implements Parameter {
         minValue = minVal;
         maxValue = maxVal;
         range = maxVal - minVal;
-        name_ = paramName;
+        name = paramName;
         integerOnly = false;
     }
 
@@ -61,13 +60,13 @@ public abstract class AbstractParameter implements Parameter {
             return;  // no change in the param.
         }
 
-        double change = (rand.nextGaussian() - 0.5) * r * getRange();
+        double change = rand.nextGaussian() * r * getRange();
         value += change;
         if (value > getMaxValue()) {
-              value = getMaxValue();
+            value = getMaxValue();
         }
         else if (value < getMinValue()) {
-             value = getMinValue();
+            value = getMinValue();
         }
         setValue(value);
    }
@@ -138,7 +137,7 @@ public abstract class AbstractParameter implements Parameter {
     }
 
     public String getName() {
-        return name_;
+        return name;
     }
 
     public void setRedistributionFunction(RedistributionFunction function) {
@@ -161,7 +160,7 @@ public abstract class AbstractParameter implements Parameter {
         if (Double.compare(that.maxValue, maxValue) != 0) return false;
         if (Double.compare(that.minValue, minValue) != 0) return false;
         if (!that.getNaturalValue().equals(getNaturalValue())) return false;
-        //if (name_ != null ? !name_.equals(that.name_) : that.name_ != null) return false;
+        //if (name != null ? !name.equals(that.name) : that.name != null) return false;
 
         return true;
     }
@@ -176,7 +175,7 @@ public abstract class AbstractParameter implements Parameter {
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         temp = maxValue != +0.0d ? Double.doubleToLongBits(maxValue) : 0L;
         result = 31 * result + (int) (temp ^ (temp >>> 32));
-        result = 31 * result + (name_ != null ? name_.hashCode() : 0);
+        result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (integerOnly ? 1 : 0);
         return result;
     }

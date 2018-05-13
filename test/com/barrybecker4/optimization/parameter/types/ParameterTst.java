@@ -3,9 +3,12 @@ package com.barrybecker4.optimization.parameter.types;
 
 import com.barrybecker4.common.math.MathUtil;
 import com.barrybecker4.optimization.parameter.Direction;
-
-import org.junit.Test;
 import org.junit.Before;
+import org.junit.Test;
+import scala.util.Random;
+
+import java.util.Arrays;
+
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -16,6 +19,7 @@ import static org.junit.Assert.assertEquals;
 public abstract class ParameterTst {
 
     private static final double TOL = 0.0;
+    private static final Random RAND = new Random(1);
 
     /** instance under test */
     protected Parameter parameter;
@@ -32,7 +36,6 @@ public abstract class ParameterTst {
 
         assertEquals("Unexpected value for isIntegerOnly", expectedIsIntegerOnly(), parameter.isIntegerOnly());
     }
-
 
     public void tetGetMinValue() {
         assertEquals("Unexpected min", expectedMinValue(), parameter.getMinValue(), TOL);
@@ -73,14 +76,35 @@ public abstract class ParameterTst {
                 expectedBackwardEpsChange(), parameter.getValue(), MathUtil.EPS_MEDIUM());
     }
 
+    @Test
+    public void testTweakedValues() {
+        parameter.tweakValue(0.02, RAND);
+        Object v1 = parameter.getNaturalValue();
+        parameter.tweakValue(0.1, RAND);
+        Object v2 = parameter.getNaturalValue();
+        parameter.tweakValue(0.4, RAND);
+        Object v3 = parameter.getNaturalValue();
+        parameter.tweakValue(0.8, RAND);
+        Object v4 = parameter.getNaturalValue();
+        parameter.tweakValue(1.1, RAND);
+        Object v5 = parameter.getNaturalValue();
+
+        //assertArrayEquals("Unexpected tweaked values", expectedTweakedValues(), new Object[] {v1, v2, v3});
+        assertEquals("Unexpected tweaked values",
+                Arrays.toString(expectedTweakedValues()),
+                Arrays.toString(new Object[] {v1, v2, v3, v4, v5}));
+    }
+
     protected boolean expectedIsIntegerOnly() {
         return false;
     }
+
 
     protected abstract double expectedMinValue();
     protected abstract double expectedMaxValue();
     protected abstract double expectedRange();
     protected abstract double expectedValue();
+    protected abstract Object[] expectedTweakedValues();
     protected abstract Object expectedNaturalValue();
     protected abstract double expectedForwardEpsChange();
     protected abstract double expectedBackwardEpsChange();
