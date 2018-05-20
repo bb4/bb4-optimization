@@ -9,7 +9,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- *  represents a 1 dimensional array of parameters
+ *  Represents a 1 dimensional array of parameters
  *
  *  @author Barry Becker
  */

@@ -51,9 +51,9 @@ public class HillClimbingStrategy extends OptimizationStrategy {
 
         double jumpSize = INITIAL_JUMP_SIZE;
 
-        if (!optimizee_.evaluateByComparison()) {
+        if (!optimizee.evaluateByComparison()) {
             // get the initial baseline fitness value.
-            currentParams.setFitness(optimizee_.evaluateFitness(currentParams));
+            currentParams.setFitness(optimizee.evaluateFitness(currentParams));
         }
         int numIterations = 0;
         log(0, currentParams.getFitness(), 0.0, 0.0, currentParams, "initial test");
@@ -73,7 +73,7 @@ public class HillClimbingStrategy extends OptimizationStrategy {
         do {
             //System.out.println( "iter=" + numIterations + " FITNESS = " + currentParams.getFitness() + "  ------------");
 
-            improvement = currentParams.findIncrementalImprovement(optimizee_, jumpSize, improvement, cache);
+            improvement = currentParams.findIncrementalImprovement(optimizee, jumpSize, improvement, cache);
 
             numIterations++;
             currentParams = improvement.getParams();

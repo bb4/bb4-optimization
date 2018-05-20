@@ -28,7 +28,6 @@ public class GeneticSearchStrategy extends OptimizationStrategy {
     private static final double NBR_RADIUS_SOFTENER = 5.0;
     private static final double INITIAL_RADIUS = 1.0;
 
-
     /** this prevents us from running forever.  */
     private static final int MAX_ITERATIONS = 100;
 
@@ -73,36 +72,40 @@ public class GeneticSearchStrategy extends OptimizationStrategy {
     }
 
     /**
-     * finds a local maxima using a genetic algorithm (evolutionary) search.
-     * We stop iterating as soon as the average evaluation score of the population
+     * finds a local minima using a genetic algorithm (evolutionary) search.
+     * Stop iterating as soon as the average evaluation score of the population
      * does not significantly improve.
      *
      * @param params the initial value for the parameters to optimize.
      * @param fitnessRange the approximate absolute value of the fitnessRange.
      * @return the optimized params.
      */
-     @Override
-     public ParameterArray doOptimization( ParameterArray params, double fitnessRange) {
+    @Override
+    public ParameterArray doOptimization( ParameterArray params, double fitnessRange) {
 
-         ParameterArray lastBest;
-         desiredPopulationSize = params.getSamplePopulationSize();
+        ParameterArray lastBest;
+        desiredPopulationSize = params.getSamplePopulationSize();
 
-         // create an initial population based on params and POPULATION_SIZE-1 other random candidate solutions.
-         List<ParameterArray> population = new LinkedList<>();
-         population.add(params);
+        // create an initial population based on params and POPULATION_SIZE-1 other random candidate solutions.
+        List<ParameterArray> population = new LinkedList<>();
+        population.add(params);
 
-         for (int i = 1; i < desiredPopulationSize; i++) {
+        int i = 0;
+        int max = 100 * desiredPopulationSize;
+        while (population.size() < desiredPopulationSize && i < max) {
              ParameterArray nbr = params.getRandomNeighbor(INITIAL_RADIUS);
              if (!population.contains(nbr)) {
                  population.add(nbr);
              }
-         }
-         assert(population.size() > 0);
+             i++;
+        }
+        if (population.size() <= 1)
+            throw new IllegalStateException("No random neighbors found");
 
-         // EVALUATE POPULATION
-         lastBest = evaluatePopulation(population, params);
+        // EVALUATE POPULATION
+        lastBest = evaluatePopulation(population, params);
 
-         return findNewBest(params, lastBest, population);
+        return findNewBest(params, lastBest, population);
      }
 
     /**
@@ -115,6 +118,7 @@ public class GeneticSearchStrategy extends OptimizationStrategy {
         int ct = 0;
         double deltaFitness;
         ParameterArray recentBest = lastBest;
+        System.out.println("recent best =" + recentBest);
 
         // each iteration represents a new generation of the population.
         do {
@@ -123,6 +127,7 @@ public class GeneticSearchStrategy extends OptimizationStrategy {
 
             // EVALUATE POPULATION
             currentBest = evaluatePopulation(population, recentBest);
+            System.out.println("currBest=" + currentBest + " recBest= " + recentBest + " ct="+ct);
 
             deltaFitness = computeFitnessDelta(params, recentBest, currentBest, ct);
             System.out.println("delta fitness =" + deltaFitness);
@@ -140,7 +145,8 @@ public class GeneticSearchStrategy extends OptimizationStrategy {
             System.out.println("stopped because we found the optimal fitness.");
         }
         else if (deltaFitness <= improvementEpsilon) {
-            System.out.println("stopped because we made no IMPROVEMENT");
+            System.out.println("stopped because we made no IMPROVEMENT. The delta, "
+                    + deltaFitness + " was <= " + improvementEpsilon );
         }
         else {
             System.out.println("Stopped because we exceeded the MAX ITERATIONS: " + ct);
@@ -225,7 +231,6 @@ public class GeneticSearchStrategy extends OptimizationStrategy {
         //printPopulation(population, 20);
     }
 
-
     /**
      * Evaluate the members of the population - either directly, or by
      * comparing them against the initial params value passed in (including params).
@@ -241,10 +246,10 @@ public class GeneticSearchStrategy extends OptimizationStrategy {
         for (ParameterArray p : population) {
 
             double fitness;
-            if (optimizee_.evaluateByComparison()) {
-                fitness = optimizee_.compareFitness(p, previousBest);
+            if (optimizee.evaluateByComparison()) {
+                fitness = optimizee.compareFitness(p, previousBest);
             } else {
-                fitness = optimizee_.evaluateFitness(p);
+                fitness = optimizee.evaluateFitness(p);
             }
             p.setFitness(fitness);
             if (fitness < bestFitness.getFitness()) {

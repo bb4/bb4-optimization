@@ -81,10 +81,10 @@ public class ConcurrentGeneticSearchStrategy extends GeneticSearchStrategy {
 
         public void run() {
 
-            if (optimizee_.evaluateByComparison()) {
-                fitness = optimizee_.compareFitness(candidate, params);
+            if (optimizee.evaluateByComparison()) {
+                fitness = optimizee.compareFitness(candidate, params);
             } else {
-                fitness = optimizee_.evaluateFitness(candidate);
+                fitness = optimizee.evaluateFitness(candidate);
             }
             candidate.setFitness(fitness);
         }
