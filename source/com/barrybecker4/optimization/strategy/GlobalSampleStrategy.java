@@ -69,10 +69,10 @@ public class GlobalSampleStrategy extends OptimizationStrategy {
 
             ParameterArray sample = samples.next();
             double fitness;
-            if (optimizee_.evaluateByComparison())
-                fitness = optimizee_.compareFitness( sample, params );
+            if (optimizee.evaluateByComparison())
+                fitness = optimizee.compareFitness( sample, params );
             else
-                fitness = optimizee_.evaluateFitness( sample );
+                fitness = optimizee.evaluateFitness( sample );
             sample.setFitness(fitness);
 
             //System.out.println( "key = " + hashKey + '\n' + testParams + "\n  fitness=" + fitness );

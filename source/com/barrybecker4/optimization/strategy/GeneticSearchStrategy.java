@@ -98,6 +98,7 @@ public class GeneticSearchStrategy extends OptimizationStrategy {
              }
          }
          assert(population.size() > 0);
+         System.out.println("The population of this generation is " + population.size());
 
          // EVALUATE POPULATION
          lastBest = evaluatePopulation(population, params);
@@ -241,10 +242,10 @@ public class GeneticSearchStrategy extends OptimizationStrategy {
         for (ParameterArray p : population) {
 
             double fitness;
-            if (optimizee_.evaluateByComparison()) {
-                fitness = optimizee_.compareFitness(p, previousBest);
+            if (optimizee.evaluateByComparison()) {
+                fitness = optimizee.compareFitness(p, previousBest);
             } else {
-                fitness = optimizee_.evaluateFitness(p);
+                fitness = optimizee.evaluateFitness(p);
             }
             p.setFitness(fitness);
             if (fitness < bestFitness.getFitness()) {

@@ -40,10 +40,10 @@ public class BruteForceStrategy extends OptimizationStrategy {
         while ( samples.hasNext()) {
             ParameterArray sample = samples.next();
             double fitness;
-            if (optimizee_.evaluateByComparison())
-                fitness = optimizee_.compareFitness( sample, params );
+            if (optimizee.evaluateByComparison())
+                fitness = optimizee.compareFitness( sample, params );
             else
-                fitness = optimizee_.evaluateFitness( sample );
+                fitness = optimizee.evaluateFitness( sample );
             sample.setFitness(fitness);
 
             if ( fitness < bestFitness ) {

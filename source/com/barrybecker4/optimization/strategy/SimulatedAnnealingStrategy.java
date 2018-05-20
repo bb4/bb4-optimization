@@ -72,8 +72,8 @@ public class SimulatedAnnealingStrategy extends OptimizationStrategy {
         double temperature = tempMax;
         double tempMin = tempMax / Math.pow(2.0, NUM_TEMP_ITERATIONS);
 
-        if (!optimizee_.evaluateByComparison()) {
-            double currentFitness = optimizee_.evaluateFitness(params);
+        if (!optimizee.evaluateByComparison()) {
+            double currentFitness = optimizee.evaluateFitness(params);
             params.setFitness(currentFitness);
         }
 
@@ -125,11 +125,11 @@ public class SimulatedAnnealingStrategy extends OptimizationStrategy {
 
         double deltaFitness;
         double newFitness;
-        if (optimizee_.evaluateByComparison()) {
-            deltaFitness = optimizee_.compareFitness(newParams, params);
+        if (optimizee.evaluateByComparison()) {
+            deltaFitness = optimizee.compareFitness(newParams, params);
         }
         else {
-            newFitness = optimizee_.evaluateFitness(newParams);
+            newFitness = optimizee.evaluateFitness(newParams);
             newParams.setFitness(newFitness);
             deltaFitness = params.getFitness() - newFitness;
         }

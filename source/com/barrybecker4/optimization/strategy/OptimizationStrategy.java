@@ -19,32 +19,32 @@ import com.barrybecker4.optimization.parameter.ParameterArray;
 public abstract class OptimizationStrategy {
 
     /** The thing to be optimized */
-    Optimizee optimizee_;
+    Optimizee optimizee;
 
-    private Logger logger_;
+    private Logger logger;
 
     /** listen for optimization changed events. useful for debugging.  */
-    protected OptimizationListener listener_;
+    protected OptimizationListener listener;
 
     /**
      * Constructor
      * @param optimizee the thing to be optimized.
      */
     public OptimizationStrategy( Optimizee optimizee ) {
-        optimizee_ = optimizee;
+        this.optimizee = optimizee;
     }
 
     /**
      * @param logger the file that will record the results
      */
     public void setLogger(Logger logger) {
-        logger_ = logger;
+        this.logger = logger;
     }
 
     protected void log(int iteration, double fitness, double jumpSize, double deltaFitness,
                       ParameterArray params, String msg) {
-        if (logger_ != null)
-            logger_.write(iteration, fitness, jumpSize, deltaFitness, params, msg);
+        if (logger != null)
+            logger.write(iteration, fitness, jumpSize, deltaFitness, params, msg);
     }
 
     /**
@@ -55,7 +55,7 @@ public abstract class OptimizationStrategy {
     public abstract ParameterArray doOptimization(ParameterArray initialParams, double fitnessRange);
 
     public void setListener(OptimizationListener listener) {
-        listener_ = listener;
+        this.listener = listener;
     }
 
     /**
@@ -65,16 +65,16 @@ public abstract class OptimizationStrategy {
     protected boolean isOptimalFitnessReached(ParameterArray currentBest) {
         boolean optimalFitnessReached = false;
 
-        if (!optimizee_.evaluateByComparison()) {
-            assert optimizee_.getOptimalFitness() >= 0;
-            optimalFitnessReached = currentBest.getFitness() <= optimizee_.getOptimalFitness();
+        if (!optimizee.evaluateByComparison()) {
+            assert optimizee.getOptimalFitness() >= 0;
+            optimalFitnessReached = currentBest.getFitness() <= optimizee.getOptimalFitness();
         }
         return optimalFitnessReached;
     }
 
     protected void notifyOfChange(ParameterArray params) {
-        if (listener_ != null) {
-            listener_.optimizerChanged(params);
+        if (listener != null) {
+            listener.optimizerChanged(params);
         }
     }
 }

@@ -34,8 +34,8 @@ public class GlobalHillClimbingStrategy extends OptimizationStrategy {
     @Override
     public ParameterArray doOptimization( ParameterArray params, double fitnessRange ) {
 
-        GlobalSampleStrategy gsStrategy = new GlobalSampleStrategy(optimizee_);
-        gsStrategy.setListener(listener_);
+        GlobalSampleStrategy gsStrategy = new GlobalSampleStrategy(optimizee);
+        gsStrategy.setListener(listener);
         // 3 sample points along each dimension
         gsStrategy.setSamplingRate(NUM_SAMPLES);
 
@@ -43,8 +43,8 @@ public class GlobalHillClimbingStrategy extends OptimizationStrategy {
         // perhaps we should try several of the better results from global sampling.
         ParameterArray sampledParams = gsStrategy.doOptimization(params, fitnessRange);
 
-        OptimizationStrategy strategy = new HillClimbingStrategy(optimizee_);
-        strategy.setListener(listener_);
+        OptimizationStrategy strategy = new HillClimbingStrategy(optimizee);
+        strategy.setListener(listener);
         return strategy.doOptimization(sampledParams, fitnessRange);
     }
 }
