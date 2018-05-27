@@ -2,7 +2,7 @@
 package com.barrybecker4.optimization;
 
 import com.barrybecker4.optimization.optimizee1.Optimizee;
-import com.barrybecker4.optimization.parameter.ParameterArray;
+import com.barrybecker4.optimization.parameter1.ParameterArray;
 import com.barrybecker4.optimization.strategy.OptimizationStrategy;
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
 
@@ -32,11 +32,11 @@ import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
 public class Optimizer {
 
     /** The thing to be optimized */
-    Optimizee optimizee_;
+    Optimizee optimizee;
 
-    protected Logger logger_;
+    protected Logger logger;
 
-    protected OptimizationListener listener_;
+    protected OptimizationListener listener;
 
 
     /**
@@ -45,7 +45,7 @@ public class Optimizer {
      * @param optimizee the thing to be optimized.
      */
     public Optimizer( Optimizee optimizee ) {
-        optimizee_ = optimizee;
+        this.optimizee = optimizee;
     }
 
     /**
@@ -54,12 +54,12 @@ public class Optimizer {
      * @param optimizationLogFile the file that will record the results
      */
     public Optimizer( Optimizee optimizee, String optimizationLogFile ) {
-        optimizee_ = optimizee;
-        logger_ = new Logger(optimizationLogFile);
+        this.optimizee = optimizee;
+        logger = new Logger(optimizationLogFile);
     }
 
     public Optimizee getOptimizee() {
-        return optimizee_;
+        return optimizee;
     }
 
     /**
@@ -73,17 +73,17 @@ public class Optimizer {
     public ParameterArray doOptimization(OptimizationStrategyType optimizationType,
                                          ParameterArray params, double fitnessRange ) {
 
-        OptimizationStrategy optStrategy = optimizationType.getStrategy(optimizee_, fitnessRange);
-        if (logger_ != null) {
-            logger_.initialize( params );
-            optStrategy.setLogger(logger_);
+        OptimizationStrategy optStrategy = optimizationType.getStrategy(optimizee, fitnessRange);
+        if (logger != null) {
+            logger.initialize( params );
+            optStrategy.setLogger(logger);
         }
 
-        optStrategy.setListener(listener_);
+        optStrategy.setListener(listener);
         return optStrategy.doOptimization(params, fitnessRange);
     }
 
     public void setListener(OptimizationListener l) {
-        listener_ = l;
+        listener = l;
     }
 }

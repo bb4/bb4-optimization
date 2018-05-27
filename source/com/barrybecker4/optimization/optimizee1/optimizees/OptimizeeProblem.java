@@ -2,7 +2,7 @@
 package com.barrybecker4.optimization.optimizee1.optimizees;
 
 import com.barrybecker4.optimization.optimizee1.Optimizee;
-import com.barrybecker4.optimization.parameter.ParameterArray;
+import com.barrybecker4.optimization.parameter1.ParameterArray;
 
 /**
  * Abstract base class for optimizer test problems.

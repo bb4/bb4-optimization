@@ -4,7 +4,7 @@ package com.barrybecker4.optimization;
 import com.barrybecker4.optimization.optimizee1.optimizees.ErrorTolerances;
 import com.barrybecker4.optimization.optimizee1.optimizees.OptimizeeProblem;
 import com.barrybecker4.optimization.optimizee1.optimizees.problems.SevenElevenProblem;
-import com.barrybecker4.optimization.parameter.ParameterArray;
+import com.barrybecker4.optimization.parameter1.ParameterArray;
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
 
 /**

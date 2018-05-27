@@ -3,7 +3,7 @@ package com.barrybecker4.optimization.strategy;
 
 import com.barrybecker4.common.concurrency.RunnableParallelizer;
 import com.barrybecker4.optimization.optimizee1.Optimizee;
-import com.barrybecker4.optimization.parameter.ParameterArray;
+import com.barrybecker4.optimization.parameter1.ParameterArray;
 
 import java.util.ArrayList;
 import java.util.List;

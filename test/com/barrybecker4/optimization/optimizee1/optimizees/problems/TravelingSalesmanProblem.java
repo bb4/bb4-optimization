@@ -3,7 +3,7 @@ package com.barrybecker4.optimization.optimizee1.optimizees.problems;
 
 import com.barrybecker4.optimization.Optimizer;
 import com.barrybecker4.optimization.optimizee1.optimizees.OptimizeeProblem;
-import com.barrybecker4.optimization.parameter.ParameterArray;
+import com.barrybecker4.optimization.parameter1.ParameterArray;
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
 
 import static com.barrybecker4.optimization.OptimizerTestCase.LOG_FILE_HOME;

@@ -1,7 +1,7 @@
 // Copyright by Barry G. Becker, 2012. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.viewer;
 
-import com.barrybecker4.optimization.parameter.ParameterArray;
+import com.barrybecker4.optimization.parameter1.ParameterArray;
 import com.barrybecker4.optimization.viewer.model.PointsList;
 import com.barrybecker4.ui.util.ColorMap;
 

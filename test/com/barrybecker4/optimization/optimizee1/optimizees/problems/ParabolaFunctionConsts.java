@@ -1,10 +1,10 @@
 // Copyright by Barry G. Becker, 2000-2011. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.optimizee1.optimizees.problems;
 
-import com.barrybecker4.optimization.parameter.NumericParameterArray;
-import com.barrybecker4.optimization.parameter.ParameterArray;
-import com.barrybecker4.optimization.parameter.types.DoubleParameter;
-import com.barrybecker4.optimization.parameter.types.Parameter;
+import com.barrybecker4.optimization.parameter1.NumericParameterArray;
+import com.barrybecker4.optimization.parameter1.ParameterArray;
+import com.barrybecker4.optimization.parameter1.types.DoubleParameter;
+import com.barrybecker4.optimization.parameter1.types.Parameter;
 
 /**
  * Constants related to the analytics functions

@@ -2,7 +2,7 @@
 package com.barrybecker4.optimization.optimizee1.optimizees.problems;
 
 import com.barrybecker4.optimization.optimizee1.optimizees.OptimizeeProblem;
-import com.barrybecker4.optimization.parameter.ParameterArray;
+import com.barrybecker4.optimization.parameter1.ParameterArray;
 
 /**
  * This is a simple search space to test the optimization package.

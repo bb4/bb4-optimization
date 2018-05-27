@@ -3,8 +3,8 @@ package com.barrybecker4.optimization.optimizee1.optimizees;
 
 import com.barrybecker4.optimization.optimizee1.optimizees.problems.ParabolaFunctionConsts;
 import com.barrybecker4.optimization.optimizee1.optimizees.problems.ParabolaMinVariation;
-import com.barrybecker4.optimization.parameter.NumericParameterArrayTest;
-import com.barrybecker4.optimization.parameter.ParameterArray;
+import com.barrybecker4.optimization.parameter1.NumericParameterArrayTest;
+import com.barrybecker4.optimization.parameter1.ParameterArray;
 import org.junit.Test;
 
 import static com.barrybecker4.optimization.optimizee1.optimizees.problems.ParabolaFunctionConsts.P1;

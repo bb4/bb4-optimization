@@ -5,7 +5,7 @@ import com.barrybecker4.common.math.MathUtil;
 import com.barrybecker4.common.util.FileUtil;
 import com.barrybecker4.optimization.optimizee1.optimizees.IProblemVariation;
 import com.barrybecker4.optimization.optimizee1.optimizees.OptimizeeProblem;
-import com.barrybecker4.optimization.parameter.ParameterArray;
+import com.barrybecker4.optimization.parameter1.ParameterArray;
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
 import org.junit.Before;
 import org.junit.Test;

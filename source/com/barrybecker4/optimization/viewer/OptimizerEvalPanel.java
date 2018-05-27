@@ -4,7 +4,7 @@ package com.barrybecker4.optimization.viewer;
 import com.barrybecker4.optimization.OptimizationListener;
 import com.barrybecker4.optimization.Optimizer;
 import com.barrybecker4.optimization.optimizee1.optimizees.OptimizeeProblem;
-import com.barrybecker4.optimization.parameter.ParameterArray;
+import com.barrybecker4.optimization.parameter1.ParameterArray;
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
 import com.barrybecker4.optimization.viewer.model.PointsList;
 import com.barrybecker4.optimization.viewer.projectors.IProjector;

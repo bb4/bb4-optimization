@@ -3,10 +3,10 @@ package com.barrybecker4.optimization.optimizee1.optimizees.problems;
 
 import com.barrybecker4.optimization.optimizee1.optimizees.ErrorTolerances;
 import com.barrybecker4.optimization.optimizee1.optimizees.IProblemVariation;
-import com.barrybecker4.optimization.parameter.ParameterArray;
-import com.barrybecker4.optimization.parameter.VariableLengthIntArray;
-import com.barrybecker4.optimization.parameter.types.IntegerParameter;
-import com.barrybecker4.optimization.parameter.types.Parameter;
+import com.barrybecker4.optimization.parameter1.ParameterArray;
+import com.barrybecker4.optimization.parameter1.VariableLengthIntArray;
+import com.barrybecker4.optimization.parameter1.types.IntegerParameter;
+import com.barrybecker4.optimization.parameter1.types.Parameter;
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
 
 import java.util.ArrayList;

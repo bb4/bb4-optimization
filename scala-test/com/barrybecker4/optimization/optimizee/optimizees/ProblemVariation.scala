@@ -1,6 +1,6 @@
 package com.barrybecker4.optimization.optimizee.optimizees
 
-import com.barrybecker4.optimization.parameter.ParameterArray
+import com.barrybecker4.optimization.parameter1.ParameterArray
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType
 
 

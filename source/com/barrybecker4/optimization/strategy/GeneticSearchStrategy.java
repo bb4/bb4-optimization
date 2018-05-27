@@ -5,7 +5,7 @@ import com.barrybecker4.common.concurrency.ThreadUtil;
 import com.barrybecker4.common.format.FormatUtil;
 import com.barrybecker4.common.math.MathUtil;
 import com.barrybecker4.optimization.optimizee1.Optimizee;
-import com.barrybecker4.optimization.parameter.ParameterArray;
+import com.barrybecker4.optimization.parameter1.ParameterArray;
 
 import java.util.Collections;
 import java.util.LinkedList;

@@ -2,7 +2,7 @@
 package com.barrybecker4.optimization;
 
 import com.barrybecker4.common.format.FormatUtil;
-import com.barrybecker4.optimization.parameter.ParameterArray;
+import com.barrybecker4.optimization.parameter1.ParameterArray;
 
 import java.io.FileWriter;
 import java.io.IOException;

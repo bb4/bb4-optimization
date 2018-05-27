@@ -2,7 +2,7 @@
 package com.barrybecker4.optimization.viewer.model;
 
 import com.barrybecker4.common.math.Range;
-import com.barrybecker4.optimization.parameter.ParameterArray;
+import com.barrybecker4.optimization.parameter1.ParameterArray;
 import com.barrybecker4.optimization.viewer.NavigationListener;
 import com.barrybecker4.optimization.viewer.projectors.IProjector;
 

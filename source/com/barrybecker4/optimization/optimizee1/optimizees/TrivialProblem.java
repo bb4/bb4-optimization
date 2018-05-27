@@ -1,8 +1,8 @@
 // Copyright by Barry G. Becker, 2000-2011. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.optimizee1.optimizees;
 
-import com.barrybecker4.optimization.parameter.NumericParameterArray;
-import com.barrybecker4.optimization.parameter.ParameterArray;
+import com.barrybecker4.optimization.parameter1.NumericParameterArray;
+import com.barrybecker4.optimization.parameter1.ParameterArray;
 
 /**
  * A trivial one dimensional example implementation of an {@code OptimizeeProblem}
