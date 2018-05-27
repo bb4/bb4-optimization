@@ -2,9 +2,9 @@
 package com.barrybecker4.optimization;
 
 import com.barrybecker4.common.math.MathUtil;
-import com.barrybecker4.optimization.optimizee.optimizees.OptimizeeProblem;
-import com.barrybecker4.optimization.optimizee.optimizees.problems.ParabolaMinFunctionProblem;
-import com.barrybecker4.optimization.optimizee.optimizees.problems.ParabolaMinVariation;
+import com.barrybecker4.optimization.optimizee1.optimizees.OptimizeeProblem;
+import com.barrybecker4.optimization.optimizee1.optimizees.problems.ParabolaMinFunctionProblem;
+import com.barrybecker4.optimization.optimizee1.optimizees.problems.ParabolaMinVariation;
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
 
 /**

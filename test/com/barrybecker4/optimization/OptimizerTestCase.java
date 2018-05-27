@@ -3,8 +3,8 @@ package com.barrybecker4.optimization;
 
 import com.barrybecker4.common.math.MathUtil;
 import com.barrybecker4.common.util.FileUtil;
-import com.barrybecker4.optimization.optimizee.optimizees.IProblemVariation;
-import com.barrybecker4.optimization.optimizee.optimizees.OptimizeeProblem;
+import com.barrybecker4.optimization.optimizee1.optimizees.IProblemVariation;
+import com.barrybecker4.optimization.optimizee1.optimizees.OptimizeeProblem;
 import com.barrybecker4.optimization.parameter.ParameterArray;
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
 import org.junit.Before;

@@ -1,7 +1,7 @@
 package com.barrybecker4.optimization.viewer;
 
 import com.barrybecker4.optimization.OptimizationListener;
-import com.barrybecker4.optimization.optimizee.optimizees.OptimizeeProblem;
+import com.barrybecker4.optimization.optimizee1.optimizees.OptimizeeProblem;
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
 
 /**

@@ -1,8 +1,8 @@
 // Copyright by Barry G. Becker, 2000-2013. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.viewer;
 
-import com.barrybecker4.optimization.optimizee.optimizees.OptimizeeProblem;
-import com.barrybecker4.optimization.optimizee.optimizees.TrivialProblem;
+import com.barrybecker4.optimization.optimizee1.optimizees.OptimizeeProblem;
+import com.barrybecker4.optimization.optimizee1.optimizees.TrivialProblem;
 import com.barrybecker4.ui.application.ApplicationFrame;
 
 import javax.swing.JPanel;

@@ -2,7 +2,7 @@
 package com.barrybecker4.optimization.parameter;
 
 import com.barrybecker4.common.math.MathUtil;
-import com.barrybecker4.optimization.optimizee.Optimizee;
+import com.barrybecker4.optimization.optimizee1.Optimizee;
 import com.barrybecker4.optimization.parameter.distancecalculators.DistanceCalculator;
 import com.barrybecker4.optimization.parameter.distancecalculators.MagnitudeIgnoredDistanceCalculator;
 import com.barrybecker4.optimization.parameter.improvement.DiscreteImprovementFinder;
