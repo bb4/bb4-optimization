@@ -10,7 +10,7 @@ import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
 /**
  * @author Barry Becker
  */
-public class TestParabolaMaxFunctionProblem extends OptimizerTestCase {
+public class TestParabolaMinFunctionProblem extends OptimizerTestCase {
 
     @Override
     protected void doTest(OptimizationStrategyType optimizationType) {

@@ -3,6 +3,7 @@ package com.barrybecker4.optimization.strategy;
 
 import com.barrybecker4.common.concurrency.ThreadUtil;
 import com.barrybecker4.common.format.FormatUtil;
+import com.barrybecker4.common.math.MathUtil;
 import com.barrybecker4.optimization.optimizee.Optimizee;
 import com.barrybecker4.optimization.parameter.ParameterArray;
 
@@ -21,12 +22,13 @@ import java.util.List;
 public class GeneticSearchStrategy extends OptimizationStrategy {
 
     // Percent amount to decimate the parent population by on each iteration
-    private static final double CULL_FACTOR = 0.7;
+    private static final double CULL_FACTOR = 0.8;
     private static final double NBR_RADIUS = 0.08;
     private static final double NBR_RADIUS_SHRINK_FACTOR = 0.7;
     private static final double NBR_RADIUS_EXPAND_FACTOR = 1.1;
-    private static final double NBR_RADIUS_SOFTENER = 5.0;
+    private static final double NBR_RADIUS_SOFTENER = 10.0;
     private static final double INITIAL_RADIUS = 1.0;
+    private static final int MAX_NBRS_TO_EXPLORE = 8;
 
     /** this prevents us from running forever.  */
     private static final int MAX_ITERATIONS = 100;
@@ -101,7 +103,8 @@ public class GeneticSearchStrategy extends OptimizationStrategy {
         }
         if (population.size() <= 1)
             throw new IllegalStateException("No random neighbors found");
-        System.out.println("The population of this generation is " + population.size());
+        //System.out.println("The population of this generation is " + population.size()
+        //    + " (desired was " + desiredPopulationSize + ")");
 
         // EVALUATE POPULATION
         lastBest = evaluatePopulation(population, params);
@@ -119,7 +122,7 @@ public class GeneticSearchStrategy extends OptimizationStrategy {
         int ct = 0;
         double deltaFitness;
         ParameterArray recentBest = lastBest;
-        System.out.println("recent best =" + recentBest);
+        //System.out.println("findNewBest: recent best =" + recentBest);
 
         // each iteration represents a new generation of the population.
         do {
@@ -128,26 +131,27 @@ public class GeneticSearchStrategy extends OptimizationStrategy {
 
             // EVALUATE POPULATION
             currentBest = evaluatePopulation(population, recentBest);
-            System.out.println("currBest=" + currentBest + " recBest= " + recentBest + " ct="+ct);
+            System.out.println("currBest = " + currentBest + " \nrecBest = " + recentBest + "        ct="+ct);
 
             deltaFitness = computeFitnessDelta(params, recentBest, currentBest, ct);
-            System.out.println("delta fitness =" + deltaFitness);
-            nbrRadius *= deltaFitness > 0 ? NBR_RADIUS_SHRINK_FACTOR : NBR_RADIUS_EXPAND_FACTOR;
+            System.out.println("delta fitness =" + deltaFitness + "      rbrRadius = " + nbrRadius + "  improvementEpsilon = " + improvementEpsilon);
+            double factor = deltaFitness < (-1000000 * improvementEpsilon) ? NBR_RADIUS_EXPAND_FACTOR : NBR_RADIUS_SHRINK_FACTOR;
+            nbrRadius *= factor;
             recentBest = currentBest.copy();
 
             notifyOfChange(currentBest);
             ct++;
 
-        } while ( (deltaFitness > improvementEpsilon)
+        } while ( (deltaFitness < -improvementEpsilon)
                 && !isOptimalFitnessReached(currentBest)
                 && (ct < MAX_ITERATIONS));
 
         if (isOptimalFitnessReached(currentBest)) {
             System.out.println("stopped because we found the optimal fitness.");
         }
-        else if (deltaFitness <= improvementEpsilon) {
+        else if (deltaFitness >= -improvementEpsilon) {
             System.out.println("stopped because we made no IMPROVEMENT. The delta, "
-                    + deltaFitness + " was <= " + improvementEpsilon );
+                    + deltaFitness + " was >= " + -improvementEpsilon );
         }
         else {
             System.out.println("Stopped because we exceeded the MAX ITERATIONS: " + ct);
@@ -164,10 +168,10 @@ public class GeneticSearchStrategy extends OptimizationStrategy {
     private double computeFitnessDelta(ParameterArray params, ParameterArray lastBest,
                                        ParameterArray currentBest, int ct) {
         double deltaFitness;
-        deltaFitness = (lastBest.getFitness() - currentBest.getFitness());
-        assert (deltaFitness >= 0) :
+        deltaFitness = (currentBest.getFitness() - lastBest.getFitness());
+        assert (deltaFitness <= 0) :
                 "We must never get worse in a new generation. Old fitness="
-                        + lastBest.getFitness() + " New Fitenss = " + currentBest.getFitness() + ".";
+                        + lastBest.getFitness() + " New Fitness = " + currentBest.getFitness() + ".";
 
         //System.out.println(" ct="+ct+"  nbrRadius = " + nbrRadius + "  population size =" + desiredPopulationSize
         //                   +"  deltaFitness = " + deltaFitness+"  currentBest = " + currentBest.getFitness()
@@ -195,6 +199,8 @@ public class GeneticSearchStrategy extends OptimizationStrategy {
         for (int j = size-1; j >= keepSize; j--) {
             population.remove( j );
         }
+        //System.out.println("pop after culling: first = "  +  population.get(0) + " last("+population.size()+")");
+        //printPopulation(population, 5);
         return keepSize;
     }
 
@@ -206,23 +212,20 @@ public class GeneticSearchStrategy extends OptimizationStrategy {
     private void replaceCulledWithKeeperVariants(List<ParameterArray> population, int keepSize) {
 
         int k = keepSize;
+        //System.out.println("keepSize = " + keepSize + " grow current popSize of "
+        //    + population.size() + " to " + desiredPopulationSize);
         while ( k < desiredPopulationSize) {
 
-            // loop over the keepers until all replacements found
-            int keeperIndex = k % keepSize;
+            // loop over the keepers until all replacements found. Select randomly, but skewed toward the better ones
+            double rnd =  MathUtil.RANDOM().nextDouble();
+            int keeperIndex = (int) (rnd * rnd * keepSize);  //k % keepSize;
 
-            // do the best one twice to avoid terminating too quickly
-            // in the event that we got a very good fitness score on an early iteration.
-            if (keeperIndex == keepSize - 1) {
-                keeperIndex = 0;
-            }
             ParameterArray p = population.get(keeperIndex);
 
-            // add a permutation of one of the keepers
-            // we multiply the radius by m because we want the worse ones to have
-            // higher variability.
-            double r = (keeperIndex + NBR_RADIUS_SOFTENER)/NBR_RADIUS_SOFTENER * nbrRadius;
-            ParameterArray nbr = p.getRandomNeighbor(r);
+            // Add a permutation of one of the keepers.
+            // Multiply the radius by m because we want the worse ones to have higher variability.
+            double r = (keeperIndex + NBR_RADIUS_SOFTENER) / NBR_RADIUS_SOFTENER * nbrRadius;
+            ParameterArray nbr = getNeighbor(p, r); //p.getRandomNeighbor(r);
             if (!population.contains(nbr)) {
                 population.add(nbr);
                 notifyOfChange(p);
@@ -230,6 +233,26 @@ public class GeneticSearchStrategy extends OptimizationStrategy {
             k++;
         }
         //printPopulation(population, 20);
+    }
+
+    /**
+     *
+     * @param p parameter array to get neighbor for
+     * @param rad larger radius means more distanc neighbor
+     * @return a neighbor of p. If using absolute fitness, try to find a neighbor that has better fitnesss.
+     */
+    private ParameterArray getNeighbor(ParameterArray p, double rad) {
+        ParameterArray nbr = p.getRandomNeighbor(rad);
+        if (!optimizee.evaluateByComparison()) {
+            // try to find a nbr with fitness that is better
+            double curFitness = optimizee.evaluateFitness(p);
+            int ct = 0;
+            while (optimizee.evaluateFitness(nbr) > curFitness && ct < MAX_NBRS_TO_EXPLORE) {
+                nbr = p.getRandomNeighbor(rad);
+                ct++;
+            }
+        }
+        return nbr;
     }
 
     /**

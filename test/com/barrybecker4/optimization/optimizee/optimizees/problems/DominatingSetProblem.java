@@ -18,17 +18,17 @@ import static com.barrybecker4.optimization.OptimizerTestCase.LOG_FILE_HOME;
  */
 public class DominatingSetProblem extends OptimizeeProblem {
 
-    private DominatingSetVariation variation_;
+    private DominatingSetVariation variation;
 
 
     /** constructor */
     public DominatingSetProblem(DominatingSetVariation variation) {
-        variation_ = variation;
+        this.variation = variation;
     }
 
     @Override
     public String getName() {
-        return "Dominating Set: " + variation_.name();
+        return "Dominating Set: " + variation.name();
     }
 
     /**
@@ -45,22 +45,22 @@ public class DominatingSetProblem extends OptimizeeProblem {
      */
     @Override
     public double evaluateFitness(ParameterArray a) {
-        return variation_.evaluateFitness(a);
+        return variation.evaluateFitness(a);
     }
 
     @Override
     public ParameterArray getExactSolution() {
-        return variation_.getExactSolution();
+        return variation.getExactSolution();
     }
 
     @Override
     public ParameterArray getInitialGuess() {
-        return variation_.getInitialGuess();
+        return variation.getInitialGuess();
     }
 
     @Override
     public double getFitnessRange() {
-        return variation_.getFitnessRange();
+        return variation.getFitnessRange();
     }
 
     /**

@@ -6,9 +6,9 @@ import com.barrybecker4.optimization.parameter.ParameterArray;
 
 /**
  * This is a simple search space to test the optimization package.
- * The function we will try to maximize is
+ * The function we will try to minimize is
  *
- *   z = 1 - (1 - p1)^2 - (2 - p2)^2
+ *   z = (1 - p1)^2 + (2 - p2)^2
  *
  * Normally we have no idea what the real function is that we are trying to optimize.
  * Nor is a real life function likely to be as well behaved as this one is.
@@ -25,14 +25,14 @@ import com.barrybecker4.optimization.parameter.ParameterArray;
  *
  * @author Barry Becker
  */
-public class ParabolaMaxFunctionProblem extends OptimizeeProblem {
+public class ParabolaMinFunctionProblem extends OptimizeeProblem {
 
     private static final double FITNESS_RANGE = 1000.0;
 
-    private ParabolaMaxVariation variation = ParabolaMaxVariation.PARABOLA;
+    private ParabolaMinVariation variation;
 
     /** Constructor */
-    public ParabolaMaxFunctionProblem(ParabolaMaxVariation v) {
+    public ParabolaMinFunctionProblem(ParabolaMinVariation v) {
         variation = v;
     }
 
@@ -41,7 +41,7 @@ public class ParabolaMaxFunctionProblem extends OptimizeeProblem {
         return "Analytic: " + variation.name();
     }
 
-    /** we evaluate directly not by comparing with a different trial.   */
+    /** Evaluate directly not by comparing with a different trial.   */
     @Override
     public boolean evaluateByComparison() {
         return false;

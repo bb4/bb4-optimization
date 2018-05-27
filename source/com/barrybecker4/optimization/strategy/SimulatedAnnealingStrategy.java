@@ -19,7 +19,7 @@ public class SimulatedAnnealingStrategy extends OptimizationStrategy {
     private static final int NUM_TEMP_ITERATIONS = 20;
 
     /** the amount to drop the temperature on each temperature iteration.   */
-    private static final double TEMP_DROP_FACTOR = 0.5;
+    private static final double TEMP_DROP_FACTOR = 0.6;
 
     /** the client should really set the tempMax using setTemperatureMax before running. */
     private static final double DEFAULT_TEMP_MAX = 1000;
@@ -99,6 +99,7 @@ public class SimulatedAnnealingStrategy extends OptimizationStrategy {
              ct = 0;
              // keep Reducing the temperature until it reaches tempMin
              temperature *= TEMP_DROP_FACTOR;
+             System.out.println("temp = " + temperature + " tempMin = " + tempMin + "\n bestParams = " + bestParams);
 
         } while (temperature > tempMin && !isOptimalFitnessReached(currentParams));
 

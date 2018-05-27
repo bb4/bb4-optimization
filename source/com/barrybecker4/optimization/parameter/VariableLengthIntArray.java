@@ -26,6 +26,9 @@ import java.util.Set;
  */
 public class VariableLengthIntArray extends AbstractParameterArray {
 
+    /** The larger this number is the less likely we are to add/remove ints when finding a random neighbor */
+    private static final double ADD_REMOVE_RADIUS_SOFTENER = 0.6;
+
     private List<Integer> fullSet;
 
     /** Default constructor */
@@ -83,15 +86,15 @@ public class VariableLengthIntArray extends AbstractParameterArray {
      * The two ways a configuration of marked nodes can change is
      *  - add or remove nodes
      *  - change values of nodes
-     * @param radius a indication of the amount of variation to use. 0 is none, 2 is a lot.
+     * @param radius an indication of the amount of variation to use. 0 is none, 2 is a lot.
      *   Change Math.min(1, 10 * radius * N/100) of the entries, where N is the number of params
      * @return the random nbr.
      */
     public VariableLengthIntArray getRandomNeighbor(double radius) {
 
-        if (size() <= 1) return this;
+        if (size() < 1) return this;
 
-        double probAddRemove = 1.0/(1.0 + radius);
+        double probAddRemove = radius / (ADD_REMOVE_RADIUS_SOFTENER + radius);
         boolean add = false;
         boolean remove = false;
         if (MathUtil.RANDOM().nextDouble() > probAddRemove) {
@@ -106,10 +109,11 @@ public class VariableLengthIntArray extends AbstractParameterArray {
         VariableLengthIntArray nbr = (VariableLengthIntArray)this.copy();
 
         if (add || remove) {
-            numNodesToMove = MathUtil.RANDOM().nextInt(Math.min(size(), (int)(radius + 1)));
+            numNodesToMove = MathUtil.RANDOM().nextInt(Math.min(size(), (int)(radius + 1.5)));
         }
         else {
-            numNodesToMove = 1 + MathUtil.RANDOM().nextInt(1 + (int)radius);
+            // at least 1 will be moved
+            numNodesToMove = 1 + MathUtil.RANDOM().nextInt((int)(1.5 + radius));
         }
 
         if (remove) {
@@ -210,11 +214,12 @@ public class VariableLengthIntArray extends AbstractParameterArray {
         int newSize = nbr.size() + 1;
         assert newSize <= getMaxLength();
         List<Parameter> newParams = new ArrayList<>(newSize);
-        for (Parameter p : nbr.params) {
-            newParams.add(p);
-        }
+        newParams.addAll(nbr.params);
+
+        // randomly add one one of the free nodes to the list
         int value = freeNodes.get(MathUtil.RANDOM().nextInt(freeNodes.size()));
         newParams.add(createParam(value));
+
         nbr.params = newParams;
     }
 
@@ -228,7 +233,7 @@ public class VariableLengthIntArray extends AbstractParameterArray {
         int numSelect = Math.min(freeNodes.size(), numNodesToMove);
         List<Integer> swapNodes = selectRandomNodes(numSelect, freeNodes);
 
-        for (int i=0; i<numSelect; i++) {
+        for (int i = 0; i < numSelect; i++) {
             int index = MathUtil.RANDOM().nextInt(nbr.size());
             nbr.get(index).setValue(swapNodes.get(i));
         }

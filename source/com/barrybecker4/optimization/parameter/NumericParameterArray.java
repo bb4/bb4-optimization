@@ -25,7 +25,7 @@ public class NumericParameterArray extends AbstractParameterArray {
 
     /** default number of steps to go from the min to the max */
     private static final int DEFAULT_NUM_STEPS = 10;
-    private int numSteps_ = DEFAULT_NUM_STEPS;
+    private int numSteps = DEFAULT_NUM_STEPS;
 
     /** If the dot product of the new gradient with the old is less than this, then decrease the jump size. */
     private static final double MIN_DOT_PRODUCT = 0.3;
@@ -75,7 +75,7 @@ public class NumericParameterArray extends AbstractParameterArray {
     public NumericParameterArray copy() {
 
         NumericParameterArray pa = (NumericParameterArray)super.copy();
-        pa.setNumSteps(numSteps_);
+        pa.setNumSteps(numSteps);
         return pa;
     }
 
@@ -231,10 +231,10 @@ public class NumericParameterArray extends AbstractParameterArray {
     }
 
     public void setNumSteps( int numSteps ) {
-        numSteps_ = numSteps;
+        this.numSteps = numSteps;
     }
 
     public int getNumSteps()  {
-        return numSteps_;
+        return numSteps;
     }
 }

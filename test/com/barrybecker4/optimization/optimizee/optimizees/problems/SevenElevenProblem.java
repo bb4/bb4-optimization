@@ -27,7 +27,7 @@ import static com.barrybecker4.optimization.OptimizerTestCase.LOG_FILE_HOME;
  * Our choice of evaluation function to maximize is somewhat arbitrary.
  * When this function evaluates to 0, we have a solution.
  *
- * @see ParabolaMaxFunctionProblem for an easier optimization example.
+ * @see ParabolaMinFunctionProblem for an easier optimization example.
  *
  * @author Barry Becker
  */

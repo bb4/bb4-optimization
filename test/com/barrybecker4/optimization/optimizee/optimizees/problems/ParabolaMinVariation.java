@@ -15,18 +15,17 @@ import static com.barrybecker4.optimization.optimizee.optimizees.problems.Parabo
  *
  * @author Barry Becker
  */
-public enum ParabolaMaxVariation implements IProblemVariation {
+public enum ParabolaMinVariation implements IProblemVariation {
 
     PARABOLA {
         private final ErrorTolerances ERROR_TOLERANCES =
                 new ErrorTolerances(0.009, RELAXED_TOL, BASE_TOLERANCE,
-                    GLOB_SAMP_TOL,  0,  RELAXED_TOL,  RELAXED_TOL, BASE_TOLERANCE);
+                    GLOB_SAMP_TOL,  0,  BASE_TOLERANCE,  BASE_TOLERANCE, BASE_TOLERANCE);
 
         /** Smooth parabola with min of 0.0 at P1, P2 */
         @Override
         public double evaluateFitness(ParameterArray a) {
-            return  (Math.pow(P1 - a.get(0).getValue(), 2)
-                   + Math.pow(P2 - a.get(1).getValue(), 2));
+            return Math.pow(P1 - a.get(0).getValue(), 2) + Math.pow(P2 - a.get(1).getValue(), 2);
         }
 
         @Override
@@ -37,7 +36,7 @@ public enum ParabolaMaxVariation implements IProblemVariation {
     SINUSOIDAL {
         private final ErrorTolerances ERROR_TOLERANCES =
                 new ErrorTolerances(0.009, RELAXED_TOL, 0.01, GLOB_SAMP_TOL,
-                        RELAXED_TOL, 0.0032, 0.0032, BASE_TOLERANCE);
+                        RELAXED_TOL, BASE_TOLERANCE, BASE_TOLERANCE, BASE_TOLERANCE);
 
         /**
          * This version introduces a bit of sinusoidal noise.
@@ -58,7 +57,7 @@ public enum ParabolaMaxVariation implements IProblemVariation {
     ABS_SINUSOIDAL {
         private final ErrorTolerances ERROR_TOLERANCES =
                 new ErrorTolerances(0.009, 0.0128, 0.01, GLOB_SAMP_TOL,
-                        RELAXED_TOL, 0.0032,  0.0032,  BASE_TOLERANCE);
+                        RELAXED_TOL, BASE_TOLERANCE,  BASE_TOLERANCE,  BASE_TOLERANCE);
 
         /**
          * This version introduces a bit of absolute value sinusoidal noise.
@@ -69,7 +68,7 @@ public enum ParabolaMaxVariation implements IProblemVariation {
         @Override
         public double evaluateFitness(ParameterArray a) {
             return PARABOLA.evaluateFitness(a)
-                    + 0.5 * Math.abs(Math.cos((a.get(0).getValue() - P1) * (a.get(1).getValue() - P2))) - 0.5;
+                    - 0.5 * Math.abs(Math.cos((a.get(0).getValue() - P1) * (a.get(1).getValue() - P2))) + 0.5;
         }
 
         @Override
@@ -80,15 +79,15 @@ public enum ParabolaMaxVariation implements IProblemVariation {
     STEPPED  {
         private final ErrorTolerances ERROR_TOLERANCES =
                 new ErrorTolerances(0.009, RELAXED_TOL, BASE_TOLERANCE, GLOB_SAMP_TOL,
-                        RELAXED_TOL,  0.03,  0.03, BASE_TOLERANCE);
+                        RELAXED_TOL,  BASE_TOLERANCE,  BASE_TOLERANCE, BASE_TOLERANCE);
 
         /**
          *  This version introduces a bit of step function noise.
          */
         @Override
         public double evaluateFitness(ParameterArray a) {
-            return PARABOLA.evaluateFitness(a) - 0.2 * Math.round( Math.abs((P1
-                    - a.get(0).getValue())) * Math.abs((P2 - a.get(1).getValue())));
+            return PARABOLA.evaluateFitness(a) +
+                    0.2 * Math.round( Math.abs((P1 - a.get(0).getValue())) * Math.abs((P2 - a.get(1).getValue())));
         }
 
         @Override
@@ -127,7 +126,7 @@ public enum ParabolaMaxVariation implements IProblemVariation {
         double p2 = 1.975;
         System.out.println("f("+p1+", "+ p2 +")="
                 + PARABOLA.evaluateFitness(NumericParameterArrayTest.createParamArray(p1, p2)));
-        for (ParabolaMaxVariation variation : ParabolaMaxVariation.values())  {
+        for (ParabolaMinVariation variation : ParabolaMinVariation.values())  {
             System.out.println(variation.name() + " f("+P1+", "+ P2 +")="
                 + variation.evaluateFitness(NumericParameterArrayTest.createParamArray(P1, P2)));
         }

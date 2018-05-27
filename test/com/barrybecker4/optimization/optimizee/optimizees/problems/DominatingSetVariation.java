@@ -32,7 +32,8 @@ public enum DominatingSetVariation implements IProblemVariation {
                 Arrays.asList(0, 1)
         );
 
-        private final ErrorTolerances ERROR_TOLERANCES = new ErrorTolerances(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+        private final ErrorTolerances ERROR_TOLERANCES =
+                new ErrorTolerances(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
         protected Graph getAdjacencies() {
             return ADJACENCIES;
@@ -84,7 +85,7 @@ public enum DominatingSetVariation implements IProblemVariation {
         );
 
         private final ErrorTolerances ERROR_TOLERANCES =
-                new ErrorTolerances(4.0, 1.0, 1.0, 2.0, 1.0, 5.0, 5.0, 1.0, 0);
+                new ErrorTolerances(2.5, 0.5, 1.0, 2.1, 1.0, 2.1, 2.1, 1.0, 0);
 
         protected Graph getAdjacencies() {
             return ADJACENCIES;
@@ -110,7 +111,7 @@ public enum DominatingSetVariation implements IProblemVariation {
     public List<Integer> getAllNodes() {
         int num = getAdjacencies().size();
         List<Integer> nodes = new ArrayList<>(num);
-        for (int i=0; i<num; i++) {
+        for (int i = 0; i < num; i++) {
             nodes.add(i);
         }
         return nodes;
@@ -127,8 +128,8 @@ public enum DominatingSetVariation implements IProblemVariation {
         int num = getAllNodes().size();
         List<Parameter> params = new ArrayList<>(num);
         // just add some of the nodes
-        for (int i=0; i<num; i+=3) {
-            params.add(new IntegerParameter(i, 0, num-1, "p" + i));
+        for (int i = 0; i < num; i += 3) {
+            params.add(new IntegerParameter(i, 0, num - 1, "p" + i));
         }
         VariableLengthIntArray pa = VariableLengthIntArray.createInstance(params, getAllNodes());
         pa.setFitness(getScore(getMarked(pa)));
@@ -137,20 +138,16 @@ public enum DominatingSetVariation implements IProblemVariation {
 
     private List<Integer> getMarked(VariableLengthIntArray pa) {
         List<Integer> marked = new ArrayList<>(pa.size());
-        for (int i=0; i<pa.size(); i++) {
+        for (int i = 0; i < pa.size(); i++) {
            marked.add((int)pa.get(i).getValue());
         }
         return marked;
     }
 
-    public double getScore(List<Integer> marked) {
-        return marked.size() + 0.5 * getAdjacencies().getNumNotWithinOneHop(marked);
-    }
-
     /**
-     * Evaluate fitness for the analytics function.
+     * Evaluate fitness for the candidate solution to the dominating set problem.
      * @param pa param array
-     * @return fitness value
+     * @return fitness value. The closer it is to 0 the better. When 0 it is the exact cover.
      */
     public double evaluateFitness(ParameterArray pa) {
         return computeCost(pa) - getExactSolution().size();
@@ -160,9 +157,10 @@ public enum DominatingSetVariation implements IProblemVariation {
     public abstract double getFitnessRange();
 
     /**
-     * We assume that the parameter array contains 0 based integers
+     * We assume that the parameter array contains 0 based integers.
      * @param params last best guess at dominating set.
-     * @return the total cost of the path represented by param.
+     * @return the total cost of the candidate vertex cover.
+     *  It is defined as the number of nodes in the cover + the number of nodes not within 1 hop from that set.
      */
     protected double computeCost(ParameterArray params) {
 
@@ -173,6 +171,10 @@ public enum DominatingSetVariation implements IProblemVariation {
         }
 
         return getScore(marked);
+    }
+
+    private double getScore(List<Integer> marked) {
+        return marked.size() + 0.4 * getAdjacencies().getNumNotWithinOneHop(marked);
     }
 
     /** @return the error tolerance percent for a specific optimization strategy */

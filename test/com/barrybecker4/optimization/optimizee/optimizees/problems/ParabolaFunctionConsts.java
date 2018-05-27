@@ -32,7 +32,6 @@ public class ParabolaFunctionConsts {
     private static final String[] PARAM_NAMES = {"p1",   "p2"};
     public static final ParameterArray INITIAL_GUESS = new NumericParameterArray(VALUES, MIN_VALS, MAX_VALS, PARAM_NAMES);
 
-
     public static final double BASE_TOLERANCE = 0.0002;
     public static final double RELAXED_TOL = 0.0032;
     /** Really relax this one because we do not expect it to ever get that close */

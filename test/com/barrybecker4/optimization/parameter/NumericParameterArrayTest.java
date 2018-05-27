@@ -41,7 +41,7 @@ public class NumericParameterArrayTest {
 
         params = createParamArray(.2, .3);
 
-        assertEquals("Unexpected numSteps", 36, params.getSamplePopulationSize());
+        assertEquals("Unexpected numSteps", 144, params.getSamplePopulationSize());
     }
 
     @Test(expected=IllegalArgumentException.class)

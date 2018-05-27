@@ -2,8 +2,8 @@
 package com.barrybecker4.optimization.optimizee.optimizees;
 
 import com.barrybecker4.common.util.FileUtil;
-import com.barrybecker4.optimization.optimizee.optimizees.problems.ParabolaMaxFunctionProblem;
-import com.barrybecker4.optimization.optimizee.optimizees.problems.ParabolaMaxVariation;
+import com.barrybecker4.optimization.optimizee.optimizees.problems.ParabolaMinFunctionProblem;
+import com.barrybecker4.optimization.optimizee.optimizees.problems.ParabolaMinVariation;
 import com.barrybecker4.optimization.optimizee.optimizees.problems.DominatingSetProblem;
 import com.barrybecker4.optimization.optimizee.optimizees.problems.DominatingSetVariation;
 import com.barrybecker4.optimization.optimizee.optimizees.problems.SevenElevenProblem;
@@ -45,8 +45,8 @@ public class GraphAnalyticFunctionSolution {
     private static OptimizeeProblem[] getAllTestProblems() {
         List<OptimizeeProblem> testProblems = new LinkedList<>();
 
-        for (ParabolaMaxVariation v : ParabolaMaxVariation.values()) {
-            testProblems.add(new ParabolaMaxFunctionProblem(v));
+        for (ParabolaMinVariation v : ParabolaMinVariation.values()) {
+            testProblems.add(new ParabolaMinFunctionProblem(v));
         }
         for (DominatingSetVariation v : DominatingSetVariation.values()) {
             testProblems.add(new DominatingSetProblem(v));
@@ -58,6 +58,6 @@ public class GraphAnalyticFunctionSolution {
         for (TravelingSalesmanVariation v : TravelingSalesmanVariation.values()) {
             testProblems.add(new TravelingSalesmanProblem(v));
         }
-        return testProblems.toArray(new OptimizeeProblem[testProblems.size()]);
+        return testProblems.toArray(new OptimizeeProblem[0]);
     }
 }

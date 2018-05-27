@@ -76,7 +76,7 @@ public class VariableLengthIntArrayTest  {
     public void testGetSamplePopulationSizeWhenSmall() {
 
         params = createDistArray(2, -1, 3, -1);
-        assertEquals("Unexpected numSteps", 16, params.getSamplePopulationSize());
+        assertEquals("Unexpected numSteps", 81, params.getSamplePopulationSize());
     }
 
     @Test
@@ -163,7 +163,7 @@ public class VariableLengthIntArrayTest  {
         return list;
     }
 
-    public VariableLengthIntArray createArray(DistanceCalculator dCalc, Integer... numberList) {
+    private VariableLengthIntArray createArray(DistanceCalculator dCalc, Integer... numberList) {
         int numNodes = numberList.length;
         List<Parameter> params = new ArrayList<>(numNodes);
         for (int i : numberList) {
@@ -172,7 +172,7 @@ public class VariableLengthIntArrayTest  {
         return new VariableLengthIntArray(params, Arrays.asList(numberList), dCalc);
     }
 
-    public VariableLengthIntArray createDistArray(Integer... numberList) {
+    private VariableLengthIntArray createDistArray(Integer... numberList) {
         return createArray(new MagnitudeDistanceCalculator(), numberList);
     }
 

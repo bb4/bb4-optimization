@@ -17,17 +17,17 @@ import static com.barrybecker4.optimization.OptimizerTestCase.LOG_FILE_HOME;
  */
 public class SubsetSumProblem extends OptimizeeProblem {
 
-    private SubsetSumVariation variation_;
+    private SubsetSumVariation variation;
 
 
     /** constructor */
     public SubsetSumProblem(SubsetSumVariation variation) {
-        variation_ = variation;
+        this.variation = variation;
     }
 
     @Override
     public String getName() {
-        return "Subset Sum: " + variation_.name();
+        return "Subset Sum: " + variation.name();
     }
 
     /**
@@ -44,22 +44,22 @@ public class SubsetSumProblem extends OptimizeeProblem {
      */
     @Override
     public double evaluateFitness(ParameterArray a) {
-        return variation_.evaluateFitness(a);
+        return variation.evaluateFitness(a);
     }
 
     @Override
     public ParameterArray getExactSolution() {
-        return variation_.getExactSolution();
+        return variation.getExactSolution();
     }
 
     @Override
     public ParameterArray getInitialGuess() {
-        return variation_.getInitialGuess();
+        return variation.getInitialGuess();
     }
 
     @Override
     public double getFitnessRange() {
-        return variation_.getFitnessRange();
+        return variation.getFitnessRange();
     }
 
     /**

@@ -15,28 +15,29 @@ import java.util.List;
  *
  * @author Barry Becker
  */
-public class Graph extends ArrayList<List<Integer>> {
+class Graph extends ArrayList<List<Integer>> {
 
     @SafeVarargs
-    public Graph(List<Integer>... nodeNeighbors) {
+    Graph(List<Integer>... nodeNeighbors) {
          super(Arrays.asList(nodeNeighbors));
     }
 
     /** @return the number of nodes that are more than one edge link away from the specified vertex */
     int getNumNotWithinOneHop(List<Integer> marked) {
         int total = 0;
-        for (int i=0; i < size(); i++) {
+        for (int i = 0; i < size(); i++) {
             if (!marked.contains(i)) {
                  total += isNodeOneHopAway(i, marked) ? 0 : 1;
             }
         }
+        //System.out.println("out of " + size() + " nodes, " + total + " are not within one hop from " + marked);
         return total;
     }
 
     /**
      * @param i node to start searching from
      * @param marked list of marked nodes
-     * @return true if node i is only one hop from a marked node
+     * @return true if node i is only one hop from one of the marked nodes
      */
     private boolean isNodeOneHopAway(int i, List<Integer> marked) {
         List<Integer> nbrs = get(i);

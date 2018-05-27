@@ -22,10 +22,10 @@ public abstract class AbstractParameterArray implements ParameterArray {
     protected List<Parameter> params;
 
     /** assign a fitness (evaluation value) to this set of parameters */
-    private double fitness_ = 0;
+    private double fitness = 0;
 
     /** Default constructor */
-    protected AbstractParameterArray() {}
+    AbstractParameterArray() {}
 
     /**
      *  Constructor
@@ -48,7 +48,7 @@ public abstract class AbstractParameterArray implements ParameterArray {
         int pop = 1;
         assert params != null;
         for (Parameter param : params) {
-            pop *= param.isIntegerOnly() ? 2 : 6;
+            pop *= param.isIntegerOnly() ? 3 : 12;
         }
         return Math.min(POPULATION_MAX, pop);
     }
@@ -61,11 +61,11 @@ public abstract class AbstractParameterArray implements ParameterArray {
     }
 
     public void setFitness(double value) {
-        fitness_ = value;
+        fitness = value;
     }
 
     public double getFitness() {
-        return fitness_;
+        return fitness;
     }
 
     /**
@@ -79,7 +79,7 @@ public abstract class AbstractParameterArray implements ParameterArray {
 
         AbstractParameterArray pa = createInstance();
         pa.params = newParams;
-        pa.setFitness(fitness_);
+        pa.setFitness(fitness);
         return pa;
     }
 
@@ -93,7 +93,7 @@ public abstract class AbstractParameterArray implements ParameterArray {
     }
 
     public String toString() {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder("\n");
         for ( int i = 0; i < size(); i++ ) {
             sb.append("parameter[").append(i).append("] = ").append(get(i).toString());
             sb.append('\n');

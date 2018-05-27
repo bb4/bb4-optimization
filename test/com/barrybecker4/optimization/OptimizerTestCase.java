@@ -22,7 +22,7 @@ public abstract class OptimizerTestCase  {
     public static final String LOG_FILE_HOME =
             FileUtil.getHomeDir() + "test/performance/test_optimizer/";  // NN_NLS
 
-    /** If the error is this percent less than the error threshold, let the user know */
+    /** If the error is this percent (or more) less than the error threshold, let the user know */
     private static final double THRESHOLD_SLACK_WARNING = 0.1;
 
     /** If the error is this percent less than the error threshold, give an error so the test can be updated */

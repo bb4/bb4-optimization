@@ -2,7 +2,7 @@
 package com.barrybecker4.optimization.optimizee.optimizees;
 
 import com.barrybecker4.optimization.optimizee.optimizees.problems.ParabolaFunctionConsts;
-import com.barrybecker4.optimization.optimizee.optimizees.problems.ParabolaMaxVariation;
+import com.barrybecker4.optimization.optimizee.optimizees.problems.ParabolaMinVariation;
 import com.barrybecker4.optimization.parameter.NumericParameterArrayTest;
 import com.barrybecker4.optimization.parameter.ParameterArray;
 import org.junit.Test;
@@ -12,7 +12,7 @@ import static com.barrybecker4.optimization.optimizee.optimizees.problems.Parabo
 import static org.junit.Assert.assertEquals;
 
 /**
- * Verify that the maximum value of each variation is the same (1001).
+ * Verify that the minimum value of each variation is the same (1001).
  *
  * @author Barry Becker
  */
@@ -22,7 +22,7 @@ public class AnalyticVariationTest {
 
     @Test
     public void testVariationMaximum() {
-        for (ParabolaMaxVariation variant : ParabolaMaxVariation.values()) {
+        for (ParabolaMinVariation variant : ParabolaMinVariation.values()) {
             ParameterArray param = NumericParameterArrayTest.createParamArray(P1, P2);
             assertEquals("Unexpected maximum value for " + variant.toString(),
                     ParabolaFunctionConsts.EXACT_SOLUTION.getFitness(), variant.evaluateFitness(param), TOL);
