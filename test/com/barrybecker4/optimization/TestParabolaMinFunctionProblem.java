@@ -3,8 +3,8 @@ package com.barrybecker4.optimization;
 
 import com.barrybecker4.common.math.MathUtil;
 import com.barrybecker4.optimization.optimizee.optimizees.OptimizeeProblem;
-import com.barrybecker4.optimization.optimizee.optimizees.problems.ParabolaMaxFunctionProblem;
-import com.barrybecker4.optimization.optimizee.optimizees.problems.ParabolaMaxVariation;
+import com.barrybecker4.optimization.optimizee.optimizees.problems.ParabolaMinFunctionProblem;
+import com.barrybecker4.optimization.optimizee.optimizees.problems.ParabolaMinVariation;
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
 
 /**
@@ -15,10 +15,10 @@ public class TestParabolaMaxFunctionProblem extends OptimizerTestCase {
     @Override
     protected void doTest(OptimizationStrategyType optimizationType) {
 
-        for (ParabolaMaxVariation variation : ParabolaMaxVariation.values()) {
+        for (ParabolaMinVariation variation : ParabolaMinVariation.values()) {
 
             MathUtil.RANDOM().setSeed(0);
-            OptimizeeProblem problem = new ParabolaMaxFunctionProblem(variation);
+            OptimizeeProblem problem = new ParabolaMinFunctionProblem(variation);
             verifyProblem(problem, variation, optimizationType);
         }
     }

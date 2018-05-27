@@ -18,7 +18,7 @@ public class GlobalSampleStrategy extends OptimizationStrategy {
     private static final int DEFAULT_NUM_SAMPLES = 10000;
 
     /** the user should set this explicitly. */
-    int numSample;
+    private int numSample;
 
 
     /**

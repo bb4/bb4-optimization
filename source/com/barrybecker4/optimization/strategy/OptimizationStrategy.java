@@ -62,7 +62,7 @@ public abstract class OptimizationStrategy {
      * @param currentBest current best parameter set.
      * @return true if the optimal fitness has been reached.
      */
-    protected boolean isOptimalFitnessReached(ParameterArray currentBest) {
+    boolean isOptimalFitnessReached(ParameterArray currentBest) {
         boolean optimalFitnessReached = false;
 
         if (!optimizee.evaluateByComparison()) {
@@ -72,7 +72,7 @@ public abstract class OptimizationStrategy {
         return optimalFitnessReached;
     }
 
-    protected void notifyOfChange(ParameterArray params) {
+    void notifyOfChange(ParameterArray params) {
         if (listener != null) {
             listener.optimizerChanged(params);
         }

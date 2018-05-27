@@ -9,7 +9,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- *  represents an array of parameters
+ *  Represents an array of parameters
  *
  *  @author Barry Becker
  */
