@@ -1,8 +1,8 @@
 // Copyright by Barry G. Becker, 2000-2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.optimizee.optimizees
 
-import com.barrybecker4.optimization.optimizee1.Optimizee
-import com.barrybecker4.optimization.parameter1.ParameterArray
+import com.barrybecker4.optimization.optimizee.Optimizee
+import com.barrybecker4.optimization.parameter.ParameterArray
 
 
 object OptimizeeProblem {

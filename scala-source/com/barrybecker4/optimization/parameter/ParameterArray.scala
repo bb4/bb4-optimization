@@ -1,9 +1,11 @@
 // Copyright by Barry G. Becker, 2012. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.parameter
 
-import com.barrybecker4.optimization.optimizee1.Optimizee
-import com.barrybecker4.optimization.parameter1.improvement.Improvement
-import com.barrybecker4.optimization.parameter1.types.Parameter
+import com.barrybecker4.optimization.optimizee.Optimizee
+import com.barrybecker4.optimization.parameter.improvement.Improvement
+import com.barrybecker4.optimization.parameter.types.Parameter
+
+import scala.collection.mutable
 
 
 /**
@@ -53,7 +55,7 @@ trait ParameterArray extends Comparable[ParameterArray] {
     * @return the improvement which contains the improved parameter array and possibly a revised jumpSize.
     */
   def findIncrementalImprovement(optimizee: Optimizee, jumpSize: Double,
-                                 lastImprovement: Improvement, cache: Set[ParameterArray]): Improvement
+                                 lastImprovement: Improvement, cache: mutable.Set[ParameterArray]): Improvement
 
   /** Some measure of the distance between parameter arrays of the same type.
     * The way this is computed is very dependent on the implementation of each sort of parameter array.

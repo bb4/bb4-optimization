@@ -16,8 +16,8 @@ import java.util.Set;
  */
 public class ImprovementStep {
 
-    private Optimizee optimizee_;
-    private ImprovementIteration iter_;
+    private Optimizee optimizee;
+    private ImprovementIteration iter;
     private double gradLength;
     private Set<ParameterArray> cache;
     private double jumpSize;
@@ -43,8 +43,8 @@ public class ImprovementStep {
      */
     public ImprovementStep(Optimizee optimizee, ImprovementIteration iter, double gradLength, Set<ParameterArray> cache,
                            double jumpSize, double oldFitness) {
-        optimizee_ = optimizee;
-        iter_ = iter;
+        this.optimizee = optimizee;
+        this.iter = iter;
         this.improvement = 0;
         this.gradLength = gradLength;
         this.cache = cache;
@@ -89,10 +89,10 @@ public class ImprovementStep {
         NumericParameterArray currentParams = params;
         NumericParameterArray oldParams = currentParams.copy();
 
-        iter_.updateGradient(jumpSize, gradLength);
-        //log("gradient = " + iter_.gradient + " jumpSize="+ jumpSize);
+        iter.updateGradient(jumpSize, gradLength);
+        //log("gradient = " + iter.gradient + " jumpSize="+ jumpSize);
         currentParams = currentParams.copy();
-        currentParams.add( iter_.getGradient() );
+        currentParams.add( iter.getGradient() );
         double gaussRadius = 0.01;
         boolean sameParams = false;
 
@@ -104,15 +104,15 @@ public class ImprovementStep {
         }
         cache.add(currentParams);
 
-        if (optimizee_.evaluateByComparison()) {
-            currentParams.setFitness(optimizee_.compareFitness(currentParams, oldParams));
+        if (optimizee.evaluateByComparison()) {
+            currentParams.setFitness(optimizee.compareFitness(currentParams, oldParams));
             if (currentParams.getFitness() < 0)  {
                 improved = false;
             }
             improvement = currentParams.getFitness();
         }
         else {
-            currentParams.setFitness(optimizee_.evaluateFitness(currentParams));
+            currentParams.setFitness(optimizee.evaluateFitness(currentParams));
             if (currentParams.getFitness() >= oldFitness) {
                 improved = false;
             }

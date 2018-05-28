@@ -3,6 +3,7 @@ package com.barrybecker4.optimization.parameter1;
 
 import com.barrybecker4.common.math.MathUtil;
 import com.barrybecker4.optimization.optimizee1.Optimizee;
+import com.barrybecker4.optimization.parameter1.distancecalculators.PermutedDistanceCalculator;
 import com.barrybecker4.optimization.parameter1.improvement.DiscreteImprovementFinder;
 import com.barrybecker4.optimization.parameter1.improvement.Improvement;
 import com.barrybecker4.optimization.parameter1.sampling.PermutedGlobalSampler;
@@ -65,7 +66,7 @@ public class PermutedParameterArray extends AbstractParameterArray {
         return new PermutedParameterArray();
     }
 
-    protected ParameterArray reverse() {
+    public ParameterArray reverse() {
         AbstractParameterArray paramCopy = this.copy();
         int len = size();
 

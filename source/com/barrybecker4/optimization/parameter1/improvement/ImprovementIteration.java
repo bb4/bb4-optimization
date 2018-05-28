@@ -1,7 +1,6 @@
 // Copyright by Barry G. Becker, 2000-2011. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.parameter1.improvement;
 
-
 import com.barrybecker4.common.math.MathUtil;
 import com.barrybecker4.common.math.Vector;
 import com.barrybecker4.optimization.optimizee1.Optimizee;
@@ -9,6 +8,7 @@ import com.barrybecker4.optimization.parameter1.Direction;
 import com.barrybecker4.optimization.parameter1.NumericParameterArray;
 import com.barrybecker4.optimization.parameter1.ParameterArray;
 import com.barrybecker4.optimization.parameter1.types.Parameter;
+
 
 /**
  * Utility class for maintaining the data vectors for the iteration when hill climbing
