@@ -30,10 +30,10 @@ class GaussianRedistribution(var mean: Double, var stdDeviation: Double) extends
 
   override protected def initializeFunction(): Unit = {
     var functionMap: Array[Double] = null
-    val inc = 1.0 / (GaussianRedistribution.NUM_MAP_VALUES - 1)
+    val inc: Double = 1.0 / (GaussianRedistribution.NUM_MAP_VALUES - 1)
     val cdfFunction = new Array[Double](GaussianRedistribution.NUM_MAP_VALUES)
     cdfFunction(0) = 0
-    var x = 0
+    var x: Double = 0
     for (index <- 1 until GaussianRedistribution.NUM_MAP_VALUES) {
       x += inc
       val v = cdf(x)

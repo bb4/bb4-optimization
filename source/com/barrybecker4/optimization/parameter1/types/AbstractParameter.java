@@ -159,10 +159,7 @@ public abstract class AbstractParameter implements Parameter {
         if (integerOnly != that.integerOnly) return false;
         if (Double.compare(that.maxValue, maxValue) != 0) return false;
         if (Double.compare(that.minValue, minValue) != 0) return false;
-        if (!that.getNaturalValue().equals(getNaturalValue())) return false;
-        //if (name != null ? !name.equals(that.name) : that.name != null) return false;
-
-        return true;
+        return that.getNaturalValue().equals(getNaturalValue());
     }
 
     @Override

@@ -40,7 +40,7 @@ class UniformRedistribution extends AbstractRedistributionFunction {
     assert(len == specialValueProbabilities.length)
     val xValues = new Array[Double](2 * len + 2)
     val yValues = new Array[Double](2 * len + 2)
-    var specialProbabilityTotal = getSpecialProbTotal
+    var specialProbabilityTotal: Double = getSpecialProbTotal
     val ratio = 1.0 - specialProbabilityTotal
     // now compute the piecewise function values
     specialProbabilityTotal = 0
@@ -68,7 +68,7 @@ class UniformRedistribution extends AbstractRedistributionFunction {
 
   private def getSpecialProbTotal = {
     val len = specialValues.length
-    var specialProbabilityTotal = 0
+    var specialProbabilityTotal: Double = 0
     for (i <- 0 until len) {
       verifyInRange(specialValues(i))
       if (i > 0) assert(specialValues(i) > specialValues(i - 1))
