@@ -30,7 +30,9 @@ class PermutedGlobalSampler(var params: PermutedParameterArray, val requestedNum
   // if the requested number of samples is close to the total number of permutations,
   // then we could just enumerate the permutations.
   numSamples = requestedNumSamples
-  useExhaustiveSearch = requestedNumSamples > PermutedGlobalSampler.CLOSE_FACTOR * numPermutations
+
+  /** becomes true if the requestedNumSamples is close to the total number of permutations in the space */
+  private var useExhaustiveSearch = requestedNumSamples > PermutedGlobalSampler.CLOSE_FACTOR * numPermutations
 
   /** Used to enumerate all possible permutations when doing exhaustive search */
   private var permuter: Permuter = _
@@ -40,8 +42,6 @@ class PermutedGlobalSampler(var params: PermutedParameterArray, val requestedNum
   /** used to cache the samples already tried so we do not repeat them if the requestedNumSamples is small */
   private val globalSamples = new ArrayBuffer[ParameterArray]()
 
-  /** becomes true if the requestedNumSamples is close to the total number of permutations in the space */
-  private var useExhaustiveSearch = false
 
   override def next: PermutedParameterArray = {
     if (counter >= numSamples) throw new IllegalStateException("ran out of samples.")

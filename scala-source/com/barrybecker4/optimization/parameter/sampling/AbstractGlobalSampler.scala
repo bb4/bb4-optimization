@@ -10,7 +10,7 @@ package com.barrybecker4.optimization.parameter.sampling
 abstract class AbstractGlobalSampler[E] extends Iterator[E] {
 
   /** becomes false when no more samples to iterate through */
-  protected var hasNext = true
+  var hasNext = true
 
   /** counts up to the number of samples as we iterate */
   protected var counter = 0

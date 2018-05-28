@@ -99,7 +99,7 @@ class PermutedParameterArray(theParams: Array[Parameter])  extends AbstractParam
 
   /** @return get a completely random solution in the parameter space. */
   override def getRandomSample: ParameterArray = {
-    val theParams = MathUtil.RANDOM.shuffle(params)
+    val theParams: Array[Parameter] = MathUtil.RANDOM.shuffle(params.toSeq).toArray
     var newParams = Array.ofDim[Parameter](size)
 
     for (p <- theParams) {
