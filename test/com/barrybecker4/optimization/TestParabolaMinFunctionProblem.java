@@ -5,7 +5,7 @@ import com.barrybecker4.common.math.MathUtil;
 import com.barrybecker4.optimization.optimizee1.optimizees.OptimizeeProblem;
 import com.barrybecker4.optimization.optimizee1.optimizees.problems.ParabolaMinFunctionProblem;
 import com.barrybecker4.optimization.optimizee1.optimizees.problems.ParabolaMinVariation;
-import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
+import com.barrybecker4.optimization.strategy1.OptimizationStrategyType;
 
 /**
  * @author Barry Becker

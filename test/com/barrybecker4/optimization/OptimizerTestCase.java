@@ -6,7 +6,7 @@ import com.barrybecker4.common.util.FileUtil;
 import com.barrybecker4.optimization.optimizee1.optimizees.IProblemVariation;
 import com.barrybecker4.optimization.optimizee1.optimizees.OptimizeeProblem;
 import com.barrybecker4.optimization.parameter1.ParameterArray;
-import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
+import com.barrybecker4.optimization.strategy1.OptimizationStrategyType;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -83,7 +83,7 @@ public abstract class OptimizerTestCase  {
                                  OptimizationStrategyType optType) {
         String logFile = LOG_FILE_HOME + "analytic_" + variation + "_optimization.txt";
 
-        Optimizer optimizer = new Optimizer(problem, logFile);
+        Optimizer1 optimizer = new Optimizer1(problem, logFile);
 
         ParameterArray initialGuess = problem.getInitialGuess();
 
@@ -98,7 +98,7 @@ public abstract class OptimizerTestCase  {
     protected static void verifyTest(OptimizationStrategyType optType,
                                      OptimizeeProblem problem,
                                      ParameterArray initialGuess,
-                                     Optimizer optimizer, double fitnessRange,
+                                     Optimizer1 optimizer, double fitnessRange,
                                      double errorThresh, String title) {
 
         System.out.println(title + "\nabout to apply "

@@ -1,11 +1,11 @@
 package com.barrybecker4.optimization.optimizee1.optimizees;
 
-import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
+import com.barrybecker4.optimization.strategy1.OptimizationStrategyType;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.barrybecker4.optimization.strategy.OptimizationStrategyType.*;
+import static com.barrybecker4.optimization.strategy1.OptimizationStrategyType.*;
 
 /**
  * Collects together expected error tolerances for all the optimization strategies.

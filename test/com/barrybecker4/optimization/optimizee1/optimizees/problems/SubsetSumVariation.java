@@ -8,7 +8,7 @@ import com.barrybecker4.optimization.parameter1.VariableLengthIntArray;
 import com.barrybecker4.optimization.parameter1.distancecalculators.MagnitudeDistanceCalculator;
 import com.barrybecker4.optimization.parameter1.types.IntegerParameter;
 import com.barrybecker4.optimization.parameter1.types.Parameter;
-import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
+import com.barrybecker4.optimization.strategy1.OptimizationStrategyType;
 
 import java.util.ArrayList;
 import java.util.Arrays;

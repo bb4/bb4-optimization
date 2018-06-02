@@ -11,27 +11,30 @@ package com.barrybecker4.optimization.optimizee.optimizees.problems
   * The list entry contains the numbers of the nodes that are connected to it.
   * @author Barry Becker
   */
-class Graph @SafeVarargs private[problems](val nodeNeighbors: List[Integer]*) {
+class Graph @SafeVarargs private[problems](val nodeNeighbors: Seq[List[Integer]]) {
 
-  /** @return the number of nodes that are more than one edge link away from the specified vertex */
-  private[problems] def getNumNotWithinOneHop(marked: List[Integer]) = {
+  def size: Int = nodeNeighbors.length
+
+  /** @return the number of nodes that are more than one edge link away from the specified marked vertices */
+  private[problems] def getNumNotWithinOneHop(marked: Array[Int]) = {
     var total = 0
     var i = 0
+    val markedSet = marked.toSet
     for (i <- nodeNeighbors.indices) {
-      if (!marked.contains(i)) {
-        val v: Int = if (isNodeOneHopAway(i, marked)) 0 else 1
+      if (!markedSet.contains(i)) {
+        val v: Int = if (isNodeOneHopAway(i, markedSet)) 0 else 1
         total += v
       }
     }
-    System.out.println("out of " + nodeNeighbors.size + " nodes, " + total + " are not within one hop from " + marked)
+    println("out of " + nodeNeighbors.size + " nodes, " + total + " are not within one hop from " + marked)
     total
   }
 
   /** @param i node to start searching from
-    * @param marked list of marked nodes
+    * @param marked set of marked nodes
     * @return true if node i is only one hop from one of the marked nodes
     */
-  private def isNodeOneHopAway(i: Int, marked: List[Integer]): Boolean = {
+  private def isNodeOneHopAway(i: Int, marked: Set[Int]): Boolean = {
     val nbrs = nodeNeighbors(i)
     marked.exists(nbrs.contains)
   }

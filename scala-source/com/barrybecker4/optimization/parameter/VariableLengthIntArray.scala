@@ -106,8 +106,8 @@ class VariableLengthIntArray(theParams: Array[Parameter]) extends AbstractParame
 
   /** Globally sample the parameter space.
     * @param requestedNumSamples approximate number of samples to retrieve.
-    *                            If the problem space is small and requestedNumSamples is large, it may not be possible to return this
-    *                            many unique samples.
+    *     If the problem space is small and requestedNumSamples is large, it may not be possible to return this
+    *     many unique samples.
     * @return some number of unique samples.
     */
   override def findGlobalSamples(requestedNumSamples: Long) = new VariableLengthGlobalSampler(this, requestedNumSamples)

@@ -7,7 +7,7 @@ import com.barrybecker4.optimization.parameter1.ParameterArray;
 import com.barrybecker4.optimization.parameter1.PermutedParameterArray;
 import com.barrybecker4.optimization.parameter1.types.IntegerParameter;
 import com.barrybecker4.optimization.parameter1.types.Parameter;
-import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
+import com.barrybecker4.optimization.strategy1.OptimizationStrategyType;
 
 import static com.barrybecker4.optimization.optimizee1.optimizees.problems.ParabolaFunctionConsts.*;
 

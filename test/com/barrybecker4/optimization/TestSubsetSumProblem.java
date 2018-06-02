@@ -4,7 +4,7 @@ package com.barrybecker4.optimization;
 import com.barrybecker4.optimization.optimizee1.optimizees.OptimizeeProblem;
 import com.barrybecker4.optimization.optimizee1.optimizees.problems.SubsetSumProblem;
 import com.barrybecker4.optimization.optimizee1.optimizees.problems.SubsetSumVariation;
-import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
+import com.barrybecker4.optimization.strategy1.OptimizationStrategyType;
 import org.junit.Test;
 
 import java.util.EnumSet;

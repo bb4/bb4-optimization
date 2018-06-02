@@ -1,11 +1,11 @@
 // Copyright by Barry G. Becker, 2013. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.optimizee1.optimizees.problems;
 
-import com.barrybecker4.optimization.Optimizer;
+import com.barrybecker4.optimization.Optimizer1;
 import com.barrybecker4.optimization.optimizee1.optimizees.OptimizeeProblem;
 import com.barrybecker4.optimization.parameter1.ParameterArray;
 import com.barrybecker4.optimization.parameter1.VariableLengthIntArray;
-import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
+import com.barrybecker4.optimization.strategy1.OptimizationStrategyType;
 import static com.barrybecker4.optimization.OptimizerTestCase.LOG_FILE_HOME;
 
 /**
@@ -68,8 +68,8 @@ public class SubsetSumProblem extends OptimizeeProblem {
     public static void main(String[] args) {
         OptimizeeProblem problem = new SubsetSumProblem(SubsetSumVariation.NO_SOLUTION);
 
-        Optimizer optimizer =
-                new Optimizer(problem, LOG_FILE_HOME + "domSet_optimization.txt");
+        Optimizer1 optimizer =
+                new Optimizer1(problem, LOG_FILE_HOME + "domSet_optimization.txt");
 
         ParameterArray initialGuess = problem.getInitialGuess();
         System.out.println("initial guess="+ initialGuess + " all=" + ((VariableLengthIntArray)initialGuess).getMaxLength());

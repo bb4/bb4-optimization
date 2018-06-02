@@ -5,7 +5,7 @@ import com.barrybecker4.optimization.optimizee1.optimizees.ErrorTolerances;
 import com.barrybecker4.optimization.optimizee1.optimizees.OptimizeeProblem;
 import com.barrybecker4.optimization.optimizee1.optimizees.problems.SevenElevenProblem;
 import com.barrybecker4.optimization.parameter1.ParameterArray;
-import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
+import com.barrybecker4.optimization.strategy1.OptimizationStrategyType;
 
 /**
  * @author Barry Becker
@@ -24,8 +24,8 @@ public class TestSevenElevenProblem extends OptimizerTestCase {
     protected void doTest(OptimizationStrategyType optType) {
 
        OptimizeeProblem problem = new SevenElevenProblem();
-       Optimizer optimizer =
-               new Optimizer(problem, LOG_FILE_HOME + "sevenEleven_optimization.txt");
+       Optimizer1 optimizer =
+               new Optimizer1(problem, LOG_FILE_HOME + "sevenEleven_optimization.txt");
 
        ParameterArray initialGuess = problem.getInitialGuess();
 

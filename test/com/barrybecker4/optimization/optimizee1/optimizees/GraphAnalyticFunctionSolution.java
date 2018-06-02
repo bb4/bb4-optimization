@@ -11,7 +11,7 @@ import com.barrybecker4.optimization.optimizee1.optimizees.problems.SubsetSumPro
 import com.barrybecker4.optimization.optimizee1.optimizees.problems.SubsetSumVariation;
 import com.barrybecker4.optimization.optimizee1.optimizees.problems.TravelingSalesmanProblem;
 import com.barrybecker4.optimization.optimizee1.optimizees.problems.TravelingSalesmanVariation;
-import com.barrybecker4.optimization.viewer.OptimizerEvalFrame;
+import com.barrybecker4.optimization.viewer1.OptimizerEvalFrame;
 
 import java.util.LinkedList;
 import java.util.List;

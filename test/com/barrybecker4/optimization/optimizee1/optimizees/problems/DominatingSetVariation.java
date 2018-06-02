@@ -7,7 +7,7 @@ import com.barrybecker4.optimization.parameter1.ParameterArray;
 import com.barrybecker4.optimization.parameter1.VariableLengthIntArray;
 import com.barrybecker4.optimization.parameter1.types.IntegerParameter;
 import com.barrybecker4.optimization.parameter1.types.Parameter;
-import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
+import com.barrybecker4.optimization.strategy1.OptimizationStrategyType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -106,6 +106,7 @@ public enum DominatingSetVariation implements IProblemVariation {
             return ERROR_TOLERANCES;
         }
     };
+
 
     /** @return the number of nodes in the graph */
     public List<Integer> getAllNodes() {

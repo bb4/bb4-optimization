@@ -1,7 +1,7 @@
 package com.barrybecker4.optimization.optimizee1.optimizees;
 
 import com.barrybecker4.optimization.parameter1.ParameterArray;
-import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
+import com.barrybecker4.optimization.strategy1.OptimizationStrategyType;
 
 /**
  * A variation on an {@code OptimizeeProblem}

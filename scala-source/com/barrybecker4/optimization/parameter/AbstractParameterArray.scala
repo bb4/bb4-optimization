@@ -53,7 +53,7 @@ abstract class AbstractParameterArray private[parameter](theParams: Array[Parame
   /** @return the ith parameter in the array. */
   override def get(i: Int): Parameter = params(i)
 
-  override def getFitness(): Double = fitness
+  override def getFitness: Double = fitness
   override def setFitness(value: Double): Unit = {
     fitness = value
   }

@@ -6,7 +6,7 @@ import com.barrybecker4.optimization.parameter1.ParameterArray;
 
 /**
  *  This interface needs to be implemented for any object you wish to have optimized.
- *  Optimization of an Optimizee is done by the Optimizer class.
+ *  Optimization of an Optimizee is done by the Optimizer1 class.
  *
  *  @author Barry Becker
  */

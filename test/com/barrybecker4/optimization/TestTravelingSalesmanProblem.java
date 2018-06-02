@@ -4,7 +4,7 @@ package com.barrybecker4.optimization;
 import com.barrybecker4.optimization.optimizee1.optimizees.OptimizeeProblem;
 import com.barrybecker4.optimization.optimizee1.optimizees.problems.TravelingSalesmanProblem;
 import com.barrybecker4.optimization.optimizee1.optimizees.problems.TravelingSalesmanVariation;
-import com.barrybecker4.optimization.strategy.OptimizationStrategyType;
+import com.barrybecker4.optimization.strategy1.OptimizationStrategyType;
 import org.junit.Test;
 
 /**
