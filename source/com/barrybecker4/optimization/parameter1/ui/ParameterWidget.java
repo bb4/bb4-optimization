@@ -59,6 +59,4 @@ public abstract class ParameterWidget extends JPanel {
         return 40;
     }
 
-
-
 }

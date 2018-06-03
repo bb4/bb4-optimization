@@ -1,7 +1,9 @@
+// Copyright by Barry G. Becker, 2000-2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.strategy
 
 import com.barrybecker4.optimization.optimizee.Optimizee
 import com.barrybecker4.optimization.parameter.ParameterArray
+import GlobalSampleStrategy._
 
 
 object GlobalSampleStrategy {
@@ -17,7 +19,7 @@ object GlobalSampleStrategy {
   */
 class GlobalSampleStrategy(optimizee: Optimizee) extends OptimizationStrategy(optimizee) {
 
-  numSample = GlobalSampleStrategy.DEFAULT_NUM_SAMPLES
+  numSample = DEFAULT_NUM_SAMPLES
 
   /** the user should set this explicitly. */
   private var numSample = 0
