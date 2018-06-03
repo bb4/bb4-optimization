@@ -13,10 +13,8 @@ package com.barrybecker4.optimization.parameter.redistribution
   * @author Barry Becker
   */
 case class DiscreteRedistribution(numValues: Int, discreteSpecialValues: Array[Int],
-                                  discreteSpecialValueProbabilities: Array[Double])
+                                  discreteSpecialValueProbabilities: Array[Double]) extends UniformRedistribution {
 
-
-  extends UniformRedistribution {
   val len: Int = discreteSpecialValues.length
   specialValues = new Array[Double](len)
   specialValueProbabilities = new Array[Double](len)

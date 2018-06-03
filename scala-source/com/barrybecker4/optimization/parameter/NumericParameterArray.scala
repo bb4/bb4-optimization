@@ -1,4 +1,4 @@
-// Copyright by Barry G. Becker, 2000-2011. Licensed under MIT License: http://www.opensource.org/licenses/MIT
+// Copyright by Barry G. Becker, 2000-2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.parameter
 
 import com.barrybecker4.common.math.MathUtil
@@ -75,7 +75,7 @@ class NumericParameterArray(theParams: Array[Parameter]) extends AbstractParamet
   override def findIncrementalImprovement(optimizee: Optimizee, jumpSize: Double,
                       lastImprovement: Improvement, cache: mutable.Set[ParameterArray]): Improvement = {
     var currentParams = this
-    var oldFitness = currentParams.getFitness()
+    var oldFitness = currentParams.getFitness
     var oldGradient: Vector = null
     if (lastImprovement != null) {
       oldFitness = lastImprovement.parameters.getFitness
@@ -138,13 +138,15 @@ class NumericParameterArray(theParams: Array[Parameter]) extends AbstractParamet
     for (i <- 0 until size) {
       val param = get(i)
       param.setValue(param.getValue + vec.get(i))
-      if (param.getValue > param.getMaxValue) {
-        System.out.println("Warning param " + param.getName + " is exceeding is maximum value. It is being pegged to that maximum of " + param.getMaxValue)
-        param.setValue(param.getMaxValue)
+      if (param.getValue > param.maxValue) {
+        System.out.println("Warning param " +
+          param.name + " is exceeding is maximum value. It is being pegged to that maximum of " + param.maxValue)
+        param.setValue(param.maxValue)
       }
-      if (param.getValue < param.getMinValue) {
-        System.out.println("Warning param " + param.getName + " is exceeding is minimum value. It is being pegged to that minimum of " + param.getMinValue)
-        param.setValue(param.getMinValue)
+      if (param.getValue < param.minValue) {
+        System.out.println("Warning param " +
+          param.name + " is exceeding is minimum value. It is being pegged to that minimum of " + param.minValue)
+        param.setValue(param.minValue)
       }
     }
   }
@@ -167,9 +169,9 @@ class NumericParameterArray(theParams: Array[Parameter]) extends AbstractParamet
     val nbr = this.copy
     for (k <- 0 until size) {
       val newPar = nbr.get(k)
-      newPar.setValue(newPar.getMinValue + MathUtil.RANDOM.nextDouble * newPar.getRange)
-      assert(newPar.getValue < newPar.getMaxValue && newPar.getValue > newPar.getMinValue, "newPar "
-        + newPar.getValue + " not between " + newPar.getMinValue + " and  " + newPar.getMaxValue)
+      newPar.setValue(newPar.minValue + MathUtil.RANDOM.nextDouble * newPar.range)
+      assert(newPar.getValue < newPar.maxValue && newPar.getValue > newPar.minValue, "newPar "
+        + newPar.getValue + " not between " + newPar.minValue + " and  " + newPar.maxValue)
     }
     nbr
   }

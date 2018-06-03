@@ -1,4 +1,4 @@
-// Copyright by Barry G. Becker, 2000-2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
+// Copyright by Barry G. Becker, 2000 - 2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.parameter.types
 
 import com.barrybecker4.optimization.parameter.ParameterChangeListener
@@ -17,7 +17,7 @@ class StringParameter(index: Int, values: Array[String], paramName: String)
   }
 
   override def copy: Parameter = {
-    val p = new StringParameter(getValue.toInt, values, getName)
+    val p = new StringParameter(getValue.toInt, values, name)
     p.setRedistributionFunction(redistributionFunction)
     p
   }

@@ -21,7 +21,7 @@ class BooleanParameterWidget(val param: Parameter, val listener: ParameterChange
   /** Create a ui widget appropriate for the parameter type. */
   override protected def addChildren(): Unit = {
     cb = new JCheckBox
-    cb.setText(parameter.getName)
+    cb.setText(parameter.name)
     val bparam = parameter.asInstanceOf[BooleanParameter]
     cb.setSelected(bparam.getNaturalValue.asInstanceOf[Boolean])
     cb.addItemListener(this)

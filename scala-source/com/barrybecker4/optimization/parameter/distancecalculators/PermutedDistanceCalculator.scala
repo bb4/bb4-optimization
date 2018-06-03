@@ -4,7 +4,6 @@ package com.barrybecker4.optimization.parameter.distancecalculators
 import com.barrybecker4.optimization.parameter.ParameterArray
 import com.barrybecker4.optimization.parameter.PermutedParameterArray
 import com.barrybecker4.optimization.parameter.types.Parameter
-
 import scala.collection.mutable.ArrayBuffer
 
 
@@ -13,6 +12,7 @@ import scala.collection.mutable.ArrayBuffer
   * @author Barry Becker
   */
 class PermutedDistanceCalculator {
+
   /**
     * The distance computation will be quite different for this than a regular parameter array.
     * We want the distance to represent a measure of the amount of similarity between two permutations.
@@ -45,7 +45,8 @@ class PermutedDistanceCalculator {
   /** Adds the computed runlength to the runLengths list.
     * @return the computed runlength
     */
-  private def determineRunLength(pa1: ParameterArray, pa2: ParameterArray, len: Int, i: Int, runLengths: ArrayBuffer[Int]) = {
+  private def determineRunLength(pa1: ParameterArray, pa2: ParameterArray, len: Int, i: Int,
+                                 runLengths: ArrayBuffer[Int]) = {
     var k = 0
     var ii: Int = i
     k = 1

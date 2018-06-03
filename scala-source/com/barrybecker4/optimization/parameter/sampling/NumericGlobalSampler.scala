@@ -1,4 +1,4 @@
-// Copyright by Barry G. Becker, 2013. Licensed under MIT License: http://www.opensource.org/licenses/MIT
+// Copyright by Barry G. Becker, 2013 - 2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.parameter.sampling
 
 import com.barrybecker4.common.math.MultiDimensionalIndexer
@@ -33,8 +33,8 @@ class NumericGlobalSampler(var params: NumericParameterArray, val requestedNumSa
     val nextSample = params.copy
     for (j <- 0 until nextSample.size) {
       val p = nextSample.get(j)
-      val increment = (p.getMaxValue - p.getMinValue) / samplingRate
-      p.setValue(p.getMinValue + increment / 2.0 + index(j) * increment)
+      val increment = (p.maxValue - p.minValue) / samplingRate
+      p.setValue(p.minValue + increment / 2.0 + index(j) * increment)
     }
     counter += 1
     nextSample

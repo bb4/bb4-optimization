@@ -1,4 +1,4 @@
-// Copyright by Barry G. Becker, 2000-2011. Licensed under MIT License: http://www.opensource.org/licenses/MIT
+// Copyright by Barry G. Becker, 2000-2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.parameter.types
 
 import com.barrybecker4.common.math.MathUtil
@@ -15,6 +15,7 @@ import scala.util.Random
   * @author Barry Becker
   */
 object IntegerParameter {
+
   def createDiscreteParameter(theVal: Int, minVal: Int, maxVal: Int, paramName: String,
               discreteSpecialValues: Array[Int], specialValueProbabilities: Array[Double]): IntegerParameter = {
     val param = new IntegerParameter(theVal, minVal, maxVal, paramName)
@@ -27,13 +28,13 @@ object IntegerParameter {
 class IntegerParameter(theVal: Int, minVal: Int, maxVal: Int, paramName: String)
     extends AbstractParameter(theVal.toDouble, minVal.toDouble, maxVal.toDouble, paramName, true) {
   override def copy: Parameter = {
-    val p = new IntegerParameter(getValue.round.toInt, getMinValue.toInt, getMaxValue.toInt, getName)
+    val p = new IntegerParameter(getValue.round.toInt, minValue.toInt, maxValue.toInt, name)
     p.setRedistributionFunction(redistributionFunction)
     p
   }
 
   override def randomizeValue(rand: Random): Unit = {
-    value = getMinValue + rand.nextDouble * (getRange + 1.0)
+    value = minValue + rand.nextDouble * (range + 1.0)
   }
 
   override def tweakValue(r: Double, rand: Random): Unit = {
@@ -63,22 +64,21 @@ class IntegerParameter(theVal: Int, minVal: Int, maxVal: Int, paramName: String)
     this.value = value
     // if there is a redistribution function, we need to apply its inverse.
     if (redistributionFunction != null) {
-      val v = (value - minValue) / (getRange + 1.0)
-      this.value = minValue + (getRange + 1.0) * redistributionFunction.getInverseFunctionValue(v)
+      val v = (value - minValue) / (range + 1.0)
+      this.value = minValue + (range + 1.0) * redistributionFunction.getInverseFunctionValue(v)
     }
   }
 
   override def getValue: Double = {
     var value = this.value
     if (redistributionFunction != null) {
-      val v = (this.value - minValue) / (getRange + 1.0)
+      val v = (this.value - minValue) / (range + 1.0)
       val rv = redistributionFunction.getValue(v)
-      value = rv * (getRange + (1.0 - MathUtil.EPS)) + minValue
+      value = rv * (range + (1.0 - MathUtil.EPS)) + minValue
     }
     value.round
   }
 
-  override def isIntegerOnly = true
   override def getNaturalValue: Any = this.getValue.round
   override def getType: Class[_] = classOf[Int]
   override def createWidget(listener: ParameterChangeListener): ParameterWidget =

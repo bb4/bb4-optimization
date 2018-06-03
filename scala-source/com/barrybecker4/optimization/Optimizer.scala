@@ -7,25 +7,20 @@ import com.barrybecker4.optimization.strategy.OptimizationStrategyType
 
 
 /**
-  * This class (the optimizer) uses a specified optimization strategy to optimize something (the optimizee).
+  * Uses a specified optimization strategy to optimize something (the optimizee).
   * @see OptimizationStrategyType for a list of the possible algorithms.
   *
-  *      This class uses the delegation design pattern rather than inheritance
-  *      so that it can be reused across many classes. For example, an optimize
-  *      method could have been added to the game/TwoPlayerController class, and all the subclasses
-  *      of TwoPlayerController would be able to use it. However, by having the optimization
-  *      classes in their own package, they can be used by a variety of projects to do
-  * optimization. Also it abstracts the concept of optimization and as a result
-  *      makes it easy to work on independently. For example, this library is used to
-  *      optimize the motion of the snake in com.barrybecker4.snake (in bb4-simulations),
-  *      the firing of a trebuchet (in bb4-simulations), and solve
-  *      puzzles efficiently in bb4-puzzles.
+  * Uses the delegation design pattern rather than inheritance so that it can be reused across many classes.
+  * It abstracts the concept of optimization, and as a result makes it easy to work on independently.
+  * For example, this library is used to optimize the motion of the snake in com.barrybecker4.snake (bb4-simulations),
+  * the firing of a trebuchet (in bb4-simulations), and solve puzzles efficiently in bb4-puzzles.
   *
-  *      This class also acts as a facade to the optimization package. The use of this package
-  *      really does not need to direclty construct or use the different optimization strategy classes.
+  * This class also acts as a facade to the optimization package. The use of this package
+  * really does not need to directly construct or use the different optimization strategy classes.
   *
-  *      Details of the optimization algorithms can be found in
-  *      How To Solve It: Modern Heuristics  by Michaelwics and Fogel
+  * Details of the optimization algorithms can be found in
+  *    How To Solve It: Modern Heuristics  by Michaelwics and Fogel
+  *
   * @param optimizee the thing to be optimized
   * @param optimizationLogFile (optional) used to log info as optimization proceeds
   * @author Barry Becker

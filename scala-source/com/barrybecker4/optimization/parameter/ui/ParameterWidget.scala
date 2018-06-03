@@ -13,7 +13,7 @@ object ParameterWidget {
 }
 
 /**
-  * Shows UI for a given paramter
+  * Shows UI for a given parameter
   * @author Barry Becker
   */
 abstract class ParameterWidget(var parameter: Parameter, var changeListener: ParameterChangeListener) extends JPanel {

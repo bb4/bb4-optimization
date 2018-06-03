@@ -13,14 +13,4 @@ import com.barrybecker4.optimization.parameter.ParameterArray
   * @param gradient  direction that we are currently moving in.
   * @author Barry Becker
   */
-case class Improvement(parameters: ParameterArray, improvement: Double, newJumpSize: Double, gradient: Vector = null) {
-
-  /*
-  override def toString: String = {
-    val bldr = new StringBuilder
-    bldr.append("Improvement = ")
-      .append(improvement).append(", New jumpsize = ")
-      .append(newJumpSize).append(", Gradient = ").append(gradient)
-    bldr.toString
-  }*/
-}
+case class Improvement(parameters: ParameterArray, improvement: Double, newJumpSize: Double, gradient: Vector = null)

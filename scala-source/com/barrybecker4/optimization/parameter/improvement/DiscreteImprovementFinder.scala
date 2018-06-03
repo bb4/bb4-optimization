@@ -1,4 +1,4 @@
-// Copyright by Barry G. Becker, 2013. Licensed under MIT License: http://www.opensource.org/licenses/MIT
+// Copyright by Barry G. Becker, 2013 - 2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.parameter.improvement
 
 import com.barrybecker4.optimization.optimizee.Optimizee
@@ -19,13 +19,12 @@ object DiscreteImprovementFinder {
   */
 class DiscreteImprovementFinder(var params: ParameterArray) {
 
-  /**
-    * Try to find a parameterArray that is better than what we have now by evaluating using the optimizee passed in.
+  /** Try to find a parameterArray that is better than what we have now by evaluating using the optimizee passed in.
     * Try swapping parameters randomly until we find an improvement (if we can).
     * @param optimizee something that can evaluate parameterArrays.
     * @param initialJumpSize  how far to move in the direction of improvement
-    * @param cache     set of parameters that have already been tested. This is important for cases where the
-    *                  parameters are discrete and not continuous.
+    * @param cache  set of parameters that have already been tested. This is important for cases where the
+    *               parameters are discrete and not continuous.
     * @return the improvement which contains the improved parameter array and possibly a revised jumpSize.
     */
   def findIncrementalImprovement(optimizee: Optimizee, initialJumpSize: Double, cache: mutable.Set[ParameterArray]): Improvement = {

@@ -15,11 +15,9 @@ class DoubleParameterWidget(param: Parameter, listener: ParameterChangeListener)
     extends ParameterWidget(param, listener) with SliderChangeListener {
   private var slider: LabeledSlider = _
 
-  /**
-    * Create a ui widget appropriate for the parameter type.
-    */
+  /** Create a ui widget appropriate for the parameter type. */
   override protected def addChildren(): Unit = {
-    slider = new LabeledSlider(parameter.getName, parameter.getValue, parameter.getMinValue, parameter.getMaxValue)
+    slider = new LabeledSlider(parameter.name, parameter.getValue, parameter.minValue, parameter.maxValue)
     if (parameter.isIntegerOnly) slider.setShowAsInteger(true)
     slider.addChangeListener(this)
     add(slider, BorderLayout.CENTER)

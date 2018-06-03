@@ -6,7 +6,7 @@ import com.barrybecker4.common.math.Range
 import com.barrybecker4.common.math.function.ArrayFunction
 import com.barrybecker4.common.math.function.FunctionInverter
 import com.barrybecker4.common.math.function.ErrorFunction
-import AbstractRedistributionFunction.verifyInRange
+import RedistributionFunction.verifyInRange
 
 
 object GaussianRedistribution {
@@ -22,7 +22,7 @@ object GaussianRedistribution {
   * Convert the uniform distribution to a normal (gaussian) one.
   * @author Barry Becker
   */
-class GaussianRedistribution(var mean: Double, var stdDeviation: Double) extends AbstractRedistributionFunction {
+class GaussianRedistribution(var mean: Double, var stdDeviation: Double) extends RedistributionFunction {
 
   verifyInRange(mean)
   private var errorFunction = new ErrorFunction

@@ -15,7 +15,7 @@ import scala.util.Random
 trait Parameter {
 
   /** @return the name of the parameter. */
-  def getName: String
+  def name: String
 
   /** Increments the parameter a little bit in the specified direction.
     * If we are already at the max end of the range, then we increment in a negative direction.
@@ -63,13 +63,13 @@ trait Parameter {
   def setValue(value: Double): Unit
 
   /** @return the minimum value of the parameters range.*/
-  def getMinValue: Double
+  def minValue: Double
 
   /** @return the maximum value of the parameters range. */
-  def getMaxValue: Double
+  def maxValue: Double
 
   /** @return the parameters range.*/
-  def getRange: Double
+  def range: Double
 
   /** @return true if this parameter should be treated as an integer and not a double.*/
   def isIntegerOnly: Boolean

@@ -30,7 +30,7 @@ class Logger(var sLogFile: String) {
       logFile.write("jumpSize" + Logger1.SEPARATOR)
       logFile.write("dotprod" + Logger1.SEPARATOR)
       for (i <- 0 until params.size) {
-        logFile.write(params.get(i).getName + Logger1.SEPARATOR)
+        logFile.write(params.get(i).name + Logger1.SEPARATOR)
       }
       logFile.write("comment ")
       logFile.write('\n')

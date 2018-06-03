@@ -25,16 +25,14 @@ class StringParameterWidget(val param: Parameter, val listener: ParameterChangeL
   override protected def addChildren(): Unit = { // create a dropdown
     val sparam = parameter.asInstanceOf[StringParameter]
     dropdown = new JComboBox(sparam.getStringValues)
-    dropdown.setName(parameter.getName)
+    dropdown.setName(parameter.name)
     dropdown.setMaximumSize(new Dimension(200, 20))
-    dropdown.setToolTipText(parameter.getName)
+    dropdown.setToolTipText(parameter.name)
     dropdown.addActionListener(this)
     add(dropdown, BorderLayout.CENTER)
   }
 
-  /**
-    * Called when a ComboBox selection has changed.
-    *
+  /** Called when a ComboBox selection has changed.
     * @param e the item event
     */
   override def actionPerformed(e: ActionEvent): Unit = {

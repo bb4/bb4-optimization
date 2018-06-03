@@ -1,10 +1,9 @@
-// Copyright by Barry G. Becker, 2012. Licensed under MIT License: http://www.opensource.org/licenses/MIT
+// Copyright by Barry G. Becker, 2012 - 2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.parameter
 
 import com.barrybecker4.optimization.optimizee.Optimizee
 import com.barrybecker4.optimization.parameter.improvement.Improvement
 import com.barrybecker4.optimization.parameter.types.Parameter
-
 import scala.collection.mutable
 
 
@@ -47,11 +46,11 @@ trait ParameterArray extends Comparable[ParameterArray] {
   def findGlobalSamples(requestedNumSamples: Long): Iterator[_ <: ParameterArray]
 
   /** Try to find a parameterArray that is better than what we have now by evaluating using the optimizee passed in.
-    * @param optimizee       something that can evaluate parameterArrays.
-    * @param jumpSize        how far to move in the direction of improvement
+    * @param optimizee   something that can evaluate parameterArrays.
+    * @param jumpSize    how far to move in the direction of improvement
     * @param lastImprovement the improvement we had most recently. May be null if none.
-    * @param cache           set of parameters that have already been tested. This is important for cases where the
-    *                        parameters are discrete and not continuous.
+    * @param cache       set of parameters that have already been tested. This is important for cases where the
+    *                    parameters are discrete and not continuous.
     * @return the improvement which contains the improved parameter array and possibly a revised jumpSize.
     */
   def findIncrementalImprovement(optimizee: Optimizee, jumpSize: Double,

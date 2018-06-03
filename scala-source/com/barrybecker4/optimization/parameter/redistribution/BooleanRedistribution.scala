@@ -7,12 +7,7 @@ import BooleanRedistribution._
 object BooleanRedistribution {
   private val SPECIAL_VALUES = Array(0, 1)
 
-  private def getSpecialValueProbs(percentTrue: Double) = {
-    val probs = new Array[Double](2)
-    probs(0) = percentTrue
-    probs(1) = 1.0 - percentTrue
-    probs
-  }
+  private def getSpecialValueProbs(percentTrue: Double) = Array(percentTrue, 1.0 - percentTrue)
 }
 
 /**

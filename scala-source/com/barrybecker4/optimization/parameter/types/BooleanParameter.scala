@@ -9,7 +9,6 @@ import com.barrybecker4.optimization.parameter.ui.ParameterWidget
 
 /**
   * Represents a boolean parameter to an algorithm.
-  *
   * @author Barry Becker
   */
 object BooleanParameter {
@@ -23,7 +22,7 @@ object BooleanParameter {
 class BooleanParameter(theVal: Boolean, paramName: String)
   extends IntegerParameter(if (theVal) 1 else 0, 0, 1, paramName) {
   override def copy: Parameter = {
-    val p = new BooleanParameter(getNaturalValue.asInstanceOf[Boolean], getName)
+    val p = new BooleanParameter(getNaturalValue.asInstanceOf[Boolean], name)
     p.setRedistributionFunction(redistributionFunction)
     p
   }

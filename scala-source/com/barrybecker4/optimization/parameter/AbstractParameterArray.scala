@@ -11,7 +11,7 @@ object AbstractParameterArray {
 }
 
 /**
-  * Represents a 1 dimensional array of parameters
+  * Represents a 1 dimensional array of parameters. This is the thing to be optimized.
   * @param theParams the list of parameters
   * @author Barry Becker
   */

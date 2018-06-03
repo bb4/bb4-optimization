@@ -43,20 +43,20 @@ class DoubleParameter(theVal: Double, minVal: Double, maxVal: Double, paramName:
   extends AbstractParameter(theVal, minVal, maxVal, paramName, false) {
 
   override def copy: Parameter = {
-    val p = new DoubleParameter(getValue, getMinValue, getMaxValue, getName)
+    val p = new DoubleParameter(getValue, minValue, maxValue, name)
     p.setRedistributionFunction(redistributionFunction)
     p
   }
 
   override def incrementByEps(direction: Direction): Double = {
-    val increment = direction.multiplier * (getMaxValue - getMinValue) / DoubleParameter.NUM_STEPS
+    val increment = direction.multiplier * (maxValue - minValue) / DoubleParameter.NUM_STEPS
     val v = getValue
-    if (v + increment > getMaxValue) {
-      value = getMaxValue
+    if (v + increment > maxValue) {
+      value = maxValue
       0
     }
-    else if (v + increment < getMinValue) {
-      value = getMinValue
+    else if (v + increment < minValue) {
+      value = minValue
       0
     }
     else {
@@ -66,7 +66,6 @@ class DoubleParameter(theVal: Double, minVal: Double, maxVal: Double, paramName:
   }
 
   override def getNaturalValue: Any = this.getValue
-  override def isIntegerOnly = false
   override def getType: Class[_] = classOf[Float]
   override def createWidget(listener: ParameterChangeListener) = new DoubleParameterWidget(this, listener)
 }

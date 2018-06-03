@@ -9,5 +9,4 @@ case class Direction(multiplier: Int)
 object Direction  {
   val FORWARD = Direction(1)
   val BACKWARD = Direction(-1)
-  //val VALUES = Array(FORWARD, BACKWARD)
 }

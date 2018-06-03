@@ -3,7 +3,7 @@ package com.barrybecker4.optimization.parameter.redistribution
 
 import com.barrybecker4.common.math.MathUtil
 import com.barrybecker4.common.math.function.PiecewiseFunction
-import AbstractRedistributionFunction.verifyInRange
+import RedistributionFunction.verifyInRange
 
 
 /**
@@ -13,7 +13,7 @@ import AbstractRedistributionFunction.verifyInRange
   * want to have special probabilities in an otherwise uniform distribution.
   * @author Barry Becker
   */
-class UniformRedistribution extends AbstractRedistributionFunction {
+class UniformRedistribution extends RedistributionFunction {
 
   protected var specialValues: Array[Double] = _
   protected var specialValueProbabilities: Array[Double] = _
@@ -22,8 +22,8 @@ class UniformRedistribution extends AbstractRedistributionFunction {
     * If you have just a purely uniform distribution you do not need to add any redistribution
     * function as that is the default. Use this function though, if you have uniform except for a few special values.
     * If the sum of all special value probabilities is equal to one, then no non-special values are ever selected.
-    * @param specialValues             certain values that are more likely to occur than other regular values.
-    *                                  (must be in increasing order)
+    * @param specialValues certain values that are more likely to occur than other regular values.
+    *                      (must be in increasing order)
     * @param specialValueProbabilities sum of all special value probabilities must be less than or equal to one.
     */
   def this(specialValues: Array[Double], specialValueProbabilities: Array[Double]) {

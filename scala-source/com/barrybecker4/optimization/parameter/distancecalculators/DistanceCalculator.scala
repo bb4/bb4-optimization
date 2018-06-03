@@ -9,5 +9,8 @@ import com.barrybecker4.optimization.parameter.ParameterArray
   * @author Barry Becker
   */
 trait DistanceCalculator {
+
+  /** @return distance between parameter arrays */
   def calculateDistance(pa1: ParameterArray, pa2: ParameterArray): Double
+
 }
