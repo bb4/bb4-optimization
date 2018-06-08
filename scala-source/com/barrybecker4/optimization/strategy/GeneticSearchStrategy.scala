@@ -50,12 +50,6 @@ class GeneticSearchStrategy(optimizee: Optimizee) extends OptimizationStrategy(o
   /** If we don't improve by at least this amount between iterations, terminate.  */
   protected var improvementEpsilon: Double = DEFAULT_IMPROVEMENT_EPS
 
-  /** //@param useCrossOver if true then create new population members using genetic crossover between parents.
-    *
-    * public void setUseCrossOver(boolean useCrossOver) {
-    * useCrossOver_ = useCrossOver;
-    * }   */
-
   def setImprovementEpsilon(eps: Double): Unit = {
     improvementEpsilon = eps
   }

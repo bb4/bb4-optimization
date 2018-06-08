@@ -23,7 +23,7 @@ class ConcurrentGeneticSearchStrategy(optimizee: Optimizee) extends GeneticSearc
     * Evaluate the members of the population - either directly, or by
     * comparing them against the initial params value passed in (including params).
     *
-    * Create a thread for each evaluation and don't continue until they are all done (countDown latch or gate);
+    * Create a thread for each evaluation and don't continue until they are all done (countDown latch or gate)
     *
     * @param population   the population to evaluate
     * @param previousBest the best solution from the previous iteration

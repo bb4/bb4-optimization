@@ -24,9 +24,9 @@ object GlobalHillClimbingStrategy {
   * @param optimizee the thing to be optimized.
   */
 class GlobalHillClimbingStrategy(optimizee: Optimizee) extends OptimizationStrategy(optimizee) {
+
   /**
     * Perform the optimization of the optimizee.
-    *
     * @param params       parameter array
     * @param fitnessRange the approximate absolute value of the fitnessRange.
     * @return optimized params

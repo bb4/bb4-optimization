@@ -12,10 +12,8 @@ import com.barrybecker4.optimization.parameter.ParameterArray
   */
 class BruteForceStrategy(optimizee: Optimizee) extends OptimizationStrategy(optimizee) {
 
-  /**
-    * Systematically search the entire global space and return the best of the samples.
+  /** Systematically search the entire global space and return the best of the samples.
     * Stops if the optimal fitness is reached.
-    *
     * @param params       the params to compare evaluation against if we evaluate BY_COMPARISON.
     * @param fitnessRange the approximate absolute value of the fitnessRange.
     * @return best solution found using global sampling.

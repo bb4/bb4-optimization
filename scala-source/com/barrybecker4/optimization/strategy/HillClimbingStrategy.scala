@@ -25,7 +25,7 @@ object HillClimbingStrategy {
   */
 class HillClimbingStrategy(optimizee: Optimizee) extends OptimizationStrategy(optimizee) {
 
-  /** Finds a local maxima.
+  /** Finds a local maxima (actually minima in this case).
     * It is a bit like newton's method, but in n dimensions.
     * If we make a jump and find that we are worse off than before, we will backtrack and reduce the stepsize so
     * that we can be guaranteed to improve my some amount on every iteration until the incremental improvement

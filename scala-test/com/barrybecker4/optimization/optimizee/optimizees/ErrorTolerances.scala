@@ -1,7 +1,7 @@
+// Copyright by Barry G. Becker, 2013-2014. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.optimizee.optimizees
 
 import com.barrybecker4.optimization.strategy.{GLOBAL_SAMPLING, OptimizationStrategyType}
-
 
 
 /**
