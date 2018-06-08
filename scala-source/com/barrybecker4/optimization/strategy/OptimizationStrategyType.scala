@@ -3,12 +3,17 @@ package com.barrybecker4.optimization.strategy
 
 import com.barrybecker4.optimization.optimizee.Optimizee
 
+object OptimizationStrategyType {
+   val VALUES: Array[OptimizationStrategyType] = Array(
+     GLOBAL_SAMPLING, GLOBAL_HILL_CLIMBING, HILL_CLIMBING, SIMULATED_ANNEALING, GENETIC_SEARCH, BRUTE_FORCE
+   )
+}
 
 /**
   * Enum for the different possible Optimization Strategies.
   * There is an optimization strategy class corresponding to each of these types.
   * Detailed explanations for many of these algorithms can be found in
-  * How To Solve It: Modern Heuristics  by Michaelwics and Fogel
+  * How To Solve It: Modern Heuristics by Michaelwicz and Fogel
   * @author Barry Becker
   */
 sealed trait OptimizationStrategyType {
@@ -26,7 +31,6 @@ sealed trait OptimizationStrategyType {
 
 
 case object GLOBAL_SAMPLING extends OptimizationStrategyType {
-
   override def getDescription: String = "Sparsely sample the space and return the best sample."
 
   override def getStrategy(optimizee: Optimizee, fitnessRange: Double): OptimizationStrategy = {
@@ -36,13 +40,64 @@ case object GLOBAL_SAMPLING extends OptimizationStrategyType {
   }
 }
 
-case object SIMULATED_ANNEALING extends OptimizationStrategyType {
+case object GLOBAL_HILL_CLIMBING extends OptimizationStrategyType {
+  override def getDescription: String = "Start with the best global sampling and hill climb from there."
 
-  override def getDescription: String = "Marches in the general direction of improvement, but can escape local optima."
+  override def getStrategy(optimizee: Optimizee, fitnessRange: Double): OptimizationStrategy =
+    new GlobalHillClimbingStrategy(optimizee)
+}
+
+case object HILL_CLIMBING extends OptimizationStrategyType {
+  override def getDescription: String =
+    "Search method which always marches toward the direction of greatest improvement."
+
+  override def getStrategy(optimizee: Optimizee, fitnessRange: Double): OptimizationStrategy =
+    new HillClimbingStrategy(optimizee)
+}
+
+case object SIMULATED_ANNEALING extends OptimizationStrategyType {
+  override def getDescription: String =
+    "Marches in the general direction of improvement, but can escape local optima."
 
   override def getStrategy(optimizee: Optimizee, fitnessRange: Double): OptimizationStrategy = {
     val strategy = new SimulatedAnnealingStrategy(optimizee)
     strategy.setMaxTemperature(fitnessRange / 10.0)
     strategy
   }
+}
+
+case object TABU_SEARCH extends OptimizationStrategyType {
+  override def getDescription: String =
+    "Uses memory of past solutions to avoid searching them again as it marches toward an optimal solution."
+
+  override def getStrategy(optimizee: Optimizee, fitnessRange: Double): OptimizationStrategy =
+    throw new AbstractMethodError("Tabu search not yet implemented")
+}
+
+case object GENETIC_SEARCH extends OptimizationStrategyType {
+  override def getDescription: String =
+    "Uses a genetic algorithm to search for the best solution."
+
+  override def getStrategy(optimizee: Optimizee, fitnessRange: Double): OptimizationStrategy = {
+    val strategy = new GeneticSearchStrategy(optimizee)
+    strategy.setImprovementEpsilon(fitnessRange / 100000000.0)
+    strategy
+  }
+}
+
+case object STATE_SPACE_SEARCH extends OptimizationStrategyType {
+  override def getDescription: String =
+    "Searches the state space to find an optima."
+
+  override def getStrategy(optimizee: Optimizee, fitnessRange: Double): OptimizationStrategy =
+    throw new AbstractMethodError("State space search not yet implemented")
+}
+
+case object BRUTE_FORCE extends OptimizationStrategyType {
+  override def getDescription: String =
+    "Tries all possible combinations in order to find the best possible. " +
+      "Not possible if parameter space has real values."
+
+  override def getStrategy(optimizee: Optimizee, fitnessRange: Double): OptimizationStrategy =
+    new BruteForceStrategy(optimizee)
 }

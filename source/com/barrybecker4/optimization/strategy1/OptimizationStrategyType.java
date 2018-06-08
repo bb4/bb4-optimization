@@ -82,7 +82,7 @@ public enum OptimizationStrategyType {
     };
 
 
-    private String description_;
+    private String description;
 
     /**
      * constructor for optimization type enum
@@ -90,11 +90,11 @@ public enum OptimizationStrategyType {
      * @param description string description of the optimization strategy.
      */
     OptimizationStrategyType(String description) {
-       description_ = description;
+       this.description = description;
     }
 
     public String getDescription() {
-        return description_;
+        return description;
     }
 
     /**

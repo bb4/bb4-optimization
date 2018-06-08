@@ -23,8 +23,8 @@ public class NavigationBar extends TexturedToolBar  {
     private static final ImageIcon zoomInImage = GUIUtil.getIcon(DIR + "zoomIn.png");
     private static final ImageIcon zoomOutImage = GUIUtil.getIcon(DIR + "zoomOut.png");
 
-    private GradientButton zoomInButton_;
-    private GradientButton zoomOutButton_;
+    private GradientButton zoomInButton;
+    private GradientButton zoomOutButton;
 
     private OptimizationViewable navListener;
 
@@ -43,12 +43,12 @@ public class NavigationBar extends TexturedToolBar  {
 
     private void init() {
 
-        zoomInButton_ = createToolBarButton("", "Zoom in", zoomInImage );
-        zoomOutButton_ = createToolBarButton("", "Zoom out", zoomOutImage );
+        zoomInButton = createToolBarButton("", "Zoom in", zoomInImage );
+        zoomOutButton = createToolBarButton("", "Zoom out", zoomOutImage );
 
         add( Box.createHorizontalStrut(10));
-        add( zoomInButton_ );
-        add( zoomOutButton_ );
+        add(zoomInButton);
+        add(zoomOutButton);
     }
 
     /**
@@ -66,10 +66,10 @@ public class NavigationBar extends TexturedToolBar  {
         public void actionPerformed(ActionEvent e) {
             GradientButton src = (GradientButton)  e.getSource();
 
-            if (src == zoomInButton_)  {
+            if (src == zoomInButton)  {
                 navListener.zoomIn();
             }
-            else if (src == zoomOutButton_)  {
+            else if (src == zoomOutButton)  {
                 navListener.zoomOut();
             }
         }

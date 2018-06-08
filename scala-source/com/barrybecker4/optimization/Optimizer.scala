@@ -19,7 +19,7 @@ import com.barrybecker4.optimization.strategy.OptimizationStrategyType
   * really does not need to directly construct or use the different optimization strategy classes.
   *
   * Details of the optimization algorithms can be found in
-  *    How To Solve It: Modern Heuristics  by Michaelwics and Fogel
+  *    How To Solve It: Modern Heuristics  by Michaelwicz and Fogel
   *
   * @param optimizee the thing to be optimized
   * @param optimizationLogFile (optional) used to log info as optimization proceeds

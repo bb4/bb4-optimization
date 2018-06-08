@@ -23,10 +23,10 @@ public class PointsList implements NavigationListener {
     /** zoom out by this much */
     private static final double ZOOM_OUT_INCREMENT = 1.05;
 
-    private List<Point2d> rawPoints_;
-    private List<ParameterArray> paramArrays_;
+    private List<Point2d> rawPoints;
+    private List<ParameterArray> paramArrays;
 
-    private Point2d rawSolutionPosition_;
+    private Point2d rawSolutionPosition;
     private int edgeSize;
     private Range rangeX, rangeY;
     private IProjector projector;
@@ -36,34 +36,34 @@ public class PointsList implements NavigationListener {
      * @param solutionPosition where we hope to wind up at.
      */
     public PointsList(Point2d solutionPosition, int edgeSize, IProjector projector) {
-        rawPoints_ = new ArrayList<>();
-        paramArrays_ = new ArrayList<>();
-        rawSolutionPosition_ = solutionPosition;
+        rawPoints = new ArrayList<>();
+        paramArrays = new ArrayList<>();
+        rawSolutionPosition = solutionPosition;
 
         this.edgeSize = edgeSize;
         this.projector = projector;
     }
 
     public Point getSolutionPosition() {
-        return new Point(getScaledXValue(rawSolutionPosition_.x),
-                         getScaledYValue(rawSolutionPosition_.y));
+        return new Point(getScaledXValue(rawSolutionPosition.x),
+                         getScaledYValue(rawSolutionPosition.y));
     }
 
     public Point2d getRawPoint(int i) {
-        return rawPoints_.get(i);
+        return rawPoints.get(i);
     }
 
     public ParameterArray getParamArrayForPoint(int i) {
-        return paramArrays_.get(i);
+        return paramArrays.get(i);
     }
 
     public Point getScaledPoint(int i) {
-        Point2d pt = rawPoints_.get(i);
+        Point2d pt = rawPoints.get(i);
         return new Point(getScaledXValue(pt.x), getScaledYValue(pt.y));
     }
 
     public int size() {
-        return rawPoints_.size();
+        return rawPoints.size();
     }
 
     /**
@@ -78,8 +78,8 @@ public class PointsList implements NavigationListener {
             rangeY = projector.getYRange(params);
         }
 
-        rawPoints_.add(projector.project(params));
-        paramArrays_.add(params);
+        rawPoints.add(projector.project(params));
+        paramArrays.add(params);
     }
 
     public void pan(Point2d offset) {

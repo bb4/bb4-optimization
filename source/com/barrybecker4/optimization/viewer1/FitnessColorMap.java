@@ -9,14 +9,14 @@ import java.awt.Color;
  */
 public class FitnessColorMap extends ColorMap {
 
-    private static final double[] myValues_ = {
+    private static final double[] myValues = {
              0.0,
               0.1, 1.0, 10.0, 100.0, 1000.0, 10000.0};
     /** base transparency value.*/
     private static final int CM_TRANS = 100;
 
     /** this colormap is used to show a spectrum of colors representing a group's health status.*/
-    private static final Color[] myColors_ = {
+    private static final Color[] myColors = {
             new Color(250, 0, 0, CM_TRANS + 40),  // min. start of low range.
             new Color(255, 40, 0, CM_TRANS),
             new Color(255, 255, 0, CM_TRANS),
@@ -31,7 +31,7 @@ public class FitnessColorMap extends ColorMap {
      */
     public FitnessColorMap()
     {
-        super(myValues_, myColors_);
+        super(myValues, myColors);
     }
 
 }

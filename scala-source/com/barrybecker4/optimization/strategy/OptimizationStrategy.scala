@@ -11,19 +11,16 @@ import com.barrybecker4.optimization.parameter.ParameterArray
 /**
   * Abstract base class for Optimization strategy.
   * This and derived classes uses the strategy design pattern.
-  *
   * @param optimizee The thing to be optimized
   * @author Barry Becker
   */
-abstract class OptimizationStrategy(/** */
-                                    var optimizee: Optimizee) {
+abstract class OptimizationStrategy(var optimizee: Optimizee) {
+
   private var logger: Logger = _
   /** listen for optimization changed events. useful for debugging.  */
   protected var listener: OptimizationListener = _
 
-  /**
-    * @param logger the file that will record the results
-    */
+  /** @param logger the file that will record the results */
   def setLogger(logger: Logger): Unit = {
     this.logger = logger
   }
@@ -33,8 +30,7 @@ abstract class OptimizationStrategy(/** */
     if (logger != null) logger.write(iteration, fitness, jumpSize, deltaFitness, params, msg)
   }
 
-  /**
-    * @param initialParams the initial guess at the solution.
+  /** @param initialParams the initial guess at the solution.
     * @param fitnessRange  the approximate absolute value of the fitnessRange.
     * @return optimized parameters.
     */
