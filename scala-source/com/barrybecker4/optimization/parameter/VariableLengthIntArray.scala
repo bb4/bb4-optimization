@@ -19,10 +19,10 @@ object VariableLengthIntArray {
   /** The larger this number is the less likely we are to add/remove ints when finding a random neighbor */
     private val ADD_REMOVE_RADIUS_SOFTENER = 0.6
 
-  def createInstance(params: Array[Parameter], fullSet: Array[Int]): VariableLengthIntArray =
+  def createInstance(params: Array[Parameter], fullSet: Seq[Int]): VariableLengthIntArray =
     createInstance(params, fullSet, new MagnitudeIgnoredDistanceCalculator())
 
-  def createInstance(params: Array[Parameter], fullSet: Array[Int], distanceCalculator: DistanceCalculator) =
+  def createInstance(params: Array[Parameter], fullSet: Seq[Int], distanceCalculator: DistanceCalculator) =
     new VariableLengthIntArray(params, fullSet, distanceCalculator)
 }
 
@@ -33,7 +33,7 @@ object VariableLengthIntArray {
   */
 class VariableLengthIntArray(theParams: Array[Parameter]) extends AbstractParameterArray(theParams) {
 
-  private var fullSet: Array[Int] = _
+  private var fullSet: Seq[Int] = _
   private var distCalculator: DistanceCalculator = _
 
   /**
@@ -41,7 +41,7 @@ class VariableLengthIntArray(theParams: Array[Parameter]) extends AbstractParame
     * @param params  an array of params to initialize with.
     * @param fullSet the full set of all integer parameters.
     */
-  def this(params: Array[Parameter], fullSet: Array[Int], distCalc: DistanceCalculator) {
+  def this(params: Array[Parameter], fullSet: Seq[Int], distCalc: DistanceCalculator) {
     this(params)
     this.fullSet = fullSet
     assert(distCalc != null)
@@ -110,7 +110,8 @@ class VariableLengthIntArray(theParams: Array[Parameter]) extends AbstractParame
     *     many unique samples.
     * @return some number of unique samples.
     */
-  override def findGlobalSamples(requestedNumSamples: Long) = new VariableLengthGlobalSampler(this, requestedNumSamples)
+  override def findGlobalSamples(requestedNumSamples: Long) =
+    new VariableLengthGlobalSampler(this, requestedNumSamples)
 
   /** Try swapping parameters randomly until we find an improvement (if we can). */
   override def findIncrementalImprovement(optimizee: Optimizee, jumpSize: Double,
