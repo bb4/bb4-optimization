@@ -86,6 +86,7 @@ sealed trait DominatingSetVariation extends ProblemVariation {
   }
 }
 
+
 /**
   * Trivial example.
   * There are three nodes, A, B, C. This list of lists defines the connectivity of the graph.
@@ -98,6 +99,7 @@ case object SIMPLE_DS extends DominatingSetVariation {
   override def getExactSolution: ParameterArray = createSolution(0)
   override def getFitnessRange = 7.0
 }
+
 
 case object TYPICAL_DS extends DominatingSetVariation {
 
