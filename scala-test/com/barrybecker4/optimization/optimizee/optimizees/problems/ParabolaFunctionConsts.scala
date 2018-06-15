@@ -1,3 +1,4 @@
+// Copyright by Barry G. Becker, 2013-2014. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.optimizee.optimizees.problems
 
 import com.barrybecker4.optimization.parameter.NumericParameterArray
@@ -32,5 +33,5 @@ object ParabolaFunctionConsts {
   /** Really relax this one because we do not expect it to ever get that close */
   val GLOB_SAMP_TOL = 0.03
 
-  try EXACT_SOLUTION.setFitness(0.0)
+  EXACT_SOLUTION.setFitness(0.0)
 }
