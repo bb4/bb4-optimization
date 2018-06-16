@@ -29,7 +29,7 @@ object SubsetSumProblem {
   */
 class SubsetSumProblem(var variation: SubsetSumVariation) extends OptimizeeProblem {
 
-  override def getName: String = "Subset Sum: " + variation.getClass.getName
+  override def getName: String = "Subset Sum: " + variation.getName
 
   /** Evaluate directly not by comparing with a different trial. */
   override def evaluateByComparison = false

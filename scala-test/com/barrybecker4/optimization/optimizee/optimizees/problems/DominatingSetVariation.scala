@@ -60,7 +60,9 @@ sealed trait DominatingSetVariation extends ProblemVariation {
     *         It is defined as the number of nodes in the cover + the number of nodes not within 1 hop from that set.
     */
   protected def computeCost(params: ParameterArray): Double = {
-    val marked = for (i <- 0 until params.size) yield params.get(i).getValue.toInt
+    val marked =
+      for (i <- 0 until params.size)
+        yield params.get(i).getValue.toInt
     getScore(marked.toArray)
   }
 

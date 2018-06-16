@@ -6,6 +6,7 @@ import com.barrybecker4.optimization.parameter.ParameterArray
 
 
 object OptimizeeProblem {
+
   def showSolution(problem: OptimizeeProblem, solution: ParameterArray): Unit = {
     System.out.println("\n************************************************************************")
     System.out.println("The solution to the " + problem.getName + " test problem is :\n" + solution)

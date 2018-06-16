@@ -17,7 +17,7 @@ class ImprovementIteration(params: NumericParameterArray, var oldGradient: Vecto
 
   private var delta: Vector = params.asVector
   private var fitnessDelta: Vector = params.asVector
-  var gradient: Vector = oldGradient
+  var gradient: Vector = params.asVector //oldGradient
 
   if (oldGradient == null) {
     this.oldGradient = params.asVector
@@ -68,7 +68,7 @@ class ImprovementIteration(params: NumericParameterArray, var oldGradient: Vecto
 
   /** Update gradient. Use EPS if the gradLength is 0. */
   def updateGradient(jumpSize: Double, gradLength: Double): Unit = {
-    val gradLen: Double = if (gradLength ==0)  MathUtil.EPS_MEDIUM else gradLength
+    val gradLen: Double = if (gradLength == 0)  MathUtil.EPS_MEDIUM else gradLength
     for (i <- 0 until delta.size) {
       val denominator = delta.get(i) * gradLen
       gradient.set(i, jumpSize * fitnessDelta.get(i) / denominator)

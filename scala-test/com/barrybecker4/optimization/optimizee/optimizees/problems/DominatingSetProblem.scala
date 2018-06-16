@@ -31,7 +31,7 @@ object DominatingSetProblem {
 
 class DominatingSetProblem(var variation: DominatingSetVariation) extends OptimizeeProblem {
 
-  override def getName: String = "Dominating Set: " + variation.getClass.getName
+  override def getName: String = "Dominating Set: " + variation.getName
 
   /** Evaluate directly not by comparing with a different trial. */
   override def evaluateByComparison = false

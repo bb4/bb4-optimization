@@ -29,7 +29,7 @@ object TravelingSalesmanProblem {
 class TravelingSalesmanProblem(val variation: TravelingSalesmanVariation = SIMPLE)
     extends OptimizeeProblem {
 
-  override def getName: String = "TSP: " + variation.getClass.getName
+  override def getName: String = "TSP: " + variation.getName
 
   /** Evaluate directly not by comparing with a different trial */
   override def evaluateByComparison = false

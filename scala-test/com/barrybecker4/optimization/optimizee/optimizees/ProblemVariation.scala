@@ -18,4 +18,6 @@ trait ProblemVariation {
     * @return the error tolerance percent for a specific optimization strategy
     */
   def getErrorTolerancePercent(opt: OptimizationStrategyType): Double
+
+  def getName: String = getClass.getSimpleName
 }

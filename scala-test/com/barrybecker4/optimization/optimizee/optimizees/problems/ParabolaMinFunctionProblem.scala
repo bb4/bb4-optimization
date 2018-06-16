@@ -30,7 +30,7 @@ object ParabolaMinFunctionProblem {
 }
 
 class ParabolaMinFunctionProblem(var variation: ParabolaMinVariation) extends OptimizeeProblem {
-  override def getName: String = "Analytic: " + variation.getClass.getName
+  override def getName: String = "Analytic: " + variation.getName
 
   /** Evaluate directly not by comparing with a different trial */
   override def evaluateByComparison = false
