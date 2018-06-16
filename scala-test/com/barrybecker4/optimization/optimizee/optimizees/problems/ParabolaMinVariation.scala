@@ -9,7 +9,7 @@ import com.barrybecker4.optimization.parameter.ParameterArray
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType
 
 object ParabolaMinVariation {
-  val VALUES = Array(PARABOLA, SINUSOIDAL, ABS_SINUSOIDAL, STEPPED)
+  val VALUES = IndexedSeq(PARABOLA, SINUSOIDAL, ABS_SINUSOIDAL, STEPPED)
 }
 /**
   * An enum for different sorts of analytic functions that we might want to test.

@@ -8,6 +8,10 @@ import com.barrybecker4.optimization.strategy.OptimizationStrategyType
 import ErrorTolerances._
 
 
+object TravelingSalesmanVariation {
+  val VALUES = IndexedSeq(SIMPLE, STANDARD)
+}
+
 sealed trait TravelingSalesmanVariation  extends ProblemVariation {
 
   /** @return the number of cities to visit */

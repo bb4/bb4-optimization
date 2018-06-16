@@ -22,7 +22,7 @@ object OptimizerEvalFrame {
   * @param logFile where logs will go
   * @author Barry Becker
   */
-class OptimizerEvalFrame(var logFile: String, val testProblems: Array[OptimizeeProblem])
+class OptimizerEvalFrame(var logFile: String, val testProblems: Seq[OptimizeeProblem])
 
   extends ApplicationFrame("Optimization Animation") {
   this.setSize(OptimizerEvalPanel.SIZE)
@@ -34,7 +34,7 @@ class OptimizerEvalFrame(var logFile: String, val testProblems: Array[OptimizeeP
     this(logFile, Array[OptimizeeProblem](testProblem))
   }
 
-  private def createContent(testProblems: Array[OptimizeeProblem]) = {
+  private def createContent(testProblems: Seq[OptimizeeProblem]) = {
     val mainPanel = new JPanel(new BorderLayout)
     val evalPanel = new OptimizerEvalPanel
     val topControls = new TopControls(logFile, testProblems, evalPanel)

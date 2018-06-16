@@ -56,8 +56,7 @@ class ImprovementIteration(params: NumericParameterArray, var oldGradient: Vecto
     sumOfSqs + (fitnessDelta.get(i) * fitnessDelta.get(i)) / (delta.get(i) * delta.get(i))
   }
 
-  /**
-    * @param optimizee the thing being optimized
+  /** @param optimizee the thing being optimized
     * @param params the current parameters
     * @param testParams the new set of parameters being evaluated.
     * @return the incremental change in fitness

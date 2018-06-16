@@ -8,6 +8,10 @@ import com.barrybecker4.optimization.parameter.types.{IntegerParameter, Paramete
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType
 
 
+object SubsetSumVariation {
+  val VALUES = IndexedSeq(SIMPLE_SS, TYPICAL_SS, NO_SOLUTION)
+}
+
 sealed trait SubsetSumVariation extends ProblemVariation {
 
   /** @return the number of nodes in the graph */

@@ -13,18 +13,19 @@ import javax.swing.{JComboBox, JPanel}
   *
   * @author Barry Becker
   */
-class TopControls(var logFile: String, val testProblems: Array[OptimizeeProblem], var viewable: OptimizationViewable)
+class TopControls(var logFile: String, val testProblems: Seq[OptimizeeProblem],
+                  var viewable: OptimizationViewable)
      extends JPanel with ActionListener {
 
   private var strategyDropDown: JComboBox[OptimizationStrategyType] = _
   private var testProblemDropDown: JComboBox[OptimizeeProblem] = _
-  private var testProblem = testProblems(0)
+  private var testProblem = testProblems.head
 
   setLayout(new BorderLayout)
   val navBar = new NavigationBar(viewable)
   val comboPanel: JPanel = createStrategyCombo
   if (testProblems.length > 1) {
-    testProblemDropDown = new JComboBox[OptimizeeProblem](testProblems)
+    testProblemDropDown = new JComboBox[OptimizeeProblem](testProblems.toArray)
     testProblemDropDown.addActionListener(this)
     comboPanel.add(testProblemDropDown)
   }
@@ -43,12 +44,12 @@ class TopControls(var logFile: String, val testProblems: Array[OptimizeeProblem]
 
   override def actionPerformed(e: ActionEvent): Unit = {
     if (e.getSource eq strategyDropDown) {
-      System.out.println("changed strategy to " + strategyDropDown.getSelectedItem)
+      println("changed strategy to " + strategyDropDown.getSelectedItem)
       showOptimization()
     }
     if (e.getSource eq testProblemDropDown) {
       testProblem = testProblemDropDown.getSelectedItem.asInstanceOf[OptimizeeProblem]
-      System.out.println("changed test problem to " + testProblem)
+      println("changed test problem to " + testProblem)
       showOptimization()
     }
   }

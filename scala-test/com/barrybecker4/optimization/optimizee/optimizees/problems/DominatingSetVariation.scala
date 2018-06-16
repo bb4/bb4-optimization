@@ -9,6 +9,10 @@ import com.barrybecker4.optimization.strategy.OptimizationStrategyType
 import com.barrybecker4.optimization.optimizee.optimizees.ProblemVariation
 
 
+object DominatingSetVariation {
+  val VALUES = IndexedSeq(SIMPLE_DS, TYPICAL_DS)
+}
+
 /**
   * An enum for different sorts of dominating set problems.
   * http://en.wikipedia.org/wiki/Dominating_set
