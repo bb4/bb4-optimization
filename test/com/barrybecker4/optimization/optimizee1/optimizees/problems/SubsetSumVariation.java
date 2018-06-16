@@ -133,7 +133,8 @@ public enum SubsetSumVariation implements IProblemVariation {
         for (int i=0; i<num; i+=3) {
             params.add(createParam(numSet.get(i)));
         }
-        VariableLengthIntArray pa = new VariableLengthIntArray(params, getNumberSet(), new MagnitudeDistanceCalculator());
+        VariableLengthIntArray pa =
+                new VariableLengthIntArray(params, getNumberSet(), new MagnitudeDistanceCalculator());
         pa.setFitness(computeCost(pa));
         return pa;
     }
@@ -153,7 +154,8 @@ public enum SubsetSumVariation implements IProblemVariation {
     /**
      * We assume that the parameter array contains 0 based integers.
      * @param params last best guess at subset.
-     * @return the total cost of the subset represented by param.  In this case the absolute sum of the marked values.
+     * @return the total cost of the subset represented by param.
+     * In this case the absolute sum of the marked values.
      */
     protected double computeCost(ParameterArray params) {
         int sum = 0;

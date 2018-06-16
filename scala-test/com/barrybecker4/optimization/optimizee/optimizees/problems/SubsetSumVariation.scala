@@ -1,4 +1,4 @@
-// Copyright by Barry G. Becker, 2013-2014. Licensed under MIT License: http://www.opensource.org/licenses/MIT
+// Copyright by Barry G. Becker, 2013-2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.optimizee.optimizees.problems
 
 import com.barrybecker4.optimization.optimizee.optimizees.{ErrorTolerances, ProblemVariation}
@@ -92,6 +92,20 @@ case object SIMPLE_SS extends SubsetSumVariation {
   override def getFitnessRange = 12.0
 }
 
+
+case object TYPICAL_SS extends SubsetSumVariation {
+  val errorTolerances = ErrorTolerances(0.0, 0.0, 0.5, 5.0, 1.0, 4.0, 4.0, 0.0)
+
+  override protected def getNumberSet: Seq[Int] =
+    Seq(-7, -33, -21, 5, 83, -29, -78, 213, 123, -34, -37, -41, 91, -8, -17)
+
+  // This is one of several possible solutions that gives an optimal fitness of 0
+  override def getExactSolution: ParameterArray = createSolution(-33, -21, 5, -29, 123, -37, -8)
+
+  override def getFitnessRange = 210.0
+}
+
+
 case object NO_SOLUTION extends  SubsetSumVariation {
   // none of the errors will be 0 because there is no solution that sums to 0.
   val errorTolerances = ErrorTolerances(20.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
@@ -104,5 +118,3 @@ case object NO_SOLUTION extends  SubsetSumVariation {
 
   override def getFitnessRange = 200.0
 }
-
-// more to come
