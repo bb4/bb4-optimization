@@ -18,7 +18,7 @@ object AbstractParameterArray {
 abstract class AbstractParameterArray private[parameter](theParams: Array[Parameter] = Array[Parameter]())
     extends ParameterArray {
 
-  /*protected */var params: Array[Parameter] = theParams
+  var params: Array[Parameter] = theParams
 
   /** assign a fitness (evaluation value) to this set of parameters */
   private var fitness: Double = 0

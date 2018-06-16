@@ -1,4 +1,4 @@
-// Copyright by Barry G. Becker, 2000-2011. Licensed under MIT License: http://www.opensource.org/licenses/MIT
+// Copyright by Barry G. Becker, 2000-2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.optimizee1.optimizees.problems;
 
 import com.barrybecker4.optimization.optimizee1.optimizees.ErrorTolerances;
@@ -9,10 +9,10 @@ import com.barrybecker4.optimization.strategy1.OptimizationStrategyType;
 
 import static com.barrybecker4.optimization.optimizee1.optimizees.problems.ParabolaFunctionConsts.*;
 
+
 /**
  * An enum for different sorts of analytic functions that we might want to test.
  * Different types of 3d planar functions that all have the same maximum.
- *
  * @author Barry Becker
  */
 public enum ParabolaMinVariation implements IProblemVariation {

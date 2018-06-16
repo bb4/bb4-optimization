@@ -60,7 +60,7 @@ object SevenElevenProblem {
   }
 }
 
-class SevenElevenProblem() extends OptimizeeProblem {
+class SevenElevenProblem extends OptimizeeProblem {
 
   /** Evaluate directly, not by comparing with a different trial. */
   override def evaluateByComparison = false

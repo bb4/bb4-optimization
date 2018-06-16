@@ -53,24 +53,20 @@ class VariableLengthIntArray(theParams: Array[Parameter]) extends AbstractParame
 
   override protected def createInstance = new VariableLengthIntArray(Array[Parameter]())
 
-  /**
-    * The distance computation will be quite different for this than a regular parameter array.
+  /** The distance computation will be quite different for this than a regular parameter array.
     * We want the distance to represent a measure of the amount of similarity between two instances.
     * There are two ways in which instance can differ, and the weighting assigned to each may depend on the problem.
     *  - the length of the parameter array
     *  - the set of values in the parameter array.
     * Generally, the distance is greater the greater the number of parameters that are different.
-    *
     * @return the distance between this parameter array and another.
     */
   override def distance(pa: ParameterArray): Double = distCalculator.calculateDistance(this, pa)
 
-  /**
-    * Create a new permutation that is not too distant from what we have now.
+  /** Create a new permutation that is not too distant from what we have now.
     * The two ways a configuration of marked nodes can change is
     *  - add or remove nodes
     *  - change values of nodes
-    *
     * @param radius an indication of the amount of variation to use. 0 is none, 2 is a lot.
     *               Change Math.min(1, 10 * radius * N/100) of the entries, where N is the number of params
     * @return the random nbr.
@@ -120,26 +116,18 @@ class VariableLengthIntArray(theParams: Array[Parameter]) extends AbstractParame
     finder.findIncrementalImprovement(optimizee, jumpSize, cache)
   }
 
-  /**
-    * @return get a completely random solution in the parameter space.
-    */
+  /** @return get a random solution in the parameter space by selecting about half of the ints */
   override def getRandomSample: ParameterArray = {
     var marked = List[Int]()
     for (i <- 0 until getMaxLength) {
       if (MathUtil.RANDOM.nextDouble > 0.5)
         marked +:= fullSet(i)
     }
-    var newParams = Array.ofDim[Parameter](marked.length)
-
-    for (markedNode <- marked) {
-      newParams :+= createParam(markedNode)
-    }
-    new VariableLengthIntArray(newParams, fullSet, distCalculator)
+    var newParams = for (markedNode <- marked) yield createParam(markedNode)
+    new VariableLengthIntArray(newParams.toArray, fullSet, distCalculator)
   }
 
-  /**
-    * @return a copy of ourselves.
-    */
+  /** @return a copy of ourselves */
   override def copy: AbstractParameterArray = {
     val copy = super.copy.asInstanceOf[VariableLengthIntArray]
     copy.fullSet = this.fullSet
@@ -147,8 +135,7 @@ class VariableLengthIntArray(theParams: Array[Parameter]) extends AbstractParame
     copy
   }
 
-  /**
-    * @param i the integer parameter's value. May be Negative
+  /** @param i the integer parameter's value. May be Negative
     * @return a new integer parameter.
     */
   private def createParam(i: Int) = new IntegerParameter(i, if (i < 0) i

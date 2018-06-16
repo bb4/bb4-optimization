@@ -1,12 +1,16 @@
-// Copyright by Barry G. Becker, 2013-2014. Licensed under MIT License: http://www.opensource.org/licenses/MIT
+// Copyright by Barry G. Becker, 2013-2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.optimizee.optimizees.problems
 
 import com.barrybecker4.optimization.optimizee.optimizees.ProblemVariation
 import com.barrybecker4.optimization.optimizee.optimizees.ErrorTolerances
+import ErrorTolerances._
 import com.barrybecker4.optimization.optimizee.optimizees.problems.ParabolaFunctionConsts._
 import com.barrybecker4.optimization.parameter.ParameterArray
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType
 
+object ParabolaMinVariation {
+  val VALUES = Array(PARABOLA, SINUSOIDAL, ABS_SINUSOIDAL, STEPPED)
+}
 /**
   * An enum for different sorts of analytic functions that we might want to test.
   * Different types of 3d planar functions that all have the same maximum.

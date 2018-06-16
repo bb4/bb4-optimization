@@ -28,10 +28,6 @@ object ParabolaFunctionConsts {
   private val PARAM_NAMES = Array("p1", "p2")
 
   val INITIAL_GUESS = new NumericParameterArray(VALUES, MIN_VALS, MAX_VALS, PARAM_NAMES)
-  val BASE_TOLERANCE = 0.0002
-  val RELAXED_TOL = 0.0032
-  /** Really relax this one because we do not expect it to ever get that close */
-  val GLOB_SAMP_TOL = 0.03
 
   EXACT_SOLUTION.setFitness(0.0)
 }

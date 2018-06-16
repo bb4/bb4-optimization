@@ -58,7 +58,8 @@ class VariableLengthGlobalSampler(var params: VariableLengthIntArray, val reques
     var nextSample: VariableLengthIntArray = null
     while (globalSamples.size < counter) {
       nextSample = params.getRandomSample.asInstanceOf[VariableLengthIntArray]
-      if (!globalSamples.contains(nextSample)) globalSamples.append(nextSample)
+      if (!globalSamples.contains(nextSample))
+        globalSamples.append(nextSample)
     }
     nextSample
   }

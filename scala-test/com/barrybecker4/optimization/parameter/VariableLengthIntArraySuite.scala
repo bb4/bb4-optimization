@@ -63,7 +63,7 @@ class VariableLengthIntArraySuite extends FunSuite with BeforeAndAfter{
     params = createDistArray(2, -1, 3, -1)
     val samples = getListFromIterator(params.findGlobalSamples(1))
     assertResult(1) { samples.length }
-    val expParams = Array(createDistArray(2, 3, -1))
+    val expParams = Array(createDistArray(-1, 3, 2))
     assertResult(expParams) { samples }
   }
 
@@ -82,11 +82,11 @@ class VariableLengthIntArraySuite extends FunSuite with BeforeAndAfter{
   test("Find4GlobalSamples(") {
     params = createDistArray(2, -1, 3, -1)
     val samples = getListFromIterator(params.findGlobalSamples(4))
-    assertResult( 4) { samples.length }
+    assertResult(4) { samples.length }
     val expParams = Array(
-      createDistArray(2, 3, -1),
-      createDistArray(2, -1),
-      createDistArray(3, -1),
+      createDistArray(-1, 3, 2),
+      createDistArray(-1, 2),
+      createDistArray(-1, 3),
       createDistArray(-1, -1)
     )
     assertResult(expParams) { samples }
@@ -109,10 +109,7 @@ class VariableLengthIntArraySuite extends FunSuite with BeforeAndAfter{
   }
 
   private def createArray(dCalc: DistanceCalculator, numberList: Seq[Int]) = {
-    val params = ArrayBuffer[Parameter]()
-    for (i <- numberList) {
-      params.append(createParam(i))
-    }
+    val params = for (i <- numberList) yield createParam(i)
     VariableLengthIntArray.createInstance(params.toArray, numberList, dCalc)
   }
 
