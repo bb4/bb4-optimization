@@ -41,7 +41,7 @@ class PermutedParameterArray(theParams: Array[Parameter]) extends AbstractParame
     for (i <- 0 until len / 2) {
       val temp = paramCopy.params(i)
       paramCopy.params(i) = paramCopy.params(len - i - 1)
-      paramCopy.params(len - i - 1) =  temp
+      paramCopy.params(len - i - 1) = temp
     }
     paramCopy
   }

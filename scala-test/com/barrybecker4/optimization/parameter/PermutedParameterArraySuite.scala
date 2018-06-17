@@ -36,9 +36,7 @@ class PermutedParameterArraySuite extends FunSuite with BeforeAndAfter {
     assert(0.0 === params1.distance(params2))
   }
 
-  /**
-    * One run of length 2.
-    */
+  /** One run of length 2. */
   test("PermutedDistanceAlmostEqual") {
     val params1 = createPermParameterArray(Array[Int](2, 1, 0, 3, 4))
     val params2 = createPermParameterArray(Array[Int](0, 1, 2, 3, 4))
@@ -53,10 +51,22 @@ class PermutedParameterArraySuite extends FunSuite with BeforeAndAfter {
   }
 
   /** As different as they can be. No runs even when reversed. */
-  def testPermutedDistanceMaximumDifferent(): Unit = {
+  test("PermutedDistanceMaximumDifferent") {
     val params1 = createPermParameterArray(Array[Int](4, 2, 0, 3, 1))
     val params2 = createPermParameterArray(Array[Int](0, 1, 2, 3, 4))
     assert(32.0 === params1.distance(params2))
+  }
+
+  test("ReversePermuted") {
+    val params1 = createPermParameterArray(Array[Int](4, 2, 0, 3, 1))
+    assertResult("""
+     |parameter[0] = param4 = 1.00 [0, 4.0]
+     |parameter[1] = param3 = 3.0 [0, 4.0]
+     |parameter[2] = param2 = 0 [0, 4.0]
+     |parameter[3] = param1 = 2.0 [0, 4.0]
+     |parameter[4] = param0 = 4.0 [0, 4.0]
+     |fitness = 0.0"""
+      .stripMargin.replace("\r\n", "\n")) { params1.reverse.toString }
   }
 
   /** Two runs of length 2 */

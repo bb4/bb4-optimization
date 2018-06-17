@@ -13,11 +13,11 @@ import scala.collection.mutable.ArrayBuffer
   */
 class PermutedDistanceCalculator {
 
-  /**
-    * The distance computation will be quite different for this than a regular parameter array.
-    * We want the distance to represent a measure of the amount of similarity between two permutations.
+  /** The distance computation will be quite different for this than a regular parameter array.
+    * The distance should represent a measure of the amount of similarity between two permutations,
+    * taking into account symmetry. IOW, if one is the reverse of the other, then the distance is 0.
     * If there are similar runs between two permutations, then the distance should be relatively small.
-    * N squared operation, where N is the number of params.
+    * N squared operation, where N is the number of params. The 2 param arrays must be of the same length.
     * @param pa1 first parameter array
     * @param pa2 second parameter array
     * @return the distance between this parameter array and another.
@@ -28,7 +28,7 @@ class PermutedDistanceCalculator {
     Math.min(difference(pa1, pa2), difference(pa1, paReverse))
   }
 
-  /** The amount of difference can be used as a measure of distance
+  /** The amount of difference can be used as a measure of distance.
     * @return the amount of difference between pa and ourselves.
     */
   private def difference(pa1: ParameterArray, pa2: ParameterArray) = {
@@ -45,19 +45,19 @@ class PermutedDistanceCalculator {
   /** Adds the computed runlength to the runLengths list.
     * @return the computed runlength
     */
-  private def determineRunLength(pa1: ParameterArray, pa2: ParameterArray, len: Int, i: Int,
+  private def determineRunLength(pa1: ParameterArray, pa2: ParameterArray, len: Int, idx: Int,
                                  runLengths: ArrayBuffer[Int]) = {
     var k = 0
-    var ii: Int = i
+    var i: Int = idx
     k = 1
-    var j = findCorrespondingEntryIndex(pa2, len, pa1.get(i))
+    var j = findCorrespondingEntryIndex(pa2, len, pa1.get(idx))
     var matchFound = false
     var matched = false
     do {
-      ii = (ii + 1) % len
+      i = (i + 1) % len
       j = (j + 1) % len
       k += 1
-      matched = pa1.get(ii) == pa2.get(j)
+      matched = pa1.get(i) == pa2.get(j)
       matchFound |= matched
     } while (matched && k <= len)
     val runLength = k - 1
@@ -77,12 +77,11 @@ class PermutedDistanceCalculator {
   }
 
   /** Find the distance between two permutations that each have runs of the specified lengths.
-    * Careful this could overflow if the run is really long.
+    * Careful this could overflow if the run is really long. If it does, we may need to switch to BigInteger.
     * @param runLengths list of run lengths.
     * @return the approximate distance between two permutations.
     */
   private def calcDistance(pa1: ParameterArray, runLengths: ArrayBuffer[Int]): Double = {
-    // If it does we may need to switch to BigInteger.
     val max = Math.pow(2, pa1.size)
     if (runLengths.isEmpty) return max
     var denom: Double = 0

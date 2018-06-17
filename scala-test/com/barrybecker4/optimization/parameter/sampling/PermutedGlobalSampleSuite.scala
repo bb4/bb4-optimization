@@ -30,9 +30,32 @@ class PermutedGlobalSampleSuite extends FunSuite {
         |parameter[2] = p3 = 3.0 [0, 3.0]
         |parameter[3] = p1 = 1.00 [0, 3.0]
         |fitness = 0.0""".stripMargin.replaceAll("\r\n", "\n")) { result.mkString("") }
+  }
 
-//    assertResult("0.125, 0.375, 0.625, 0.875") {
-//      result.map(p => p.get(0).getValue).mkString(", ")
-//    }
+  test("sampling when 3 permuted items - 1 permutations") {
+    val num = 3
+    val params = for (i <- 0 until num) yield new IntegerParameter(i, 0, num - 1, "p" + i)
+    val pa = new PermutedParameterArray(params.toArray)
+    val sampler = new PermutedGlobalSampler(pa, 1)
+
+    val result: Array[PermutedParameterArray] = sampler.toArray
+    assertResult(
+      """
+        |parameter[0] = p2 = 2.0 [0, 2.0]
+        |parameter[1] = p0 = 0 [0, 2.0]
+        |parameter[2] = p1 = 1.00 [0, 2.0]
+        |fitness = 0.0""".stripMargin.replaceAll("\r\n", "\n")) { result.mkString("") }
+  }
+
+  test("sampling when 3 permuted items - 4 permutations") {
+    val num = 3
+    val params = for (i <- 0 until num) yield new IntegerParameter(i, 0, num - 1, "p" + i)
+    val pa = new PermutedParameterArray(params.toArray)
+    val sampler = new PermutedGlobalSampler(pa, 4)
+
+    assertThrows[IllegalStateException] {
+      // runs out of samples
+      val result: Array[PermutedParameterArray] = sampler.toArray
+    }
   }
 }

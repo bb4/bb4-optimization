@@ -75,7 +75,7 @@ class GeneticSearchStrategy(optimizee: Optimizee) extends OptimizationStrategy(o
         population += nbr
       i += 1
     }
-    if (population.size <= 1) throw new IllegalStateException("No random neighbors found")
+    if (population.size <= 1) throw new IllegalStateException("No random neighbors found for " + params)
     //System.out.println("The population of this generation is " + population.size()
     //    + " (desired was " + desiredPopulationSize + ")");
     // EVALUATE POPULATION
