@@ -85,6 +85,17 @@ case object GENETIC_SEARCH extends OptimizationStrategyType {
   }
 }
 
+case object CONCURRENT_GENETIC_SEARCH extends OptimizationStrategyType {
+  override def getDescription: String =
+    "Uses a concurrent genetic algorithm to search for the best solution."
+
+  override def getStrategy(optimizee: Optimizee, fitnessRange: Double): OptimizationStrategy = {
+    val strategy = new ConcurrentGeneticSearchStrategy(optimizee)
+    strategy.setImprovementEpsilon(fitnessRange / 100000000.0)
+    strategy
+  }
+}
+
 case object STATE_SPACE_SEARCH extends OptimizationStrategyType {
   override def getDescription: String =
     "Searches the state space to find an optima."
