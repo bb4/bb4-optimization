@@ -42,8 +42,7 @@ class NumericParameterArray(theParams: Array[Parameter]) extends AbstractParamet
 
   private var numSteps = NumericParameterArray.DEFAULT_NUM_STEPS
 
-  /**
-    * Constructor if all the parameters are DoubleParameters
+  /** Constructor if all the parameters are DoubleParameters
     * @param vals the values for each parameter.
     * @param minVals the minimum value allowed for each parameter respectively.
     * @param maxVals the maximum value allowed for each parameter respectively.
@@ -67,7 +66,7 @@ class NumericParameterArray(theParams: Array[Parameter]) extends AbstractParamet
     *    and requestedNumSamples is large, it may not be possible to return this many unique samples.
     * @return some number of unique samples.
     */
-  override def findGlobalSamples(requestedNumSamples: Long) =
+  override def findGlobalSamples(requestedNumSamples: Long): Iterator[NumericParameterArray] =
     new NumericGlobalSampler(this, requestedNumSamples)
 
 
@@ -99,10 +98,8 @@ class NumericParameterArray(theParams: Array[Parameter]) extends AbstractParamet
     Improvement(currentParams, improvement, newJumpSize, iter.gradient)
   }
 
-  /**
-    * If we are headed in pretty much the same direction as last time, then we increase the jumpSize.
+  /** If we are headed in pretty much the same direction as last time, then we increase the jumpSize.
     * If we are headed off in a completely new direction, reduce the jumpSize until we start to stabilize.
-    *
     * @param jumpSize   the current amount that is stepped in the assumed solution direction.
     * @param dotProduct determines the angle between the new gradient and the old.
     * @return the new jump size - which is usually the same as the old one.
@@ -115,10 +112,7 @@ class NumericParameterArray(theParams: Array[Parameter]) extends AbstractParamet
     newJumpSize
   }
 
-  /**
-    * @return the distance between this parameter array and another.
-    *         sqrt(sum of squares)
-    */
+  /** @return the distance between this parameter array and another. sqrt(sum of squares) */
   override def distance(pa: ParameterArray): Double = {
     assert(size == pa.size)
     var sumOfSq = 0.0
@@ -176,7 +170,12 @@ class NumericParameterArray(theParams: Array[Parameter]) extends AbstractParamet
   }
 
   /** @return a new double array the same magnitude as the parameter list*/
-  def asVector = new Vector(this.size)
+  def asVector: Vector = {
+    val v = new Vector(this.size)
+    for (i <- 0 until this.size)
+      v.set(i, this.get(i).getValue)
+    v
+  }
 
   def setNumSteps(numSteps: Int): Unit = {
     this.numSteps = numSteps

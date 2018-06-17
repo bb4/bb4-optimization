@@ -10,7 +10,7 @@ import com.barrybecker4.optimization.strategy1.OptimizationStrategyType;
 /**
  * @author Barry Becker
  */
-public class TestSevenElevenProblem extends OptimizerTestCase {
+public class TestSevenElevenProblem1 extends OptimizerTestCase1 {
 
     /** default error tolerance. */
     private static final double TOL = 0.006;

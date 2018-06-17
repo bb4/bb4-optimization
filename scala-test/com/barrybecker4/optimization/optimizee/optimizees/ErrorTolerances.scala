@@ -1,7 +1,7 @@
 // Copyright by Barry G. Becker, 2013-2014. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.optimizee.optimizees
 
-import com.barrybecker4.optimization.strategy.{GLOBAL_SAMPLING, OptimizationStrategyType}
+import com.barrybecker4.optimization.strategy._
 
 /** Some common tolerances to use in tests */
 object ErrorTolerances {
@@ -23,15 +23,15 @@ case class ErrorTolerances(globalSampling: Double, globalHillClimbing: Double, h
 
   private val percentValues = Map[OptimizationStrategyType, Double](
     GLOBAL_SAMPLING -> globalSampling,
-    //GLOBAL_HILL_CLIMBING -> globalHillClimbing,
-    //HILL_CLIMBING -> hillClimbing,
-    //SIMULATED_ANNEALING -> simAnnealing,
+    GLOBAL_HILL_CLIMBING -> globalHillClimbing,
+    HILL_CLIMBING -> hillClimbing,
+    SIMULATED_ANNEALING -> simAnnealing,
     //TABU_SEARCH -> tabuSearch,
-    //GENETIC_SEARCH -> geneticSearch,
-    //CONCURRENT_GENETIC_SEARCH -> concurrentGeneticSearch,
+    GENETIC_SEARCH -> geneticSearch,
+    CONCURRENT_GENETIC_SEARCH -> concurrentGeneticSearch,
     // STATE_SPACE -> stateSpace,
     // the error for brute force should always be 0.
-    //BRUTE_FORCE-> bruteForce
+    BRUTE_FORCE-> bruteForce
   )
 
 

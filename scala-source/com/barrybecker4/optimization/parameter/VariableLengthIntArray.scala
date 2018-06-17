@@ -16,8 +16,9 @@ import scala.collection.mutable.ArrayBuffer
 
 
 object VariableLengthIntArray {
+
   /** The larger this number is the less likely we are to add/remove ints when finding a random neighbor */
-    private val ADD_REMOVE_RADIUS_SOFTENER = 0.6
+  private val ADD_REMOVE_RADIUS_SOFTENER = 0.6
 
   def createInstance(params: Array[Parameter], fullSet: Seq[Int]): VariableLengthIntArray =
     createInstance(params, fullSet, new MagnitudeIgnoredDistanceCalculator())
@@ -76,7 +77,9 @@ class VariableLengthIntArray(theParams: Array[Parameter]) extends AbstractParame
     val probAddRemove = radius / (VariableLengthIntArray.ADD_REMOVE_RADIUS_SOFTENER + radius)
     var add = false
     var remove = false
-    if (MathUtil.RANDOM.nextDouble > probAddRemove) if ((MathUtil.RANDOM.nextDouble > 0.5 || size <= 1) && size < getMaxLength - 1) add = true
+    if (MathUtil.RANDOM.nextDouble > probAddRemove)
+      if ((MathUtil.RANDOM.nextDouble > 0.5 || size <= 1) && size < getMaxLength - 1)
+        add = true
     else remove = true
     var numNodesToMove = 0
     val nbr = this.copy.asInstanceOf[VariableLengthIntArray]
@@ -92,12 +95,8 @@ class VariableLengthIntArray(theParams: Array[Parameter]) extends AbstractParame
 
   def setCombination(indices: Seq[Int]): Unit = {
     assert(indices.size <= getMaxLength, "The number of indices (" + indices.size + ") was greater than the size (" + size + ")")
-    var newParams = Array.ofDim[Parameter](size)
-
-    for (i <- indices) {
-      newParams :+= createParam(fullSet(i))
-    }
-    params = newParams
+    var newParams = for (i <- indices) yield createParam(fullSet(i))
+    params = newParams.toArray
   }
 
   /** Globally sample the parameter space.
@@ -145,22 +144,14 @@ class VariableLengthIntArray(theParams: Array[Parameter]) extends AbstractParame
   private def removeRandomParam(nbr: VariableLengthIntArray): Unit = {
     val indexToRemove = MathUtil.RANDOM.nextInt(size)
     assert(nbr.size > 0)
-    var newParams = Array.ofDim[Parameter](nbr.size - 1)
-    for (i <- 0 until nbr.size) {
-      if (i != indexToRemove)
-        newParams :+= nbr.get(i)
-    }
-    nbr.params = newParams
+    nbr.params = nbr.params.zipWithIndex.filter(p => p._2 != indexToRemove).map(_._1)
   }
 
   private def addRandomParam(nbr: VariableLengthIntArray): Unit = {
     val freeNodes = getFreeNodes(nbr)
     val newSize = nbr.size + 1
     assert(newSize <= getMaxLength)
-    var newParams = Array.ofDim[Parameter](newSize)
-    for (p <- nbr.params) {
-      newParams :+= p
-    }
+    var newParams = for (p <- nbr.params) yield p
 
     // randomly add one one of the free nodes to the list
     val value = freeNodes(MathUtil.RANDOM.nextInt(freeNodes.size))
@@ -184,21 +175,21 @@ class VariableLengthIntArray(theParams: Array[Parameter]) extends AbstractParame
 
   private def selectRandomNodes(numNodesToSelect: Int, freeNodes: ArrayBuffer[Int]): Array[Int] = {
     var selected = Array.ofDim[Int](numNodesToSelect)
+
     for (i <- 0 until numNodesToSelect) {
-      val node = freeNodes(MathUtil.RANDOM.nextInt(freeNodes.length))
-      selected  :+= node
-      freeNodes.remove(node.asInstanceOf[Integer])
+      val idx = MathUtil.RANDOM.nextInt(freeNodes.length)
+      selected :+= freeNodes(idx)
+      freeNodes.remove(idx)
     }
     selected
   }
 
   private def getFreeNodes(nbr: VariableLengthIntArray): ArrayBuffer[Int] = {
     var freeNodes = new ArrayBuffer[Int](getMaxLength)
-    var markedNodes = Set[Int]()
-
-    for (p <- nbr.params) {
-      markedNodes += p.getValue.toInt
-    }
+    var markedNodes = (
+      for (p <- nbr.params)
+        yield p.getValue.toInt
+      ).toSet
     for (i <- 0 until getMaxLength) {
       if (!markedNodes.contains(fullSet(i)))
         freeNodes :+= fullSet(i)

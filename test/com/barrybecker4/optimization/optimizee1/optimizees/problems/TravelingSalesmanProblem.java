@@ -6,7 +6,7 @@ import com.barrybecker4.optimization.optimizee1.optimizees.OptimizeeProblem;
 import com.barrybecker4.optimization.parameter1.ParameterArray;
 import com.barrybecker4.optimization.strategy1.OptimizationStrategyType;
 
-import static com.barrybecker4.optimization.OptimizerTestCase.LOG_FILE_HOME;
+import static com.barrybecker4.optimization.OptimizerTestCase1.LOG_FILE_HOME;
 
 /**
  * This is a simple search space to test the optimization package.

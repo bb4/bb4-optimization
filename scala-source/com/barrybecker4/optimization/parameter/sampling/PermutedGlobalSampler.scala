@@ -22,9 +22,10 @@ object PermutedGlobalSampler {
   * @author Barry Becker
   */
 class PermutedGlobalSampler(var params: PermutedParameterArray, val requestedNumSamples: Long)
-    extends AbstractGlobalSampler[PermutedParameterArray] { // Divide by 2 because it does not matter which param we start with.
+    extends AbstractGlobalSampler[PermutedParameterArray] {
 
   // See page 13 in How to Solve It.
+  // Divide by 2 because it does not matter which param we start with.
   val numPermutations: Long = MathUtil.factorial(params.size) / 2
 
   // if the requested number of samples is close to the total number of permutations,

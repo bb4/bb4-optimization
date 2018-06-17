@@ -26,7 +26,8 @@ class Graph @SafeVarargs private[problems](val nodeNeighbors: Seq[List[Integer]]
         total += v
       }
     }
-    println("out of " + nodeNeighbors.size + " nodes, " + total + " are not within one hop from " + marked)
+    println("out of " + nodeNeighbors.size + " nodes, " + total +
+      " are not within one hop from " + marked.mkString(", "))
     total
   }
 

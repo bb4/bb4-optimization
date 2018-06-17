@@ -2,7 +2,7 @@
 package com.barrybecker4.optimization.optimizee.optimizees.problems
 
 import com.barrybecker4.optimization.Optimizer
-import com.barrybecker4.optimization.OptimizerTestCase.LOG_FILE_HOME
+import com.barrybecker4.optimization.OptimizerTestCase1.LOG_FILE_HOME
 import com.barrybecker4.optimization.optimizee.optimizees.OptimizeeProblem
 import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray}
 import com.barrybecker4.optimization.parameter.types.{IntegerParameter, Parameter}

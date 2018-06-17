@@ -10,7 +10,7 @@ import org.junit.Test;
 /**
  * @author Barry Becker
  */
-public class TestDominatingSetProblem extends OptimizerTestCase {
+public class TestDominatingSetProblem1 extends OptimizerTestCase1 {
 
     @Test
     public void testBruteForce() {

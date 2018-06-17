@@ -12,7 +12,7 @@ import com.barrybecker4.optimization.parameter.ParameterArray
   */
 trait Optimizee {
 
-  /** @return the name of the thing to be optimized*/
+  /** @return the name of the thing to be optimized */
   def getName: String
 
   /** If true is returned, then compareFitness will be used and evaluateFitness will not,

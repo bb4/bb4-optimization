@@ -2,27 +2,31 @@
 package com.barrybecker4.optimization;
 
 import com.barrybecker4.optimization.optimizee1.optimizees.OptimizeeProblem;
-import com.barrybecker4.optimization.optimizee1.optimizees.problems.TravelingSalesmanProblem;
-import com.barrybecker4.optimization.optimizee1.optimizees.problems.TravelingSalesmanVariation;
+import com.barrybecker4.optimization.optimizee1.optimizees.problems.SubsetSumProblem;
+import com.barrybecker4.optimization.optimizee1.optimizees.problems.SubsetSumVariation;
 import com.barrybecker4.optimization.strategy1.OptimizationStrategyType;
 import org.junit.Test;
 
+import java.util.EnumSet;
+
 /**
+ * The subset sum problem is NP-complete.
  * @author Barry Becker
  */
-public class TestTravelingSalesmanProblem extends OptimizerTestCase {
+public class TestSubsetSumProblem1 extends OptimizerTestCase1 {
 
     @Test
     public void testBruteForce() {
         doTest(OptimizationStrategyType.BRUTE_FORCE);
     }
 
+
     @Override
     protected void doTest(OptimizationStrategyType optimizationType) {
 
-        for (TravelingSalesmanVariation variation : TravelingSalesmanVariation.values()) {
+        for (SubsetSumVariation variation : EnumSet.of(SubsetSumVariation.NO_SOLUTION)) {
 
-            OptimizeeProblem problem = new TravelingSalesmanProblem(variation);
+            OptimizeeProblem problem = new SubsetSumProblem(variation);
             verifyProblem(problem, variation, optimizationType);
         }
     }

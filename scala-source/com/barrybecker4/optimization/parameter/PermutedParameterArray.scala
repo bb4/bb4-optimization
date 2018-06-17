@@ -18,7 +18,7 @@ import scala.collection.mutable
   * the traveling salesman problem, for example.
   * @author Barry Becker
   */
-class PermutedParameterArray(theParams: Array[Parameter])  extends AbstractParameterArray(theParams) {
+class PermutedParameterArray(theParams: Array[Parameter]) extends AbstractParameterArray(theParams) {
 
   private val distanceCalculator: PermutedDistanceCalculator = new PermutedDistanceCalculator()
 
@@ -29,11 +29,8 @@ class PermutedParameterArray(theParams: Array[Parameter])  extends AbstractParam
     */
   def setPermutation(indices: List[Integer]): Unit = {
     assert(indices.size == size)
-    var newParams = Array.ofDim[Parameter](size)
-    for (i <- indices) {
-      newParams :+= get(i)
-    }
-    params = newParams
+    var newParams = for (i <- indices) yield get(i)
+    params = newParams.toArray
   }
 
   override protected def createInstance = new PermutedParameterArray
@@ -100,11 +97,6 @@ class PermutedParameterArray(theParams: Array[Parameter])  extends AbstractParam
   /** @return get a completely random solution in the parameter space. */
   override def getRandomSample: ParameterArray = {
     val theParams: Array[Parameter] = MathUtil.RANDOM.shuffle(params.toSeq).toArray
-    var newParams = Array.ofDim[Parameter](size)
-
-    for (p <- theParams) {
-      newParams :+= p.copy
-    }
-    new PermutedParameterArray(newParams)
+    new PermutedParameterArray(theParams)
   }
 }

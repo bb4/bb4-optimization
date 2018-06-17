@@ -11,7 +11,7 @@ import org.scalatest.{BeforeAndAfter, FunSuite}
 /**
   * @author Barry Becker
   */
-object OptimizerTestSuite extends FunSuite {
+object OptimizerTestSuite {
 
   /** Where the log files will go */
   val LOG_FILE_HOME: String = FileUtil.getHomeDir + "test/performance/test_optimizer/"
@@ -40,8 +40,8 @@ object OptimizerTestSuite extends FunSuite {
       problem.getExactSolution)
 
     if (error < (1.0 - THRESHOLD_SLACK_WARNING) * errorThresh && error > ACCEPTABLE_ERROR) {
-      val message = "The error threshold of " + errorThresh + " for " + optType +
-        " is a bit slack. It could be reduced to " + error
+      val message = s"The error threshold of $errorThresh for $optType running on $problem.getName " +
+        " is a bit slack. It could be reduced to $error."
       System.out.println(message)
       assert(error >= (1.0 - THRESHOLD_SLACK_ERROR) * errorThresh, message)
     }
@@ -51,7 +51,7 @@ object OptimizerTestSuite extends FunSuite {
   }
 }
 
-abstract class OptimizerTestCase extends FunSuite with BeforeAndAfter {
+abstract class OptimizerTestSuite extends FunSuite with BeforeAndAfter {
   before {
     MathUtil.RANDOM.setSeed(0)
   }

@@ -16,7 +16,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Barry Becker
  */
-public abstract class OptimizerTestCase  {
+public abstract class OptimizerTestCase1 {
 
     /** Where the log files will go */
     public static final String LOG_FILE_HOME =

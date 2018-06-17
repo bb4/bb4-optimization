@@ -5,7 +5,7 @@ import com.barrybecker4.optimization.Optimizer
 import com.barrybecker4.optimization.optimizee.optimizees.OptimizeeProblem
 import com.barrybecker4.optimization.parameter.ParameterArray
 import com.barrybecker4.optimization.strategy.{OptimizationStrategyType, SIMULATED_ANNEALING}
-import com.barrybecker4.optimization.OptimizerTestCase.LOG_FILE_HOME
+import com.barrybecker4.optimization.optimizee.OptimizerTestSuite.LOG_FILE_HOME
 import OptimizeeProblem.showSolution
 
 
