@@ -43,7 +43,7 @@ public enum SubsetSumVariation implements IProblemVariation {
 
     SIMPLE_SS {
         private final ErrorTolerances ERROR_TOLERANCES =
-                new ErrorTolerances(0.0, 0.0, 8.0, 8.0, 0.0, 8.0, 8.0, 0.0);
+                new ErrorTolerances(0.5, 0.5, 8.0, 8.0, 0.0, 8.0, 8.0, 0.0);
 
         protected List<Integer> getNumberSet() {
             return Arrays.asList(-7, -3, -2, 5, 8);
@@ -66,7 +66,7 @@ public enum SubsetSumVariation implements IProblemVariation {
 
     TYPICAL_SS {
         private final ErrorTolerances ERROR_TOLERANCES =
-                new ErrorTolerances(0.0, 0.0, 0.5, 5.0, 1.0, 4.0, 4.0, 0.0);
+                new ErrorTolerances(0.5, 0.5, 0.5, 1.0, 1.0, 4.0, 4.0, 0.0);
 
         protected List<Integer> getNumberSet() {
             return Arrays.asList(-7, -33, -21, 5, 83, -29, -78, 213, 123, -34, -37, -41, 91, -8, -17);

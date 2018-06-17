@@ -40,8 +40,8 @@ object OptimizerTestSuite {
       problem.getExactSolution)
 
     if (error < (1.0 - THRESHOLD_SLACK_WARNING) * errorThresh && error > ACCEPTABLE_ERROR) {
-      val message = s"The error threshold of $errorThresh for $optType running on $problem.getName " +
-        " is a bit slack. It could be reduced to $error."
+      val message = s"The error threshold of $errorThresh for $optType running on ${problem.getName} " +
+        s" is a bit slack. It could be reduced to $error."
       System.out.println(message)
       assert(error >= (1.0 - THRESHOLD_SLACK_ERROR) * errorThresh, message)
     }

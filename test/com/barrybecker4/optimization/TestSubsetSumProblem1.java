@@ -24,7 +24,7 @@ public class TestSubsetSumProblem1 extends OptimizerTestCase1 {
     @Override
     protected void doTest(OptimizationStrategyType optimizationType) {
 
-        for (SubsetSumVariation variation : EnumSet.of(SubsetSumVariation.NO_SOLUTION)) {
+        for (SubsetSumVariation variation : SubsetSumVariation.values()) {
 
             OptimizeeProblem problem = new SubsetSumProblem(variation);
             verifyProblem(problem, variation, optimizationType);
