@@ -76,7 +76,7 @@ class GeneticSearchStrategy(optimizee: Optimizee) extends OptimizationStrategy(o
       i += 1
     }
     if (population.size <= 1) throw new IllegalStateException("No random neighbors found for " + params)
-    //System.out.println("The population of this generation is " + population.size()
+    //println("The population of this generation is " + population.size()
     //    + " (desired was " + desiredPopulationSize + ")");
     // EVALUATE POPULATION
     lastBest = evaluatePopulation(population, params)
@@ -93,15 +93,15 @@ class GeneticSearchStrategy(optimizee: Optimizee) extends OptimizationStrategy(o
     var ct = 0
     var deltaFitness = .0
     var recentBest = lastBest
-    //System.out.println("findNewBest: recent best =" + recentBest);
+    //println("findNewBest: recent best =" + recentBest);
     // each iteration represents a new generation of the population.
     do {
       val keepSize = cullPopulation(population)
       replaceCulledWithKeeperVariants(population, keepSize)
       currentBest = evaluatePopulation(population, recentBest)
-      System.out.println("currBest = " + currentBest + " \nrecBest = " + recentBest + "        ct=" + ct)
+      println("currBest = " + currentBest + " \nrecBest = " + recentBest + "        ct=" + ct)
       deltaFitness = computeFitnessDelta(params, recentBest, currentBest, ct)
-      System.out.println("delta fitness =" +
+      println("delta fitness =" +
         deltaFitness + "      rbrRadius = " + nbrRadius + "  improvementEpsilon = " + improvementEpsilon)
       val factor = if (deltaFitness < (-1000000 * improvementEpsilon)) NBR_RADIUS_EXPAND_FACTOR
       else NBR_RADIUS_SHRINK_FACTOR
@@ -112,13 +112,13 @@ class GeneticSearchStrategy(optimizee: Optimizee) extends OptimizationStrategy(o
     } while ((deltaFitness < -improvementEpsilon) && !isOptimalFitnessReached(currentBest) && (ct < MAX_ITERATIONS))
 
     if (isOptimalFitnessReached(currentBest))
-      System.out.println("stopped because we found the optimal fitness.")
+      println("stopped because we found the optimal fitness.")
     else if (deltaFitness >= -improvementEpsilon)
-      System.out.println("stopped because we made no IMPROVEMENT. The delta, " +
+      println("stopped because we made no IMPROVEMENT. The delta, " +
         deltaFitness + " was >= " + -improvementEpsilon)
-    else System.out.println("Stopped because we exceeded the MAX ITERATIONS: " + ct)
+    else println("Stopped because we exceeded the MAX ITERATIONS: " + ct)
 
-    System.out.println("----------------------- done -------------------")
+    println("----------------------- done -------------------")
     log(ct, currentBest.getFitness, 0, 0, currentBest, FormatUtil.formatNumber(ct))
     currentBest
   }
@@ -131,7 +131,7 @@ class GeneticSearchStrategy(optimizee: Optimizee) extends OptimizationStrategy(o
     deltaFitness = currentBest.getFitness - lastBest.getFitness
     assert(deltaFitness <= 0, "We must never get worse in a new generation. Old fitness=" +
       lastBest.getFitness + " New Fitness = " + currentBest.getFitness + ".")
-    //System.out.println(" ct="+ct+"  nbrRadius = " + nbrRadius + "  population size =" + desiredPopulationSize
+    //println(" ct="+ct+"  nbrRadius = " + nbrRadius + "  population size =" + desiredPopulationSize
     //                   +"  deltaFitness = " + deltaFitness+"  currentBest = " + currentBest.getFitness()
     //                   +"  lastBest = " + lastBest.getFitness());
     log(ct, currentBest.getFitness, nbrRadius, deltaFitness, params, "---")
@@ -153,7 +153,7 @@ class GeneticSearchStrategy(optimizee: Optimizee) extends OptimizationStrategy(o
     for (j <- size - 1 to keepSize by -1) {
       sortedPopulation.remove(j)
     }
-    //System.out.println("pop after culling: first = "  +  sortedPopulation.get(0) + " last(" + sortedPopulation.size() + ")");
+    //println("pop after culling: first = "  +  sortedPopulation.get(0) + " last(" + sortedPopulation.size() + ")");
     //printPopulation(sortedPopulation, 5);
     keepSize
   }
@@ -164,7 +164,7 @@ class GeneticSearchStrategy(optimizee: Optimizee) extends OptimizationStrategy(o
     */
   private def replaceCulledWithKeeperVariants(population: ArrayBuffer[ParameterArray], keepSize: Int): Unit = {
     var k = keepSize
-    //System.out.println("keepSize = " + keepSize + " grow current popSize of "
+    //println("keepSize = " + keepSize + " grow current popSize of "
     //    + population.size() + " to " + desiredPopulationSize);
     while ( {
       k < desiredPopulationSize

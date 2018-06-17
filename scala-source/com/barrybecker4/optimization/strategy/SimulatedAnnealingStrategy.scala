@@ -85,11 +85,11 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee) extends OptimizationStrat
       ct = 0
       // keep Reducing the temperature until it reaches tempMin
       temperature *= SimulatedAnnealingStrategy.TEMP_DROP_FACTOR
-      System.out.println("temp = " + temperature + " tempMin = " + tempMin + "\n bestParams = " + bestParams)
+      println("temp = " + temperature + " tempMin = " + tempMin + "\n bestParams = " + bestParams)
     } while ( {
       temperature > tempMin && !isOptimalFitnessReached(currentParams)
     })
-    //System.out.println("T=" + temperature + "  currentFitness = " + bestParams.getFitness());
+    //println("T=" + temperature + "  currentFitness = " + bestParams.getFitness());
     log(ct, bestParams.getFitness, 0, 0, bestParams, FormatUtil.formatNumber(temperature))
     bestParams
   }
@@ -121,11 +121,11 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee) extends OptimizationStrat
     val useWorseSolution = MathUtil.RANDOM.nextDouble < probability
     if (deltaFitness > 0 || useWorseSolution) { // we always select the solution if it has a better fitness,
       // but we sometimes select a worse solution if the second term evaluates to true.
-      if (deltaFitness < 0 && useWorseSolution) System.out.println("Selected worse solution with prob=" +
+      if (deltaFitness < 0 && useWorseSolution) println("Selected worse solution with prob=" +
         probability + " delta=" + deltaFitness + " / temp=" + temperature)
       curParams = newParams
     }
-    //System.out.println("T="+temperature+" ct="+ct+" dist="+dist+" deltaFitness="
+    //println("T="+temperature+" ct="+ct+" dist="+dist+" deltaFitness="
     //        + deltaFitness+"  currentFitness = "+ curParams.getFitness() );
     log(ct, curParams.getFitness, r, dist, curParams, FormatUtil.formatNumber(temperature))
     curParams

@@ -41,7 +41,7 @@ class GaussianRedistribution(var mean: Double, var stdDeviation: Double) extends
     }
     val lowMissing = cdf(0)
     val highMissing = 1.0 - cdfFunction(GaussianRedistribution.NUM_MAP_VALUES - 1)
-    System.out.println("lowMissing=" + lowMissing + " highMissing=" + highMissing)
+    println("lowMissing=" + lowMissing + " highMissing=" + highMissing)
     // reallocate the part that is missing.
     val numMapValsm1 = GaussianRedistribution.NUM_MAP_VALUES - 1
 

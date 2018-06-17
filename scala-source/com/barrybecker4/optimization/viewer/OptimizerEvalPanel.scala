@@ -56,10 +56,10 @@ class OptimizerEvalPanel() extends JPanel
         e.printStackTrace()
     }
     this.repaint()
-    System.out.println("\n************************************************************************")
-    System.out.println("The solution to the (" + optimizer.optimizee.getName + ") Polynomial Test Problem using " + optType + " is :\n" + solution)
-    System.out.println("Which evaluates to: " + optimizer.optimizee.evaluateFitness(solution))
-    System.out.println("We expected to get exactly p1 = " + solutionPosition.x + " and p2 = " + solutionPosition.y)
+    println("\n************************************************************************")
+    println("The solution to the (" + optimizer.optimizee.getName + ") Polynomial Test Problem using " + optType + " is :\n" + solution)
+    println("Which evaluates to: " + optimizer.optimizee.evaluateFitness(solution))
+    println("We expected to get exactly p1 = " + solutionPosition.x + " and p2 = " + solutionPosition.y)
   }
 
   /** Called whenever the optimizer strategy moves incrementally toward the solution.

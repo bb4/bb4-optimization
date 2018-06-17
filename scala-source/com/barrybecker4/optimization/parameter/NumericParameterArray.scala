@@ -92,7 +92,7 @@ class NumericParameterArray(theParams: Array[Parameter]) extends AbstractParamet
     // the improvement may be zero or negative, meaning it did not improve.
     val improvement = step.getImprovement
     val dotProduct = iter.gradient.normalizedDot(iter.oldGradient)
-    //System.out.println("dot between " + iter.getGradient() + " and " + iter.getOldGradient()+ " is "+ dotProduct);
+    //println("dot between " + iter.getGradient() + " and " + iter.getOldGradient()+ " is "+ dotProduct);
     newJumpSize = findNewJumpSize(newJumpSize, dotProduct)
     iter.gradient.copyFrom(iter.oldGradient)
     Improvement(currentParams, improvement, newJumpSize, iter.gradient)
@@ -108,7 +108,7 @@ class NumericParameterArray(theParams: Array[Parameter]) extends AbstractParamet
     var newJumpSize = jumpSize
     if (dotProduct > NumericParameterArray.MAX_DOT_PRODUCT) newJumpSize *= ImprovementStep.JUMP_SIZE_INC_FACTOR
     else if (dotProduct < NumericParameterArray.MIN_DOT_PRODUCT) newJumpSize *= ImprovementStep.JUMP_SIZE_DEC_FACTOR
-    //System.out.println( "dotProduct = " + dotProduct + " new jumpsize = " + jumpSize );
+    //println( "dotProduct = " + dotProduct + " new jumpsize = " + jumpSize );
     newJumpSize
   }
 
@@ -132,12 +132,12 @@ class NumericParameterArray(theParams: Array[Parameter]) extends AbstractParamet
       val param = get(i)
       param.setValue(param.getValue + vec.get(i))
       if (param.getValue > param.maxValue) {
-        System.out.println("Warning param " +
+        println("Warning param " +
           param.name + " is exceeding is maximum value. It is being pegged to that maximum of " + param.maxValue)
         param.setValue(param.maxValue)
       }
       if (param.getValue < param.minValue) {
-        System.out.println("Warning param " +
+        println("Warning param " +
           param.name + " is exceeding is minimum value. It is being pegged to that minimum of " + param.minValue)
         param.setValue(param.minValue)
       }

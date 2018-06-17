@@ -8,10 +8,10 @@ import com.barrybecker4.optimization.parameter.ParameterArray
 object OptimizeeProblem {
 
   def showSolution(problem: OptimizeeProblem, solution: ParameterArray): Unit = {
-    System.out.println("\n************************************************************************")
-    System.out.println("The solution to the " + problem.getName + " test problem is :\n" + solution)
-    System.out.println("Which evaluates to: " + problem.evaluateFitness(solution))
-    System.out.println("We expected to get exactly " + problem.getExactSolution)
+    println("\n************************************************************************")
+    println("The solution to the " + problem.getName + " test problem is :\n" + solution)
+    println("Which evaluates to: " + problem.evaluateFitness(solution))
+    println("We expected to get exactly " + problem.getExactSolution)
   }
 }
 

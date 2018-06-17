@@ -61,7 +61,7 @@ class GlobalSampleStrategy(optimizee: Optimizee) extends OptimizationStrategy(op
       if (optimizee.evaluateByComparison) fitness = optimizee.compareFitness(sample, params)
       else fitness = optimizee.evaluateFitness(sample)
       sample.setFitness(fitness)
-      //System.out.println( "key = " + hashKey + '\n' + testParams + "\n  fitness=" + fitness );
+      //println( "key = " + hashKey + '\n' + testParams + "\n  fitness=" + fitness );
       if (fitness < bestFitness) {
         bestFitness = fitness
         notifyOfChange(sample)

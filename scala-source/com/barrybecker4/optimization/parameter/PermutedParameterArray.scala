@@ -10,6 +10,7 @@ import com.barrybecker4.optimization.parameter.sampling.PermutedGlobalSampler
 import com.barrybecker4.optimization.parameter.types.Parameter
 
 import scala.collection.mutable
+import scala.util.Random
 
 /**
   * Represents a 1 dimensional array of unique permuted parameters.
@@ -18,7 +19,8 @@ import scala.collection.mutable
   * the traveling salesman problem, for example.
   * @author Barry Becker
   */
-class PermutedParameterArray(theParams: Array[Parameter]) extends AbstractParameterArray(theParams) {
+class PermutedParameterArray(theParams: Array[Parameter], rnd: Random = MathUtil.RANDOM)
+  extends AbstractParameterArray(theParams) {
 
   private val distanceCalculator: PermutedDistanceCalculator = new PermutedDistanceCalculator()
 
@@ -67,11 +69,11 @@ class PermutedParameterArray(theParams: Array[Parameter]) extends AbstractParame
     val numToSwap = Math.max(1, (10.0 * radius * size / 100.0).toInt)
     val nbr = this.copy.asInstanceOf[PermutedParameterArray]
     for (k <- 0 until numToSwap) {
-      val index1 = MathUtil.RANDOM.nextInt(size)
-      var index2 = MathUtil.RANDOM.nextInt(size)
+      val index1 = rnd.nextInt(size)
+      var index2 = rnd.nextInt(size)
       while ( {
         index2 == index1
-      }) index2 = MathUtil.RANDOM.nextInt(size)
+      }) index2 = rnd.nextInt(size)
       val temp = nbr.params(index1)
       nbr.params(index1) == nbr.params(index2)
       nbr.params(index2) == temp
@@ -96,7 +98,7 @@ class PermutedParameterArray(theParams: Array[Parameter]) extends AbstractParame
 
   /** @return get a completely random solution in the parameter space. */
   override def getRandomSample: ParameterArray = {
-    val theParams: Array[Parameter] = MathUtil.RANDOM.shuffle(params.toSeq).toArray
+    val theParams: Array[Parameter] = rnd.shuffle(params.toSeq).toArray
     new PermutedParameterArray(theParams)
   }
 }

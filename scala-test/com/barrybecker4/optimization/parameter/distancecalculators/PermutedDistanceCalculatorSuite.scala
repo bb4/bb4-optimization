@@ -4,6 +4,8 @@ import com.barrybecker4.optimization.parameter.PermutedParameterArray
 import com.barrybecker4.optimization.parameter.types.{IntegerParameter, Parameter}
 import org.scalatest.FunSuite
 
+import scala.util.Random
+
 
 class PermutedDistanceCalculatorSuite extends FunSuite {
 

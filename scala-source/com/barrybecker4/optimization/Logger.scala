@@ -54,7 +54,7 @@ class Logger(var sLogFile: String) {
       sep + FormatUtil.formatNumber(jumpSize) +
       sep + FormatUtil.formatNumber(distance) + sep + params.toCSVString + sep + comment
     if (sLogFile == null) {
-      System.out.println("<no logfile>: " + rowText)
+      println("<no logfile>: " + rowText)
       return
     }
     try { // append to existing log file.

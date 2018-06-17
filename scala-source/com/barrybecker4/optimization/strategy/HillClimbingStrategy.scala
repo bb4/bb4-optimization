@@ -53,7 +53,7 @@ class HillClimbingStrategy(optimizee: Optimizee) extends OptimizationStrategy(op
     // iterate until there is no significant improvement between iterations,
     // of the jumpSize is too small (below some threshold).
     do {
-      //System.out.println( "iter=" + numIterations + " FITNESS = " + currentParams.getFitness() + "  ------------");
+      //println( "iter=" + numIterations + " FITNESS = " + currentParams.getFitness() + "  ------------");
       improvement = currentParams.findIncrementalImprovement(optimizee, jumpSize, improvement, cache)
       numIterations += 1
       currentParams = improvement.parameters
@@ -61,8 +61,8 @@ class HillClimbingStrategy(optimizee: Optimizee) extends OptimizationStrategy(op
       notifyOfChange(currentParams)
       improved = improvement.improvement > fitnessEps
     } while (improved && (jumpSize > JUMP_SIZE_EPS) && !isOptimalFitnessReached(currentParams))
-    System.out.println("The optimized parameters after " + numIterations + " iterations are " + currentParams)
-    System.out.println("Last improvement = " + improvement + " jumpSize=" + jumpSize + " improved=" + improved)
+    println("The optimized parameters after " + numIterations + " iterations are " + currentParams)
+    println("Last improvement = " + improvement + " jumpSize=" + jumpSize + " improved=" + improved)
     currentParams
   }
 }
