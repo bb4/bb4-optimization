@@ -18,14 +18,14 @@ sealed trait SubsetSumVariation extends ProblemVariation {
   def getNumElements: Int = getNumberSet.size
 
   /** The graph containing the node adjacency information */
-  protected def getNumberSet: Seq[Int]
+  protected def getNumberSet: Set[Int]
 
   /** Some random initial set of marked nodes.
     * One half or one third of the nodes is probably a good starting point.
     */
   def getInitialGuess: ParameterArray = {
     val num = this.getNumElements
-    val numSet = this.getNumberSet
+    val numSet = this.getNumberSet.toSeq
     val params: IndexedSeq[Parameter] = for (i <- 0 until num by 3) yield createParam(numSet(i))
     val pa = new VariableLengthIntArray(params.toArray, getNumberSet, new MagnitudeDistanceCalculator)
     pa.setFitness(computeCost(pa))
@@ -89,7 +89,7 @@ case object SIMPLE_SS extends SubsetSumVariation {
   val errorTolerances =
     ErrorTolerances(0.0, 0.0, 8.0, 8.0, 0.0, 8.0, 8.0, 0.0)
 
-  override protected def getNumberSet: Seq[Int] = Seq(-7, -3, -2, 5, 8)
+  override protected def getNumberSet: Set[Int] = Set(-7, -3, -2, 5, 8)
 
   override def getExactSolution: ParameterArray = createSolution(-3, -2, 5)
 
@@ -100,8 +100,8 @@ case object SIMPLE_SS extends SubsetSumVariation {
 case object TYPICAL_SS extends SubsetSumVariation {
   val errorTolerances = ErrorTolerances(0.0, 0.5, 0.5, 1.0, 1.0, 0.5, 0.5, 0.0)
 
-  override protected def getNumberSet: Seq[Int] =
-    Seq(-7, -33, -21, 5, 83, -29, -78, 213, 123, -34, -37, -41, 91, -8, -17)
+  override protected def getNumberSet: Set[Int] =
+    Set(-7, -33, -21, 5, 83, -29, -78, 213, 123, -34, -37, -41, 91, -8, -17)
 
   // This is one of several possible solutions that gives an optimal fitness of 0
   override def getExactSolution: ParameterArray = createSolution(-33, -21, 5, -29, 123, -37, -8)
@@ -114,8 +114,8 @@ case object NO_SOLUTION extends  SubsetSumVariation {
   // none of the errors will be 0 because there is no solution that sums to 0.
   val errorTolerances = ErrorTolerances(20.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
 
-  override protected def getNumberSet: Seq[Int] =
-    Seq(-7, -33, -21, 5, -83, -29, -78, -113, -23, -34, -37, -41, -91, -9, -17)
+  override protected def getNumberSet: Set[Int] =
+    Set(-7, -33, -21, 5, -83, -29, -78, -113, -23, -34, -37, -41, -91, -9, -17)
 
   /** There is no solution - i.e. no values that sum to 0. */
   override def getExactSolution: ParameterArray = createSolution(-7)

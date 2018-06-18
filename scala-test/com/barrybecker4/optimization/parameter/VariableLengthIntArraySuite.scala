@@ -104,20 +104,81 @@ class VariableLengthIntArraySuite extends FunSuite with BeforeAndAfter{
     assertResult(15) { samples.length }
   }
 
+  test("swap nodes (4 params). r = 1.2") {
+    params = createDistArray(2, -1, 3, -1)
+    val nbr = params.getRandomNeighbor(1.2)
+    assertResult(
+      """
+        |parameter[0] = p2 = 2.0 [0, 2.0]
+        |parameter[1] = p3 = 3.0 [0, 3.0]
+        |parameter[2] = p-1 = -1.00 [-1.00, 0]
+        |fitness = 0.0"""
+        .stripMargin.replaceAll("\r\n", "\n")) { nbr.toString }
+  }
+
+  test("swap nodes (4 params). r =  0.3") {
+    params = createDistArray(2, -1, 3, -1)
+    val nbr = params.getRandomNeighbor(0.3)
+    assertResult(
+      """
+        |parameter[0] = p2 = 2.0 [0, 2.0]
+        |parameter[1] = p3 = 3.0 [0, 3.0]
+        |parameter[2] = p-1 = -1.00 [-1.00, 0]
+        |fitness = 0.0"""
+        .stripMargin.replaceAll("\r\n", "\n")) { nbr.toString }
+  }
+
+  test("swap nodes (11 params). r = 1.2") {
+    params = createDistArray(2, -1, 3, -1, 3, -4, -2, -3, 5, -9, 6)
+    val nbr = params.getRandomNeighbor(1.2)
+    assertResult(
+      """
+        |parameter[0] = p2 = 2.0 [0, 2.0]
+        |parameter[1] = p-1 = -1.00 [-1.00, 0]
+        |parameter[2] = p-1 = -1.00 [-1.00, 0]
+        |parameter[3] = p3 = 3.0 [0, 3.0]
+        |parameter[4] = p-4 = -4.0 [-4.0, 0]
+        |parameter[5] = p-2 = -2.0 [-2.0, 0]
+        |parameter[6] = p-3 = -3.0 [-3.0, 0]
+        |parameter[7] = p5 = 5.0 [0, 5.0]
+        |parameter[8] = p-9 = -9.0 [-9.0, 0]
+        |parameter[9] = p6 = 6.0 [0, 6.0]
+        |fitness = 0.0"""
+        .stripMargin.replaceAll("\r\n", "\n")) { nbr.toString }
+  }
+
+  test("swap nodes (11 params). r =  0.3") {
+    params = createDistArray(2, -1, 3, -1, 3, -4, -2, -3, 5, -9, 6)
+    val nbr = params.getRandomNeighbor(0.3)
+    assertResult(
+      """
+        |parameter[0] = p2 = 2.0 [0, 2.0]
+        |parameter[1] = p-1 = -1.00 [-1.00, 0]
+        |parameter[2] = p-1 = -1.00 [-1.00, 0]
+        |parameter[3] = p3 = 3.0 [0, 3.0]
+        |parameter[4] = p-4 = -4.0 [-4.0, 0]
+        |parameter[5] = p-2 = -2.0 [-2.0, 0]
+        |parameter[6] = p-3 = -3.0 [-3.0, 0]
+        |parameter[7] = p5 = 5.0 [0, 5.0]
+        |parameter[8] = p-9 = -9.0 [-9.0, 0]
+        |parameter[9] = p6 = 6.0 [0, 6.0]
+        |fitness = 0.0"""
+        .stripMargin.replaceAll("\r\n", "\n")) { nbr.toString }
+  }
   private def getListFromIterator(iter: Iterator[VariableLengthIntArray]): Array[VariableLengthIntArray] = {
     iter.toArray
   }
 
-  private def createArray(dCalc: DistanceCalculator, numberList: Seq[Int]) = {
+  private def createArray(dCalc: DistanceCalculator, numberList: Set[Int]) = {
     val params = for (i <- numberList) yield createParam(i)
     VariableLengthIntArray.createInstance(params.toArray, numberList, dCalc)
   }
 
   private def createDistArray(numberList: Int*) =
-    createArray(new MagnitudeDistanceCalculator, numberList)
+    createArray(new MagnitudeDistanceCalculator, numberList.toSet)
 
   def createDistIgnoredArray(numberList: Int*): VariableLengthIntArray =
-    createArray(new MagnitudeIgnoredDistanceCalculator, numberList)
+    createArray(new MagnitudeIgnoredDistanceCalculator, numberList.toSet)
 
   private def createParam(i: Int): Parameter = {
     val min = if (i < 0) i else 0

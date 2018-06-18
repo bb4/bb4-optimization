@@ -21,7 +21,7 @@ object DominatingSetVariation {
 sealed trait DominatingSetVariation extends ProblemVariation {
 
   /** @return an array of the node ineices in the graph */
-  def getAllNodes: Array[Int] = (0 to adjacencies.size).toArray
+  def getAllNodes: Set[Int] = (0 to adjacencies.size).toSet
 
   /** The graph containing the node adjacency information */
   protected def adjacencies: Graph
@@ -30,7 +30,7 @@ sealed trait DominatingSetVariation extends ProblemVariation {
     * One half or one third of the nodes is probably a good starting point.
     */
   def getInitialGuess: ParameterArray = {
-    val num = getAllNodes.length
+    val num = getAllNodes.size
     // just add some of the nodes
     val params: Seq[IntegerParameter] =
       for (i <- 0 until num by 3) yield new IntegerParameter(i, 0, num - 1, "p" + i)
@@ -86,7 +86,7 @@ sealed trait DominatingSetVariation extends ProblemVariation {
     val allNodes = getAllNodes
     val params =
       for (i <- 0 until nodeList.length)
-        yield new IntegerParameter(nodeList(i), 0, allNodes.length - 1, "p" + i)
+        yield new IntegerParameter(nodeList(i), 0, allNodes.size - 1, "p" + i)
 
     VariableLengthIntArray.createInstance(params.toArray, allNodes)
   }
