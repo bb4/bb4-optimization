@@ -77,7 +77,7 @@ case object ABS_SINUSOIDAL extends ParabolaMinVariation {
 
 case object STEPPED extends ParabolaMinVariation {
   val errorTolerances = ErrorTolerances(0.009, RELAXED_TOL, BASE_TOLERANCE, GLOB_SAMP_TOL,
-      RELAXED_TOL,  BASE_TOLERANCE,  BASE_TOLERANCE, BASE_TOLERANCE)
+      RELAXED_TOL,  RELAXED_TOL, RELAXED_TOL, BASE_TOLERANCE)
 
   /** This version introduces a bit of step function noise. */
   override def evaluateFitness(a: ParameterArray): Double =

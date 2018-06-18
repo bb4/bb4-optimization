@@ -14,7 +14,7 @@ object GeneticSearchStrategy {
   // Percent amount to decimate the parent population by on each iteration
   private val CULL_FACTOR = 0.8
   private val NBR_RADIUS = 0.08
-  private val NBR_RADIUS_SHRINK_FACTOR = 0.7
+  private val NBR_RADIUS_SHRINK_FACTOR = 0.8
   private val NBR_RADIUS_EXPAND_FACTOR = 1.1
   private val NBR_RADIUS_SOFTENER = 10.0
   private val INITIAL_RADIUS = 1.0
@@ -64,8 +64,18 @@ class GeneticSearchStrategy(optimizee: Optimizee) extends OptimizationStrategy(o
   override def doOptimization(params: ParameterArray, fitnessRange: Double): ParameterArray = {
     var lastBest: ParameterArray = null
     desiredPopulationSize = params.getSamplePopulationSize
+
+    val population = findInitialPopulation(params)
+    //println("The population of this generation is " + population.size()
+    //    + " (desired was " + desiredPopulationSize + ")");
+    // EVALUATE POPULATION
+    lastBest = evaluatePopulation(population, params)
+    findNewBest(params, lastBest, population)
+  }
+
+  private def findInitialPopulation(params: ParameterArray) = {
     // create an initial population based on params and POPULATION_SIZE-1 other random candidate solutions.
-    var population = ArrayBuffer[ParameterArray]()
+    val population = ArrayBuffer[ParameterArray]()
     population += params
     var i = 0
     val max = 100 * desiredPopulationSize
@@ -76,16 +86,10 @@ class GeneticSearchStrategy(optimizee: Optimizee) extends OptimizationStrategy(o
       i += 1
     }
     if (population.size <= 1) throw new IllegalStateException("No random neighbors found for " + params)
-    //println("The population of this generation is " + population.size()
-    //    + " (desired was " + desiredPopulationSize + ")");
-    // EVALUATE POPULATION
-    lastBest = evaluatePopulation(population, params)
-    findNewBest(params, lastBest, population)
+    population
   }
 
-  /**
-    * Find the new best candidate.
-    *
+  /** Find the new best candidate.
     * @return the new best candidate.
     */
   private def findNewBest(params: ParameterArray, lastBest: ParameterArray, population: ArrayBuffer[ParameterArray]) = {
@@ -95,15 +99,16 @@ class GeneticSearchStrategy(optimizee: Optimizee) extends OptimizationStrategy(o
     var recentBest = lastBest
     //println("findNewBest: recent best =" + recentBest);
     // each iteration represents a new generation of the population.
+    var pop = population
     do {
-      val keepSize = cullPopulation(population)
-      replaceCulledWithKeeperVariants(population, keepSize)
-      currentBest = evaluatePopulation(population, recentBest)
+      pop = cullPopulation(pop)
+      replaceCulledWithKeeperVariants(pop, pop.size)
+      currentBest = evaluatePopulation(pop, recentBest)
       println("currBest = " + currentBest + " \nrecBest = " + recentBest + "        ct=" + ct)
       deltaFitness = computeFitnessDelta(params, recentBest, currentBest, ct)
       println("delta fitness =" +
         deltaFitness + "      rbrRadius = " + nbrRadius + "  improvementEpsilon = " + improvementEpsilon)
-      val factor = if (deltaFitness < (-1000000 * improvementEpsilon)) NBR_RADIUS_EXPAND_FACTOR
+      val factor = if (deltaFitness < -3.0) NBR_RADIUS_EXPAND_FACTOR
       else NBR_RADIUS_SHRINK_FACTOR
       nbrRadius *= factor
       recentBest = currentBest.copy
@@ -140,7 +145,7 @@ class GeneticSearchStrategy(optimizee: Optimizee) extends OptimizationStrategy(o
 
   /** Remove all but the best candidates. Better candidates have lower values.
     * @param population the whole population. It will be reduced in size.
-    * @return the number of members that were retained.
+    * @return the culled population
     */
   private def cullPopulation(population: ArrayBuffer[ParameterArray]) = {
     // sort the population according to the fitness of members.
@@ -150,12 +155,11 @@ class GeneticSearchStrategy(optimizee: Optimizee) extends OptimizationStrategy(o
     // @@ add option to do cross-over variations too.
     val keepSize = Math.max(1, (sortedPopulation.size * (1.0 - CULL_FACTOR)).toInt)
     val size = sortedPopulation.size
-    for (j <- size - 1 to keepSize by -1) {
-      sortedPopulation.remove(j)
-    }
-    //println("pop after culling: first = "  +  sortedPopulation.get(0) + " last(" + sortedPopulation.size() + ")");
+    val culledPop = sortedPopulation.dropRight(size - keepSize)
+    //println("new pop size = " + culledPop.size)
+    //println("pop after culling: first = "  +  culledPop.get(0) + " last(" + culledPop.size() + ")");
     //printPopulation(sortedPopulation, 5);
-    keepSize
+    culledPop
   }
 
   /** Replace the members of the population that were removed with variations of the ones that we kept.
@@ -166,9 +170,7 @@ class GeneticSearchStrategy(optimizee: Optimizee) extends OptimizationStrategy(o
     var k = keepSize
     //println("keepSize = " + keepSize + " grow current popSize of "
     //    + population.size() + " to " + desiredPopulationSize);
-    while ( {
-      k < desiredPopulationSize
-    }) { // loop over the keepers until all replacements found. Select randomly, but skewed toward the better ones
+    while (k < desiredPopulationSize) { // loop over the keepers until all replacements found. Select randomly, but skewed toward the better ones
       val rnd = MathUtil.RANDOM.nextDouble
       val keeperIndex = (rnd * rnd * keepSize).toInt
       //k % keepSize;
@@ -186,8 +188,8 @@ class GeneticSearchStrategy(optimizee: Optimizee) extends OptimizationStrategy(o
     //printPopulation(population, 20);
   }
 
-  /** @param p   parameter array to get neighbor for
-    * @param rad larger radius means more distanc neighbor
+  /** @param p parameter array to get neighbor for
+    * @param rad larger radius means more distant neighbor
     * @return a neighbor of p. If using absolute fitness, try to find a neighbor that has better fitnesss.
     */
   private def getNeighbor(p: ParameterArray, rad: Double) = {
@@ -195,9 +197,7 @@ class GeneticSearchStrategy(optimizee: Optimizee) extends OptimizationStrategy(o
     if (!optimizee.evaluateByComparison) { // try to find a nbr with fitness that is better
       val curFitness = optimizee.evaluateFitness(p)
       var ct = 0
-      while ( {
-        optimizee.evaluateFitness(nbr) > curFitness && ct < MAX_NBRS_TO_EXPLORE
-      }) {
+      while (optimizee.evaluateFitness(nbr) > curFitness && ct < MAX_NBRS_TO_EXPLORE) {
         nbr = p.getRandomNeighbor(rad)
         ct += 1
       }

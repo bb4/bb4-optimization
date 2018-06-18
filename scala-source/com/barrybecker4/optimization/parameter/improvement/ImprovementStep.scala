@@ -53,7 +53,6 @@ class ImprovementStep(var optimizee: Optimizee, var iter: ImprovementIteration, 
     * @return nearby location.
     */
   private def findNextCandidateParams(params: NumericParameterArray) = {
-    improved = true
     var currentParams = params
     val oldParams = currentParams.copy
     iter.updateGradient(jumpSize, gradLength)
@@ -79,6 +78,7 @@ class ImprovementStep(var optimizee: Optimizee, var iter: ImprovementIteration, 
       if (currentParams.getFitness >= oldFitness) improved = false
       improvement = oldFitness - currentParams.getFitness
     }
+    improved = improvement > 0
     if (!improved) {
       currentParams = oldParams
       if (!sameParams) { // we have not improved, try again with a reduced jump size.

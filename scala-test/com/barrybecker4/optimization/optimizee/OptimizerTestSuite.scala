@@ -34,7 +34,7 @@ object OptimizerTestSuite {
     val solution = optimizer.doOptimization(optType, initialGuess, fitnessRange)
     val error = problem.getError(solution)
     assert(error <= errorThresh,
-      "*** " + title + " ***\nAllowable error exceeded using " + optType +
+      s"*** $title ***\nAllowable error ($errorThresh) was exceeded using $optType" +
       ". \nError = " + error + "\n The Test Solution was " + solution +
       "\n but we expected to get something very close to the exact solution:\n " +
       problem.getExactSolution)

@@ -98,7 +98,7 @@ case object SIMPLE_SS extends SubsetSumVariation {
 
 
 case object TYPICAL_SS extends SubsetSumVariation {
-  val errorTolerances = ErrorTolerances(0.0, 0.5, 0.5, 1.0, 1.0, 1.0, 1.0, 0.0)
+  val errorTolerances = ErrorTolerances(0.0, 0.5, 0.5, 1.0, 1.0, 0.5, 0.5, 0.0)
 
   override protected def getNumberSet: Seq[Int] =
     Seq(-7, -33, -21, 5, 83, -29, -78, 213, 123, -34, -37, -41, 91, -8, -17)
