@@ -5,6 +5,8 @@ import com.barrybecker4.optimization.parameter.types.{IntegerParameter, Paramete
 import org.scalactic.{Equality, TolerantNumerics}
 import org.scalatest.{BeforeAndAfter, FunSuite}
 
+import scala.util.Random
+
 /**
   * @author Barry Becker
   */
@@ -12,18 +14,14 @@ object PermutedParameterArraySuite {
   private val TOL = 0.000001
 }
 
-class PermutedParameterArraySuite extends FunSuite with BeforeAndAfter {
+class PermutedParameterArraySuite extends FunSuite {
 
   implicit val doubleEq: Equality[Double] = TolerantNumerics.tolerantDoubleEquality(PermutedParameterArraySuite.TOL)
-
-  before {
-    MathUtil.RANDOM.setSeed(0)
-  }
 
   test("PermutedNeighbor") {
     val params = createPermParameterArray(Array[Int](0, 1, 2, 3, 4))
     val nbrParams = params.getRandomNeighbor(1.0)
-    val expNbr = createPermParameterArray(Array[Int](0, 1, 2, 3, 4))
+    val expNbr = createPermParameterArray(Array[Int](3, 1, 2, 0, 4))
     assertResult(expNbr) { nbrParams }
   }
 
@@ -81,6 +79,6 @@ class PermutedParameterArraySuite extends FunSuite with BeforeAndAfter {
     val params: Seq[Parameter] = for (i <- values.indices) yield {
         new IntegerParameter(values(i), 0, values.length - 1, "param" + i)
       }
-    new PermutedParameterArray(params.toArray)
+    new PermutedParameterArray(params.toArray, new Random(1))
   }
 }

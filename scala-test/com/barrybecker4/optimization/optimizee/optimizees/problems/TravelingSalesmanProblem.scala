@@ -13,7 +13,7 @@ object TravelingSalesmanProblem {
 
   /** Finds the solution for the above optimization problem. */
   def main(args: Array[String]): Unit = {
-    val v = SIMPLE
+    val v = TSP_SIMPLE
     val problem = new TravelingSalesmanProblem(v)
     val optimizer = new Optimizer(problem, Some(LOG_FILE_HOME + "tsp_optimization.txt"))
     val initialGuess = problem.getInitialGuess
@@ -26,7 +26,7 @@ object TravelingSalesmanProblem {
   * This is a simple search space to test the optimization package.
   * @author Barry Becker
   */
-class TravelingSalesmanProblem(val variation: TravelingSalesmanVariation = SIMPLE)
+class TravelingSalesmanProblem(val variation: TravelingSalesmanVariation = TSP_SIMPLE)
     extends OptimizeeProblem {
 
   override def getName: String = "TSP: " + variation.getName

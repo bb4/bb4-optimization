@@ -3,18 +3,20 @@ package com.barrybecker4.optimization.parameter.improvement
 
 import com.barrybecker4.optimization.optimizee.Optimizee
 import com.barrybecker4.optimization.parameter.ParameterArray
-
+import DiscreteImprovementFinder._
 import scala.collection.mutable
 
 
 object DiscreteImprovementFinder {
   /** don't try more than this many times to find improvement on any iteration */
   private val MAX_TRIES = 1000
+
+  private val JUMP_SIZE_DECREASE = 0.98
+  private val JUMP_SIZE_INCREASE = 1.01
 }
 
 /**
-  * Represents a 1 dimensional, variable length, array of unique integer parameters.
-  * The order of the integers does not matter.
+  * Finds incremental improvement in a discrete problem space.
   * @author Barry Becker
   */
 class DiscreteImprovementFinder(var params: ParameterArray) {
@@ -27,10 +29,11 @@ class DiscreteImprovementFinder(var params: ParameterArray) {
     *               parameters are discrete and not continuous.
     * @return the improvement which contains the improved parameter array and possibly a revised jumpSize.
     */
-  def findIncrementalImprovement(optimizee: Optimizee, initialJumpSize: Double, cache: mutable.Set[ParameterArray]): Improvement = {
+  def findIncrementalImprovement(optimizee: Optimizee, initialJumpSize: Double,
+                                 cache: mutable.Set[ParameterArray]): Improvement = {
     var numTries = 0
     var fitnessDelta = .0
-    var jumpSize = initialJumpSize * 0.98
+    var jumpSize = initialJumpSize * JUMP_SIZE_DECREASE
     var improvement = Improvement(params, 0, jumpSize)
     do {
       val nbr = params.getRandomNeighbor(jumpSize)
@@ -47,8 +50,8 @@ class DiscreteImprovementFinder(var params: ParameterArray) {
         if (fitnessDelta > 0) improvement = Improvement(nbr, fitnessDelta, jumpSize)
       }
       numTries += 1
-      jumpSize *= 1.001
-    } while (fitnessDelta <= 0 && numTries < DiscreteImprovementFinder.MAX_TRIES)
+      jumpSize *= JUMP_SIZE_INCREASE
+    } while (fitnessDelta <= 0 && numTries < MAX_TRIES)
 
     println("incremental improvement = " + improvement.improvement + " numTries=" + numTries + " jumpSize=" + jumpSize
       + "\n num nodes in improvedParams=" + improvement.parameters.size

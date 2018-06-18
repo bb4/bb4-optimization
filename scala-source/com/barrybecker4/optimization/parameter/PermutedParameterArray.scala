@@ -60,7 +60,7 @@ class PermutedParameterArray(theParams: Array[Parameter], rnd: Random = MathUtil
     distanceCalculator.findDistance(this, pa.asInstanceOf[PermutedParameterArray])
 
   /** Create a new permutation that is not too distant from what we have now.
-    * @param radius a indication of the amount of variation to use. 0 is none, 3 is a lot.
+    * @param radius an indication of the amount of variation to use. 0 is none, 3 is a lot.
     *        Change Math.min(1, 10 * radius * N/100) of the entries, where N is the number of params
     * @return the random nbr.
     */
@@ -75,8 +75,8 @@ class PermutedParameterArray(theParams: Array[Parameter], rnd: Random = MathUtil
         index2 == index1
       }) index2 = rnd.nextInt(size)
       val temp = nbr.params(index1)
-      nbr.params(index1) == nbr.params(index2)
-      nbr.params(index2) == temp
+      nbr.params(index1) = nbr.params(index2)
+      nbr.params(index2) = temp
     }
     nbr
   }

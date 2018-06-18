@@ -1,17 +1,20 @@
 // Copyright by Barry G. Becker, 2013 - 2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.parameter.sampling
 
+import java.math.BigInteger
+
 import com.barrybecker4.common.math.MathUtil
 import com.barrybecker4.common.math.combinatorics.Permuter
 import com.barrybecker4.optimization.parameter.ParameterArray
 import com.barrybecker4.optimization.parameter.PermutedParameterArray
+import PermutedGlobalSampler.CLOSE_FACTOR
 import scala.collection.mutable.ArrayBuffer
 
 
 object PermutedGlobalSampler {
 
   /** If the requestedNumSamples is within this percent of the total, then use exhaustive search */
-  private val CLOSE_FACTOR = 0.6
+  private val CLOSE_FACTOR = 60
 }
 
 /**
@@ -26,17 +29,21 @@ class PermutedGlobalSampler(var params: PermutedParameterArray, val requestedNum
 
   // See page 13 in How to Solve It.
   // Divide by 2 because it does not matter which param we start with.
-  val numPermutations: Long = MathUtil.factorial(params.size) / 2
+  val numPermutations: BigInteger = MathUtil.bigFactorial(params.size).divide(BigInteger.valueOf(2))
 
   // if the requested number of samples is close to the total number of permutations,
   // then we could just enumerate the permutations.
   numSamples = requestedNumSamples
 
   /** becomes true if the requestedNumSamples is close to the total number of permutations in the space */
-  private var useExhaustiveSearch = requestedNumSamples > PermutedGlobalSampler.CLOSE_FACTOR * numPermutations
+  private var useExhaustiveSearch = {
+    val v: BigInteger = numPermutations.multiply(BigInteger.valueOf(CLOSE_FACTOR)).divide(BigInteger.valueOf(100))
+    BigInteger.valueOf(requestedNumSamples).compareTo(v) == 1
+  }
 
   /** Used to enumerate all possible permutations when doing exhaustive search */
   private var permuter: Permuter = _
+
   if (useExhaustiveSearch)
     permuter = new Permuter(params.size)
 
