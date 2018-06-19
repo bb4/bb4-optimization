@@ -35,7 +35,7 @@ object VariableLengthIntArray {
 class VariableLengthIntArray(theParams: Array[Parameter]) extends AbstractParameterArray(theParams) {
 
   private var fullSet: Set[Int] = _
-  private var fullSeq: Seq[Int] =_
+  private var fullSeq: Seq[Int] = _
   private var distCalculator: DistanceCalculator = _
 
   /**
