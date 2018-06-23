@@ -3,8 +3,7 @@ package com.barrybecker4.optimization
 
 import com.barrybecker4.common.format.FormatUtil
 import com.barrybecker4.optimization.parameter.ParameterArray
-import java.io.FileWriter
-import java.io.IOException
+import java.io.{File, FileWriter, IOException}
 
 
 object Logger {
@@ -23,6 +22,8 @@ class Logger(var sLogFile: String) {
     */
   def initialize(params: ParameterArray): Unit = {
     try {
+      createDirIfNeeded(sLogFile)
+
       // create the log file (destroying it if it already existed)
       val logFile = new FileWriter(sLogFile, false)
       logFile.write("iteration" + Logger1.SEPARATOR)
@@ -41,8 +42,24 @@ class Logger(var sLogFile: String) {
     }
   }
 
+  private def createDirIfNeeded(sLogFile: String): Unit = {
+    val parentDirName = sLogFile.substring(0, sLogFile.lastIndexOf("/"))
+    val parentDir = new File(parentDirName)
+    if (!parentDir.exists()) {
+      try {
+        val success = parentDir.mkdir()
+        println(s"Creation of $parentDir was success = $success")
+      }
+      catch {
+        case ioe: IOException => println("IOException creating " + parentDir + ". " + ioe.getMessage)
+        case t: Throwable => throw new IllegalStateException(t)
+      }
+    }
+  }
+
   /** Write a row to the file and close it again.
     * That way if we terminate, we still have something in the file.
+    *
     * @param iteration the current iteration.
     * @param fitness   the current fitness level. Or increase if fitness if in comparison mode.
     * @param jumpSize  the distance we moved in parameter space since the last iteration.

@@ -14,7 +14,7 @@ import org.scalatest.{BeforeAndAfter, FunSuite}
 object OptimizerTestSuite {
 
   /** Where the log files will go */
-  val LOG_FILE_HOME: String = FileUtil.getHomeDir + "test/performance/test_optimizer/"
+  val LOG_FILE_HOME: String = FileUtil.getHomeDir + "scala-test/performance/test_optimizer/"
 
   /** If the error is this percent (or more) less than the error threshold, let the user know */
   private val THRESHOLD_SLACK_WARNING = 0.1
