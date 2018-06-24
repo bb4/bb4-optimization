@@ -128,8 +128,9 @@ class VariableLengthIntArraySuite extends FunSuite with BeforeAndAfter{
     val nbr = params.getRandomNeighbor(1.2)
     assertResult(strip("""
         |parameter[0] = p2 = 2.0 [0, 2.0]
-        |parameter[1] = p3 = 3.0 [0, 3.0]
-        |parameter[2] = p-4 = -1.00 [-4.0, 0]
+        |parameter[1] = p-1 = -1.00 [-1.00, 0]
+        |parameter[2] = p3 = 3.0 [0, 3.0]
+        |parameter[3] = p-4 = -4.0 [-4.0, 0]
         |fitness = 0.0""")) { nbr.toString }
   }
 
@@ -138,8 +139,9 @@ class VariableLengthIntArraySuite extends FunSuite with BeforeAndAfter{
     val nbr = params.getRandomNeighbor(0.3)
     assertResult("""
         |parameter[0] = p2 = 2.0 [0, 2.0]
-        |parameter[1] = p3 = 3.0 [0, 3.0]
-        |parameter[2] = p-4 = -4.0 [-4.0, 0]
+        |parameter[1] = p-1 = -1.00 [-1.00, 0]
+        |parameter[2] = p3 = 3.0 [0, 3.0]
+        |parameter[3] = p-4 = -4.0 [-4.0, 0]
         |fitness = 0.0"""
         .stripMargin.replaceAll("\r\n", "\n")) { nbr.toString }
   }
@@ -152,12 +154,13 @@ class VariableLengthIntArraySuite extends FunSuite with BeforeAndAfter{
         |parameter[0] = p3 = 3.0 [0, 3.0]
         |parameter[1] = p-1 = -1.00 [-1.00, 0]
         |parameter[2] = p2 = 2.0 [0, 2.0]
-        |parameter[3] = p6 = 6.0 [0, 6.0]
-        |parameter[4] = p-4 = -4.0 [-4.0, 0]
-        |parameter[5] = p-9 = -9.0 [-9.0, 0]
-        |parameter[6] = p-5 = -5.0 [-5.0, 0]
-        |parameter[7] = p5 = 5.0 [0, 5.0]
-        |parameter[8] = p-3 = -2.0 [-3.0, 0]
+        |parameter[3] = p-2 = -2.0 [-2.0, 0]
+        |parameter[4] = p6 = 6.0 [0, 6.0]
+        |parameter[5] = p-4 = -4.0 [-4.0, 0]
+        |parameter[6] = p-9 = -9.0 [-9.0, 0]
+        |parameter[7] = p-5 = -5.0 [-5.0, 0]
+        |parameter[8] = p5 = 5.0 [0, 5.0]
+        |parameter[9] = p-3 = -3.0 [-3.0, 0]
         |fitness = 0.0"""
         .stripMargin.replaceAll("\r\n", "\n")) { nbr.toString }
   }
@@ -170,12 +173,13 @@ class VariableLengthIntArraySuite extends FunSuite with BeforeAndAfter{
         |parameter[0] = p3 = 3.0 [0, 3.0]
         |parameter[1] = p-1 = -1.00 [-1.00, 0]
         |parameter[2] = p2 = 2.0 [0, 2.0]
-        |parameter[3] = p6 = 6.0 [0, 6.0]
-        |parameter[4] = p-4 = -4.0 [-4.0, 0]
-        |parameter[5] = p-9 = -9.0 [-9.0, 0]
-        |parameter[6] = p-5 = -5.0 [-5.0, 0]
-        |parameter[7] = p5 = 5.0 [0, 5.0]
-        |parameter[8] = p-3 = -3.0 [-3.0, 0]
+        |parameter[3] = p-2 = -2.0 [-2.0, 0]
+        |parameter[4] = p6 = 6.0 [0, 6.0]
+        |parameter[5] = p-4 = -4.0 [-4.0, 0]
+        |parameter[6] = p-9 = -9.0 [-9.0, 0]
+        |parameter[7] = p-5 = -5.0 [-5.0, 0]
+        |parameter[8] = p5 = 5.0 [0, 5.0]
+        |parameter[9] = p-3 = -3.0 [-3.0, 0]
         |fitness = 0.0"""
         .stripMargin.replaceAll("\r\n", "\n")) { nbr.toString }
   }

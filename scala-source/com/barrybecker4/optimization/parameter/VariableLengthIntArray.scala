@@ -78,10 +78,10 @@ class VariableLengthIntArray(theParams: Array[Parameter]) extends AbstractParame
     val probAddRemove = radius / (VariableLengthIntArray.ADD_REMOVE_RADIUS_SOFTENER + radius)
     var add = false
     var remove = false
-    if (MathUtil.RANDOM.nextDouble > probAddRemove)
-      if ((MathUtil.RANDOM.nextDouble > 0.5 || size <= 1) && size < getMaxLength - 1)
-        add = true
-    else remove = true
+    if (MathUtil.RANDOM.nextDouble < probAddRemove) {
+      if ((MathUtil.RANDOM.nextDouble > 0.5 || size <= 1) && size < getMaxLength - 1) add = true
+      else remove = true
+    }
     var numNodesToMove = 0
     val nbr = this.copy.asInstanceOf[VariableLengthIntArray]
     if (add || remove) numNodesToMove = MathUtil.RANDOM.nextInt(Math.min(size, (radius + 1.5).toInt))

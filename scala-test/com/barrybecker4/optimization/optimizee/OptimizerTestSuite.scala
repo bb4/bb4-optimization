@@ -56,12 +56,24 @@ abstract class OptimizerTestSuite extends FunSuite with BeforeAndAfter {
     MathUtil.RANDOM.setSeed(0)
   }
 
-  test("GlobalSampling") { doTest(GLOBAL_SAMPLING) }
-  test("SimulatedAnnealing") { doTest(SIMULATED_ANNEALING) }
-  test("GeneticSearch") { doTest(GENETIC_SEARCH) }
-  test("ConcurrentGeneticSearch") { doTest(CONCURRENT_GENETIC_SEARCH) }
-  test("HillClimbing") {doTest(HILL_CLIMBING) }
-  test("GlobalHillClimbing") { doTest(GLOBAL_HILL_CLIMBING) }
+  test("GlobalSampling") {
+    doTest(GLOBAL_SAMPLING)
+  }
+  test("SimulatedAnnealing") {
+    doTest(SIMULATED_ANNEALING)
+  }
+  test("GeneticSearch") {
+    doTest(GENETIC_SEARCH)
+  }
+  test("ConcurrentGeneticSearch") {
+    doTest(CONCURRENT_GENETIC_SEARCH)
+  }
+  test("HillClimbing") {
+    doTest(HILL_CLIMBING)
+  }
+  test("GlobalHillClimbing") {
+    doTest(GLOBAL_HILL_CLIMBING)
+  }
 
   /** Run test for given optimization type
     * @param optType the optimization type to use.

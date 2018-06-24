@@ -7,10 +7,12 @@ import com.barrybecker4.optimization.parameter.VariableLengthIntArray
 import com.barrybecker4.optimization.parameter.types.IntegerParameter
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType
 import com.barrybecker4.optimization.optimizee.optimizees.ProblemVariation
+import DominatingSetVariation.ONE_HOP_WEIGHT
 
 
 object DominatingSetVariation {
-  val VALUES = IndexedSeq(SIMPLE_DS, TYPICAL_DS)
+  val VALUES = IndexedSeq(TYPICAL_DS) // IndexedSeq(SIMPLE_DS, PENTAGRAM_DS, TYPICAL_DS)
+  val ONE_HOP_WEIGHT = 0.6  // amount to penalize vertices not one hop from the cover
 }
 
 /**
@@ -20,8 +22,10 @@ object DominatingSetVariation {
   */
 sealed trait DominatingSetVariation extends ProblemVariation {
 
+  private lazy val exactSolutionCost: Double = computeCost(getExactSolution)
+
   /** @return an array of the node ineices in the graph */
-  def getAllNodes: Set[Int] = (0 to adjacencies.size).toSet
+  def getAllNodes: Set[Int] = (0 until adjacencies.size).toSet
 
   /** The graph containing the node adjacency information */
   protected def adjacencies: Graph
@@ -40,33 +44,35 @@ sealed trait DominatingSetVariation extends ProblemVariation {
     pa
   }
 
-  private def getMarked(pa: VariableLengthIntArray): Array[Int] = {
-    val marked = for (i <- 0 until pa.size) yield pa.get(i).getValue.toInt
-    marked.toArray
-  }
+  private def getMarked(pa: ParameterArray): Array[Int] =
+    (for (i <- 0 until pa.size) yield pa.get(i).getValue.toInt).toArray
+
 
   /** Evaluate fitness for the candidate solution to the dominating set problem.
     * @param pa param array
     * @return fitness value. The closer it is to 0 the better. When 0 it is the exact cover.
     */
-  def evaluateFitness(pa: ParameterArray): Double = computeCost(pa) - getExactSolution.size
+  def evaluateFitness(pa: ParameterArray): Double = computeCost(pa) - exactSolutionCost
 
   /** Approximate value of maxCost - minCost */
   def getFitnessRange: Double
 
-  /** We assume that the parameter array contains 0 based integers.
+  /** Assume that the parameter array contains 0 based integers.
     * @param params last best guess at dominating set.
     * @return the total cost of the candidate vertex cover.
     *         It is defined as the number of nodes in the cover + the number of nodes not within 1 hop from that set.
     */
   protected def computeCost(params: ParameterArray): Double = {
-    val marked =
-      for (i <- 0 until params.size)
-        yield params.get(i).getValue.toInt
-    getScore(marked.toArray)
+    getScore(getMarked(params))
   }
 
-  private def getScore(marked: Array[Int]) = marked.length + 0.4 * adjacencies.getNumNotWithinOneHop(marked)
+  private def getScore(marked: Array[Int]) = {
+    val numNot1hop = adjacencies.getNumNotWithinOneHop(marked)
+    println("num marked = " + marked.length + " num not within 1 hop = " + numNot1hop)
+    val s = marked.length + ONE_HOP_WEIGHT * numNot1hop
+    println("score = " + s)
+    s
+  }
 
   /** @return the error tolerance percent for a specific optimization strategy */
   override def getErrorTolerancePercent(opt: OptimizationStrategyType): Double =
@@ -106,6 +112,23 @@ case object SIMPLE_DS extends DominatingSetVariation {
   override def getFitnessRange = 7.0
 }
 
+/**
+  * This graph looks like a 5 point star inside of a pentagon.
+  * See http://mathworld.wolfram.com/DominatingSet.html
+  * Also known as the Peterson graph.
+  */
+case object PENTAGRAM_DS extends DominatingSetVariation {
+  val adjacencies = new Graph(Seq(
+    List(2, 3, 5), List(3, 4, 6), List(0, 4, 7), List(0, 1, 8), List(1, 2, 9),
+    List(0, 6, 9), List(1, 5, 7), List(2, 6, 8), List(3, 7, 9), List(4, 5, 8)
+  ))
+
+  val errorTolerances = ErrorTolerances(4.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0)
+
+  /** This is one of several possible solutions that gives an optimal fitness of 0 */
+  override def getExactSolution: ParameterArray = createSolution(0, 1, 8)
+  override def getFitnessRange = 15.0
+}
 
 case object TYPICAL_DS extends DominatingSetVariation {
 
@@ -119,7 +142,7 @@ case object TYPICAL_DS extends DominatingSetVariation {
     List(0, 23, 24)
   ))
 
-  val errorTolerances = ErrorTolerances(2.5, 0.5, 1.0, 0.5, 1.0, 0.41, 0.41, 1.0, 0)
+  val errorTolerances = ErrorTolerances(16.0, 1.3, 1.2, 2.0, 1.0, 0.41, 0.41, 1.0, 0)
 
   /** This is one of several possible solutions that gives an optimal fitness of 0 */
   override def getExactSolution: ParameterArray = createSolution(6, 7, 8, 19, 21, 24)

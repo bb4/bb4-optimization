@@ -5,6 +5,7 @@ import com.barrybecker4.common.format.FormatUtil
 import com.barrybecker4.common.math.MathUtil
 import com.barrybecker4.optimization.optimizee.Optimizee
 import com.barrybecker4.optimization.parameter.ParameterArray
+import SimulatedAnnealingStrategy._
 
 /**
   * Simulated annealing optimization strategy.
@@ -61,7 +62,7 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee) extends OptimizationStrat
   override def doOptimization(params: ParameterArray, fitnessRange: Double): ParameterArray = {
     var ct = 0
     var temperature = tempMax
-    val tempMin = tempMax / Math.pow(2.0, SimulatedAnnealingStrategy.NUM_TEMP_ITERATIONS)
+    val tempMin = tempMax / Math.pow(2.0, NUM_TEMP_ITERATIONS)
     if (!optimizee.evaluateByComparison) {
       val currentFitness = optimizee.evaluateFitness(params)
       params.setFitness(currentFitness)
@@ -79,16 +80,12 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee) extends OptimizationStrat
           notifyOfChange(bestParams)
         }
         ct += 1
-      } while ( {
-        ct < SimulatedAnnealingStrategy.N * currentParams.size && !isOptimalFitnessReached(currentParams)
-      })
+      } while (ct < N * currentParams.size && !isOptimalFitnessReached(currentParams))
       ct = 0
       // keep Reducing the temperature until it reaches tempMin
-      temperature *= SimulatedAnnealingStrategy.TEMP_DROP_FACTOR
+      temperature *= TEMP_DROP_FACTOR
       println("temp = " + temperature + " tempMin = " + tempMin + "\n bestParams = " + bestParams)
-    } while ( {
-      temperature > tempMin && !isOptimalFitnessReached(currentParams)
-    })
+    } while (temperature > tempMin && !isOptimalFitnessReached(currentParams))
     //println("T=" + temperature + "  currentFitness = " + bestParams.getFitness());
     log(ct, bestParams.getFitness, 0, 0, bestParams, FormatUtil.formatNumber(temperature))
     bestParams
@@ -106,7 +103,7 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee) extends OptimizationStrat
   private def findNeighbor(params: ParameterArray, ct: Int, temperature: Double) = {
     //double r = (tempMax/5.0+temperature) / (8.0*(N/5.0+ct)*tempMax);
     var curParams = params
-    val r = temperature / ((SimulatedAnnealingStrategy.N + ct) * tempMax)
+    val r = 2 * temperature / ((N + ct) * tempMax)
     var newParams = curParams.getRandomNeighbor(r)
     val dist = curParams.distance(newParams)
     var deltaFitness = .0
@@ -121,8 +118,9 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee) extends OptimizationStrat
     val useWorseSolution = MathUtil.RANDOM.nextDouble < probability
     if (deltaFitness > 0 || useWorseSolution) { // we always select the solution if it has a better fitness,
       // but we sometimes select a worse solution if the second term evaluates to true.
-      if (deltaFitness < 0 && useWorseSolution) println("Selected worse solution with prob=" +
-        probability + " delta=" + deltaFitness + " / temp=" + temperature)
+      if (deltaFitness < 0 && useWorseSolution)
+        println("Selected worse solution with prob=" +
+          probability + " delta=" + deltaFitness + " / temp=" + temperature)
       curParams = newParams
     }
     //println("T="+temperature+" ct="+ct+" dist="+dist+" deltaFitness="

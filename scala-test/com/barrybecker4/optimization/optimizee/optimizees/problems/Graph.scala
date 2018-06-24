@@ -26,8 +26,8 @@ class Graph @SafeVarargs private[problems](val nodeNeighbors: Seq[List[Integer]]
         total += v
       }
     }
-    println("out of " + nodeNeighbors.size + " nodes, " + total +
-      " are not within one hop from " + marked.mkString(", "))
+    //println("out of " + nodeNeighbors.size + " nodes, " + total +
+    //  " are not within one hop from " + marked.mkString(", "))
     total
   }
 
@@ -35,8 +35,7 @@ class Graph @SafeVarargs private[problems](val nodeNeighbors: Seq[List[Integer]]
     * @param marked set of marked nodes
     * @return true if node i is only one hop from one of the marked nodes
     */
-  private def isNodeOneHopAway(i: Int, marked: Set[Int]): Boolean = {
-    val nbrs = nodeNeighbors(i)
-    marked.exists(nbrs.contains)
-  }
+  private def isNodeOneHopAway(i: Int, marked: Set[Int]): Boolean =
+    marked.exists(nodeNeighbors(i).contains)
+
 }
