@@ -63,7 +63,7 @@ class VariableLengthIntArraySuite extends FunSuite with BeforeAndAfter{
 
   test("GetSamplePopulationSizeWhenSmall"){
     params = createDistArray(Set(2, -1, 3, -4))
-    assertResult(81) { params.getSamplePopulationSize }
+    assertResult(256) { params.getSamplePopulationSize }
   }
 
   test("GetSamplePopulationSizeWhenLarge") {

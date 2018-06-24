@@ -9,7 +9,7 @@ import com.barrybecker4.optimization.strategy.OptimizationStrategyType
 
 
 object SubsetSumVariation {
-  val VALUES = IndexedSeq(SIMPLE_SS)//, TYPICAL_SS, NO_SOLUTION)
+  val VALUES = IndexedSeq(SIMPLE_SS)//, SIMPLE_SS, TYPICAL_SS, NO_SOLUTION)
 }
 
 sealed trait SubsetSumVariation extends ProblemVariation {
@@ -103,7 +103,7 @@ case object SIMPLE_SS extends SubsetSumVariation {
 
 
 case object TYPICAL_SS extends SubsetSumVariation {
-  val errorTolerances = ErrorTolerances(0.0, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.0)
+  val errorTolerances = ErrorTolerances(0.0, 0.5, 0.5, 1.25, 0.5, 0.5, 0.5, 0.0)
 
   override protected def getNumberSet: Set[Int] =
     Set(-7, -33, -21, 5, 83, -29, -78, 213, 123, -34, -37, -41, 91, -8, -17)

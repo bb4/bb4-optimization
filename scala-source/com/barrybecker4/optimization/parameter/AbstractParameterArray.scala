@@ -32,7 +32,7 @@ abstract class AbstractParameterArray private[parameter](theParams: Array[Parame
     var pop = 1
     assert(params != null)
     for (param <- params) {
-      pop *= (if (param.isIntegerOnly) 3 else 12)
+      pop *= (if (param.isIntegerOnly) 4 else 12)
     }
     Math.min(AbstractParameterArray.POPULATION_MAX, pop)
   }

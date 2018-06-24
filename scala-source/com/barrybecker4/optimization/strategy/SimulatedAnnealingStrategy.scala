@@ -32,13 +32,15 @@ object SimulatedAnnealingStrategy {
 class SimulatedAnnealingStrategy(optimizee: Optimizee) extends OptimizationStrategy(optimizee) {
   private var tempMax = SimulatedAnnealingStrategy.DEFAULT_TEMP_MAX
 
+  /** keep track of points that were searched */
+  private var cache: Set[ParameterArray] = Set()
+
   /** @param tempMax the initial temperature at the start of the simulated annealing process (before cooling) */
   def setMaxTemperature(tempMax: Double): Unit = {
     this.tempMax = tempMax
   }
 
-  /**
-    * Finds a local minima.
+  /** Finds a local minima.
     *
     * The concept is based on the manner in which liquids freeze or metals recrystallize in the process of annealing.
     * In an annealing process, an initially at high temperature and disordered liquid, is slowly cooled so that the system
@@ -91,10 +93,8 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee) extends OptimizationStrat
     bestParams
   }
 
-  /**
-    * Select a new point in the neighborhood of our current location
+  /** Select a new point in the neighborhood of our current location
     * The neighborhood we select from has a radius of r.
-    *
     * @param params      current location in the parameter space.
     * @param ct          iteration count.
     * @param temperature current temperature. Gets cooler with every successive temperature iteration.
@@ -105,6 +105,16 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee) extends OptimizationStrat
     var curParams = params
     val r = 2 * temperature / ((N + ct) * tempMax)
     var newParams = curParams.getRandomNeighbor(r)
+
+    // Try to avoid getting the same point as one we have seen before
+    var tempRad = r
+    var i = 0
+    while (cache.contains(newParams) && i < 10) {
+      newParams = curParams.getRandomNeighbor(tempRad)
+      tempRad *= 1.05
+      i += 1
+    }
+
     val dist = curParams.distance(newParams)
     var deltaFitness = .0
     var newFitness = .0
