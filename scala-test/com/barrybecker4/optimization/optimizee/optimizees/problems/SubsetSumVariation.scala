@@ -98,7 +98,7 @@ case object SIMPLE_SS extends SubsetSumVariation {
 
   override def getExactSolution: ParameterArray = createSolution(-3, -2, 5)
 
-  override def getFitnessRange = 14.0
+  override def getFitnessRange = 7.0
 }
 
 

@@ -11,7 +11,7 @@ import DominatingSetVariation.ONE_HOP_WEIGHT
 
 
 object DominatingSetVariation {
-  val VALUES = IndexedSeq(TYPICAL_DS) // IndexedSeq(SIMPLE_DS, PENTAGRAM_DS, TYPICAL_DS)
+  val VALUES = IndexedSeq(SIMPLE_DS, PENTAGRAM_DS, TYPICAL_DS) //IndexedSeq(TYPICAL_DS) //
   val ONE_HOP_WEIGHT = 0.6  // amount to penalize vertices not one hop from the cover
 }
 
