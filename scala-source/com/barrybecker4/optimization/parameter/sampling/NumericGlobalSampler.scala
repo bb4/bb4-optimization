@@ -17,18 +17,18 @@ class NumericGlobalSampler(var params: NumericParameterArray, val requestedNumSa
   val dims = new Array[Int](params.size)
 
   /** number of discrete samples to take along each parameter */
-  private var samplingRate = determineSamplingRate(requestedNumSamples)
+  private val samplingRate = determineSamplingRate(requestedNumSamples)
   for (i <- dims.indices) {
     dims(i) = samplingRate
   }
   // this potentially takes a lot of memory - may need to revisit
-  private var samples = new MultiDimensionalIndexer(dims)
+  private val samples = new MultiDimensionalIndexer(dims)
   numSamples = samples.getNumValues
 
   override def next: NumericParameterArray = {
     if (counter >= numSamples) throw new NoSuchElementException("ran out of samples.")
     if (counter == numSamples - 1) hasNext = false
-    val index = samples.getIndexFromRaw(counter.toInt)
+    val index = samples.getIndexFromRaw(counter)
     val nextSample = params.copy
     for (j <- 0 until nextSample.size) {
       val p = nextSample.get(j)

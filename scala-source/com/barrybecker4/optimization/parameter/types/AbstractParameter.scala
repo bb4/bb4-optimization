@@ -7,7 +7,9 @@ import scala.util.Random
 
 
 /**
-  * Represents a general parameter to an algorithm
+  * TODO: this needs to be made an immutable case class. Create a new instance when changing the value
+  * Represents a general parameter to an algorithm.
+  * tweakValue and randomizeValue should return new instances.
   * @param theVal  the initial or assign parameter value
   * @param minValue  the minimum value that this parameter is allowed to take on
   * @param maxValue  the maximum value that this parameter is allowed to take on

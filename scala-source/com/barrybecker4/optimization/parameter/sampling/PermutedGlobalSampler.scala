@@ -36,7 +36,7 @@ class PermutedGlobalSampler(var params: PermutedParameterArray, val requestedNum
   numSamples = requestedNumSamples
 
   /** becomes true if the requestedNumSamples is close to the total number of permutations in the space */
-  private var useExhaustiveSearch = {
+  private val useExhaustiveSearch = {
     val v: BigInteger = numPermutations.multiply(BigInteger.valueOf(CLOSE_FACTOR)).divide(BigInteger.valueOf(100))
     BigInteger.valueOf(requestedNumSamples).compareTo(v) == 1
   }

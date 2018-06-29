@@ -42,7 +42,7 @@ abstract class AbstractParameterArray private[parameter](theParams: Array[Parame
 
   /** @return a copy of ourselves.*/
   override def copy: AbstractParameterArray = {
-    var newParams = params.map(_.copy)
+    val newParams = params.map(_.copy)
     val pa = createInstance
     pa.params = newParams
     pa.setFitness(fitness)

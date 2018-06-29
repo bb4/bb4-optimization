@@ -31,7 +31,7 @@ class PermutedParameterArray(theParams: Array[Parameter], rnd: Random = MathUtil
     */
   def setPermutation(indices: List[Integer]): Unit = {
     assert(indices.size == size)
-    var newParams = for (i <- indices) yield get(i)
+    val newParams = for (i <- indices) yield get(i)
     params = newParams.toArray
   }
 

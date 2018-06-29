@@ -26,8 +26,8 @@ object NumericParameterArray {
   def createParams(vals: Array[Double], minVals: Array[Double], maxVals: Array[Double],
                    names: Array[String]): Array[Parameter] = {
     val len = vals.length
-    var params = for (i <- 0 until len) yield {
-       new DoubleParameter(vals(i), minVals(i), maxVals(i), names(i))
+    val params = for (i <- 0 until len) yield {
+      new DoubleParameter(vals(i), minVals(i), maxVals(i), names(i))
     }
     params.toArray
   }

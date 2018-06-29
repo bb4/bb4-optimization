@@ -33,7 +33,7 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee) extends OptimizationStrat
   private var tempMax = SimulatedAnnealingStrategy.DEFAULT_TEMP_MAX
 
   /** keep track of points that were searched */
-  private var cache: Set[ParameterArray] = Set()
+  private val cache: Set[ParameterArray] = Set()
 
   /** @param tempMax the initial temperature at the start of the simulated annealing process (before cooling) */
   def setMaxTemperature(tempMax: Double): Unit = {

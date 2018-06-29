@@ -35,7 +35,7 @@ object OptimizerEvalPanel {
 class OptimizerEvalPanel() extends JPanel
     with OptimizationListener with OptimizationViewable with MouseListener with MouseMotionListener {
 
-  private var renderer = new PointsListRenderer
+  private val renderer = new PointsListRenderer
   private val projector = new SimpleProjector
   private var pointsList: PointsList = _
   private var dragStartPosition: Point = _

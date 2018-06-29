@@ -25,7 +25,7 @@ object GaussianRedistribution {
 class GaussianRedistribution(var mean: Double, var stdDeviation: Double) extends RedistributionFunction {
 
   verifyInRange(mean)
-  private var errorFunction = new ErrorFunction
+  private val errorFunction = new ErrorFunction
   initializeFunction()
 
   override protected def initializeFunction(): Unit = {

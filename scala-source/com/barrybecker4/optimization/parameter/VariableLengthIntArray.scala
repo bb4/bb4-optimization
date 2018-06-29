@@ -100,7 +100,7 @@ class VariableLengthIntArray(theParams: Array[Parameter]) extends AbstractParame
   def getCombination(indices: Seq[Int]): VariableLengthIntArray = {
     assert(indices.size <= getMaxLength,
       "The number of indices (" + indices.size + ") was greater than the size (" + size + ")")
-    var newParams = for (i <- indices) yield createParam(fullSeq(i))
+    val newParams = for (i <- indices) yield createParam(fullSeq(i))
     new VariableLengthIntArray(newParams.toArray, fullSet, distCalculator)
   }
 
@@ -123,9 +123,9 @@ class VariableLengthIntArray(theParams: Array[Parameter]) extends AbstractParame
 
   /** @return get a random solution in the parameter space by selecting about half of the ints */
   override def getRandomSample: ParameterArray = {
-    val shuffled = MathUtil.RANDOM.shuffle(fullSeq.toSeq)
-    var marked = shuffled.take((shuffled.length + 1) / 2)
-    var newParams = marked.map(m => createParam(m))
+    val shuffled = MathUtil.RANDOM.shuffle(fullSeq)
+    val marked = shuffled.take((shuffled.length + 1) / 2)
+    val newParams = marked.map(m => createParam(m))
     new VariableLengthIntArray(newParams.toArray, fullSet, distCalculator)
   }
 

@@ -15,9 +15,9 @@ import com.barrybecker4.optimization.parameter.{Direction, NumericParameterArray
   */
 class ImprovementIteration(params: NumericParameterArray, var oldGradient: Vector = null) {
 
-  private var delta: Vector = params.asVector
-  private var fitnessDelta: Vector = params.asVector
-  var gradient: Vector = params.asVector //oldGradient
+  private val delta: Vector = params.asVector
+  private val fitnessDelta: Vector = params.asVector
+  val gradient: Vector = params.asVector
 
   if (oldGradient == null) {
     this.oldGradient = params.asVector
