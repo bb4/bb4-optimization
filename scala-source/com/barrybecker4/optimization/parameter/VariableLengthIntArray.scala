@@ -84,7 +84,7 @@ class VariableLengthIntArray(theParams: Array[Parameter]) extends AbstractParame
     }
     var numNodesToMove = 0
     val nbr = this.copy.asInstanceOf[VariableLengthIntArray]
-    println(s"rad=$radius pAdd/Rm=$probAddRemove add=$add remove=$remove")
+    //println(s"rad=$radius pAdd/Rm=$probAddRemove add=$add remove=$remove")
     if (add || remove) numNodesToMove = MathUtil.RANDOM.nextInt(Math.min(size, (radius + 1.5).toInt))
     else { // at least 1 will be moved
       numNodesToMove = 1 + MathUtil.RANDOM.nextInt((1.5 + radius).toInt)

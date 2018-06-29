@@ -9,7 +9,7 @@ import com.barrybecker4.optimization.strategy.OptimizationStrategyType
 
 
 object SubsetSumVariation {
-  val VALUES = IndexedSeq(SIMPLE_SS)//, SIMPLE_SS, TYPICAL_SS, NO_SOLUTION)
+  val VALUES = IndexedSeq(NO_SOLUTION)//, SIMPLE_SS, TYPICAL_SS, NO_SOLUTION)
 }
 
 sealed trait SubsetSumVariation extends ProblemVariation {
@@ -36,7 +36,11 @@ sealed trait SubsetSumVariation extends ProblemVariation {
     * @param pa param array
     * @return fitness value
     */
-  def evaluateFitness(pa: ParameterArray): Double = computeCost(pa)
+  def evaluateFitness(pa: ParameterArray): Double = {
+    val c = computeCost(pa)
+    println("cost = " + c)
+    c
+  }
 
   /** Approximate value of maxCost - minCost */
   def getFitnessRange: Double
@@ -92,13 +96,13 @@ sealed trait SubsetSumVariation extends ProblemVariation {
 
 case object SIMPLE_SS extends SubsetSumVariation {
   val errorTolerances =
-    ErrorTolerances(0.0, 0.0, 8.0, 8.0, 0.0, 8.0, 8.0, 0.0)
+    ErrorTolerances(0.0, 0.0, 8.0, 6.4, 0.0, 6.4, 6.4, 0.0)
 
   override protected def getNumberSet: Set[Int] = Set(-7, -3, -2, 5, 8)
 
   override def getExactSolution: ParameterArray = createSolution(-3, -2, 5)
 
-  override def getFitnessRange = 7.0
+  override def getFitnessRange = 22.0
 }
 
 
@@ -117,7 +121,7 @@ case object TYPICAL_SS extends SubsetSumVariation {
 
 case object NO_SOLUTION extends  SubsetSumVariation {
   // none of the errors will be 0 because there is no solution that sums to 0.
-  val errorTolerances = ErrorTolerances(40.0, 20.0, 20.0, 0.25, 20.0, 20.0, 20.0, 20.0, 20.0)
+  val errorTolerances = ErrorTolerances(40.0, 0.7, 0.7, 1.7, 1.7, 0.7, 0.7, 0.7, 0.7)
 
   override protected def getNumberSet: Set[Int] =
     Set(-7, -33, -21, 5, -83, -29, -78, -113, -23, -34, -37, -41, -91, -9, -17)
@@ -125,5 +129,5 @@ case object NO_SOLUTION extends  SubsetSumVariation {
   /** There is no solution - i.e. no values that sum to 0. */
   override def getExactSolution: ParameterArray = createSolution(-7)
 
-  override def getFitnessRange = 400.0
+  override def getFitnessRange = 600.0
 }

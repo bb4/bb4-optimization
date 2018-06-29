@@ -95,6 +95,7 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee) extends OptimizationStrat
 
   /** Select a new point in the neighborhood of our current location
     * The neighborhood we select from has a radius of r.
+    * Uses cache to avoid finding candidates that wre previously searched.
     * @param params      current location in the parameter space.
     * @param ct          iteration count.
     * @param temperature current temperature. Gets cooler with every successive temperature iteration.
@@ -103,7 +104,7 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee) extends OptimizationStrat
   private def findNeighbor(params: ParameterArray, ct: Int, temperature: Double) = {
     //double r = (tempMax/5.0+temperature) / (8.0*(N/5.0+ct)*tempMax);
     var curParams = params
-    val r = 2 * temperature / ((N + ct) * tempMax)
+    val r = 8 * temperature / ((N + ct) * tempMax)
     var newParams = curParams.getRandomNeighbor(r)
 
     // Try to avoid getting the same point as one we have seen before

@@ -11,7 +11,7 @@ import DominatingSetVariation.ONE_HOP_WEIGHT
 
 
 object DominatingSetVariation {
-  val VALUES = IndexedSeq(SIMPLE_DS, PENTAGRAM_DS, TYPICAL_DS) //IndexedSeq(TYPICAL_DS) //
+  val VALUES = IndexedSeq(SIMPLE_DS, PENTAGRAM_DS, TYPICAL_DS)
   val ONE_HOP_WEIGHT = 0.6  // amount to penalize vertices not one hop from the cover
 }
 
@@ -68,10 +68,8 @@ sealed trait DominatingSetVariation extends ProblemVariation {
 
   private def getScore(marked: Array[Int]) = {
     val numNot1hop = adjacencies.getNumNotWithinOneHop(marked)
-    println("num marked = " + marked.length + " num not within 1 hop = " + numNot1hop)
-    val s = marked.length + ONE_HOP_WEIGHT * numNot1hop
-    println("score = " + s)
-    s
+    // println("num marked = " + marked.length + " num not within 1 hop = " + numNot1hop)
+    marked.length + ONE_HOP_WEIGHT * numNot1hop
   }
 
   /** @return the error tolerance percent for a specific optimization strategy */
@@ -142,7 +140,7 @@ case object TYPICAL_DS extends DominatingSetVariation {
     List(0, 23, 24)
   ))
 
-  val errorTolerances = ErrorTolerances(16.0, 1.3, 2.41, 2.0, 1.0, 0.41, 0.41, 1.0, 0)
+  val errorTolerances = ErrorTolerances(16.0, 1.3, 1.2, 2.0, 1.0, 0.41, 0.41, 1.0, 0)
 
   /** This is one of several possible solutions that gives an optimal fitness of 0 */
   override def getExactSolution: ParameterArray = createSolution(6, 7, 8, 19, 21, 24)
