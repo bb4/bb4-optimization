@@ -44,7 +44,6 @@ case object PARABOLA extends ParabolaMinVariation {
   /** Smooth parabola with min of 0.0 at P1, P2 */
   override def evaluateFitness(a: ParameterArray): Double =
     Math.pow(P1 - a.get(0).getValue, 2) + Math.pow(P2 - a.get(1).getValue, 2)
-
 }
 
 

@@ -19,10 +19,8 @@ object GlobalSampleStrategy {
   */
 class GlobalSampleStrategy(optimizee: Optimizee) extends OptimizationStrategy(optimizee) {
 
-  numSample = DEFAULT_NUM_SAMPLES
-
   /** the user should set this explicitly. */
-  private var numSample = 0
+  private var numSample = DEFAULT_NUM_SAMPLES
 
   /**
     * @param samplingRate the rate at which to sample along each dimension when trying guesses globally.

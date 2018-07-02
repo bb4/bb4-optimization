@@ -5,7 +5,7 @@ import com.barrybecker4.optimization.strategy._
 
 /** Some common tolerances to use in tests */
 object ErrorTolerances {
-  val BASE_TOLERANCE = 0.0002
+  val BASE_TOLERANCE = 0.0004
   val RELAXED_TOL = 0.0032
   /** Really relax this one because we do not expect it to ever get that close */
   val GLOB_SAMP_TOL = 0.03

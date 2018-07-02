@@ -23,5 +23,5 @@ class DoubleParameterSuite extends ParameterSuite[Double] {
   override protected def expectedBackwardEpsChange = 1.8333333333333333
 
   override protected def expectedTweakedValues: Array[Double] =
-    Array(2.063847575097573, 1.9887453440192462, 0.042689875177752246, 0.0, 0.09535999327768793)
+    Array(2.1561581040188953, 1.8520668005154652, 0.0, 0.0, 0.0)
 }

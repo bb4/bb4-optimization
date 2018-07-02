@@ -19,12 +19,12 @@ import scala.util.Random
   * the traveling salesman problem, for example.
   * @author Barry Becker
   */
-class PermutedParameterArray(theParams: Array[Parameter], rnd: Random = MathUtil.RANDOM)
-  extends AbstractParameterArray(theParams) {
+class PermutedParameterArray(theParams: Array[Parameter], rnd: Random)
+  extends AbstractParameterArray(theParams, rnd) {
 
   private val distanceCalculator: PermutedDistanceCalculator = new PermutedDistanceCalculator()
 
-  def this() { this(Array[Parameter]())}
+  def this(rnd: Random = MathUtil.RANDOM) { this(Array[Parameter](), rnd)}
 
   /** Permute the parameters according to the specified permutation
     * of 0 based indices.
@@ -35,7 +35,7 @@ class PermutedParameterArray(theParams: Array[Parameter], rnd: Random = MathUtil
     params = newParams.toArray
   }
 
-  override protected def createInstance = new PermutedParameterArray
+  override protected def createInstance = new PermutedParameterArray(rnd)
 
   def reverse: ParameterArray = {
     val paramCopy = this.copy
@@ -99,6 +99,6 @@ class PermutedParameterArray(theParams: Array[Parameter], rnd: Random = MathUtil
   /** @return get a completely random solution in the parameter space. */
   override def getRandomSample: ParameterArray = {
     val theParams: Array[Parameter] = rnd.shuffle(params.toSeq).toArray
-    new PermutedParameterArray(theParams)
+    new PermutedParameterArray(theParams, rnd)
   }
 }

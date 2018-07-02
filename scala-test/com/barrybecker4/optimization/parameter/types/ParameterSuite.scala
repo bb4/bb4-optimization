@@ -5,23 +5,20 @@ import com.barrybecker4.common.math.MathUtil
 import com.barrybecker4.optimization.parameter.Direction
 import org.junit.Assert.assertEquals
 import org.scalatest.{BeforeAndAfter, FunSuite}
-import ParameterSuite.RAND
 import scala.util.Random
 
 /**
   * Base class for all parameter test classes
   * @author Barry Becker
   */
-object ParameterSuite  {
-  private val RAND: Random = new Random(1)
-}
-
 abstract class ParameterSuite[T] extends FunSuite with BeforeAndAfter {
   /** instance under test */
   protected var parameter: Parameter = _
+  protected var rand: Random = _
 
   before {
     parameter = createParameter
+    rand = new Random(1)
   }
 
   protected def createParameter: Parameter
@@ -61,15 +58,15 @@ abstract class ParameterSuite[T] extends FunSuite with BeforeAndAfter {
   }
 
   test("TweakedValues") {
-    parameter.tweakValue(0.02, RAND)
+    parameter.tweakValue(0.02, rand)
     val v1: Any = parameter.getNaturalValue
-    parameter.tweakValue(0.1, RAND)
+    parameter.tweakValue(0.1, rand)
     val v2: Any = parameter.getNaturalValue
-    parameter.tweakValue(0.4, RAND)
+    parameter.tweakValue(0.4, rand)
     val v3: Any = parameter.getNaturalValue
-    parameter.tweakValue(0.8, RAND)
+    parameter.tweakValue(0.8, rand)
     val v4: Any = parameter.getNaturalValue
-    parameter.tweakValue(1.1, RAND)
+    parameter.tweakValue(1.1, rand)
     val v5: Any = parameter.getNaturalValue
     //assertArrayEquals("Unexpected tweaked values", expectedTweakedValues(), new Object[] {v1, v2, v3});
     assertResult(expectedTweakedValues) { Array(v1, v2, v3, v4, v5) }

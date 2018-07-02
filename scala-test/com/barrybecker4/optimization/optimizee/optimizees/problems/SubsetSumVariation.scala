@@ -6,10 +6,11 @@ import com.barrybecker4.optimization.parameter.{ParameterArray, VariableLengthIn
 import com.barrybecker4.optimization.parameter.distancecalculators.MagnitudeDistanceCalculator
 import com.barrybecker4.optimization.parameter.types.{IntegerParameter, Parameter}
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType
+import scala.util.Random
 
 
 object SubsetSumVariation {
-  val VALUES = IndexedSeq(NO_SOLUTION)//, SIMPLE_SS, TYPICAL_SS, NO_SOLUTION)
+  val VALUES = IndexedSeq(SIMPLE_SS, TYPICAL_SS, NO_SOLUTION)
 }
 
 sealed trait SubsetSumVariation extends ProblemVariation {
@@ -27,7 +28,11 @@ sealed trait SubsetSumVariation extends ProblemVariation {
     val num = this.getNumElements
     val numSet = this.getNumberSet.toSeq
     val params: IndexedSeq[Parameter] = for (i <- 0 until num by 3) yield createParam(numSet(i))
-    val pa = new VariableLengthIntArray(params.toArray, getNumberSet, new MagnitudeDistanceCalculator)
+    val pa = new VariableLengthIntArray(
+      params.toArray, getNumberSet,
+      new MagnitudeDistanceCalculator,
+      new Random(1)
+    )
     pa.setFitness(computeCost(pa))
     pa
   }
@@ -37,9 +42,7 @@ sealed trait SubsetSumVariation extends ProblemVariation {
     * @return fitness value
     */
   def evaluateFitness(pa: ParameterArray): Double = {
-    val c = computeCost(pa)
-    println("cost = " + c)
-    c
+    computeCost(pa)
   }
 
   /** Approximate value of maxCost - minCost */
@@ -81,7 +84,7 @@ sealed trait SubsetSumVariation extends ProblemVariation {
     assert(numNodes > 0, "There must be some values in a valid solution.")
     val params: IndexedSeq[Parameter] = for (i <- 0 until numNodes) yield createParam(i)
 
-    new VariableLengthIntArray(params.toArray, getNumberSet, new MagnitudeDistanceCalculator)
+    new VariableLengthIntArray(params.toArray, getNumberSet, new MagnitudeDistanceCalculator, new Random(1))
   }
 
   private def createParam(i: Int) = {
@@ -121,7 +124,7 @@ case object TYPICAL_SS extends SubsetSumVariation {
 
 case object NO_SOLUTION extends  SubsetSumVariation {
   // none of the errors will be 0 because there is no solution that sums to 0.
-  val errorTolerances = ErrorTolerances(40.0, 0.7, 0.7, 1.7, 1.7, 0.7, 0.7, 0.7, 0.7)
+  val errorTolerances = ErrorTolerances(40.0, 0.7, 1.3, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7)
 
   override protected def getNumberSet: Set[Int] =
     Set(-7, -33, -21, 5, -83, -29, -78, -113, -23, -34, -37, -41, -91, -9, -17)

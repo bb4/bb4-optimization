@@ -4,6 +4,8 @@ package com.barrybecker4.optimization.optimizee.optimizees.problems
 import com.barrybecker4.optimization.parameter.NumericParameterArray
 import com.barrybecker4.optimization.parameter.types.{DoubleParameter, Parameter}
 
+import scala.util.Random
+
 /**
   * Constants related to the analytics functions
   * @author Barry Becker
@@ -18,7 +20,7 @@ object ParabolaFunctionConsts {
     new DoubleParameter(P2, 0.0, 3.0, "p2")
   )
 
-  val EXACT_SOLUTION = new NumericParameterArray(EXACT_SOLUTION_PARAMS)
+  val EXACT_SOLUTION = new NumericParameterArray(EXACT_SOLUTION_PARAMS, new Random(1))
 
   // define the initialGuess in some bounded region of the 2-dimensional search space.
   private val VALUES = Array(6.81, 7.93) // initialGuess
@@ -27,7 +29,7 @@ object ParabolaFunctionConsts {
   private val MAX_VALS = Array(10.0, 10.0)
   private val PARAM_NAMES = Array("p1", "p2")
 
-  val INITIAL_GUESS = new NumericParameterArray(VALUES, MIN_VALS, MAX_VALS, PARAM_NAMES)
+  val INITIAL_GUESS = new NumericParameterArray(VALUES, MIN_VALS, MAX_VALS, PARAM_NAMES, new Random(1))
 
   EXACT_SOLUTION.setFitness(0.0)
 }

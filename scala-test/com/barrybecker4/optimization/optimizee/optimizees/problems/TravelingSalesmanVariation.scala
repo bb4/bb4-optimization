@@ -6,9 +6,12 @@ import com.barrybecker4.optimization.parameter.{ParameterArray, PermutedParamete
 import com.barrybecker4.optimization.parameter.types.IntegerParameter
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType
 import ErrorTolerances._
+import TravelingSalesmanVariation.RANDOM
+import scala.util.Random
 
 
 object TravelingSalesmanVariation {
+  val RANDOM = new Random(1)
   val VALUES = IndexedSeq(TSP_SIMPLE, TSP_STANDARD)//, TSP_US_CAPITALS)
 }
 
@@ -21,7 +24,7 @@ sealed trait TravelingSalesmanVariation  extends ProblemVariation {
   def getInitialGuess: ParameterArray = {
     val num = this.getNumCities
     val params = for (i <- 0 until num) yield new IntegerParameter(i, 0, num - 1, "p" + i)
-    val guess = new PermutedParameterArray(params.toArray)
+    val guess = new PermutedParameterArray(params.toArray, RANDOM)
     guess.setFitness(evaluateFitness(guess))
     guess
   }
@@ -95,7 +98,7 @@ sealed trait TravelingSalesmanVariation  extends ProblemVariation {
     val numCities = cityList.length
     val params = for (i <- cityList.indices) yield
       new IntegerParameter(cityList(i), 0, numCities - 1, "p" + i)
-    new PermutedParameterArray(params.toArray)
+    new PermutedParameterArray(params.toArray, RANDOM)
   }
 }
 

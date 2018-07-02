@@ -25,5 +25,5 @@ class BooleanParameterSuite extends ParameterSuite[Boolean] {
   override protected def expectedBackwardEpsChange = 0.0
 
   override protected def expectedTweakedValues: Array[Boolean] =
-    Array[Boolean](true, true, true, true, false)
+    Array[Boolean](true, true, false, false, true)
 }

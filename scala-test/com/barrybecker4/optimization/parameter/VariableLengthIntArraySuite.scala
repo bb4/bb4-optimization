@@ -1,19 +1,18 @@
 package com.barrybecker4.optimization.parameter
 
-import com.barrybecker4.common.math.MathUtil
 import com.barrybecker4.optimization.parameter.distancecalculators.{DistanceCalculator, MagnitudeDistanceCalculator, MagnitudeIgnoredDistanceCalculator}
 import com.barrybecker4.optimization.parameter.types.{IntegerParameter, Parameter}
 import org.scalatest.{BeforeAndAfter, FunSuite}
-import scala.collection.mutable.ArrayBuffer
 import com.barrybecker4.common.testsupport.strip
+import scala.util.Random
 
 
 class VariableLengthIntArraySuite extends FunSuite with BeforeAndAfter{
 
   private var params: VariableLengthIntArray = _
-
+  private var rnd: Random = _
   before {
-    MathUtil.RANDOM.setSeed(0)
+    rnd = new Random(1)
   }
 
   test("serialization of typical") {
@@ -81,7 +80,7 @@ class VariableLengthIntArraySuite extends FunSuite with BeforeAndAfter{
     val samples = getListFromIterator(params.findGlobalSamples(1))
     assertResult(1) { samples.length }
     val expParams = Array(
-      createDistArray(Set(3, -1))
+      createDistArray(Set(-1, 3))
     )
     assertResult(expParams) { samples }
   }
@@ -98,13 +97,13 @@ class VariableLengthIntArraySuite extends FunSuite with BeforeAndAfter{
     assertResult(3) { samples.length }
   }
 
-  test("Find4GlobalSamples(") {
+  test("Find4GlobalSamples") {
     params = createDistArray(Set(2, -1, 3))
     val samples = getListFromIterator(params.findGlobalSamples(4))
     assertResult(4) { samples.length }
     val expParams = Array(
-      createDistArray(Set(3, -1)),
-      createDistArray(Set(2, 3)),
+      createDistArray(Set(-1, 3)),
+      createDistArray(Set(3, 2)),
       createDistArray(Set(-1, 2)),
       createDistArray(Set(2, -1))
     )
@@ -137,20 +136,18 @@ class VariableLengthIntArraySuite extends FunSuite with BeforeAndAfter{
   test("swap nodes (4 params). r =  0.3") {
     params = createDistArray(Set(2, -1, 3, -4))
     val nbr = params.getRandomNeighbor(0.3)
-    assertResult("""
+    assertResult(strip("""
         |parameter[0] = p2 = 2.0 [0, 2.0]
         |parameter[1] = p-1 = -1.00 [-1.00, 0]
         |parameter[2] = p3 = 3.0 [0, 3.0]
         |parameter[3] = p-4 = -4.0 [-4.0, 0]
-        |fitness = 0.0"""
-        .stripMargin.replaceAll("\r\n", "\n")) { nbr.toString }
+        |fitness = 0.0""")) { nbr.toString }
   }
 
   test("swap nodes (11 params). r = 1.2") {
     params = createDistArray(Set(2, -1, 3, -5, 3, -4, -2, -3, 5, -9, 6))
     val nbr = params.getRandomNeighbor(1.2)
-    assertResult(
-      """
+    assertResult(strip("""
         |parameter[0] = p3 = 3.0 [0, 3.0]
         |parameter[1] = p-1 = -1.00 [-1.00, 0]
         |parameter[2] = p2 = 2.0 [0, 2.0]
@@ -161,15 +158,13 @@ class VariableLengthIntArraySuite extends FunSuite with BeforeAndAfter{
         |parameter[7] = p-5 = -5.0 [-5.0, 0]
         |parameter[8] = p5 = 5.0 [0, 5.0]
         |parameter[9] = p-3 = -3.0 [-3.0, 0]
-        |fitness = 0.0"""
-        .stripMargin.replaceAll("\r\n", "\n")) { nbr.toString }
+        |fitness = 0.0""")) { nbr.toString }
   }
 
   test("swap nodes (11 params). r =  0.3") {
     params = createDistArray(Set(2, -1, 3, -5, 3, -4, -2, -3, 5, -9, 6))
     val nbr = params.getRandomNeighbor(0.3)
-    assertResult(
-      """
+    assertResult(strip("""
         |parameter[0] = p3 = 3.0 [0, 3.0]
         |parameter[1] = p-1 = -1.00 [-1.00, 0]
         |parameter[2] = p2 = 2.0 [0, 2.0]
@@ -180,21 +175,18 @@ class VariableLengthIntArraySuite extends FunSuite with BeforeAndAfter{
         |parameter[7] = p-5 = -5.0 [-5.0, 0]
         |parameter[8] = p5 = 5.0 [0, 5.0]
         |parameter[9] = p-3 = -3.0 [-3.0, 0]
-        |fitness = 0.0"""
-        .stripMargin.replaceAll("\r\n", "\n")) { nbr.toString }
+        |fitness = 0.0""")) { nbr.toString }
   }
-  private def getListFromIterator(iter: Iterator[VariableLengthIntArray]): Array[VariableLengthIntArray] = {
+  private def getListFromIterator(iter: Iterator[VariableLengthIntArray]): Array[VariableLengthIntArray] =
     iter.toArray
-  }
 
   private def createArray(dCalc: DistanceCalculator, numberList: Set[Int]) = {
     val params = for (i <- numberList) yield createParam(i)
-    VariableLengthIntArray.createInstance(params.toArray, numberList, dCalc)
+    VariableLengthIntArray.createInstance(params.toArray, numberList, dCalc, rnd)
   }
 
-  private def createDistArray(numberList: Set[Int]) = {
+  private def createDistArray(numberList: Set[Int]) =
     createArray(new MagnitudeDistanceCalculator, numberList)
-  }
 
   def createDistIgnoredArray(numberList: Set[Int]): VariableLengthIntArray =
     createArray(new MagnitudeIgnoredDistanceCalculator, numberList)

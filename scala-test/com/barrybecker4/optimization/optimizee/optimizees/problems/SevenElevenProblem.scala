@@ -8,6 +8,8 @@ import com.barrybecker4.optimization.parameter.{NumericParameterArray, Parameter
 import com.barrybecker4.optimization.parameter.types.{IntegerParameter, Parameter}
 import com.barrybecker4.optimization.strategy.{GLOBAL_SAMPLING, OptimizationStrategyType}
 
+import scala.util.Random
+
 /**
   * This is a simple search space to test the optimization package.
   * The problem we will try to solve is :
@@ -38,6 +40,7 @@ object SevenElevenProblem {
   private val P2 = 125
   private val P3 = 120
   private val P4 = 150
+  private val RAND = new Random(1)
   /** these may be in any order, however */
   private val EXACT_SOLUTION_PARAMS: Array[Parameter] = Array(
     new IntegerParameter(P1, 0, 708, "p1"),
@@ -45,8 +48,8 @@ object SevenElevenProblem {
     new IntegerParameter(P3, 0, 708, "p3"),
     new IntegerParameter(P4, 0, 708, "p4")
   )
-  private val INITIAL_GUESS = new NumericParameterArray(INITIAL_GUESS_PARAMS)
-  private val EXACT_SOLUTION = new NumericParameterArray(EXACT_SOLUTION_PARAMS)
+  private val INITIAL_GUESS = new NumericParameterArray(INITIAL_GUESS_PARAMS, RAND)
+  private val EXACT_SOLUTION = new NumericParameterArray(EXACT_SOLUTION_PARAMS, RAND)
   // @@ exp errors.
   private val FITNESS_RANGE = 5000000.0
 

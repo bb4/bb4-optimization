@@ -22,7 +22,9 @@ class StringParameter(index: Int, values: Array[String], paramName: String)
     p
   }
 
-  override def getNaturalValue: Any = values(getValue.toInt)
+  override def getNaturalValue: Any =
+    values(getValue.toInt)
+
   def getStringValues: Array[String] = values
   override protected def isOrdered = false
   override def getType: Class[_] = classOf[String]

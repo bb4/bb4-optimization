@@ -9,8 +9,11 @@ import com.barrybecker4.optimization.parameter.improvement.ImprovementIteration
 import com.barrybecker4.optimization.parameter.improvement.ImprovementStep
 import com.barrybecker4.optimization.parameter.sampling.NumericGlobalSampler
 import com.barrybecker4.optimization.parameter.types.{DoubleParameter, Parameter}
+
 import scala.collection.mutable
 import NumericParameterArray._
+
+import scala.util.Random
 
 
 object NumericParameterArray {
@@ -38,7 +41,8 @@ object NumericParameterArray {
   * @param theParams an array of params to initialize with.
   * @author Barry Becker
   */
-class NumericParameterArray(theParams: Array[Parameter]) extends AbstractParameterArray(theParams) {
+class NumericParameterArray(theParams: Array[Parameter], rnd: Random)
+  extends AbstractParameterArray(theParams, rnd) {
 
   private var numSteps = NumericParameterArray.DEFAULT_NUM_STEPS
 
@@ -48,8 +52,9 @@ class NumericParameterArray(theParams: Array[Parameter]) extends AbstractParamet
     * @param maxVals the maximum value allowed for each parameter respectively.
     * @param names   the display name for each parameter in the array.
     */
-  def this(vals: Array[Double], minVals: Array[Double], maxVals: Array[Double], names: Array[String]) {
-    this(createParams(vals, minVals, maxVals, names))
+  def this(vals: Array[Double], minVals: Array[Double], maxVals: Array[Double],
+           names: Array[String], rnd: Random = MathUtil.RANDOM) {
+    this(createParams(vals, minVals, maxVals, names), rnd)
   }
 
   /** @return a copy of ourselves.*/
@@ -59,7 +64,7 @@ class NumericParameterArray(theParams: Array[Parameter]) extends AbstractParamet
     pa
   }
 
-  override protected def createInstance = new NumericParameterArray(Array[Parameter]())
+  override protected def createInstance = new NumericParameterArray(Array[Parameter](), rnd)
 
   /** Globally sample the parameter space with a uniform distribution.
     * @param requestedNumSamples approximate number of samples to retrieve. If the problem space is small
@@ -152,7 +157,7 @@ class NumericParameterArray(theParams: Array[Parameter]) extends AbstractParamet
     val nbr = this.copy
     for (k <- 0 until size) {
       val param = nbr.get(k)
-      param.tweakValue(radius, MathUtil.RANDOM)
+      param.tweakValue(radius, rnd)
     }
     nbr
   }
@@ -162,7 +167,7 @@ class NumericParameterArray(theParams: Array[Parameter]) extends AbstractParamet
     val nbr = this.copy
     for (k <- 0 until size) {
       val newPar = nbr.get(k)
-      newPar.setValue(newPar.minValue + MathUtil.RANDOM.nextDouble * newPar.range)
+      newPar.setValue(newPar.minValue + rnd.nextDouble * newPar.range)
       assert(newPar.getValue < newPar.maxValue && newPar.getValue > newPar.minValue, "newPar "
         + newPar.getValue + " not between " + newPar.minValue + " and  " + newPar.maxValue)
     }

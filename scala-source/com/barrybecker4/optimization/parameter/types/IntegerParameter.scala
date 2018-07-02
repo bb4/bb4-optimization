@@ -27,6 +27,7 @@ object IntegerParameter {
 
 class IntegerParameter(theVal: Int, minVal: Int, maxVal: Int, paramName: String)
     extends AbstractParameter(theVal.toDouble, minVal.toDouble, maxVal.toDouble, paramName, true) {
+
   override def copy: Parameter = {
     val p = new IntegerParameter(getValue.round.toInt, minValue.toInt, maxValue.toInt, name)
     p.setRedistributionFunction(redistributionFunction)
@@ -34,7 +35,7 @@ class IntegerParameter(theVal: Int, minVal: Int, maxVal: Int, paramName: String)
   }
 
   override def randomizeValue(rand: Random): Unit = {
-    value = minValue + rand.nextDouble * (range + 1.0)
+    value = minValue + rand.nextDouble * range
   }
 
   override def tweakValue(r: Double, rand: Random): Unit = {

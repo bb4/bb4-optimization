@@ -9,6 +9,8 @@ import com.barrybecker4.optimization.strategy.OptimizationStrategyType
 import com.barrybecker4.optimization.optimizee.optimizees.ProblemVariation
 import DominatingSetVariation.ONE_HOP_WEIGHT
 
+import scala.util.Random
+
 
 object DominatingSetVariation {
   val VALUES = IndexedSeq(SIMPLE_DS, PENTAGRAM_DS, TYPICAL_DS)
@@ -23,6 +25,7 @@ object DominatingSetVariation {
 sealed trait DominatingSetVariation extends ProblemVariation {
 
   private lazy val exactSolutionCost: Double = computeCost(getExactSolution)
+  private val rnd = new Random(1)
 
   /** @return an array of the node ineices in the graph */
   def getAllNodes: Set[Int] = (0 until adjacencies.size).toSet
@@ -39,7 +42,7 @@ sealed trait DominatingSetVariation extends ProblemVariation {
     val params: Seq[IntegerParameter] =
       for (i <- 0 until num by 3) yield new IntegerParameter(i, 0, num - 1, "p" + i)
 
-    val pa = VariableLengthIntArray.createInstance(params.toArray, getAllNodes)
+    val pa = VariableLengthIntArray.createInstance(params.toArray, getAllNodes, rnd)
     pa.setFitness(getScore(getMarked(pa)))
     pa
   }
@@ -92,7 +95,7 @@ sealed trait DominatingSetVariation extends ProblemVariation {
       for (i <- 0 until nodeList.length)
         yield new IntegerParameter(nodeList(i), 0, allNodes.size - 1, "p" + i)
 
-    VariableLengthIntArray.createInstance(params.toArray, allNodes)
+    VariableLengthIntArray.createInstance(params.toArray, allNodes, rnd)
   }
 }
 
@@ -140,7 +143,7 @@ case object TYPICAL_DS extends DominatingSetVariation {
     List(0, 23, 24)
   ))
 
-  val errorTolerances = ErrorTolerances(16.0, 1.3, 1.2, 2.0, 1.0, 0.41, 0.41, 1.0, 0)
+  val errorTolerances = ErrorTolerances(16.0, 1.3, 1.2, 1.2, 1.0, 0.41, 0.41, 1.0, 0)
 
   /** This is one of several possible solutions that gives an optimal fitness of 0 */
   override def getExactSolution: ParameterArray = createSolution(6, 7, 8, 19, 21, 24)

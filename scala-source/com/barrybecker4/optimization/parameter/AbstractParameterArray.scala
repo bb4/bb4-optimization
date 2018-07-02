@@ -2,7 +2,10 @@
 package com.barrybecker4.optimization.parameter
 
 import com.barrybecker4.common.format.FormatUtil
+import com.barrybecker4.common.math.MathUtil
 import com.barrybecker4.optimization.parameter.types.Parameter
+
+import scala.util.Random
 
 
 object AbstractParameterArray {
@@ -15,7 +18,7 @@ object AbstractParameterArray {
   * @param theParams the list of parameters
   * @author Barry Becker
   */
-abstract class AbstractParameterArray private[parameter](theParams: Array[Parameter] = Array[Parameter]())
+abstract class AbstractParameterArray(theParams: Array[Parameter] = Array[Parameter](), rnd: Random)
     extends ParameterArray {
 
   assert(theParams != null)
@@ -23,10 +26,6 @@ abstract class AbstractParameterArray private[parameter](theParams: Array[Parame
 
   /** assign a fitness (evaluation value) to this set of parameters */
   private var fitness: Double = 0
-
-  def this(params: List[Parameter]) {
-    this(params.toArray)
-  }
 
   override def getSamplePopulationSize: Int = {
     var pop = 1
