@@ -2,7 +2,7 @@ package com.barrybecker4.optimization.optimizee
 
 import com.barrybecker4.common.math.MathUtil
 import com.barrybecker4.common.util.FileUtil
-import com.barrybecker4.optimization.{Optimizer, OptimizerTestCase1}
+import com.barrybecker4.optimization.{Optimizer}
 import com.barrybecker4.optimization.optimizee.optimizees.{OptimizeeProblem, ProblemVariation}
 import com.barrybecker4.optimization.parameter.ParameterArray
 import com.barrybecker4.optimization.strategy._
@@ -82,7 +82,7 @@ abstract class OptimizerTestSuite extends FunSuite with BeforeAndAfter {
 
   protected def verifyProblem(problem: OptimizeeProblem,
                               variation: ProblemVariation, optType: OptimizationStrategyType): Unit = {
-    val logFile = OptimizerTestCase1.LOG_FILE_HOME + "analytic_" + variation + "_optimization.txt"
+    val logFile = OptimizerTestSuite.LOG_FILE_HOME + "analytic_" + variation + "_optimization.txt"
     val optimizer = new Optimizer(problem, Some(logFile))
     val initialGuess = problem.getInitialGuess
     val percent = variation.getErrorTolerancePercent(optType)

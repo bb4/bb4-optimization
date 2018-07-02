@@ -4,6 +4,7 @@ package com.barrybecker4.optimization
 import com.barrybecker4.common.format.FormatUtil
 import com.barrybecker4.optimization.parameter.ParameterArray
 import java.io.{File, FileWriter, IOException}
+import Logger.SEPARATOR
 
 
 object Logger {
@@ -26,12 +27,12 @@ class Logger(var sLogFile: String) {
 
       // create the log file (destroying it if it already existed)
       val logFile = new FileWriter(sLogFile, false)
-      logFile.write("iteration" + Logger1.SEPARATOR)
-      logFile.write("fitness" + Logger1.SEPARATOR)
-      logFile.write("jumpSize" + Logger1.SEPARATOR)
-      logFile.write("dotprod" + Logger1.SEPARATOR)
+      logFile.write("iteration" + SEPARATOR)
+      logFile.write("fitness" + SEPARATOR)
+      logFile.write("jumpSize" + SEPARATOR)
+      logFile.write("dotprod" + SEPARATOR)
       for (i <- 0 until params.size) {
-        logFile.write(params.get(i).name + Logger1.SEPARATOR)
+        logFile.write(params.get(i).name + SEPARATOR)
       }
       logFile.write("comment ")
       logFile.write('\n')
@@ -66,7 +67,7 @@ class Logger(var sLogFile: String) {
     * @param params    the params to write.
     */
   final def write(iteration: Int, fitness: Double, jumpSize: Double, distance: Double, params: ParameterArray, comment: String): Unit = {
-    val sep = Logger1.SEPARATOR
+    val sep = SEPARATOR
     val rowText = iteration + sep + FormatUtil.formatNumber(fitness) +
       sep + FormatUtil.formatNumber(jumpSize) +
       sep + FormatUtil.formatNumber(distance) + sep + params.toCSVString + sep + comment
