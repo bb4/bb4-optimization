@@ -7,8 +7,9 @@ import com.barrybecker4.common.concurrency.ThreadUtil
 import com.barrybecker4.common.format.FormatUtil
 import com.barrybecker4.common.math.MathUtil
 import com.barrybecker4.optimization.parameter.ParameterArray
-
 import scala.collection.mutable.ArrayBuffer
+import scala.util.Random
+
 
 object GeneticSearchStrategy {
   // Percent amount to decimate the parent population by on each iteration
@@ -37,7 +38,7 @@ object GeneticSearchStrategy {
   * @param optimizee the thing to be optimized.
   * @author Barry Becker
   */
-class GeneticSearchStrategy(optimizee: Optimizee) extends OptimizationStrategy(optimizee) {
+class GeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM) extends OptimizationStrategy(optimizee) {
 
   /** radius to look for neighbors in  */
   private var nbrRadius = NBR_RADIUS
@@ -170,15 +171,17 @@ class GeneticSearchStrategy(optimizee: Optimizee) extends OptimizationStrategy(o
     var k = keepSize
     //println("keepSize = " + keepSize + " grow current popSize of "
     //    + population.size() + " to " + desiredPopulationSize);
-    while (k < desiredPopulationSize) { // loop over the keepers until all replacements found. Select randomly, but skewed toward the better ones
-      val rnd = MathUtil.RANDOM.nextDouble
-      val keeperIndex = (rnd * rnd * keepSize).toInt
+    while (k < desiredPopulationSize) {
+      // loop over the keepers until all replacements found.
+      // Select randomly, but skewed toward the better ones
+      val r = rnd.nextDouble
+      val keeperIndex: Int = (r * r * keepSize).toInt
       //k % keepSize;
       val p = population(keeperIndex)
       // Add a permutation of one of the keepers.
       // Multiply the radius by m because we want the worse ones to have higher variability.
-      val r = (keeperIndex + NBR_RADIUS_SOFTENER) / NBR_RADIUS_SOFTENER * nbrRadius
-      val nbr = getNeighbor(p, r) //p.getRandomNeighbor(r);
+      val r2 = (keeperIndex + NBR_RADIUS_SOFTENER) / NBR_RADIUS_SOFTENER * nbrRadius
+      val nbr = getNeighbor(p, r2)
       if (!population.contains(nbr)) {
         population += nbr
         notifyOfChange(p)

@@ -7,6 +7,7 @@ import com.barrybecker4.optimization.optimizee.optimizees.OptimizeeProblem
 import com.barrybecker4.optimization.parameter.ParameterArray
 import com.barrybecker4.optimization.strategy.SIMULATED_ANNEALING
 import OptimizeeProblem.showSolution
+import scala.util.Random
 
 
 object TravelingSalesmanProblem {
@@ -17,7 +18,8 @@ object TravelingSalesmanProblem {
     val problem = new TravelingSalesmanProblem(v)
     val optimizer = new Optimizer(problem, Some(LOG_FILE_HOME + "tsp_optimization.txt"))
     val initialGuess = problem.getInitialGuess
-    val solution = optimizer.doOptimization(SIMULATED_ANNEALING, initialGuess, v.getFitnessRange)
+    val solution = optimizer.doOptimization(SIMULATED_ANNEALING,
+      initialGuess, v.getFitnessRange, new Random(1))
     showSolution(problem, solution)
   }
 }

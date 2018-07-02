@@ -58,7 +58,7 @@ object SevenElevenProblem {
     val problem = new SevenElevenProblem
     val optimizer = new Optimizer(problem, Some(LOG_FILE_HOME + "seven11_optimization.txt"))
     val initialGuess = problem.getInitialGuess
-    val solution = optimizer.doOptimization(GLOBAL_SAMPLING, initialGuess, FITNESS_RANGE)
+    val solution = optimizer.doOptimization(GLOBAL_SAMPLING, initialGuess, FITNESS_RANGE, RAND)
     OptimizeeProblem.showSolution(problem, solution)
   }
 }

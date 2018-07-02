@@ -1,9 +1,12 @@
 // Copyright by Barry G. Becker, 2001-2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.strategy
 
+import com.barrybecker4.common.math.MathUtil
 import com.barrybecker4.optimization.optimizee.Optimizee
 import com.barrybecker4.optimization.parameter.ParameterArray
+
 import scala.collection.mutable.ArrayBuffer
+import scala.util.Random
 
 
 /**
@@ -14,7 +17,9 @@ import scala.collection.mutable.ArrayBuffer
   * @param optimizee the thing to be optimized.
   * @author Barry Becker
   */
-class ConcurrentGeneticSearchStrategy(optimizee: Optimizee) extends GeneticSearchStrategy(optimizee) {
+class ConcurrentGeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM)
+  extends GeneticSearchStrategy(optimizee, rnd) {
+
   /**
     * Note: this method assigns a fitness value to each member of the population.
     *

@@ -2,11 +2,13 @@ package com.barrybecker4.optimization.optimizee
 
 import com.barrybecker4.common.math.MathUtil
 import com.barrybecker4.common.util.FileUtil
-import com.barrybecker4.optimization.{Optimizer}
+import com.barrybecker4.optimization.Optimizer
 import com.barrybecker4.optimization.optimizee.optimizees.{OptimizeeProblem, ProblemVariation}
 import com.barrybecker4.optimization.parameter.ParameterArray
 import com.barrybecker4.optimization.strategy._
 import org.scalatest.{BeforeAndAfter, FunSuite}
+
+import scala.util.Random
 
 /**
   * @author Barry Becker
@@ -31,7 +33,7 @@ object OptimizerTestSuite {
                            errorThresh: Double, title: String): Unit = {
     System.out.println(title + "\nabout to apply " + optType + " to " + problem.getName +
       " with initial guess = " + initialGuess + ".")
-    val solution = optimizer.doOptimization(optType, initialGuess, fitnessRange)
+    val solution = optimizer.doOptimization(optType, initialGuess, fitnessRange, new Random(1))
     val error = problem.getError(solution)
     assert(error <= errorThresh,
       s"*** $title ***\nAllowable error ($errorThresh) was exceeded using $optType" +

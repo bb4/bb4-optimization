@@ -7,6 +7,8 @@ import com.barrybecker4.optimization.optimizee.optimizees.OptimizeeProblem
 import com.barrybecker4.optimization.parameter.{ParameterArray, VariableLengthIntArray}
 import com.barrybecker4.optimization.strategy.{GLOBAL_HILL_CLIMBING, OptimizationStrategyType}
 
+import scala.util.Random
+
 
 object SubsetSumProblem {
 
@@ -16,7 +18,8 @@ object SubsetSumProblem {
     val optimizer = new Optimizer(problem, Some(LOG_FILE_HOME + "domSet_optimization.txt"))
     val initialGuess = problem.getInitialGuess
     System.out.println("initial guess=" + initialGuess + " all=" + initialGuess.asInstanceOf[VariableLengthIntArray].getMaxLength)
-    val solution = optimizer.doOptimization(GLOBAL_HILL_CLIMBING, initialGuess, problem.getFitnessRange)
+    val solution = optimizer.doOptimization(GLOBAL_HILL_CLIMBING,
+      initialGuess, problem.getFitnessRange, new Random(1))
     OptimizeeProblem.showSolution(problem, solution)
   }
 }

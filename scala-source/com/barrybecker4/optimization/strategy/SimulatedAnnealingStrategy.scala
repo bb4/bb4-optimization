@@ -7,6 +7,8 @@ import com.barrybecker4.optimization.optimizee.Optimizee
 import com.barrybecker4.optimization.parameter.ParameterArray
 import SimulatedAnnealingStrategy._
 
+import scala.util.Random
+
 /**
   * Simulated annealing optimization strategy.
   * See http://en.wikipedia.org/wiki/Annealing for an explanation of the name.
@@ -29,7 +31,7 @@ object SimulatedAnnealingStrategy {
   * so it can be easily run in an applet without using resources.
   * @param optimizee the thing to be optimized.
   */
-class SimulatedAnnealingStrategy(optimizee: Optimizee) extends OptimizationStrategy(optimizee) {
+class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM) extends OptimizationStrategy(optimizee) {
   private var tempMax = SimulatedAnnealingStrategy.DEFAULT_TEMP_MAX
 
   /** keep track of points that were searched */
@@ -126,12 +128,12 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee) extends OptimizationStrat
       deltaFitness = curParams.getFitness - newFitness
     }
     val probability = Math.pow(Math.E, tempMax * deltaFitness / temperature)
-    val useWorseSolution = MathUtil.RANDOM.nextDouble < probability
+    val useWorseSolution = rnd.nextDouble < probability
     if (deltaFitness > 0 || useWorseSolution) { // we always select the solution if it has a better fitness,
       // but we sometimes select a worse solution if the second term evaluates to true.
-      if (deltaFitness < 0 && useWorseSolution)
+      /*if (deltaFitness < 0 && useWorseSolution)
         println("Selected worse solution with prob=" +
-          probability + " delta=" + deltaFitness + " / temp=" + temperature)
+          probability + " delta=" + deltaFitness + " / temp=" + temperature)*/
       curParams = newParams
     }
     //println("T="+temperature+" ct="+ct+" dist="+dist+" deltaFitness="

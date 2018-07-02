@@ -1,9 +1,12 @@
 // Copyright by Barry G. Becker, 2000-2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization
 
+import com.barrybecker4.common.math.MathUtil
 import com.barrybecker4.optimization.optimizee.Optimizee
 import com.barrybecker4.optimization.parameter.ParameterArray
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType
+
+import scala.util.Random
 
 
 /**
@@ -38,8 +41,9 @@ class Optimizer(val optimizee: Optimizee, optimizationLogFile: Option[String]) {
     * @return the solution to the optimization problem.
     */
   def doOptimization(optimizationType: OptimizationStrategyType,
-                     params: ParameterArray, fitnessRange: Double): ParameterArray = {
-    val optStrategy = optimizationType.getStrategy(optimizee, fitnessRange)
+                     params: ParameterArray, fitnessRange: Double, rnd: Random = MathUtil.RANDOM): ParameterArray = {
+
+    val optStrategy = optimizationType.getStrategy(optimizee, fitnessRange, rnd)
     if (logger.isDefined) {
       logger.get.initialize(params)
       optStrategy.setLogger(logger.get)

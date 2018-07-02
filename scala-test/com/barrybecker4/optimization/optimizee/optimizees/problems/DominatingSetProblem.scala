@@ -8,6 +8,8 @@ import com.barrybecker4.optimization.strategy.{OptimizationStrategyType, SIMULAT
 import com.barrybecker4.optimization.optimizee.OptimizerTestSuite.LOG_FILE_HOME
 import OptimizeeProblem.showSolution
 
+import scala.util.Random
+
 
 /**
   * See these references to help understand the problem of finding dominating sets given a graph.
@@ -24,7 +26,8 @@ object DominatingSetProblem {
     val problem = new DominatingSetProblem(v)
     val optimizer = new Optimizer(problem, Some(LOG_FILE_HOME + "domSet_optimization.txt"))
     val initialGuess = problem.getInitialGuess
-    val solution = optimizer.doOptimization(SIMULATED_ANNEALING, initialGuess, v.getFitnessRange)
+    val solution = optimizer.doOptimization(SIMULATED_ANNEALING,
+      initialGuess, v.getFitnessRange, new Random(1))
     showSolution(problem, solution)
   }
 }
