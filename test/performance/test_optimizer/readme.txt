@@ -1,1 +1,0 @@
-The tests will right performance information to files in this directory.
