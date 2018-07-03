@@ -116,7 +116,7 @@ case object TSP_SIMPLE extends TravelingSalesmanVariation {
   )
 
   val errorTolerances =
-    ErrorTolerances(GLOB_SAMP_TOL, BASE_TOLERANCE, BASE_TOLERANCE, 0.04, RELAXED_TOL, 0.042, 0.042, BASE_TOLERANCE)
+    ErrorTolerances(GLOB_SAMP_TOL, BASE_TOLERANCE, BASE_TOLERANCE, 0.04, 0.042, 0.042, BASE_TOLERANCE)
 
   override def getNumCities = 4
   override def getShortestPathLength = 6.0
@@ -152,7 +152,7 @@ case object TSP_STANDARD extends TravelingSalesmanVariation {
     Array(24, 35, 23, 67, 0)
   )
 
-  val errorTolerances = ErrorTolerances(GLOB_SAMP_TOL, RELAXED_TOL, 0.01, 0.04, RELAXED_TOL, 0.042, 0.042, BASE_TOLERANCE)
+  val errorTolerances = ErrorTolerances(GLOB_SAMP_TOL, RELAXED_TOL, 0.01, 0.04, 0.042, 0.042, BASE_TOLERANCE)
 
   override def getNumCities = 5
   override def getShortestPathLength = 207.0
@@ -230,7 +230,7 @@ case object TSP_US_CAPITALS extends TravelingSalesmanVariation {
     Array(3023, 1942)
   )
 
-  val errorTolerances = ErrorTolerances(GLOB_SAMP_TOL, RELAXED_TOL, 0.01, 0.04, RELAXED_TOL, 0.042, 0.042, BASE_TOLERANCE)
+  val errorTolerances = ErrorTolerances(GLOB_SAMP_TOL, RELAXED_TOL, 0.01, 0.04, 0.042, 0.042, BASE_TOLERANCE)
 
   override def getNumCities = 48
   override def getShortestPathLength = 10627.75

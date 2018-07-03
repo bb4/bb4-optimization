@@ -28,7 +28,7 @@ import scala.util.Random
   * @param optimizationLogFile (optional) used to log info as optimization proceeds
   * @author Barry Becker
   */
-class Optimizer(val optimizee: Optimizee, optimizationLogFile: Option[String]) {
+class Optimizer(val optimizee: Optimizee, optimizationLogFile: Option[String] = None) {
 
   protected var listener: OptimizationListener = _
   private val logger: Option[Logger] =

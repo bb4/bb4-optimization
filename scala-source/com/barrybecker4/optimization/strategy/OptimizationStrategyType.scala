@@ -68,13 +68,6 @@ case object SIMULATED_ANNEALING extends OptimizationStrategyType {
   }
 }
 
-case object TABU_SEARCH extends OptimizationStrategyType {
-  override def getDescription: String =
-    "Uses memory of past solutions to avoid searching them again as it marches toward an optimal solution."
-
-  override def getStrategy(optimizee: Optimizee, fitnessRange: Double, rnd: Random): OptimizationStrategy =
-    throw new AbstractMethodError("Tabu search not yet implemented")
-}
 
 case object GENETIC_SEARCH extends OptimizationStrategyType {
   override def getDescription: String =

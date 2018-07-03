@@ -99,7 +99,7 @@ sealed trait SubsetSumVariation extends ProblemVariation {
 
 case object SIMPLE_SS extends SubsetSumVariation {
   val errorTolerances =
-    ErrorTolerances(0.0, 0.0, 8.0, 6.4, 0.0, 14.6, 14.6, 0.0)
+    ErrorTolerances(0.0, 0.0, 8.0, 6.4, 14.6, 14.6, 0.0)
 
   override protected def getNumberSet: Set[Int] = Set(-7, -3, -2, 5, 8)
 
@@ -110,7 +110,7 @@ case object SIMPLE_SS extends SubsetSumVariation {
 
 
 case object TYPICAL_SS extends SubsetSumVariation {
-  val errorTolerances = ErrorTolerances(0.0, 0.5, 0.5, 1.25, 0.5, 0.5, 0.5, 0.0)
+  val errorTolerances = ErrorTolerances(0.0, 0.5, 0.5, 1.25, 0.5, 0.5, 0.0)
 
   override protected def getNumberSet: Set[Int] =
     Set(-7, -33, -21, 5, 83, -29, -78, 213, 123, -34, -37, -41, 91, -8, -17)
@@ -124,7 +124,7 @@ case object TYPICAL_SS extends SubsetSumVariation {
 
 case object NO_SOLUTION extends  SubsetSumVariation {
   // none of the errors will be 0 because there is no solution that sums to 0.
-  val errorTolerances = ErrorTolerances(40.0, 0.7, 1.3, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7)
+  val errorTolerances = ErrorTolerances(40.0, 0.7, 1.3, 0.7, 0.7, 0.7, 0.7, 0.7)
 
   override protected def getNumberSet: Set[Int] =
     Set(-7, -33, -21, 5, -83, -29, -78, -113, -23, -34, -37, -41, -91, -9, -17)
