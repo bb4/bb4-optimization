@@ -15,7 +15,7 @@ object GeneticSearchStrategy {
   // Percent amount to decimate the parent population by on each iteration
   private val CULL_FACTOR = 0.8
   private val NBR_RADIUS = 0.08
-  private val NBR_RADIUS_SHRINK_FACTOR = 0.8
+  private val NBR_RADIUS_SHRINK_FACTOR = 0.7
   private val NBR_RADIUS_EXPAND_FACTOR = 1.1
   private val NBR_RADIUS_SOFTENER = 10.0
   private val INITIAL_RADIUS = 1.0
@@ -71,7 +71,7 @@ class GeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM)
     //    + " (desired was " + desiredPopulationSize + ")");
     // EVALUATE POPULATION
     lastBest = evaluatePopulation(population, params)
-    findNewBest(params, lastBest, population)
+    findNewBest(params, lastBest, population, fitnessRange)
   }
 
   private def findInitialPopulation(params: ParameterArray) = {
@@ -93,10 +93,12 @@ class GeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM)
   /** Find the new best candidate.
     * @return the new best candidate.
     */
-  private def findNewBest(params: ParameterArray, lastBest: ParameterArray, population: ArrayBuffer[ParameterArray]) = {
+  private def findNewBest(params: ParameterArray, lastBest: ParameterArray,
+                          population: ArrayBuffer[ParameterArray], fitnessRange: Double) = {
     var currentBest = lastBest
     var ct = 0
     var deltaFitness = .0
+    var changeThresh = 0.05 * fitnessRange
     var recentBest = lastBest
     //println("findNewBest: recent best =" + recentBest);
     // each iteration represents a new generation of the population.
@@ -109,12 +111,14 @@ class GeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM)
       deltaFitness = computeFitnessDelta(params, recentBest, currentBest, ct)
       println("delta fitness =" +
         deltaFitness + "      rbrRadius = " + nbrRadius + "  improvementEpsilon = " + improvementEpsilon)
-      val factor = if (deltaFitness < -3.0) NBR_RADIUS_EXPAND_FACTOR
-      else NBR_RADIUS_SHRINK_FACTOR
+      val factor =
+        if (deltaFitness < -changeThresh) NBR_RADIUS_EXPAND_FACTOR
+        else NBR_RADIUS_SHRINK_FACTOR
       nbrRadius *= factor
       recentBest = currentBest.copy
       notifyOfChange(currentBest)
       ct += 1
+      assert(deltaFitness <= 0, "The fitness should never get worse.")
     } while ((deltaFitness < -improvementEpsilon) && !isOptimalFitnessReached(currentBest) && (ct < MAX_ITERATIONS))
 
     if (isOptimalFitnessReached(currentBest))
