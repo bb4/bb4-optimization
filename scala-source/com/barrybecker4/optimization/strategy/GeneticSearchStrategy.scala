@@ -13,8 +13,8 @@ import scala.util.Random
 
 object GeneticSearchStrategy {
   // Percent amount to decimate the parent population by on each iteration
-  private val CULL_FACTOR = 0.8
-  private val NBR_RADIUS = 0.08
+  private val CULL_FACTOR = 0.7
+  private val NBR_RADIUS = 0.1
   private val NBR_RADIUS_SHRINK_FACTOR = 0.7
   private val NBR_RADIUS_EXPAND_FACTOR = 1.1
   private val NBR_RADIUS_SOFTENER = 10.0
@@ -98,7 +98,10 @@ class GeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM)
     var currentBest = lastBest
     var ct = 0
     var deltaFitness = .0
-    var changeThresh = 0.05 * fitnessRange
+
+    var lowThresh = 0.01* fitnessRange  // shrink if less than this
+    var highThresh = 0.05 * fitnessRange // grow if more than this
+
     var recentBest = lastBest
     //println("findNewBest: recent best =" + recentBest);
     // each iteration represents a new generation of the population.
@@ -112,8 +115,9 @@ class GeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM)
       println("delta fitness =" +
         deltaFitness + "      rbrRadius = " + nbrRadius + "  improvementEpsilon = " + improvementEpsilon)
       val factor =
-        if (deltaFitness < -changeThresh) NBR_RADIUS_EXPAND_FACTOR
-        else NBR_RADIUS_SHRINK_FACTOR
+        if (deltaFitness < -highThresh) NBR_RADIUS_EXPAND_FACTOR
+        else if (deltaFitness > -lowThresh) NBR_RADIUS_SHRINK_FACTOR
+        else 1.0
       nbrRadius *= factor
       recentBest = currentBest.copy
       notifyOfChange(currentBest)

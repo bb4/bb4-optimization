@@ -34,11 +34,9 @@ class ConcurrentGeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUt
     */
   override protected def evaluatePopulation(population: ArrayBuffer[ParameterArray],
                                             previousBest: ParameterArray): ParameterArray = {
-
     var bestFitness = previousBest
     val workers = population.map(candidate => new EvaluationWorker(candidate, previousBest))
 
-    // blocks until all Callables are done running.
     workers.par.foreach(x => x.run()) // run workers in parallel
 
     for (worker <- workers) {

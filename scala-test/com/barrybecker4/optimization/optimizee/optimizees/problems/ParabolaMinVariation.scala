@@ -63,7 +63,7 @@ case object SINUSOIDAL extends ParabolaMinVariation {
 case object ABS_SINUSOIDAL extends ParabolaMinVariation {
   val errorTolerances =
     ErrorTolerances(0.009, 0.0128, 0.01,
-      GLOB_SAMP_TOL, RELAXED_TOL, BASE_TOLERANCE, BASE_TOLERANCE, BASE_TOLERANCE)
+      GLOB_SAMP_TOL, RELAXED_TOL, RELAXED_TOL, BASE_TOLERANCE, BASE_TOLERANCE)
 
   /** This version introduces a bit of absolute value sinusoidal noise.
     * This means it will not be second order differentiable, making this type of search harder.
