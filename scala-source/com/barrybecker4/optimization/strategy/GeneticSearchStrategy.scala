@@ -23,6 +23,8 @@ object GeneticSearchStrategy {
 
   /** this prevents us from running forever.  */
   private val MAX_ITERATIONS = 100
+  /** If more than this many iterations with no improvement, then stop */
+  private val MAX_ITER_NO_IMPRV = 3
 
   /** stop when the avg population score does not improve by better than this  */
   private val DEFAULT_IMPROVEMENT_EPS = 0.000000000001
@@ -124,17 +126,15 @@ class GeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM)
       notifyOfChange(currentBest)
       ct += 1
       assert(deltaFitness <= 0, "The fitness should never get worse.")
-      if (deltaFitness < -improvementEpsilon) {
+      if (deltaFitness > -improvementEpsilon) {
         numWithNoImprovement += 1
-      } else {
-        numWithNoImprovement = 0
       }
-    } while (!(deltaFitness >= -improvementEpsilon && numWithNoImprovement > 1)
+    } while (!(deltaFitness >= -improvementEpsilon && numWithNoImprovement > MAX_ITER_NO_IMPRV)
         && !isOptimalFitnessReached(currentBest) && (ct <= MAX_ITERATIONS))
 
     if (isOptimalFitnessReached(currentBest))
       println("stopped because we found the optimal fitness.")
-    else if (deltaFitness >= -improvementEpsilon && numWithNoImprovement > 1) {
+    else if (deltaFitness >= -improvementEpsilon && numWithNoImprovement > MAX_ITER_NO_IMPRV) {
       println("stopped because we made no IMPROVEMENT. The delta, " +
         deltaFitness + " was >= " + -improvementEpsilon)
     }
@@ -220,7 +220,7 @@ class GeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM)
     if (!optimizee.evaluateByComparison) { // try to find a nbr with fitness that is better
       val curFitness = optimizee.evaluateFitness(p)
       var ct = 0
-      while (optimizee.evaluateFitness(nbr) > curFitness && ct < MAX_NBRS_TO_EXPLORE) {
+      while (optimizee.evaluateFitness(nbr) >= curFitness && ct < MAX_NBRS_TO_EXPLORE) {
         nbr = p.getRandomNeighbor(rad)
         ct += 1
       }
