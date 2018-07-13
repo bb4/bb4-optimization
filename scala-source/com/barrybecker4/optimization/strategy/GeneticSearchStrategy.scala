@@ -15,9 +15,9 @@ object GeneticSearchStrategy {
   // Percent amount to decimate the parent population by on each iteration
   private val CULL_FACTOR = 0.7
   private val NBR_RADIUS = 0.1
-  private val NBR_RADIUS_SHRINK_FACTOR = 0.7
+  private val NBR_RADIUS_SHRINK_FACTOR = 0.8
   private val NBR_RADIUS_EXPAND_FACTOR = 1.1
-  private val NBR_RADIUS_SOFTENER = 10.0
+  private val NBR_RADIUS_SOFTENER = 20.0
   private val INITIAL_RADIUS = 1.0
   private val MAX_NBRS_TO_EXPLORE = 8
 
@@ -98,8 +98,9 @@ class GeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM)
     var currentBest = lastBest
     var ct = 0
     var deltaFitness = .0
+    var numWithNoImprovement = 0
 
-    var lowThresh = 0.01* fitnessRange  // shrink if less than this
+    var lowThresh = 0.005* fitnessRange  // shrink if less than this
     var highThresh = 0.05 * fitnessRange // grow if more than this
 
     var recentBest = lastBest
@@ -123,14 +124,25 @@ class GeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM)
       notifyOfChange(currentBest)
       ct += 1
       assert(deltaFitness <= 0, "The fitness should never get worse.")
-    } while ((deltaFitness < -improvementEpsilon) && !isOptimalFitnessReached(currentBest) && (ct < MAX_ITERATIONS))
+      if (deltaFitness < -improvementEpsilon) {
+        numWithNoImprovement += 1
+      } else {
+        numWithNoImprovement = 0
+      }
+    } while (!(deltaFitness >= -improvementEpsilon && numWithNoImprovement > 1)
+        && !isOptimalFitnessReached(currentBest) && (ct <= MAX_ITERATIONS))
 
     if (isOptimalFitnessReached(currentBest))
       println("stopped because we found the optimal fitness.")
-    else if (deltaFitness >= -improvementEpsilon)
+    else if (deltaFitness >= -improvementEpsilon && numWithNoImprovement > 1) {
       println("stopped because we made no IMPROVEMENT. The delta, " +
         deltaFitness + " was >= " + -improvementEpsilon)
-    else println("Stopped because we exceeded the MAX ITERATIONS: " + ct)
+    }
+    else if (ct > MAX_ITERATIONS)
+      println(s"Stopped because we exceeded the MAX ITERATIONS($MAX_ITERATIONS): num iterations = $ct")
+    else
+      throw new IllegalStateException(s"stopped for unexpected cause. ct = $ct deltaFit=$deltaFitness " +
+        s"currBest=$currentBest nbrRad=$nbrRadius")
 
     println("----------------------- done -------------------")
     log(ct, currentBest.getFitness, 0, 0, currentBest, FormatUtil.formatNumber(ct))
