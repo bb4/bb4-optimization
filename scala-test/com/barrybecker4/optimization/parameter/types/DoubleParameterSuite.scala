@@ -7,6 +7,7 @@ package com.barrybecker4.optimization.parameter.types
 class DoubleParameterSuite extends ParameterSuite[Double] {
 
   override protected def createParameter = DoubleParameter(2.0, 0.0, 5.0, "double param")
+  override protected def createOtherParameter = DoubleParameter(2.1, 0.0, 5.0, "double param")
 
   override protected def expectedMinValue = 0.0
 

@@ -22,6 +22,8 @@ abstract class ParameterSuite[T] extends FunSuite with BeforeAndAfter {
   }
 
   protected def createParameter: Parameter
+  // used in equality tests
+  protected def createOtherParameter: Parameter
 
   test("IsIntegerOnly") {
     assertResult(expectedIsIntegerOnly) { parameter.isIntegerOnly }
@@ -76,6 +78,19 @@ abstract class ParameterSuite[T] extends FunSuite with BeforeAndAfter {
       rParam.getNaturalValue
     }
     assertResult(expectedRandomValues) { actResult }
+  }
+
+  test("equality") {
+    val otherParam = createParameter
+    if (parameter != otherParam) {
+      println("pams not eq p=" + parameter.toString + " other = " + otherParam.toString)
+    }
+    assertResult(parameter) {otherParam}
+  }
+
+  test("inequality") {
+    val otherParam = createOtherParameter
+    assertResult(false) {parameter == otherParam}
   }
 
   protected def expectedIsIntegerOnly: Boolean = false

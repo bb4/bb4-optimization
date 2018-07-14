@@ -11,11 +11,11 @@ import scala.util.Random
   * Represents a general parameter to an algorithm
   * @author Barry Becker
   */
-case class StringParameter(index: Int, values: Array[String], name: String,
+case class StringParameter(index: Int, values: IndexedSeq[String], name: String,
                            redistFunc: Option[RedistributionFunction] = None)
     extends AbstractIntParameter(index, 0, values.length - 1, name, redistFunc) {
 
-  def this(theVal: Enum[_], enumValues: Array[Enum[_]], paramName: String) {
+  def this(theVal: Enum[_], enumValues: IndexedSeq[Enum[_]], paramName: String) {
     this(theVal.ordinal(), enumValues.map(_.toString), paramName, None)
   }
 
@@ -34,7 +34,7 @@ case class StringParameter(index: Int, values: Array[String], name: String,
   override def getNaturalValue: Any =
     values(getValue.toInt)
 
-  def getStringValues: Array[String] = values
+  def getStringValues: IndexedSeq[String] = values
   override protected def isOrdered = false
   override def getType: Class[_] = classOf[String]
   override def createWidget(listener: ParameterChangeListener) = new StringParameterWidget(this, listener)

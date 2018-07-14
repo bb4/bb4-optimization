@@ -7,6 +7,7 @@ package com.barrybecker4.optimization.parameter.types
 class BooleanParameterSuite extends ParameterSuite[Boolean] {
 
   override protected def createParameter = BooleanParameter(bValue = true, "boolean param")
+  override protected def createOtherParameter = BooleanParameter(bValue = false, "boolean param")
 
   override protected def expectedIsIntegerOnly = true
 

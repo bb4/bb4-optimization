@@ -7,7 +7,11 @@ package com.barrybecker4.optimization.parameter.types
 class StringParameterSuite extends ParameterSuite[String] {
 
   override protected def createParameter =
-    StringParameter(2, Array("foo", "bar", "baz", "abc", "bcd", "barry", "becker"), "integer param")
+    StringParameter(2, IndexedSeq("foo", "bar", "baz", "abc", "bcd", "barry", "becker"),
+      "integer param")
+  override protected def createOtherParameter =
+    StringParameter(3, IndexedSeq("foo", "bar", "baz", "abc", "bcd", "barry", "becker"),
+      "integer param")
 
   override protected def expectedIsIntegerOnly = true
 

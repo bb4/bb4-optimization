@@ -7,6 +7,7 @@ package com.barrybecker4.optimization.parameter.types
 class IntegerParameterSuite extends ParameterSuite[Int] {
 
   override protected def createParameter = new IntegerParameter(5, 3, 11, "integer param")
+  override protected def createOtherParameter = new IntegerParameter(6, 3, 11, "integer param")
 
   override protected def expectedIsIntegerOnly = true
 

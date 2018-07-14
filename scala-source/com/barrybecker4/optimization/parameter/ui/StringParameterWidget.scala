@@ -24,7 +24,7 @@ class StringParameterWidget(val param: Parameter, val listener: ParameterChangeL
     */
   override protected def addChildren(): Unit = { // create a dropdown
     val sparam = parameter.asInstanceOf[StringParameter]
-    dropdown = new JComboBox(sparam.getStringValues)
+    dropdown = new JComboBox(sparam.getStringValues.toArray)
     dropdown.setName(parameter.name)
     dropdown.setMaximumSize(new Dimension(200, 20))
     dropdown.setToolTipText(parameter.name)
