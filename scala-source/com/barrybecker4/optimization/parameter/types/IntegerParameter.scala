@@ -4,9 +4,8 @@ package com.barrybecker4.optimization.parameter.types
 import com.barrybecker4.common.math.MathUtil
 import com.barrybecker4.optimization.parameter.Direction
 import com.barrybecker4.optimization.parameter.ParameterChangeListener
-import com.barrybecker4.optimization.parameter.redistribution.DiscreteRedistribution
+import com.barrybecker4.optimization.parameter.redistribution.{DiscreteRedistribution, RedistributionFunction}
 import com.barrybecker4.optimization.parameter.ui.{DoubleParameterWidget, ParameterWidget}
-
 import scala.util.Random
 
 
@@ -16,68 +15,50 @@ import scala.util.Random
   */
 object IntegerParameter {
 
-  def createDiscreteParameter(theVal: Int, minVal: Int, maxVal: Int, paramName: String,
+  def createDiscreteParameter(theVal: Int, minVal: Int, maxVal: Int, name: String,
               discreteSpecialValues: Array[Int], specialValueProbabilities: Array[Double]): IntegerParameter = {
-    val param = new IntegerParameter(theVal, minVal, maxVal, paramName)
     val numValues = maxVal - minVal + 1
-    param.setRedistributionFunction(DiscreteRedistribution(numValues, discreteSpecialValues, specialValueProbabilities))
-    param
+    IntegerParameter(theVal, minVal, maxVal, name,
+      Some(DiscreteRedistribution(numValues, discreteSpecialValues, specialValueProbabilities)))
   }
 }
 
-class IntegerParameter(theVal: Int, minVal: Int, maxVal: Int, paramName: String)
-    extends AbstractParameter(theVal.toDouble, minVal.toDouble, maxVal.toDouble, paramName, true) {
+case class IntegerParameter(theVal: Double, minValue: Double, maxValue: Double, name: String,
+                       redisFunc: Option[RedistributionFunction] = None)
+    extends AbstractIntParameter(theVal.toInt, minValue.toInt, maxValue.toInt, name, redisFunc) {
 
-  override def copy: Parameter = {
-    val p = new IntegerParameter(getValue.round.toInt, minValue.toInt, maxValue.toInt, name)
-    p.setRedistributionFunction(redistributionFunction)
-    p
-  }
+  override def copy: IntegerParameter =
+    IntegerParameter(getValue.round.toInt, minValue, maxValue, name, redisFunc)
 
-  override def randomizeValue(rand: Random): Unit = {
-    value = minValue + rand.nextDouble * range
-  }
+  override def randomizeValue(rand: Random): IntegerParameter =
+    IntegerParameter(getRandomVal(rand), minValue, maxValue, name, redisFunc)
 
-  override def tweakValue(r: Double, rand: Random): Unit = {
-    if (isOrdered) super.tweakValue(r, rand)
-    else {
-      val rr = rand.nextDouble
-      if (rr < r) { // if not ordered, then just randomize with probability r
-        randomizeValue(rand)
-      }
-    }
-  }
-
-  protected def isOrdered = true
+  override def tweakValue(r: Double, rand: Random): IntegerParameter =
+    IntegerParameter(tweakIntValue(r, rand), minValue, maxValue, name, redisFunc)
 
   /** increments the parameter based on the number of steps to get from one end of the range to the other.
     * If we are already at the max end of the range, then we can only move in the other direction if at all.
-    * @param direction 1 for forward, -1 for backward.
+    * @param direction forward or backward.
     * @return the size of the increment taken
     */
-  override def incrementByEps(direction: Direction): Double = {
-    val increment = direction.multiplier
-    value = getValue + increment
-    increment
-  }
+  override def incrementByEps(direction: Direction): IntegerParameter =
+    new IntegerParameter((getValue + direction.multiplier).toInt, minValue, maxValue, name, redisFunc)
 
-  override def setValue(value: Double): Unit = {
-    this.value = value
-    // if there is a redistribution function, we need to apply its inverse.
-    if (redistributionFunction != null) {
-      val v = (value - minValue) / (range + 1.0)
-      this.value = minValue + (range + 1.0) * redistributionFunction.getInverseFunctionValue(v)
-    }
+  override def setValue(value: Double): IntegerParameter = {
+    val retValue =
+      if (redisFunc != null) {
+        val v = (value - minValue) / (range + 1.0)
+        minValue + (range + 1.0) * redisFunc.get.getInverseFunctionValue(v)
+      } else value
+    new IntegerParameter(retValue.toInt, minValue, maxValue, name, redisFunc)
   }
 
   override def getValue: Double = {
-    var value = this.value
-    if (redistributionFunction != null) {
-      val v = (this.value - minValue) / (range + 1.0)
-      val rv = redistributionFunction.getValue(v)
-      value = rv * (range + (1.0 - MathUtil.EPS)) + minValue
-    }
-    value.round
+    if (redisFunc.isDefined) {
+      val v = (theVal - minValue) / (range + 1.0)
+      val rv = redisFunc.get.getValue(v)
+      (rv * (range + (1.0 - MathUtil.EPS)) + minValue).round
+    } else theVal
   }
 
   override def getNaturalValue: Any = this.getValue.round

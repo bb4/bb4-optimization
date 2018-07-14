@@ -41,14 +41,14 @@ class ImprovementIteration(params: NumericParameterArray, var oldGradient: Vecto
     val p: Parameter = testParams.get(i)
 
     // increment forward.
-    delta.set(i, p.incrementByEps(Direction.FORWARD))
+    delta.set(i, p.getIncrementForDirection(Direction.FORWARD))
+    var newParam = p.incrementByEps(Direction.FORWARD)
 
+    // TODO need to create new immutable testParams
     fwdFitness = findFitnessDelta(optimizee, params, testParams)
 
-    // revert the increment
-    p.incrementByEps(Direction.BACKWARD)
     // this checks the fitness on the other side (backwards).
-    p.incrementByEps(Direction.BACKWARD)
+    newParam = p.incrementByEps(Direction.BACKWARD)
 
     bwdFitness = findFitnessDelta(optimizee, params, testParams)
 

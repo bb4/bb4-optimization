@@ -7,7 +7,7 @@ package com.barrybecker4.optimization.parameter.types
 class StringParameterSuite extends ParameterSuite[String] {
 
   override protected def createParameter =
-    new StringParameter(2, Array("foo", "bar", "baz", "abc", "bcd", "barry", "becker"), "integer param")
+    StringParameter(2, Array("foo", "bar", "baz", "abc", "bcd", "barry", "becker"), "integer param")
 
   override protected def expectedIsIntegerOnly = true
 
@@ -26,6 +26,9 @@ class StringParameterSuite extends ParameterSuite[String] {
   override protected def expectedBackwardEpsChange = 1.0
 
   override protected def expectedTweakedValues: Array[String] =
-    Array("baz", "baz", "baz", "baz", "becker")
+    Array("baz", "baz", "bar", "bar", "barry")
     //Array("baz", "baz", "baz", "bcd", "bar")
+
+  override protected def expectedRandomValues: Array[String] =
+    Array[String]("bcd", "baz")
 }

@@ -6,7 +6,7 @@ package com.barrybecker4.optimization.parameter.types
   */
 class DoubleParameterSuite extends ParameterSuite[Double] {
 
-  override protected def createParameter = new DoubleParameter(2.0, 0.0, 5.0, "double param")
+  override protected def createParameter = DoubleParameter(2.0, 0.0, 5.0, "double param")
 
   override protected def expectedMinValue = 0.0
 
@@ -24,4 +24,7 @@ class DoubleParameterSuite extends ParameterSuite[Double] {
 
   override protected def expectedTweakedValues: Array[Double] =
     Array(2.1561581040188953, 1.8520668005154652, 0.0, 0.0, 0.0)
+
+  override protected def expectedRandomValues: Array[Double] =
+    Array[Double](3.6543909535164545, 2.0504040574610083)
 }

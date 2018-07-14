@@ -6,30 +6,35 @@ import com.barrybecker4.optimization.parameter.redistribution.BooleanRedistribut
 import com.barrybecker4.optimization.parameter.ui.BooleanParameterWidget
 import com.barrybecker4.optimization.parameter.ui.ParameterWidget
 
+import scala.util.Random
+
+
+object BooleanParameter {
+  def createSkewedParameter(value: Boolean, paramName: String, percentTrue: Double): BooleanParameter = {
+    new BooleanParameter(value, paramName, Some(new BooleanRedistribution(percentTrue)))
+  }
+}
 
 /**
   * Represents a boolean parameter to an algorithm.
   * @author Barry Becker
   */
-object BooleanParameter {
-  def createSkewedParameter(value: Boolean, paramName: String, percentTrue: Double): BooleanParameter = {
-    val param = new BooleanParameter(value, paramName)
-    param.setRedistributionFunction(new BooleanRedistribution(percentTrue))
-    param
-  }
-}
+case class BooleanParameter(bValue: Boolean, name: String, redistFunc: Option[BooleanRedistribution] = None)
+  extends AbstractIntParameter(if (bValue) 1 else 0, 0, 1, name, redistFunc) {
 
-class BooleanParameter(theVal: Boolean, paramName: String)
-  extends IntegerParameter(if (theVal) 1 else 0, 0, 1, paramName) {
-  override def copy: Parameter = {
-    val p = new BooleanParameter(getNaturalValue.asInstanceOf[Boolean], name)
-    p.setRedistributionFunction(redistributionFunction)
-    p
-  }
+  override def minValue: Double = 0
+  override def maxValue: Double = 1
 
-  /**
-    * @return true if getValue is odd.
-    */
+  override def copy: BooleanParameter =
+    BooleanParameter(getNaturalValue.asInstanceOf[Boolean], name, redistFunc)
+
+  override def randomizeValue(rand: Random): BooleanParameter =
+    new BooleanParameter(if (getRandomVal(rand) == 1.0) true else false, name,  redistFunc)
+
+  override def tweakValue(r: Double, rand: Random): BooleanParameter =
+    new BooleanParameter(if (tweakIntValue(r, rand) == 0) true else false, name, redistFunc)
+
+  /** @return true if getValue is odd. */
   override def getNaturalValue: Any = (getValue.toInt % 2) == 1
 
   override protected def isOrdered = false

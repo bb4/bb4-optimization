@@ -6,7 +6,7 @@ package com.barrybecker4.optimization.parameter.types
   */
 class BooleanParameterSuite extends ParameterSuite[Boolean] {
 
-  override protected def createParameter = new BooleanParameter(true, "boolean param")
+  override protected def createParameter = BooleanParameter(bValue = true, "boolean param")
 
   override protected def expectedIsIntegerOnly = true
 
@@ -25,5 +25,8 @@ class BooleanParameterSuite extends ParameterSuite[Boolean] {
   override protected def expectedBackwardEpsChange = 0.0
 
   override protected def expectedTweakedValues: Array[Boolean] =
-    Array[Boolean](true, true, false, false, true)
+    Array[Boolean](false, true, true, false, true)
+
+  override protected def expectedRandomValues: Array[Boolean] =
+    Array[Boolean](false, false)
 }

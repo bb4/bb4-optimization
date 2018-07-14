@@ -18,11 +18,13 @@ trait Parameter {
   def name: String
 
   /** Increments the parameter a little bit in the specified direction.
-    * If we are already at the max end of the range, then we increment in a negative direction.
+    * If we are already at the max end of the range, then we increment in the negative direction.
     * @param direction either forward, or backward.
-    * @return the size of the increment taken
+    * @return the new incremented parameter
     */
-  def incrementByEps(direction: Direction): Double
+  def incrementByEps(direction: Direction): Parameter
+
+  def getIncrementForDirection(direction: Direction): Double
 
   /** Modify the value of this parameter by a little bit.
     * The amount that it changes by depends on the size of r, which is the
@@ -30,12 +32,12 @@ trait Parameter {
     * @param r the size of the (1 std deviation) gaussian neighborhood to select a random nbr from
     *          (relative to each parameter range).
     */
-  def tweakValue(r: Double, rand: Random): Unit
+  def tweakValue(r: Double, rand: Random): Parameter
 
   /** Randomizes the value within its range.
     * If no redistribution function, then the distribution is uniform.
     */
-  def randomizeValue(rand: Random): Unit
+  def randomizeValue(rand: Random): Parameter
 
   /** @return a value whose type matches the type of the parameter.
     *         (e.g. String for StringParameter Integer for IntegerParameter)
@@ -47,20 +49,13 @@ trait Parameter {
     */
   def getValue: Double
 
-  /** This optional function redistributes the normally uniform
-    * parameter distribution into something potentially completely different
-    * like a gaussian, or one where specific values have higher probability than others.
-    * @param func the redistribution function to use
-    */
-  def setRedistributionFunction(func: RedistributionFunction): Unit
-
   /** Set the value of the parameter.
     * If there is a redistribution function, then
     * set the value in the inverse redistribution space - at least
     * until I implement the inverse redistribution function.
     * @param value value to set.
     */
-  def setValue(value: Double): Unit
+  def setValue(value: Double): Parameter
 
   /** @return the minimum value of the parameters range.*/
   def minValue: Double

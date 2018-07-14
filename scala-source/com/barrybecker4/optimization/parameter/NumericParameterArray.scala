@@ -133,8 +133,11 @@ class NumericParameterArray(theParams: Array[Parameter], rnd: Random)
     */
   def add(vec: Vector): Unit = {
     assert(vec.size == size, "Parameter vec has magnitude " + vec.size + ", expecting " + size)
+
     for (i <- 0 until size) {
       val param = get(i)
+      //val range = param.range
+
       param.setValue(param.getValue + vec.get(i))
       if (param.getValue > param.maxValue) {
         println("Warning param " +
