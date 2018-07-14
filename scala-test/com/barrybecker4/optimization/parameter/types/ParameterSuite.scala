@@ -57,27 +57,25 @@ abstract class ParameterSuite[T] extends FunSuite with BeforeAndAfter {
     assertEquals("Unexpected eps backward", expectedBackwardEpsChange, newParam.getValue, MathUtil.EPS_MEDIUM)
   }
 
-  test("TweakedValues") {
-    var newParam = parameter.tweakValue(0.02, rand)
-    val v1: Any = newParam.getNaturalValue
-    newParam = newParam.tweakValue(0.1, rand)
-    val v2: Any = newParam.getNaturalValue
-    newParam = newParam.tweakValue(0.4, rand)
-    val v3: Any = newParam.getNaturalValue
-    newParam = newParam.tweakValue(0.8, rand)
-    val v4: Any = newParam.getNaturalValue
-    newParam = newParam.tweakValue(1.1, rand)
-    val v5: Any = newParam.getNaturalValue
-    //assertArrayEquals("Unexpected tweaked values", expectedTweakedValues(), new Object[] {v1, v2, v3});
-    assertResult(expectedTweakedValues) { Array(v1, v2, v3, v4, v5) }
+  test("tweaked values") {
+    val radii = Array[Double](0.02, 0.1, 0.2, 0.4, 0.6, 0.8, 1.0, 1.1, 1.2, 1.4)
+
+    var newParam = parameter
+    val actResult = for(r <- radii) yield {
+      newParam = newParam.tweakValue(r, rand)
+      newParam.getNaturalValue
+    }
+    assertResult(expectedTweakedValues) { actResult }
   }
 
   test("random values") {
-    val rParam1 = parameter.randomizeValue(rand)
-    val rParam2 = rParam1.randomizeValue(rand)
-    assertResult(expectedRandomValues) {
-      Array(rParam1.getNaturalValue, rParam2.getNaturalValue)
+    var rParam = parameter
+
+    val actResult = for (i <- 0 until 10) yield {
+      rParam = rParam.randomizeValue(rand)
+      rParam.getNaturalValue
     }
+    assertResult(expectedRandomValues) { actResult }
   }
 
   protected def expectedIsIntegerOnly: Boolean = false

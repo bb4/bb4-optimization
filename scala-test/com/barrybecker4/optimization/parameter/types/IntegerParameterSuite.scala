@@ -25,8 +25,8 @@ class IntegerParameterSuite extends ParameterSuite[Int] {
   override protected def expectedBackwardEpsChange = 4.0
 
   override protected def expectedTweakedValues: Array[Int] =
-    Array[Int](5, 4, 3, 3, 3) //4, 5, 7, 3, 3)
+    Array[Int](5, 5, 3, 3, 3, 3, 3, 4, 3, 6) //4, 5, 7, 3, 3)
 
   override protected def expectedRandomValues: Array[Int] =
-    Array[Int](8, 6)
+    Array[Int](9, 6, 5, 6, 11, 3, 11, 11, 11, 10)
 }

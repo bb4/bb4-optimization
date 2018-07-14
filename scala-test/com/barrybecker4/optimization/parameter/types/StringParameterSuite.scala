@@ -26,9 +26,8 @@ class StringParameterSuite extends ParameterSuite[String] {
   override protected def expectedBackwardEpsChange = 1.0
 
   override protected def expectedTweakedValues: Array[String] =
-    Array("baz", "baz", "bar", "bar", "barry")
-    //Array("baz", "baz", "baz", "bcd", "bar")
+    Array("baz", "baz", "baz", "becker", "becker", "becker", "becker", "baz", "abc", "barry")
 
   override protected def expectedRandomValues: Array[String] =
-    Array[String]("bcd", "baz")
+    Array[String]("bcd", "baz", "bar", "baz", "becker", "foo", "becker", "becker", "becker", "becker")
 }
