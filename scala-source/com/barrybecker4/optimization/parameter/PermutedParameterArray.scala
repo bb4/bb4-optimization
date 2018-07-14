@@ -32,7 +32,7 @@ class PermutedParameterArray(theParams: Array[Parameter], rnd: Random)
   def setPermutation(indices: List[Integer]): Unit = {
     assert(indices.size == size)
     val newParams = for (i <- indices) yield get(i)
-    params = newParams.toArray
+    params = newParams.toIndexedSeq
   }
 
   override protected def createInstance = new PermutedParameterArray(rnd)
@@ -40,11 +40,12 @@ class PermutedParameterArray(theParams: Array[Parameter], rnd: Random)
   def reverse: ParameterArray = {
     val paramCopy = this.copy
     val len = size
-    for (i <- 0 until len / 2) {
-      val temp = paramCopy.params(i)
-      paramCopy.params(i) = paramCopy.params(len - i - 1)
-      paramCopy.params(len - i - 1) = temp
-    }
+    paramCopy.params = this.params.reverse
+//    for (i <- 0 until len / 2) {
+//      val temp = paramCopy.params(i)
+//      paramCopy.params(i) = paramCopy.params(len - i - 1)
+//      paramCopy.params(len - i - 1) = temp
+//    }
     paramCopy
   }
 
@@ -67,17 +68,23 @@ class PermutedParameterArray(theParams: Array[Parameter], rnd: Random)
   override def getRandomNeighbor(radius: Double): PermutedParameterArray = {
     if (size <= 1) return this
     val numToSwap = Math.max(1, (10.0 * radius * size / 100.0).toInt)
+
+
     val nbr = this.copy.asInstanceOf[PermutedParameterArray]
+    val revisedParams = nbr.params.toArray
+
     for (k <- 0 until numToSwap) {
       val index1 = rnd.nextInt(size)
       var index2 = rnd.nextInt(size)
       while ( {
         index2 == index1
       }) index2 = rnd.nextInt(size)
-      val temp = nbr.params(index1)
-      nbr.params(index1) = nbr.params(index2)
-      nbr.params(index2) = temp
+      // swap
+      val temp = revisedParams(index1)
+      revisedParams(index1) = revisedParams(index2)
+      revisedParams(index2) = temp
     }
+    nbr.params = revisedParams.toIndexedSeq
     nbr
   }
 

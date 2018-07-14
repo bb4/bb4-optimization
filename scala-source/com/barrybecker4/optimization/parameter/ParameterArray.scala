@@ -8,7 +8,8 @@ import scala.collection.mutable
 
 
 /**
-  * Represents an array of parameters
+  * Represents an array of parameters.
+  * Derived classes should be immutable.
   * @author Barry Becker
   */
 trait ParameterArray extends Comparable[ParameterArray] {
@@ -57,7 +58,7 @@ trait ParameterArray extends Comparable[ParameterArray] {
                                  lastImprovement: Improvement, cache: mutable.Set[ParameterArray]): Improvement
 
   /** Some measure of the distance between parameter arrays of the same type.
-    * The way this is computed is very dependent on the implementation of each sort of parameter array.
+    * The way this is computed is very implementation dependent.
     * @return a measure of the distance between this parameter array and another.
     */
   def distance(pa: ParameterArray): Double

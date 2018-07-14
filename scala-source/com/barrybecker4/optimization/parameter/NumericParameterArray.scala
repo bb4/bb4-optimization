@@ -136,7 +136,6 @@ class NumericParameterArray(theParams: Array[Parameter], rnd: Random)
 
     for (i <- 0 until size) {
       val param = get(i)
-      //val range = param.range
 
       param.setValue(param.getValue + vec.get(i))
       if (param.getValue > param.maxValue) {

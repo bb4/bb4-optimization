@@ -18,11 +18,11 @@ object AbstractParameterArray {
   * @param theParams the list of parameters
   * @author Barry Becker
   */
-abstract class AbstractParameterArray(theParams: Array[Parameter] = Array[Parameter](), rnd: Random)
+abstract class AbstractParameterArray(theParams: IndexedSeq[Parameter] = IndexedSeq[Parameter](), rnd: Random)
     extends ParameterArray {
 
   assert(theParams != null)
-  var params: Array[Parameter] = theParams
+  var params: IndexedSeq[Parameter] = theParams
 
   /** assign a fitness (evaluation value) to this set of parameters */
   private var fitness: Double = 0
