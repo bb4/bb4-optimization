@@ -2,7 +2,7 @@
 package com.barrybecker4.optimization.optimizee.optimizees.problems
 
 import com.barrybecker4.optimization.optimizee.optimizees.OptimizeeProblem
-import com.barrybecker4.optimization.parameter.ParameterArray
+import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 
 /**
   * This is a simple search space to test the optimization package.
@@ -42,7 +42,7 @@ class ParabolaMinFunctionProblem(var variation: ParabolaMinVariation) extends Op
 
   override def getInitialGuess: ParameterArray = ParabolaFunctionConsts.INITIAL_GUESS
 
-  override def getExactSolution: ParameterArray = ParabolaFunctionConsts.EXACT_SOLUTION
+  override def getExactSolution: ParameterArrayWithFitness = ParabolaFunctionConsts.EXACT_SOLUTION
 
   override def getFitnessRange: Double = ParabolaMinFunctionProblem.FITNESS_RANGE
 }

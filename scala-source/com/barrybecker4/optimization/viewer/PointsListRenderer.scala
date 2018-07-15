@@ -2,7 +2,8 @@
 package com.barrybecker4.optimization.viewer
 
 import java.awt._
-import com.barrybecker4.optimization.parameter.ParameterArray
+
+import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 import com.barrybecker4.optimization.viewer.model.PointsList
 import javax.vecmath.Point2d
 
@@ -35,12 +36,12 @@ class PointsListRenderer {
   }
 
   private def drawVector(g2: Graphics2D, lastPoint: Point, currentPoint: Point, rawPoint: Point2d,
-                         params: ParameterArray, isLast: Boolean): Unit = {
+                         params: ParameterArrayWithFitness, isLast: Boolean): Unit = {
     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
     g2.setStroke(PointsListRenderer.LINE_STROKE)
     g2.setColor(PointsListRenderer.VECTOR_COLOR)
     g2.drawLine(currentPoint.x, currentPoint.y, lastPoint.x, lastPoint.y)
-    g2.setColor(PointsListRenderer.cmap.getColorForValue(params.getFitness))
+    g2.setColor(PointsListRenderer.cmap.getColorForValue(params.fitness))
     fillOval(currentPoint, 3 * PointsListRenderer.POINT_DIAMETER, g2)
     g2.setStroke(PointsListRenderer.POINT_STROKE)
     g2.setColor(if (isLast) PointsListRenderer.FINAL_POINT_COLOR
@@ -48,7 +49,7 @@ class PointsListRenderer {
     drawOval(currentPoint, PointsListRenderer.POINT_DIAMETER, g2)
     g2.setColor(PointsListRenderer.TEXT_COLOR)
     //String label = "(" + FormatUtil.formatNumber(rawPoint.x) + ", " + FormatUtil.formatNumber(rawPoint.y) + ")";
-    val label = "(" + params.toCSVString + ")"
+    val label = "(" + params.pa.toCSVString + ")"
     g2.drawString(label, currentPoint.x - 10 - 5 * label.length, currentPoint.y + 12)
   }
 

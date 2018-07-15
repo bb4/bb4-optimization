@@ -5,7 +5,7 @@ import com.barrybecker4.common.math.MathUtil
 import com.barrybecker4.common.math.Vector
 import com.barrybecker4.optimization.optimizee.Optimizee
 import com.barrybecker4.optimization.parameter.types.Parameter
-import com.barrybecker4.optimization.parameter.{Direction, NumericParameterArray, ParameterArray}
+import com.barrybecker4.optimization.parameter.{Direction, NumericParameterArray, ParameterArray, ParameterArrayWithFitness}
 
 
 /**
@@ -13,17 +13,17 @@ import com.barrybecker4.optimization.parameter.{Direction, NumericParameterArray
   * over a numerical parameter space.
   * @author Barry Becker
   */
-class ImprovementIteration(params: NumericParameterArray, var oldGradient: Vector = null) {
+class ImprovementIteration(params: ParameterArrayWithFitness, var oldGradient: Vector = null) {
 
-  private val delta: Vector = params.asVector
-  private val fitnessDelta: Vector = params.asVector
-  val gradient: Vector = params.asVector
+  private val delta: Vector = params.pa.asInstanceOf[NumericParameterArray].asVector
+  private val fitnessDelta: Vector = delta
+  val gradient: Vector = delta
 
   if (oldGradient == null) {
-    this.oldGradient = params.asVector
+    this.oldGradient = params.pa.asInstanceOf[NumericParameterArray].asVector
 
     // initialize the old gradient to the unit vector (any random direction will do)
-    for (i <- 0 until params.size) {
+    for (i <- 0 until params.pa.size) {
       this.oldGradient.set(i, 1.0)
     }
     this.oldGradient = this.oldGradient.normalize
@@ -33,7 +33,7 @@ class ImprovementIteration(params: NumericParameterArray, var oldGradient: Vecto
     * @return the sum of squares in one of the iteration directions.
     */
   def incSumOfSqs(i: Int, sumOfSqs: Double, optimizee: Optimizee,
-                  params: ParameterArray, testParams: ParameterArray): Double = {
+                  params: ParameterArrayWithFitness, testParams: ParameterArray): Double = {
 
     var fwdFitness: Double = 0
     var bwdFitness: Double = 0
@@ -44,7 +44,6 @@ class ImprovementIteration(params: NumericParameterArray, var oldGradient: Vecto
     delta.set(i, p.getIncrementForDirection(Direction.FORWARD))
     var newParam = p.incrementByEps(Direction.FORWARD)
 
-    // TODO need to create new immutable testParams
     fwdFitness = findFitnessDelta(optimizee, params, testParams)
 
     // this checks the fitness on the other side (backwards).
@@ -61,9 +60,11 @@ class ImprovementIteration(params: NumericParameterArray, var oldGradient: Vecto
     * @param testParams the new set of parameters being evaluated.
     * @return the incremental change in fitness
     */
-  private def findFitnessDelta(optimizee: Optimizee, params: ParameterArray, testParams: ParameterArray): Double = {
-    if (optimizee.evaluateByComparison) optimizee.compareFitness( testParams, params )
-    else params.getFitness - optimizee.evaluateFitness( testParams )
+  private def findFitnessDelta(optimizee: Optimizee,
+                               params: ParameterArrayWithFitness,
+                               testParams: ParameterArray): Double = {
+    if (optimizee.evaluateByComparison) optimizee.compareFitness( testParams, params.pa )
+    else params.fitness - optimizee.evaluateFitness( testParams )
   }
 
   /** Update gradient. Use EPS if the gradLength is 0. */

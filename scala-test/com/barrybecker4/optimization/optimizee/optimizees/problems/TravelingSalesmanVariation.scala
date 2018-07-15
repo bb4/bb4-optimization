@@ -2,11 +2,12 @@
 package com.barrybecker4.optimization.optimizee.optimizees.problems
 
 import com.barrybecker4.optimization.optimizee.optimizees.{ErrorTolerances, ProblemVariation}
-import com.barrybecker4.optimization.parameter.{ParameterArray, PermutedParameterArray}
+import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness, PermutedParameterArray}
 import com.barrybecker4.optimization.parameter.types.IntegerParameter
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType
 import ErrorTolerances._
 import TravelingSalesmanVariation.RANDOM
+
 import scala.util.Random
 
 
@@ -25,7 +26,7 @@ sealed trait TravelingSalesmanVariation  extends ProblemVariation {
     val num = this.getNumCities
     val params = for (i <- 0 until num) yield new IntegerParameter(i, 0, num - 1, "p" + i)
     val guess = new PermutedParameterArray(params.toArray, RANDOM)
-    guess.setFitness(evaluateFitness(guess))
+    //guess.setFitness(evaluateFitness(guess))
     guess
   }
 
@@ -121,10 +122,9 @@ case object TSP_SIMPLE extends TravelingSalesmanVariation {
   override def getNumCities = 4
   override def getShortestPathLength = 6.0
 
-  override def getExactSolution: PermutedParameterArray = {
+  override def getExactSolution: ParameterArrayWithFitness = {
     val solution = createSolution(Array[Int](0, 2, 1, 3))
-    solution.setFitness(0)
-    solution
+    ParameterArrayWithFitness(solution, 0)
   }
 
   override def getFitnessRange = 9.0
@@ -157,10 +157,9 @@ case object TSP_STANDARD extends TravelingSalesmanVariation {
   override def getNumCities = 5
   override def getShortestPathLength = 207.0
 
-  override def getExactSolution: PermutedParameterArray = {
+  override def getExactSolution: ParameterArrayWithFitness = {
     val solution = createSolution(Array[Int](2, 4, 0, 1, 3))
-    solution.setFitness(0)
-    solution
+    ParameterArrayWithFitness(solution, 0)
   }
 
   override def getFitnessRange = 1000.0
@@ -235,10 +234,9 @@ case object TSP_US_CAPITALS extends TravelingSalesmanVariation {
   override def getNumCities = 48
   override def getShortestPathLength = 10627.75
 
-  override def getExactSolution: PermutedParameterArray = {
+  override def getExactSolution: ParameterArrayWithFitness = {
     val solution = createSolution(Array[Int](2, 4)) // not knoen
-    solution.setFitness(0)
-    solution
+    ParameterArrayWithFitness(solution, 0)
   }
 
   override def getFitnessRange = 120000.0

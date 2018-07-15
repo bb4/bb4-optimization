@@ -2,7 +2,7 @@
 package com.barrybecker4.optimization.strategy
 
 import com.barrybecker4.optimization.optimizee.Optimizee
-import com.barrybecker4.optimization.parameter.ParameterArray
+import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 
 
 /**
@@ -31,16 +31,18 @@ class GlobalHillClimbingStrategy(optimizee: Optimizee) extends OptimizationStrat
     * @param fitnessRange the approximate absolute value of the fitnessRange.
     * @return optimized params
     */
-  override def doOptimization(params: ParameterArray, fitnessRange: Double): ParameterArray = {
+  override def doOptimization(params: ParameterArray,
+                              fitnessRange: Double): ParameterArrayWithFitness = {
     val gsStrategy = new GlobalSampleStrategy(optimizee)
     gsStrategy.setListener(listener)
     // 3 sample points along each dimension
     gsStrategy.setSamplingRate(GlobalHillClimbingStrategy.NUM_SAMPLES)
+
     // first find a good place to start
     // perhaps we should try several of the better results from global sampling.
     val sampledParams = gsStrategy.doOptimization(params, fitnessRange)
     val strategy = new HillClimbingStrategy(optimizee)
     strategy.setListener(listener)
-    strategy.doOptimization(sampledParams, fitnessRange)
+    strategy.doOptimization(sampledParams.pa, fitnessRange)
   }
 }

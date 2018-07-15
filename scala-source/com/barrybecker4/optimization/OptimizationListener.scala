@@ -1,7 +1,7 @@
 // Copyright by Barry G. Becker, 2000-2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization
 
-import com.barrybecker4.optimization.parameter.ParameterArray
+import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 
 
 /**
@@ -9,5 +9,5 @@ import com.barrybecker4.optimization.parameter.ParameterArray
   * @author Barry Becker
   */
 trait OptimizationListener {
-  def optimizerChanged(params: ParameterArray): Unit
+  def optimizerChanged(params: ParameterArrayWithFitness): Unit
 }

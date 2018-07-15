@@ -2,10 +2,11 @@
 package com.barrybecker4.optimization.optimizee.optimizees.problems
 
 import com.barrybecker4.optimization.optimizee.optimizees.{ErrorTolerances, ProblemVariation}
-import com.barrybecker4.optimization.parameter.{ParameterArray, VariableLengthIntArray}
+import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness, VariableLengthIntArray}
 import com.barrybecker4.optimization.parameter.distancecalculators.MagnitudeDistanceCalculator
 import com.barrybecker4.optimization.parameter.types.{IntegerParameter, Parameter}
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType
+
 import scala.util.Random
 
 
@@ -33,7 +34,7 @@ sealed trait SubsetSumVariation extends ProblemVariation {
       new MagnitudeDistanceCalculator,
       new Random(1)
     )
-    pa.setFitness(computeCost(pa))
+    // pa.setFitness(computeCost(pa))
     pa
   }
 
@@ -79,12 +80,14 @@ sealed trait SubsetSumVariation extends ProblemVariation {
     * @param numberList optimal dominating set of marked nodes. May not be unique.
     * @return optimal solution (to compare against at the end of the test).
     */
-  protected def createSolution(numberList: Int*): VariableLengthIntArray = {
+  protected def createSolution(numberList: Int*): ParameterArrayWithFitness = {
     val numNodes = numberList.length
     assert(numNodes > 0, "There must be some values in a valid solution.")
     val params: IndexedSeq[Parameter] = for (i <- 0 until numNodes) yield createParam(i)
 
-    new VariableLengthIntArray(params.toArray, getNumberSet, new MagnitudeDistanceCalculator, new Random(1))
+    ParameterArrayWithFitness(
+      new VariableLengthIntArray(params.toArray, getNumberSet, new MagnitudeDistanceCalculator, new Random(1)),
+      0)
   }
 
   private def createParam(i: Int) = {
@@ -103,7 +106,7 @@ case object SIMPLE_SS extends SubsetSumVariation {
 
   override protected def getNumberSet: Set[Int] = Set(-7, -3, -2, 5, 8)
 
-  override def getExactSolution: ParameterArray = createSolution(-3, -2, 5)
+  override def getExactSolution: ParameterArrayWithFitness = createSolution(-3, -2, 5)
 
   override def getFitnessRange = 22.0
 }
@@ -116,7 +119,8 @@ case object TYPICAL_SS extends SubsetSumVariation {
     Set(-7, -33, -21, 5, 83, -29, -78, 213, 123, -34, -37, -41, 91, -8, -17)
 
   // This is one of several possible solutions that gives an optimal fitness of 0
-  override def getExactSolution: ParameterArray = createSolution(-33, -21, 5, -29, 123, -37, -8)
+  override def getExactSolution: ParameterArrayWithFitness =
+    createSolution(-33, -21, 5, -29, 123, -37, -8)
 
   override def getFitnessRange = 400.0
 }
@@ -130,7 +134,7 @@ case object NO_SOLUTION extends  SubsetSumVariation {
     Set(-7, -33, -21, 5, -83, -29, -78, -113, -23, -34, -37, -41, -91, -9, -17)
 
   /** There is no solution - i.e. no values that sum to 0. */
-  override def getExactSolution: ParameterArray = createSolution(-7)
+  override def getExactSolution: ParameterArrayWithFitness = createSolution(-7)
 
   override def getFitnessRange = 600.0
 }

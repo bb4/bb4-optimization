@@ -112,13 +112,13 @@ class VariableLengthIntArray(theParams: Array[Parameter], rnd: Random)
   override def findGlobalSamples(requestedNumSamples: Long) =
     new VariableLengthGlobalSampler(this, requestedNumSamples)
 
-  /** Try swapping parameters randomly until we find an improvement (if we can). */
+  /** Try swapping parameters randomly until we find an improvement (if we can).
   override def findIncrementalImprovement(optimizee: Optimizee, jumpSize: Double,
                                           lastImprovement: Improvement,
                                           cache: mutable.Set[ParameterArray]): Improvement = {
-    val finder = new DiscreteImprovementFinder(this)
+    val finder = new DiscreteImprovementFinder()
     finder.findIncrementalImprovement(optimizee, jumpSize, cache)
-  }
+  }*/
 
   /** @return get a random solution in the parameter space by selecting about half of the ints */
   override def getRandomSample: ParameterArray = {

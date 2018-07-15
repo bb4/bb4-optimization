@@ -2,7 +2,7 @@
 package com.barrybecker4.optimization.parameter.improvement
 
 import com.barrybecker4.common.math.Vector
-import com.barrybecker4.optimization.parameter.ParameterArray
+import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 
 
 /**
@@ -13,4 +13,5 @@ import com.barrybecker4.optimization.parameter.ParameterArray
   * @param gradient  direction that we are currently moving in.
   * @author Barry Becker
   */
-case class Improvement(parameters: ParameterArray, improvement: Double, newJumpSize: Double, gradient: Vector = null)
+case class Improvement(parameters: ParameterArrayWithFitness,
+                       improvement: Double, newJumpSize: Double, gradient: Vector = null)

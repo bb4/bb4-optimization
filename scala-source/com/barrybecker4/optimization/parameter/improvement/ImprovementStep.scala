@@ -2,8 +2,7 @@
 package com.barrybecker4.optimization.parameter.improvement
 
 import com.barrybecker4.optimization.optimizee.Optimizee
-import com.barrybecker4.optimization.parameter.NumericParameterArray
-import com.barrybecker4.optimization.parameter.ParameterArray
+import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray, ParameterArrayWithFitness}
 
 import scala.collection.mutable
 
@@ -36,7 +35,7 @@ class ImprovementStep(var optimizee: Optimizee, var iter: ImprovementIteration, 
   /** @param params the initial value for the parameters to optimize.
     * @return the parameters to try next.
     */
-  def findNextParams(params: NumericParameterArray): NumericParameterArray = {
+  def findNextParams(params: ParameterArrayWithFitness): ParameterArrayWithFitness = {
     var currentParams = params
     val maxTries = 100
     var numTries = 0
@@ -52,13 +51,13 @@ class ImprovementStep(var optimizee: Optimizee, var iter: ImprovementIteration, 
     * @param params parameter set to find neighbor of.
     * @return nearby location.
     */
-  private def findNextCandidateParams(params: NumericParameterArray) = {
-    var currentParams = params
-    val oldParams = currentParams.copy
+  private def findNextCandidateParams(params: ParameterArrayWithFitness): ParameterArrayWithFitness = {
+    var currentParams: NumericParameterArray = params.pa.asInstanceOf[NumericParameterArray]
+    val oldParams = params
     iter.updateGradient(jumpSize, gradLength)
     //log("gradient = " + iter.gradient + " jumpSize="+ jumpSize);
     currentParams = currentParams.copy
-    currentParams.add(iter.gradient)
+    currentParams = currentParams.add(iter.gradient)
     var gaussRadius = 0.01
     var sameParams = false
     // for problems with integer params, we want to avoid testing the same candidate over again. */
@@ -68,25 +67,29 @@ class ImprovementStep(var optimizee: Optimizee, var iter: ImprovementIteration, 
       gaussRadius *= ImprovementStep.RADIUS_EXPANDER
     }
     cache += currentParams
+
+    var newParams: ParameterArrayWithFitness = null
     if (optimizee.evaluateByComparison) {
-      currentParams.setFitness(optimizee.compareFitness(currentParams, oldParams))
-      if (currentParams.getFitness < 0) improved = false
-      improvement = currentParams.getFitness
+      val fitness = optimizee.compareFitness(currentParams, oldParams.pa)
+      newParams = ParameterArrayWithFitness(currentParams, fitness)
+      if (fitness < 0) improved = false
+      improvement = fitness
     }
     else {
-      currentParams.setFitness(optimizee.evaluateFitness(currentParams))
-      if (currentParams.getFitness >= oldFitness) improved = false
-      improvement = oldFitness - currentParams.getFitness
+      val fitness = optimizee.evaluateFitness(currentParams)
+      newParams = ParameterArrayWithFitness(currentParams, fitness)
+      if (fitness >= oldFitness) improved = false
+      improvement = oldFitness - fitness
     }
     improved = improvement > 0
     if (!improved) {
-      currentParams = oldParams
+      newParams = oldParams
       if (!sameParams) { // we have not improved, try again with a reduced jump size.
         //log( "Warning: the new params are worse so reduce the step size and try again");
         //log(numIterations, currentParams.getFitness(), jumpSize, Double.NaN, currentParams, "not improved");
         jumpSize *= ImprovementStep.JUMP_SIZE_DEC_FACTOR
       }
     }
-    currentParams
+    newParams
   }
 }

@@ -4,10 +4,10 @@ package com.barrybecker4.optimization.strategy
 import com.barrybecker4.common.format.FormatUtil
 import com.barrybecker4.common.math.MathUtil
 import com.barrybecker4.optimization.optimizee.Optimizee
-import com.barrybecker4.optimization.parameter.ParameterArray
+import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 import SimulatedAnnealingStrategy._
-
 import scala.util.Random
+
 
 /**
   * Simulated annealing optimization strategy.
@@ -31,7 +31,9 @@ object SimulatedAnnealingStrategy {
   * so it can be easily run in an applet without using resources.
   * @param optimizee the thing to be optimized.
   */
-class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM) extends OptimizationStrategy(optimizee) {
+class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM)
+  extends OptimizationStrategy(optimizee) {
+
   private var tempMax = SimulatedAnnealingStrategy.DEFAULT_TEMP_MAX
 
   /** keep track of points that were searched */
@@ -63,35 +65,35 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
     * @param fitnessRange the approximate absolute value of the fitnessRange.
     * @return the optimized params.
     */
-  override def doOptimization(params: ParameterArray, fitnessRange: Double): ParameterArray = {
+  override def doOptimization(params: ParameterArray, fitnessRange: Double): ParameterArrayWithFitness = {
     var ct = 0
     var temperature = tempMax
     val tempMin = tempMax / Math.pow(2.0, NUM_TEMP_ITERATIONS)
-    if (!optimizee.evaluateByComparison) {
-      val currentFitness = optimizee.evaluateFitness(params)
-      params.setFitness(currentFitness)
-    }
+    var bestParams =
+      if (!optimizee.evaluateByComparison)
+        ParameterArrayWithFitness(params, optimizee.evaluateFitness(params))
+      else ParameterArrayWithFitness(params, Double.MaxValue)
+
     // store the best solution we found at any given temperature iteration and use that as the initial
     // start of the next temperature iteration.
-    var bestParams = params.copy
-    var currentParams: ParameterArray = null
+    var currentParams: ParameterArrayWithFitness = null
     do { // temperature iteration (temperature drops each time through)
       currentParams = bestParams
       do {
         currentParams = findNeighbor(currentParams, ct, temperature)
-        if (currentParams.getFitness < bestParams.getFitness) {
-          bestParams = currentParams.copy
+        if (currentParams.fitness < bestParams.fitness) {
+          bestParams = currentParams
           notifyOfChange(bestParams)
         }
         ct += 1
-      } while (ct < N * currentParams.size && !isOptimalFitnessReached(currentParams))
+      } while (ct < N * currentParams.pa.size && !isOptimalFitnessReached(currentParams))
       ct = 0
       // keep Reducing the temperature until it reaches tempMin
       temperature *= TEMP_DROP_FACTOR
       println("temp = " + temperature + " tempMin = " + tempMin + "\n bestParams = " + bestParams)
     } while (temperature > tempMin && !isOptimalFitnessReached(currentParams))
     //println("T=" + temperature + "  currentFitness = " + bestParams.getFitness());
-    log(ct, bestParams.getFitness, 0, 0, bestParams, FormatUtil.formatNumber(temperature))
+    log(ct, bestParams, 0, 0, FormatUtil.formatNumber(temperature))
     bestParams
   }
 
@@ -103,42 +105,41 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
     * @param temperature current temperature. Gets cooler with every successive temperature iteration.
     * @return neighboring point that is hopefully better than params.
     */
-  private def findNeighbor(params: ParameterArray, ct: Int, temperature: Double) = {
+  private def findNeighbor(params: ParameterArrayWithFitness,
+                           ct: Int, temperature: Double): ParameterArrayWithFitness = {
     //double r = (tempMax/5.0+temperature) / (8.0*(N/5.0+ct)*tempMax);
     var curParams = params
     val r = 8 * temperature / ((N + ct) * tempMax)
-    var newParams = curParams.getRandomNeighbor(r)
+    var newParams = curParams.pa.getRandomNeighbor(r)
 
     // Try to avoid getting the same point as one we have seen before
     var tempRad = r
     var i = 0
     while (cache.contains(newParams) && i < 10) {
-      newParams = curParams.getRandomNeighbor(tempRad)
+      newParams = curParams.pa.getRandomNeighbor(tempRad)
       tempRad *= 1.05
       i += 1
     }
 
-    val dist = curParams.distance(newParams)
-    var deltaFitness = .0
+    val dist = curParams.pa.distance(newParams)
     var newFitness = .0
-    if (optimizee.evaluateByComparison) deltaFitness = optimizee.compareFitness(newParams, curParams)
-    else {
-      newFitness = optimizee.evaluateFitness(newParams)
-      newParams.setFitness(newFitness)
-      deltaFitness = curParams.getFitness - newFitness
-    }
+    val deltaFitness =
+      if (optimizee.evaluateByComparison)
+        optimizee.compareFitness(newParams, curParams.pa)
+      else {
+        newFitness = optimizee.evaluateFitness(newParams)
+        curParams.fitness - newFitness
+      }
     val probability = Math.pow(Math.E, tempMax * deltaFitness / temperature)
     val useWorseSolution = rnd.nextDouble < probability
-    if (deltaFitness > 0 || useWorseSolution) { // we always select the solution if it has a better fitness,
-      // but we sometimes select a worse solution if the second term evaluates to true.
-      /*if (deltaFitness < 0 && useWorseSolution)
-        println("Selected worse solution with prob=" +
-          probability + " delta=" + deltaFitness + " / temp=" + temperature)*/
-      curParams = newParams
+    if (deltaFitness > 0 || useWorseSolution) {
+      // Always select the solution if it has a better fitness,
+      // but sometimes select a worse solution if the second term evaluates to true.
+      curParams = ParameterArrayWithFitness(newParams, curParams.fitness + deltaFitness)
     }
     //println("T="+temperature+" ct="+ct+" dist="+dist+" deltaFitness="
     //        + deltaFitness+"  currentFitness = "+ curParams.getFitness() );
-    log(ct, curParams.getFitness, r, dist, curParams, FormatUtil.formatNumber(temperature))
+    log(ct, curParams, r, dist, FormatUtil.formatNumber(temperature))
     curParams
   }
 }

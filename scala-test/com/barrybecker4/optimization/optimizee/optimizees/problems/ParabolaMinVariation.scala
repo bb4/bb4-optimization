@@ -5,7 +5,7 @@ import com.barrybecker4.optimization.optimizee.optimizees.ProblemVariation
 import com.barrybecker4.optimization.optimizee.optimizees.ErrorTolerances
 import ErrorTolerances._
 import com.barrybecker4.optimization.optimizee.optimizees.problems.ParabolaFunctionConsts._
-import com.barrybecker4.optimization.parameter.ParameterArray
+import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType
 
 object ParabolaMinVariation {
@@ -24,7 +24,7 @@ sealed trait ParabolaMinVariation extends ProblemVariation {
     */
   def evaluateFitness(a: ParameterArray): Double
 
-  override def getExactSolution: ParameterArray = ParabolaFunctionConsts.EXACT_SOLUTION
+  override def getExactSolution: ParameterArrayWithFitness = ParabolaFunctionConsts.EXACT_SOLUTION
 
   /** @return the error tolerance percent for a specific optimization strategy */
   override def getErrorTolerancePercent(opt: OptimizationStrategyType): Double =

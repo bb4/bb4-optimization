@@ -2,8 +2,9 @@
 package com.barrybecker4.optimization.parameter.improvement
 
 import com.barrybecker4.optimization.optimizee.Optimizee
-import com.barrybecker4.optimization.parameter.ParameterArray
+import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 import DiscreteImprovementFinder._
+
 import scala.collection.mutable
 
 
@@ -19,7 +20,7 @@ object DiscreteImprovementFinder {
   * Finds incremental improvement in a discrete problem space.
   * @author Barry Becker
   */
-class DiscreteImprovementFinder(var params: ParameterArray) {
+class DiscreteImprovementFinder(var params: ParameterArrayWithFitness) {
 
   /** Try to find a parameterArray that is better than what we have now by evaluating using the optimizee passed in.
     * Try swapping parameters randomly until we find an improvement (if we can).
@@ -36,17 +37,20 @@ class DiscreteImprovementFinder(var params: ParameterArray) {
     var jumpSize = initialJumpSize * JUMP_SIZE_DECREASE
     var improvement = Improvement(params, 0, jumpSize)
     do {
-      val nbr = params.getRandomNeighbor(jumpSize)
+      val nbrParam = params.pa.getRandomNeighbor(jumpSize)
       fitnessDelta = 0
-      if (!cache.contains(nbr)) {
-        cache += nbr
-        if (optimizee.evaluateByComparison)
-          fitnessDelta = optimizee.compareFitness(nbr, params)
-        else {
-          val fitness = optimizee.evaluateFitness(nbr)
-          fitnessDelta = params.getFitness - fitness
-          nbr.setFitness(fitness)
+      if (!cache.contains(nbrParam)) {
+        cache += nbrParam
+        var nbr: ParameterArrayWithFitness = null
+        if (optimizee.evaluateByComparison) {
+          fitnessDelta = optimizee.compareFitness(nbrParam, params.pa)
+          nbr = ParameterArrayWithFitness(nbrParam, params.fitness + fitnessDelta)
+        } else {
+          val fitness = optimizee.evaluateFitness(nbrParam)
+          fitnessDelta = params.fitness - fitness
+          nbr = ParameterArrayWithFitness(nbrParam, fitness)
         }
+
         if (fitnessDelta > 0) improvement = Improvement(nbr, fitnessDelta, jumpSize)
       }
       numTries += 1
@@ -54,8 +58,8 @@ class DiscreteImprovementFinder(var params: ParameterArray) {
     } while (fitnessDelta <= 0 && numTries < MAX_TRIES)
 
     println("incremental improvement = " + improvement.improvement + " numTries=" + numTries + " jumpSize=" + jumpSize
-      + "\n num nodes in improvedParams=" + improvement.parameters.size
-      + " fit=" + improvement.parameters.getFitness)
+      + "\n num nodes in improvedParams=" + improvement.parameters.pa.size
+      + " fit=" + improvement.parameters.fitness)
     improvement
   }
 }

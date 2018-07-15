@@ -1,7 +1,7 @@
 // Copyright by Barry G. Becker, 2013-2014. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.optimizee.optimizees
 
-import com.barrybecker4.optimization.parameter.ParameterArray
+import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType
 
 
@@ -12,7 +12,7 @@ import com.barrybecker4.optimization.strategy.OptimizationStrategyType
 trait ProblemVariation {
 
   /** @return An optimal ordering of the cities to visit such that cost is minimized.  */
-  def getExactSolution: ParameterArray
+  def getExactSolution: ParameterArrayWithFitness
 
   /** @param opt the strategy type to get the expected error tolerance for.
     * @return the error tolerance percent for a specific optimization strategy

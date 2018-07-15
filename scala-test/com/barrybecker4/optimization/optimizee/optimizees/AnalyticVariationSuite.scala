@@ -26,7 +26,7 @@ class AnalyticVariationSuite extends FunSuite {
   test("VariationMaximum") {
     for (variant <- ParabolaMinVariation.VALUES) {
       val param: ParameterArray = NumericParameterArraySuite.createParamArray(P1, P2)
-      assert(EXACT_SOLUTION.getFitness === variant.evaluateFitness(param),
+      assert(EXACT_SOLUTION.fitness === variant.evaluateFitness(param),
         "Unexpected fitness for " + variant.getClass.getName)
     }
   }

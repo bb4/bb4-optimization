@@ -4,7 +4,7 @@ package com.barrybecker4.optimization.optimizee.optimizees.problems
 import com.barrybecker4.optimization.Optimizer
 import com.barrybecker4.optimization.optimizee.OptimizerTestSuite.LOG_FILE_HOME
 import com.barrybecker4.optimization.optimizee.optimizees.OptimizeeProblem
-import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray}
+import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray, ParameterArrayWithFitness}
 import com.barrybecker4.optimization.parameter.types.{IntegerParameter, Parameter}
 import com.barrybecker4.optimization.strategy.{GLOBAL_SAMPLING, OptimizationStrategyType}
 
@@ -49,7 +49,9 @@ object SevenElevenProblem {
     new IntegerParameter(P4, 0, 708, "p4")
   )
   private val INITIAL_GUESS = new NumericParameterArray(INITIAL_GUESS_PARAMS, RAND)
-  private val EXACT_SOLUTION = new NumericParameterArray(EXACT_SOLUTION_PARAMS, RAND)
+  private val EXACT_SOLUTION = ParameterArrayWithFitness(
+    new NumericParameterArray(EXACT_SOLUTION_PARAMS, RAND), 0)
+
   // @@ exp errors.
   private val FITNESS_RANGE = 5000000.0
 
@@ -85,7 +87,7 @@ class SevenElevenProblem extends OptimizeeProblem {
     Math.abs(711.0 - sum) + Math.abs(711000000.0 - product) / 1000000.0
   }
 
-  override def getExactSolution: ParameterArray = SevenElevenProblem.EXACT_SOLUTION
+  override def getExactSolution: ParameterArrayWithFitness = SevenElevenProblem.EXACT_SOLUTION
 
   override def getInitialGuess: ParameterArray = SevenElevenProblem.INITIAL_GUESS
 

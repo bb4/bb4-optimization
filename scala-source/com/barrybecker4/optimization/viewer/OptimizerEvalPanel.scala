@@ -4,7 +4,7 @@ package com.barrybecker4.optimization.viewer
 import com.barrybecker4.optimization.OptimizationListener
 import com.barrybecker4.optimization.Optimizer
 import com.barrybecker4.optimization.optimizee.optimizees.OptimizeeProblem
-import com.barrybecker4.optimization.parameter.ParameterArray
+import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType
 import com.barrybecker4.optimization.viewer.model.PointsList
 import com.barrybecker4.optimization.viewer.projectors.SimpleProjector
@@ -47,7 +47,7 @@ class OptimizerEvalPanel() extends JPanel
   def doTest(optType: OptimizationStrategyType, optimizer: Optimizer,
              solutionPosition: Point2d, initialGuess: ParameterArray, fitnessRange: Double): Unit = {
     pointsList = new PointsList(solutionPosition, OptimizerEvalPanel.EDGE_SIZE, projector)
-    var solution: ParameterArray = null
+    var solution: ParameterArrayWithFitness = null
     try
       solution = optimizer.doOptimization(optType, initialGuess, fitnessRange)
     catch {
@@ -58,20 +58,21 @@ class OptimizerEvalPanel() extends JPanel
     this.repaint()
     println("\n************************************************************************")
     println("The solution to the (" + optimizer.optimizee.getName + ") Polynomial Test Problem using " + optType + " is :\n" + solution)
-    println("Which evaluates to: " + optimizer.optimizee.evaluateFitness(solution))
+    println("Which evaluates to: " + solution.fitness)
     println("We expected to get exactly p1 = " + solutionPosition.x + " and p2 = " + solutionPosition.y)
   }
 
   /** Called whenever the optimizer strategy moves incrementally toward the solution.
     * @param params we assume there is only two.
     */
-  override def optimizerChanged(params: ParameterArray): Unit = pointsList.addPoint(params)
+  override def optimizerChanged(params: ParameterArrayWithFitness): Unit =
+    pointsList.addPoint(params)
 
   /** Show the optimization results in the ui. */
   override def showOptimization(strategy: OptimizationStrategyType, testProblem: OptimizeeProblem, logFile: String): Unit = {
     val params = testProblem.getExactSolution
     // have strategy for projecting n-dimensions down to two.
-    val solutionPosition = projector.project(params)
+    val solutionPosition = projector.project(params.pa)
     val optimizer = new Optimizer(testProblem, Some(logFile))
     optimizer.setListener(this)
     doTest(strategy, optimizer, solutionPosition, testProblem.getInitialGuess, testProblem.getFitnessRange)

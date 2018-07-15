@@ -4,7 +4,7 @@ package com.barrybecker4.optimization.optimizee.optimizees.problems
 import com.barrybecker4.optimization.Optimizer
 import com.barrybecker4.optimization.optimizee.OptimizerTestSuite.LOG_FILE_HOME
 import com.barrybecker4.optimization.optimizee.optimizees.OptimizeeProblem
-import com.barrybecker4.optimization.parameter.{ParameterArray, VariableLengthIntArray}
+import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness, VariableLengthIntArray}
 import com.barrybecker4.optimization.strategy.{GLOBAL_HILL_CLIMBING, OptimizationStrategyType}
 
 import scala.util.Random
@@ -42,7 +42,7 @@ class SubsetSumProblem(var variation: SubsetSumVariation) extends OptimizeeProbl
     */
   override def evaluateFitness(a: ParameterArray): Double = variation.evaluateFitness(a)
 
-  override def getExactSolution: ParameterArray = variation.getExactSolution
+  override def getExactSolution: ParameterArrayWithFitness = variation.getExactSolution
 
   override def getInitialGuess: ParameterArray = variation.getInitialGuess
 

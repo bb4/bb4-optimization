@@ -31,7 +31,7 @@ trait Optimizee {
   def evaluateFitness(params: ParameterArray): Double
 
   /** Compares two sets of parameters.  Used if evaluateByComparison returns true.
-    * @return the amount that params1 are better than params2. May be negative if params2 are better than params1.
+    * @return the amount that params1 are better than params2. May be positive if params2 are better than params1.
     */
   def compareFitness(params1: ParameterArray, params2: ParameterArray): Double
 

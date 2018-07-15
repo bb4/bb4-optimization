@@ -2,12 +2,12 @@
 package com.barrybecker4.optimization.optimizee.optimizees.problems
 
 import com.barrybecker4.optimization.optimizee.optimizees.ErrorTolerances
-import com.barrybecker4.optimization.parameter.ParameterArray
-import com.barrybecker4.optimization.parameter.VariableLengthIntArray
+import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness, VariableLengthIntArray}
 import com.barrybecker4.optimization.parameter.types.IntegerParameter
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType
 import com.barrybecker4.optimization.optimizee.optimizees.ProblemVariation
 import DominatingSetVariation._
+
 import scala.util.Random
 
 
@@ -24,7 +24,7 @@ object DominatingSetVariation {
   */
 sealed trait DominatingSetVariation extends ProblemVariation {
 
-  private lazy val exactSolutionCost: Double = computeCost(getExactSolution)
+  private lazy val exactSolutionCost: Double = computeCost(getExactSolution.pa)
 
   /** @return an array of the node ineices in the graph */
   def getAllNodes: Set[Int] = (0 until adjacencies.size).toSet
@@ -42,7 +42,7 @@ sealed trait DominatingSetVariation extends ProblemVariation {
       for (i <- 0 until num by 3) yield new IntegerParameter(i, 0, num - 1, "p" + i)
 
     val pa = VariableLengthIntArray.createInstance(params.toArray, getAllNodes, RND)
-    pa.setFitness(getScore(getMarked(pa)))
+    //ParameterArrayWithFitness(pa, getScore(getMarked(pa)))
     pa
   }
 
@@ -87,13 +87,13 @@ sealed trait DominatingSetVariation extends ProblemVariation {
     * @param nodeList optimal dominating set of marked nodes. May not be unique.
     * @return optimal solution (to compare against at the end of the test).
     */
-  def createSolution(nodeList: Int*): VariableLengthIntArray = {
+  def createSolution(nodeList: Int*): ParameterArrayWithFitness = {
     val allNodes = getAllNodes
     val params =
       for (i <- 0 until nodeList.length)
         yield new IntegerParameter(nodeList(i), 0, allNodes.size - 1, "p" + i)
 
-    VariableLengthIntArray.createInstance(params.toArray, allNodes, RND)
+    ParameterArrayWithFitness(VariableLengthIntArray.createInstance(params.toArray, allNodes, RND), 0)
   }
 }
 
@@ -107,7 +107,7 @@ case object SIMPLE_DS extends DominatingSetVariation {
   val adjacencies = new Graph(Seq(List(1, 2), List(0, 2), List(0, 1)))
   val errorTolerances = ErrorTolerances(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
 
-  override def getExactSolution: ParameterArray = createSolution(0)
+  override def getExactSolution: ParameterArrayWithFitness = createSolution(0)
   override def getFitnessRange = 7.0
 }
 
@@ -125,7 +125,7 @@ case object PENTAGRAM_DS extends DominatingSetVariation {
   val errorTolerances = ErrorTolerances(4.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0)
 
   /** This is one of several possible solutions that gives an optimal fitness of 0 */
-  override def getExactSolution: ParameterArray = createSolution(0, 1, 8)
+  override def getExactSolution: ParameterArrayWithFitness = createSolution(0, 1, 8)
   override def getFitnessRange = 15.0
 }
 
@@ -144,6 +144,6 @@ case object TYPICAL_DS extends DominatingSetVariation {
   val errorTolerances = ErrorTolerances(16.0, 2.01, 1.21, 1.2, 1.2, 1.2, 0)
 
   /** This is one of several possible solutions that gives an optimal fitness of 0 */
-  override def getExactSolution: ParameterArray = createSolution(6, 7, 8, 19, 21, 24)
+  override def getExactSolution: ParameterArrayWithFitness = createSolution(6, 7, 8, 19, 21, 24)
   override def getFitnessRange = 50.0
 }

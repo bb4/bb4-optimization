@@ -3,7 +3,7 @@ package com.barrybecker4.optimization.optimizee.optimizees.problems
 
 import com.barrybecker4.optimization.Optimizer
 import com.barrybecker4.optimization.optimizee.optimizees.OptimizeeProblem
-import com.barrybecker4.optimization.parameter.ParameterArray
+import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 import com.barrybecker4.optimization.strategy.{OptimizationStrategyType, SIMULATED_ANNEALING}
 import com.barrybecker4.optimization.optimizee.OptimizerTestSuite.LOG_FILE_HOME
 import OptimizeeProblem.showSolution
@@ -44,7 +44,7 @@ class DominatingSetProblem(var variation: DominatingSetVariation) extends Optimi
     */
   override def evaluateFitness(a: ParameterArray): Double = variation.evaluateFitness(a)
 
-  override def getExactSolution: ParameterArray = variation.getExactSolution
+  override def getExactSolution: ParameterArrayWithFitness = variation.getExactSolution
   override def getInitialGuess: ParameterArray = variation.getInitialGuess
   override def getFitnessRange: Double = variation.getFitnessRange
 }

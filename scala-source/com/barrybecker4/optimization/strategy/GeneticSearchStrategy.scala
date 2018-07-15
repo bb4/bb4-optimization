@@ -6,7 +6,7 @@ import GeneticSearchStrategy._
 import com.barrybecker4.common.concurrency.ThreadUtil
 import com.barrybecker4.common.format.FormatUtil
 import com.barrybecker4.common.math.MathUtil
-import com.barrybecker4.optimization.parameter.ParameterArray
+import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
 
@@ -40,7 +40,8 @@ object GeneticSearchStrategy {
   * @param optimizee the thing to be optimized.
   * @author Barry Becker
   */
-class GeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM) extends OptimizationStrategy(optimizee) {
+class GeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM)
+  extends OptimizationStrategy(optimizee) {
 
   /** radius to look for neighbors in  */
   private var nbrRadius = NBR_RADIUS
@@ -60,32 +61,40 @@ class GeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM)
   /** Finds a local minima using a genetic algorithm (evolutionary) search.
     * Stop iterating as soon as the average evaluation score of the population
     * does not significantly improve.
-    * @param params   the initial value for the parameters to optimize.
+    * @param params the initial value for the parameters to optimize.
     * @param fitnessRange the approximate absolute value of the fitnessRange.
     * @return the optimized params.
     */
-  override def doOptimization(params: ParameterArray, fitnessRange: Double): ParameterArray = {
-    var lastBest: ParameterArray = null
+  override def doOptimization(params: ParameterArray, fitnessRange: Double): ParameterArrayWithFitness = {
+    var lastBest: ParameterArrayWithFitness = null
     desiredPopulationSize = params.getSamplePopulationSize
 
     val population = findInitialPopulation(params)
     //println("The population of this generation is " + population.size()
     //    + " (desired was " + desiredPopulationSize + ")");
     // EVALUATE POPULATION
-    lastBest = evaluatePopulation(population, params)
-    findNewBest(params, lastBest, population, fitnessRange)
+    lastBest = population.min //evaluatePopulation(population, params)
+    evolve(params, lastBest, population, fitnessRange)
   }
 
-  private def findInitialPopulation(params: ParameterArray) = {
+  private def findInitialPopulation(params: ParameterArray): ArrayBuffer[ParameterArrayWithFitness] = {
     // create an initial population based on params and POPULATION_SIZE-1 other random candidate solutions.
-    val population = ArrayBuffer[ParameterArray]()
-    population += params
+    val population = ArrayBuffer[ParameterArrayWithFitness]()
+    val fitness =
+      if (optimizee.evaluateByComparison) Double.MaxValue
+      else optimizee.evaluateFitness(params)
+    val p1 = ParameterArrayWithFitness(params, fitness)
+    population += p1
     var i = 0
     val max = 100 * desiredPopulationSize
     while (population.size < desiredPopulationSize && i < max) {
       val nbr = params.getRandomNeighbor(INITIAL_RADIUS)
-      if (!population.contains(nbr))
-        population += nbr
+      if (!population.contains(nbr)) {
+        val fitness =
+          if (optimizee.evaluateByComparison) optimizee.compareFitness(nbr, params)
+          else optimizee.evaluateFitness(params)
+        population += ParameterArrayWithFitness(nbr, fitness)
+      }
       i += 1
     }
     if (population.size <= 1) throw new IllegalStateException("No random neighbors found for " + params)
@@ -95,8 +104,9 @@ class GeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM)
   /** Find the new best candidate.
     * @return the new best candidate.
     */
-  private def findNewBest(params: ParameterArray, lastBest: ParameterArray,
-                          population: ArrayBuffer[ParameterArray], fitnessRange: Double) = {
+  private def evolve(params: ParameterArray, lastBest: ParameterArrayWithFitness,
+                          population: ArrayBuffer[ParameterArrayWithFitness],
+                          fitnessRange: Double): ParameterArrayWithFitness = {
     var currentBest = lastBest
     var ct = 0
     var deltaFitness = .0
@@ -112,7 +122,7 @@ class GeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM)
     do {
       pop = cullPopulation(pop)
       replaceCulledWithKeeperVariants(pop, pop.size)
-      currentBest = evaluatePopulation(pop, recentBest)
+      currentBest = pop.min //evaluatePopulation(pop, recentBest.pa)
       println("currBest = " + currentBest + " \nrecBest = " + recentBest + "        ct=" + ct)
       deltaFitness = computeFitnessDelta(params, recentBest, currentBest, ct)
       println("delta fitness =" +
@@ -122,7 +132,7 @@ class GeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM)
         else if (deltaFitness > -lowThresh) NBR_RADIUS_SHRINK_FACTOR
         else 1.0
       nbrRadius *= factor
-      recentBest = currentBest.copy
+      recentBest = currentBest
       notifyOfChange(currentBest)
       ct += 1
       assert(deltaFitness <= 0, "The fitness should never get worse.")
@@ -145,22 +155,24 @@ class GeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM)
         s"currBest=$currentBest nbrRad=$nbrRadius")
 
     println("----------------------- done -------------------")
-    log(ct, currentBest.getFitness, 0, 0, currentBest, FormatUtil.formatNumber(ct))
+    log(ct, currentBest, 0, 0, FormatUtil.formatNumber(ct))
     currentBest
   }
 
   /** Computes the fitness delta, but also logs and asserts that it is not 0.
     * @return the different in fitness between current best and last best.
     */
-  private def computeFitnessDelta(params: ParameterArray, lastBest: ParameterArray, currentBest: ParameterArray, ct: Int) = {
+  private def computeFitnessDelta(params: ParameterArray,
+                                  lastBest: ParameterArrayWithFitness,
+                                  currentBest: ParameterArrayWithFitness, ct: Int) = {
     var deltaFitness = .0
-    deltaFitness = currentBest.getFitness - lastBest.getFitness
+    deltaFitness = currentBest.fitness - lastBest.fitness
     assert(deltaFitness <= 0, "We must never get worse in a new generation. Old fitness=" +
-      lastBest.getFitness + " New Fitness = " + currentBest.getFitness + ".")
+      lastBest.fitness + " New Fitness = " + currentBest.fitness + ".")
     //println(" ct="+ct+"  nbrRadius = " + nbrRadius + "  population size =" + desiredPopulationSize
     //                   +"  deltaFitness = " + deltaFitness+"  currentBest = " + currentBest.getFitness()
     //                   +"  lastBest = " + lastBest.getFitness());
-    log(ct, currentBest.getFitness, nbrRadius, deltaFitness, params, "---")
+    log(ct, currentBest, nbrRadius, deltaFitness, "---")
     deltaFitness
   }
 
@@ -168,7 +180,7 @@ class GeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM)
     * @param population the whole population. It will be reduced in size.
     * @return the culled population
     */
-  private def cullPopulation(population: ArrayBuffer[ParameterArray]) = {
+  private def cullPopulation(population: ArrayBuffer[ParameterArrayWithFitness]) = {
     // sort the population according to the fitness of members.
     val sortedPopulation = population.sorted
     // throw out the bottom CULL_FACTOR*desiredPopulationSize members - keeping the cream of the crop.
@@ -187,7 +199,8 @@ class GeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM)
     * @param population population
     * @param keepSize the number that were kept
     */
-  private def replaceCulledWithKeeperVariants(population: ArrayBuffer[ParameterArray], keepSize: Int): Unit = {
+  private def replaceCulledWithKeeperVariants(population: ArrayBuffer[ParameterArrayWithFitness],
+                                              keepSize: Int): Unit = {
     var k = keepSize
     //println("keepSize = " + keepSize + " grow current popSize of "
     //    + population.size() + " to " + desiredPopulationSize);
@@ -201,7 +214,7 @@ class GeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM)
       // Add a permutation of one of the keepers.
       // Multiply the radius by m because we want the worse ones to have higher variability.
       val r2 = (keeperIndex + NBR_RADIUS_SOFTENER) / NBR_RADIUS_SOFTENER * nbrRadius
-      val nbr = getNeighbor(p, r2)
+      val nbr = getNeighbor(p.pa, r2)
       if (!population.contains(nbr)) {
         population += nbr
         notifyOfChange(p)
@@ -215,17 +228,20 @@ class GeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM)
     * @param rad larger radius means more distant neighbor
     * @return a neighbor of p. If using absolute fitness, try to find a neighbor that has better fitnesss.
     */
-  private def getNeighbor(p: ParameterArray, rad: Double) = {
+  private def getNeighbor(p: ParameterArray, rad: Double): ParameterArrayWithFitness = {
     var nbr = p.getRandomNeighbor(rad)
+    var nbrFitness = Double.MaxValue
     if (!optimizee.evaluateByComparison) { // try to find a nbr with fitness that is better
       val curFitness = optimizee.evaluateFitness(p)
       var ct = 0
-      while (optimizee.evaluateFitness(nbr) >= curFitness && ct < MAX_NBRS_TO_EXPLORE) {
+      nbrFitness = optimizee.evaluateFitness(nbr)
+      while (nbrFitness >= curFitness && ct < MAX_NBRS_TO_EXPLORE) {
         nbr = p.getRandomNeighbor(rad)
+        nbrFitness = optimizee.evaluateFitness(nbr)
         ct += 1
       }
     }
-    nbr
+    ParameterArrayWithFitness(nbr, nbrFitness)
   }
 
   /** Evaluate the members of the population - either directly, or by
@@ -236,22 +252,21 @@ class GeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM)
     * @return the new best solution.
     */
   protected def evaluatePopulation(population: ArrayBuffer[ParameterArray],
-                                   previousBest: ParameterArray): ParameterArray = {
-    var bestFitness = previousBest
+                                   previousBest: ParameterArray): ParameterArrayWithFitness = {
+    var bestFitness = ParameterArrayWithFitness(previousBest, Double.MaxValue)
 
     for (p <- population) {
-      var fitness = .0
-      if (optimizee.evaluateByComparison) fitness = optimizee.compareFitness(p, previousBest)
-      else fitness = optimizee.evaluateFitness(p)
-      p.setFitness(fitness)
-      if (fitness < bestFitness.getFitness) {
-        bestFitness = p
+      val fitness =
+        if (optimizee.evaluateByComparison) optimizee.compareFitness(p, previousBest)
+        else optimizee.evaluateFitness(p)
+      if (fitness < bestFitness.fitness) {
+        bestFitness = ParameterArrayWithFitness(p, fitness)
         // show it if better than what we had before
-        notifyOfChange(p)
-        ThreadUtil.sleep(500)
+        notifyOfChange(bestFitness)
+        //ThreadUtil.sleep(500)
       }
     }
-    bestFitness.copy
+    bestFitness
   }
 
   private def printPopulation(population: List[_]): Unit = printPopulation(population, population.size)

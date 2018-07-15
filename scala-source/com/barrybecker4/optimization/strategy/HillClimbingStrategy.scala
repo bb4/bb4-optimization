@@ -1,9 +1,10 @@
 // Copyright by Barry G. Becker, 2000-2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.strategy
 
-import com.barrybecker4.optimization.parameter.improvement.Improvement
+import com.barrybecker4.optimization.parameter.improvement.{Improvement, NumericImprovementFinder}
 import com.barrybecker4.optimization.optimizee.Optimizee
-import com.barrybecker4.optimization.parameter.ParameterArray
+import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
+
 import scala.collection.mutable
 import HillClimbingStrategy._
 
@@ -34,27 +35,28 @@ class HillClimbingStrategy(optimizee: Optimizee) extends OptimizationStrategy(op
     * @param fitnessRange the approximate absolute value of the fitnessRange.
     * @return the optimized params.
     */
-  override def doOptimization(params: ParameterArray, fitnessRange: Double): ParameterArray = {
-    var currentParams = params.copy
+  override def doOptimization(params: ParameterArray, fitnessRange: Double): ParameterArrayWithFitness = {
+    //var currentParams = params.copy
     var jumpSize = INITIAL_JUMP_SIZE
-    if (!optimizee.evaluateByComparison) { // get the initial baseline fitness value.
-      currentParams.setFitness(optimizee.evaluateFitness(currentParams))
-    }
+    var currentParams =
+      if (optimizee.evaluateByComparison) ParameterArrayWithFitness(params, Double.MaxValue)
+      else ParameterArrayWithFitness(params, optimizee.evaluateFitness(params))
     var numIterations = 0
-    log(0, currentParams.getFitness, 0.0, 0.0, currentParams, "initial test")
+    log(0, currentParams, 0.0, 0.0, "initial test")
     notifyOfChange(currentParams)
     val fitnessEps = fitnessRange * FITNESS_EPS_PERCENT / 100.0
     // Use cache to avoid repeats. This can be a real issue if  we have a discrete problem space.
     val cache = mutable.HashSet[ParameterArray]()
-    cache += currentParams
+    cache += currentParams.pa
     var improvement: Improvement = null
     var improved = false
 
     // iterate until there is no significant improvement between iterations,
     // of the jumpSize is too small (below some threshold).
+    val impFinter = new NumericImprovementFinder(currentParams)
     do {
       //println( "iter=" + numIterations + " FITNESS = " + currentParams.getFitness() + "  ------------");
-      improvement = currentParams.findIncrementalImprovement(optimizee, jumpSize, improvement, cache)
+      improvement = impFinter.findIncrementalImprovement(optimizee, jumpSize, improvement, cache)
       numIterations += 1
       currentParams = improvement.parameters
       jumpSize = improvement.newJumpSize

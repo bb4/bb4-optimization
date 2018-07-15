@@ -2,7 +2,6 @@
 package com.barrybecker4.optimization.parameter
 
 import com.barrybecker4.common.format.FormatUtil
-import com.barrybecker4.common.math.MathUtil
 import com.barrybecker4.optimization.parameter.types.Parameter
 
 import scala.util.Random
@@ -24,9 +23,6 @@ abstract class AbstractParameterArray(theParams: IndexedSeq[Parameter] = Indexed
   assert(theParams != null)
   var params: IndexedSeq[Parameter] = theParams
 
-  /** assign a fitness (evaluation value) to this set of parameters */
-  private var fitness: Double = 0
-
   override def getSamplePopulationSize: Int = {
     var pop = 1
     assert(params != null)
@@ -44,7 +40,6 @@ abstract class AbstractParameterArray(theParams: IndexedSeq[Parameter] = Indexed
     val newParams = params.map(_.copy)
     val pa = createInstance
     pa.params = newParams
-    pa.setFitness(fitness)
     pa
   }
 
@@ -53,18 +48,12 @@ abstract class AbstractParameterArray(theParams: IndexedSeq[Parameter] = Indexed
   /** @return the ith parameter in the array. */
   override def get(i: Int): Parameter = params(i)
 
-  override def getFitness: Double = fitness
-  override def setFitness(value: Double): Unit = {
-    fitness = value
-  }
-
   override def toString: String = {
     val sb = new StringBuilder("\n")
     for (i <- 0 until size) {
       sb.append("parameter[").append(i).append("] = ").append(get(i).toString)
       sb.append('\n')
     }
-    sb.append("fitness = ").append(this.getFitness)
     sb.toString
   }
 
@@ -76,31 +65,5 @@ abstract class AbstractParameterArray(theParams: IndexedSeq[Parameter] = Indexed
     }
     sb.append(FormatUtil.formatNumber(get(size - 1).getValue))
     sb.toString
-  }
-
-  /** Natural ordering based on the fitness evaluation assigned to this parameter array.
-    * @param params the parameter array to compare ourselves too.
-    * @return -1 if we are less than params, 1 if greater than params, 0 if equal.
-    */
-  override def compareTo(params: ParameterArray): Int = {
-    val diff = this.getFitness - params.getFitness
-    if (diff < 0) return -1
-    if (diff > 0) 1
-    else 0
-  }
-
-  def canEqual(other: Any): Boolean = other.isInstanceOf[AbstractParameterArray]
-
-  override def equals(other: Any): Boolean = other match {
-    case that: AbstractParameterArray =>
-      (that canEqual this) &&
-        (params sameElements that.params) &&
-        fitness == that.fitness
-    case _ => false
-  }
-
-  override def hashCode(): Int = {
-    val state = Seq(params, fitness)
-    state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
   }
 }

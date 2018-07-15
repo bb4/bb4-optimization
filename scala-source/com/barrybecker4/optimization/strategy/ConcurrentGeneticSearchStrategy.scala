@@ -3,7 +3,7 @@ package com.barrybecker4.optimization.strategy
 
 import com.barrybecker4.common.math.MathUtil
 import com.barrybecker4.optimization.optimizee.Optimizee
-import com.barrybecker4.optimization.parameter.ParameterArray
+import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
@@ -33,18 +33,18 @@ class ConcurrentGeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUt
     * @return the new best solution.
     */
   override protected def evaluatePopulation(population: ArrayBuffer[ParameterArray],
-                                            previousBest: ParameterArray): ParameterArray = {
-    var bestFitness = previousBest
+                                            previousBest: ParameterArray): ParameterArrayWithFitness = {
+    var bestFitness = ParameterArrayWithFitness(previousBest, Double.MaxValue)
     val workers = population.map(candidate => new EvaluationWorker(candidate, previousBest))
 
     workers.par.foreach(x => x.run()) // run workers in parallel
 
     for (worker <- workers) {
       val eworker = worker.asInstanceOf[EvaluationWorker]
-      val fitness = eworker.getResult
-      if (fitness < bestFitness.getFitness) bestFitness = eworker.getCandidate
+      if (eworker.getResult < bestFitness.fitness)
+        bestFitness = eworker.getCandidateWithFitness
     }
-    bestFitness.copy
+    bestFitness
   }
 
   /** Does the evaluation for each candidate in a different thread. */
@@ -54,10 +54,9 @@ class ConcurrentGeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUt
     override def run(): Unit = {
       if (optimizee.evaluateByComparison) fitness = optimizee.compareFitness(candidate, params)
       else fitness = optimizee.evaluateFitness(candidate)
-      candidate.setFitness(fitness)
     }
 
     private[strategy] def getResult = fitness
-    private[strategy] def getCandidate = candidate
+    private[strategy] def getCandidateWithFitness = ParameterArrayWithFitness(candidate, fitness)
   }
 }

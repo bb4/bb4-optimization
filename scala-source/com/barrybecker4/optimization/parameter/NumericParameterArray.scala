@@ -3,28 +3,21 @@ package com.barrybecker4.optimization.parameter
 
 import com.barrybecker4.common.math.MathUtil
 import com.barrybecker4.common.math.Vector
-import com.barrybecker4.optimization.optimizee.Optimizee
-import com.barrybecker4.optimization.parameter.improvement.Improvement
-import com.barrybecker4.optimization.parameter.improvement.ImprovementIteration
-import com.barrybecker4.optimization.parameter.improvement.ImprovementStep
 import com.barrybecker4.optimization.parameter.sampling.NumericGlobalSampler
 import com.barrybecker4.optimization.parameter.types.{DoubleParameter, Parameter}
-
-import scala.collection.mutable
 import NumericParameterArray._
-
 import scala.util.Random
 
 
 object NumericParameterArray {
   /** default number of steps to go from the min to the max */
-  private val DEFAULT_NUM_STEPS = 10
+  val DEFAULT_NUM_STEPS = 10
 
   /** If the dot product of the new gradient with the old is less than this, then decrease the jump size. */
-  private val MIN_DOT_PRODUCT = 0.3
+  val MIN_DOT_PRODUCT = 0.3
 
   /** If the dot product of the new gradient with the old is greater than this, then increase the jump size. */
-  private val MAX_DOT_PRODUCT = 0.98
+  val MAX_DOT_PRODUCT = 0.98
 
   def createParams(vals: Array[Double], minVals: Array[Double], maxVals: Array[Double],
                    names: Array[String]): Array[Parameter] = {
@@ -41,7 +34,7 @@ object NumericParameterArray {
   * @param theParams an array of params to initialize with.
   * @author Barry Becker
   */
-class NumericParameterArray(theParams: Array[Parameter], rnd: Random)
+case class NumericParameterArray(theParams: IndexedSeq[Parameter], rnd: Random)
   extends AbstractParameterArray(theParams, rnd) {
 
   private var numSteps = NumericParameterArray.DEFAULT_NUM_STEPS
@@ -74,49 +67,6 @@ class NumericParameterArray(theParams: Array[Parameter], rnd: Random)
   override def findGlobalSamples(requestedNumSamples: Long): Iterator[NumericParameterArray] =
     new NumericGlobalSampler(this, requestedNumSamples)
 
-
-  override def findIncrementalImprovement(optimizee: Optimizee, jumpSize: Double,
-                      lastImprovement: Improvement, cache: mutable.Set[ParameterArray]): Improvement = {
-    var currentParams = this
-    var oldFitness = currentParams.getFitness
-    var oldGradient: Vector = null
-    if (lastImprovement != null) {
-      oldFitness = lastImprovement.parameters.getFitness
-      oldGradient = lastImprovement.gradient
-    }
-    val iter = new ImprovementIteration(this, oldGradient)
-    var sumOfSqs: Double = 0
-    for (i <- 0 until size) {
-      val testParams = this.copy
-      sumOfSqs = iter.incSumOfSqs(i, sumOfSqs, optimizee, currentParams, testParams)
-    }
-    val gradLength = Math.sqrt(sumOfSqs)
-    val step = new ImprovementStep(optimizee, iter, gradLength, cache, jumpSize, oldFitness)
-    currentParams = step.findNextParams(currentParams)
-    var newJumpSize = step.getJumpSize
-    // the improvement may be zero or negative, meaning it did not improve.
-    val improvement = step.getImprovement
-    val dotProduct = iter.gradient.normalizedDot(iter.oldGradient)
-    //println("dot between " + iter.getGradient() + " and " + iter.getOldGradient()+ " is "+ dotProduct);
-    newJumpSize = findNewJumpSize(newJumpSize, dotProduct)
-    iter.gradient.copyFrom(iter.oldGradient)
-    Improvement(currentParams, improvement, newJumpSize, iter.gradient)
-  }
-
-  /** If we are headed in pretty much the same direction as last time, then we increase the jumpSize.
-    * If we are headed off in a completely new direction, reduce the jumpSize until we start to stabilize.
-    * @param jumpSize   the current amount that is stepped in the assumed solution direction.
-    * @param dotProduct determines the angle between the new gradient and the old.
-    * @return the new jump size - which is usually the same as the old one.
-    */
-  private def findNewJumpSize(jumpSize: Double, dotProduct: Double) = {
-    var newJumpSize = jumpSize
-    if (dotProduct > NumericParameterArray.MAX_DOT_PRODUCT) newJumpSize *= ImprovementStep.JUMP_SIZE_INC_FACTOR
-    else if (dotProduct < NumericParameterArray.MIN_DOT_PRODUCT) newJumpSize *= ImprovementStep.JUMP_SIZE_DEC_FACTOR
-    //println( "dotProduct = " + dotProduct + " new jumpsize = " + jumpSize );
-    newJumpSize
-  }
-
   /** @return the distance between this parameter array and another. sqrt(sum of squares) */
   override def distance(pa: ParameterArray): Double = {
     assert(size == pa.size)
@@ -131,24 +81,26 @@ class NumericParameterArray(theParams: Array[Parameter], rnd: Random)
   /** Add a vector of deltas to the parameters.
     * @param vec must be the same size as the parameter list.
     */
-  def add(vec: Vector): Unit = {
+  def add(vec: Vector): NumericParameterArray = {
     assert(vec.size == size, "Parameter vec has magnitude " + vec.size + ", expecting " + size)
 
-    for (i <- 0 until size) {
+    val newParams = for (i <- 0 until size) yield {
       val param = get(i)
 
-      param.setValue(param.getValue + vec.get(i))
-      if (param.getValue > param.maxValue) {
+      var newParam = param.setValue(param.getValue + vec.get(i))
+      if (newParam.getValue > newParam.maxValue) {
         println("Warning param " +
-          param.name + " is exceeding is maximum value. It is being pegged to that maximum of " + param.maxValue)
-        param.setValue(param.maxValue)
+          newParam.name + " is exceeding is maximum value. It is being pegged to that maximum of " + newParam.maxValue)
+        newParam = newParam.setValue(newParam.maxValue)
       }
-      if (param.getValue < param.minValue) {
+      if (newParam.getValue < newParam.minValue) {
         println("Warning param " +
-          param.name + " is exceeding is minimum value. It is being pegged to that minimum of " + param.minValue)
-        param.setValue(param.minValue)
+          newParam.name + " is exceeding is minimum value. It is being pegged to that minimum of " + newParam.minValue)
+        newParam.setValue(newParam.minValue)
       }
+      newParam
     }
+    new NumericParameterArray(newParams, rnd)
   }
 
   /** @param radius the size of the (1 std deviation) gaussian neighborhood to select a random nbr from
@@ -184,9 +136,6 @@ class NumericParameterArray(theParams: Array[Parameter], rnd: Random)
     v
   }
 
-  def setNumSteps(numSteps: Int): Unit = {
-    this.numSteps = numSteps
-  }
-
+  def setNumSteps(numSteps: Int): Unit = this.numSteps = numSteps
   def getNumSteps: Int = numSteps
 }

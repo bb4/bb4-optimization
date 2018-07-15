@@ -41,11 +41,6 @@ class PermutedParameterArray(theParams: Array[Parameter], rnd: Random)
     val paramCopy = this.copy
     val len = size
     paramCopy.params = this.params.reverse
-//    for (i <- 0 until len / 2) {
-//      val temp = paramCopy.params(i)
-//      paramCopy.params(i) = paramCopy.params(len - i - 1)
-//      paramCopy.params(len - i - 1) = temp
-//    }
     paramCopy
   }
 
@@ -88,20 +83,13 @@ class PermutedParameterArray(theParams: Array[Parameter], rnd: Random)
     nbr
   }
 
-  /**
-    * Globally sample the parameter space.
+  /** Globally sample the parameter space.
     * @param requestedNumSamples approximate number of samples to retrieve. If the problem space is small
     *       and requestedNumSamples is large, it may not be possible to return this many unique samples.
     * @return some number of unique samples.
     */
   override def findGlobalSamples(requestedNumSamples: Long) = new PermutedGlobalSampler(this, requestedNumSamples)
 
-  /** Try swapping parameters randomly until we find an improvement (if we can);  */
-  override def findIncrementalImprovement(optimizee: Optimizee,
-            jumpSize: Double, lastImprovement: Improvement, cache: mutable.Set[ParameterArray]): Improvement = {
-    val finder = new DiscreteImprovementFinder(this)
-    finder.findIncrementalImprovement(optimizee, jumpSize, cache)
-  }
 
   /** @return get a completely random solution in the parameter space. */
   override def getRandomSample: ParameterArray = {

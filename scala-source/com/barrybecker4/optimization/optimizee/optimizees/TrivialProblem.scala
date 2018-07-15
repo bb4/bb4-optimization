@@ -1,17 +1,16 @@
 // Copyright by Barry G. Becker, 2000-2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.optimizee.optimizees
 
-import com.barrybecker4.optimization.parameter.NumericParameterArray
-import com.barrybecker4.optimization.parameter.ParameterArray
+import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray, ParameterArrayWithFitness}
 import TrivialProblem._
 
 
 object TrivialProblem {
   private val SOLUTION_VALUE = 0.4
 
-  val EXACT_SOLUTION = new NumericParameterArray(
-    Array[Double](SOLUTION_VALUE), Array[Double](0.0), Array[Double](1.0), Array[String]("param1")
-  )
+  val EXACT_SOLUTION = ParameterArrayWithFitness(
+    new NumericParameterArray(
+      Array[Double](SOLUTION_VALUE), Array[Double](0.0), Array[Double](1.0), Array[String]("param1")), 0.0)
 }
 
 /**
@@ -20,7 +19,7 @@ object TrivialProblem {
   */
 class TrivialProblem extends OptimizeeProblem {
 
-  override def getExactSolution: ParameterArray = EXACT_SOLUTION
+  override def getExactSolution: ParameterArrayWithFitness = EXACT_SOLUTION
 
   override def getInitialGuess = new NumericParameterArray(
     Array[Double](0.5), Array[Double](0.0), Array[Double](1.0), Array[String]("param1")
@@ -29,5 +28,5 @@ class TrivialProblem extends OptimizeeProblem {
   override def getFitnessRange = 1.0
   override def getName = "Trivial Test Problem"
   override def evaluateByComparison = false
-  override def evaluateFitness(params: ParameterArray): Double = EXACT_SOLUTION.distance(params)
+  override def evaluateFitness(params: ParameterArray): Double = EXACT_SOLUTION.pa.distance(params)
 }

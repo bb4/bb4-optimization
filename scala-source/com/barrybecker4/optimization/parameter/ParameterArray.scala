@@ -12,22 +12,12 @@ import scala.collection.mutable
   * Derived classes should be immutable.
   * @author Barry Becker
   */
-trait ParameterArray extends Comparable[ParameterArray] {
+trait ParameterArray {
 
   /** Some parameter arrays may have variable numbers of parameters.
     * @return the number of parameters in the array.
     */
   def size: Int
-
-  /** Lower values are better.
-    * @param value fitness value to assign to this parameter array.
-    */
-  def setFitness(value: Double): Unit
-
-  /** Lower values are better.
-    * @return the fitness value.
-    */
-  def getFitness: Double
 
   /** @return a copy of ourselves. */
   def copy: ParameterArray
@@ -45,17 +35,6 @@ trait ParameterArray extends Comparable[ParameterArray] {
     * @return an iterator that is capable of producing the specified number of unique samples.
     */
   def findGlobalSamples(requestedNumSamples: Long): Iterator[_ <: ParameterArray]
-
-  /** Try to find a parameterArray that is better than what we have now by evaluating using the optimizee passed in.
-    * @param optimizee   something that can evaluate parameterArrays.
-    * @param jumpSize    how far to move in the direction of improvement
-    * @param lastImprovement the improvement we had most recently. May be null if none.
-    * @param cache       set of parameters that have already been tested. This is important for cases where the
-    *                    parameters are discrete and not continuous.
-    * @return the improvement which contains the improved parameter array and possibly a revised jumpSize.
-    */
-  def findIncrementalImprovement(optimizee: Optimizee, jumpSize: Double,
-                                 lastImprovement: Improvement, cache: mutable.Set[ParameterArray]): Improvement
 
   /** Some measure of the distance between parameter arrays of the same type.
     * The way this is computed is very implementation dependent.

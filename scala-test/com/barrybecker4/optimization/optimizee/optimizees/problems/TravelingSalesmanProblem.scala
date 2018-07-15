@@ -4,9 +4,10 @@ package com.barrybecker4.optimization.optimizee.optimizees.problems
 import com.barrybecker4.optimization.Optimizer
 import com.barrybecker4.optimization.optimizee.OptimizerTestSuite.LOG_FILE_HOME
 import com.barrybecker4.optimization.optimizee.optimizees.OptimizeeProblem
-import com.barrybecker4.optimization.parameter.ParameterArray
+import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 import com.barrybecker4.optimization.strategy.SIMULATED_ANNEALING
 import OptimizeeProblem.showSolution
+
 import scala.util.Random
 
 
@@ -41,7 +42,7 @@ class TravelingSalesmanProblem(val variation: TravelingSalesmanVariation = TSP_S
     */
   override def evaluateFitness(a: ParameterArray): Double = variation.evaluateFitness(a)
 
-  override def getExactSolution: ParameterArray = variation.getExactSolution
+  override def getExactSolution: ParameterArrayWithFitness = variation.getExactSolution
 
   override def getInitialGuess: ParameterArray = variation.getInitialGuess
 

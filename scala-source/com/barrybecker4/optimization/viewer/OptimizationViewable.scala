@@ -12,6 +12,7 @@ import com.barrybecker4.optimization.strategy.OptimizationStrategyType
   */
 trait OptimizationViewable extends OptimizationListener with NavigationListener {
 
-  def showOptimization(strategy: OptimizationStrategyType, testProblem: OptimizeeProblem, logFile: String): Unit
+  def showOptimization(strategy: OptimizationStrategyType,
+                       testProblem: OptimizeeProblem, logFile: String): Unit
 
 }

@@ -2,15 +2,15 @@
 package com.barrybecker4.optimization.optimizee.optimizees
 
 import com.barrybecker4.optimization.optimizee.Optimizee
-import com.barrybecker4.optimization.parameter.ParameterArray
+import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 
 
 object OptimizeeProblem {
 
-  def showSolution(problem: OptimizeeProblem, solution: ParameterArray): Unit = {
+  def showSolution(problem: OptimizeeProblem, solution: ParameterArrayWithFitness): Unit = {
     println("\n************************************************************************")
     println("The solution to the " + problem.getName + " test problem is :\n" + solution)
-    println("Which evaluates to: " + problem.evaluateFitness(solution))
+    println("Which evaluates to: " + solution.fitness)
     println("We expected to get exactly " + problem.getExactSolution)
   }
 }
@@ -22,13 +22,13 @@ object OptimizeeProblem {
 abstract class OptimizeeProblem extends Optimizee {
 
   /** @return the exact solution for this problem. */
-  def getExactSolution: ParameterArray
+  def getExactSolution: ParameterArrayWithFitness
 
   def getInitialGuess: ParameterArray
 
   /** @return distance from the exact solution as the error. */
-  def getError(solution: ParameterArray): Double =
-    100.0 * (solution.getFitness - getOptimalFitness) / getFitnessRange
+  def getError(solution: ParameterArrayWithFitness): Double =
+    100.0 * (solution.fitness - getOptimalFitness) / getFitnessRange
 
   override def getOptimalFitness = 0
   override def compareFitness(a: ParameterArray, b: ParameterArray) = 0.0

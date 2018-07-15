@@ -2,11 +2,13 @@
 package com.barrybecker4.optimization.viewer.model
 
 import java.awt.Point
+
 import com.barrybecker4.common.math.Range
-import com.barrybecker4.optimization.parameter.ParameterArray
+import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 import com.barrybecker4.optimization.viewer.NavigationListener
 import com.barrybecker4.optimization.viewer.projectors.Projector
 import javax.vecmath.Point2d
+
 import scala.collection.mutable.ArrayBuffer
 
 
@@ -28,7 +30,7 @@ class PointsList(var rawSolutionPosition: Point2d, var edgeSize: Int, var projec
    extends NavigationListener {
 
   private var rawPoints = ArrayBuffer[Point2d]()
-  private var paramArrays = ArrayBuffer[ParameterArray]()
+  private var paramArrays = ArrayBuffer[ParameterArrayWithFitness]()
 
   private var rangeX: Range = _
   private var rangeY: Range = _
@@ -38,7 +40,7 @@ class PointsList(var rawSolutionPosition: Point2d, var edgeSize: Int, var projec
 
   def getRawPoint(i: Int): Point2d = rawPoints(i)
 
-  def getParamArrayForPoint(i: Int): ParameterArray = paramArrays(i)
+  def getParamArrayForPoint(i: Int): ParameterArrayWithFitness = paramArrays(i)
 
   def getScaledPoint(i: Int): Point = {
     val pt: Point2d = rawPoints(i)
@@ -51,12 +53,12 @@ class PointsList(var rawSolutionPosition: Point2d, var edgeSize: Int, var projec
     * Does first time initialization.
     * @param params the parameter array to add to the list.
     */
-  def addPoint(params: ParameterArray): Unit = {
+  def addPoint(params: ParameterArrayWithFitness): Unit = {
     if (rangeX == null) {
-      rangeX = projector.getXRange(params)
-      rangeY = projector.getYRange(params)
+      rangeX = projector.getXRange(params.pa)
+      rangeY = projector.getYRange(params.pa)
     }
-    rawPoints += projector.project(params)
+    rawPoints += projector.project(params.pa)
     paramArrays += params
   }
 
