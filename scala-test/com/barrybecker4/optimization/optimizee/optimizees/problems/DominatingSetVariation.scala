@@ -41,7 +41,7 @@ sealed trait DominatingSetVariation extends ProblemVariation {
     val params: Seq[IntegerParameter] =
       for (i <- 0 until num by 3) yield new IntegerParameter(i, 0, num - 1, "p" + i)
 
-    val pa = VariableLengthIntArray.createInstance(params.toArray, getAllNodes, RND)
+    val pa = VariableLengthIntArray.createInstance(params.toIndexedSeq, getAllNodes, RND)
     //ParameterArrayWithFitness(pa, getScore(getMarked(pa)))
     pa
   }
@@ -93,7 +93,7 @@ sealed trait DominatingSetVariation extends ProblemVariation {
       for (i <- 0 until nodeList.length)
         yield new IntegerParameter(nodeList(i), 0, allNodes.size - 1, "p" + i)
 
-    ParameterArrayWithFitness(VariableLengthIntArray.createInstance(params.toArray, allNodes, RND), 0)
+    ParameterArrayWithFitness(VariableLengthIntArray.createInstance(params, allNodes, RND), 0)
   }
 }
 

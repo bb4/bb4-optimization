@@ -182,7 +182,7 @@ class VariableLengthIntArraySuite extends FunSuite with BeforeAndAfter{
 
   private def createArray(dCalc: DistanceCalculator, numberList: Set[Int]) = {
     val params = for (i <- numberList) yield createParam(i)
-    VariableLengthIntArray.createInstance(params.toArray, numberList, dCalc, rnd)
+    VariableLengthIntArray(params.toIndexedSeq, numberList, dCalc, rnd)
   }
 
   private def createDistArray(numberList: Set[Int]) =

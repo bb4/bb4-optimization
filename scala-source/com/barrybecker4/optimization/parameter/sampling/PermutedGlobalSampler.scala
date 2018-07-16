@@ -76,8 +76,7 @@ class PermutedGlobalSampler(var params: PermutedParameterArray, val requestedNum
     * @return the next exhaustive sample.
     */
   private def getNextExhaustiveSample = {
-    val pParams = params.copy.asInstanceOf[PermutedParameterArray]
-    pParams.setPermutation(permuter.next)
+    val pParams = params.setPermutation(permuter.next)
     hasNext = permuter.hasNext
     pParams
   }

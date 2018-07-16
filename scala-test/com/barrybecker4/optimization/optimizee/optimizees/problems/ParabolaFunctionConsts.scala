@@ -20,7 +20,9 @@ object ParabolaFunctionConsts {
     new DoubleParameter(P2, 0.0, 3.0, "p2")
   )
 
-  val EXACT_SOLUTION = ParameterArrayWithFitness(NumericParameterArray(EXACT_SOLUTION_PARAMS, new Random(1)), 0)
+  val EXACT_SOLUTION = ParameterArrayWithFitness(
+    NumericParameterArray(EXACT_SOLUTION_PARAMS, rnd = new Random(1)),
+    0)
 
   // define the initialGuess in some bounded region of the 2-dimensional search space.
   private val VALUES = Array(6.81, 7.93) // initialGuess

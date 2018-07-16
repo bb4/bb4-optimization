@@ -48,9 +48,9 @@ object SevenElevenProblem {
     new IntegerParameter(P3, 0, 708, "p3"),
     new IntegerParameter(P4, 0, 708, "p4")
   )
-  private val INITIAL_GUESS = new NumericParameterArray(INITIAL_GUESS_PARAMS, RAND)
+  private val INITIAL_GUESS = new NumericParameterArray(INITIAL_GUESS_PARAMS, rnd = RAND)
   private val EXACT_SOLUTION = ParameterArrayWithFitness(
-    new NumericParameterArray(EXACT_SOLUTION_PARAMS, RAND), 0)
+    new NumericParameterArray(EXACT_SOLUTION_PARAMS, rnd = RAND), 0)
 
   // @@ exp errors.
   private val FITNESS_RANGE = 5000000.0

@@ -46,7 +46,7 @@ case class IntegerParameter(theVal: Double, minValue: Double, maxValue: Double, 
 
   override def setValue(value: Double): IntegerParameter = {
     val retValue =
-      if (redisFunc != null) {
+      if (redisFunc.isDefined) {
         val v = (value - minValue) / (range + 1.0)
         minValue + (range + 1.0) * redisFunc.get.getInverseFunctionValue(v)
       } else value

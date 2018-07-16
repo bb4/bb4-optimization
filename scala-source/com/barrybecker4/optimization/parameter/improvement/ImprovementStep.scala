@@ -48,15 +48,14 @@ class ImprovementStep(var optimizee: Optimizee, var iter: ImprovementIteration, 
 
   /**
     * Consider a nearby neighbor of the passed in params to see if it will yield improvement.
-    * @param params parameter set to find neighbor of.
-    * @return nearby location.
+    * @param params parameter to find neighbor of.
+    * @return nearby location with better fitness if there is one.
     */
   private def findNextCandidateParams(params: ParameterArrayWithFitness): ParameterArrayWithFitness = {
     var currentParams: NumericParameterArray = params.pa.asInstanceOf[NumericParameterArray]
     val oldParams = params
     iter.updateGradient(jumpSize, gradLength)
     //log("gradient = " + iter.gradient + " jumpSize="+ jumpSize);
-    currentParams = currentParams.copy
     currentParams = currentParams.add(iter.gradient)
     var gaussRadius = 0.01
     var sameParams = false

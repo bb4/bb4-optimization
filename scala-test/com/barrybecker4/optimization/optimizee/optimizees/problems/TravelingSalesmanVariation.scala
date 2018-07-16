@@ -25,7 +25,7 @@ sealed trait TravelingSalesmanVariation  extends ProblemVariation {
   def getInitialGuess: ParameterArray = {
     val num = this.getNumCities
     val params = for (i <- 0 until num) yield new IntegerParameter(i, 0, num - 1, "p" + i)
-    val guess = new PermutedParameterArray(params.toArray, RANDOM)
+    val guess = PermutedParameterArray(params, RANDOM)
     //guess.setFitness(evaluateFitness(guess))
     guess
   }
@@ -99,7 +99,7 @@ sealed trait TravelingSalesmanVariation  extends ProblemVariation {
     val numCities = cityList.length
     val params = for (i <- cityList.indices) yield
       new IntegerParameter(cityList(i), 0, numCities - 1, "p" + i)
-    new PermutedParameterArray(params.toArray, RANDOM)
+    PermutedParameterArray(params, RANDOM)
   }
 }
 

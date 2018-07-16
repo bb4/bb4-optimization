@@ -13,12 +13,6 @@ object NumericParameterArray {
   /** default number of steps to go from the min to the max */
   val DEFAULT_NUM_STEPS = 10
 
-  /** If the dot product of the new gradient with the old is less than this, then decrease the jump size. */
-  val MIN_DOT_PRODUCT = 0.3
-
-  /** If the dot product of the new gradient with the old is greater than this, then increase the jump size. */
-  val MAX_DOT_PRODUCT = 0.98
-
   def createParams(vals: Array[Double], minVals: Array[Double], maxVals: Array[Double],
                    names: Array[String]): Array[Parameter] = {
     val len = vals.length
@@ -31,13 +25,13 @@ object NumericParameterArray {
 
 /**
   * Represents a 1 dimensional array of parameters
-  * @param theParams an array of params to initialize with.
+  * @param params an array of params to initialize with.
   * @author Barry Becker
   */
-case class NumericParameterArray(theParams: IndexedSeq[Parameter], rnd: Random)
-  extends AbstractParameterArray(theParams, rnd) {
-
-  private var numSteps = NumericParameterArray.DEFAULT_NUM_STEPS
+case class NumericParameterArray(params: IndexedSeq[Parameter],
+                                 numSteps: Int = DEFAULT_NUM_STEPS,
+                                 rnd: Random = MathUtil.RANDOM)
+  extends AbstractParameterArray(params, rnd) {
 
   /** Constructor if all the parameters are DoubleParameters
     * @param vals the values for each parameter.
@@ -46,18 +40,9 @@ case class NumericParameterArray(theParams: IndexedSeq[Parameter], rnd: Random)
     * @param names   the display name for each parameter in the array.
     */
   def this(vals: Array[Double], minVals: Array[Double], maxVals: Array[Double],
-           names: Array[String], rnd: Random = MathUtil.RANDOM) {
-    this(createParams(vals, minVals, maxVals, names), rnd)
+           names: Array[String], rnd: Random) {
+    this(createParams(vals, minVals, maxVals, names), DEFAULT_NUM_STEPS, rnd)
   }
-
-  /** @return a copy of ourselves.*/
-  override def copy: NumericParameterArray = {
-    val pa = super.copy.asInstanceOf[NumericParameterArray]
-    pa.setNumSteps(numSteps)
-    pa
-  }
-
-  override protected def createInstance = new NumericParameterArray(Array[Parameter](), rnd)
 
   /** Globally sample the parameter space with a uniform distribution.
     * @param requestedNumSamples approximate number of samples to retrieve. If the problem space is small
@@ -86,7 +71,6 @@ case class NumericParameterArray(theParams: IndexedSeq[Parameter], rnd: Random)
 
     val newParams = for (i <- 0 until size) yield {
       val param = get(i)
-
       var newParam = param.setValue(param.getValue + vec.get(i))
       if (newParam.getValue > newParam.maxValue) {
         println("Warning param " +
@@ -100,42 +84,34 @@ case class NumericParameterArray(theParams: IndexedSeq[Parameter], rnd: Random)
       }
       newParam
     }
-    new NumericParameterArray(newParams, rnd)
+    NumericParameterArray(newParams, numSteps, rnd)
   }
 
   /** @param radius the size of the (1 std deviation) gaussian neighborhood to select a random nbr from
     *               (relative to each parameter range).
     * @return the random nbr.
     */
-  override def getRandomNeighbor(radius: Double): NumericParameterArray = {
-    val nbr = this.copy
-    for (k <- 0 until size) {
-      val param = nbr.get(k)
-      param.tweakValue(radius, rnd)
-    }
-    nbr
-  }
+  override def getRandomNeighbor(radius: Double): NumericParameterArray =
+    NumericParameterArray(this.params.map(p => p.tweakValue(radius, rnd)), numSteps, rnd)
 
   /** @return get a completely random solution in the parameter space.*/
   override def getRandomSample: NumericParameterArray = {
-    val nbr = this.copy
-    for (k <- 0 until size) {
-      val newPar = nbr.get(k)
-      newPar.setValue(newPar.minValue + rnd.nextDouble * newPar.range)
-      assert(newPar.getValue < newPar.maxValue && newPar.getValue > newPar.minValue, "newPar "
-        + newPar.getValue + " not between " + newPar.minValue + " and  " + newPar.maxValue)
-    }
-    nbr
+    val newParams =
+      for (k <- 0 until size) yield {
+        val par = get(k)
+        val newPar = par.setValue(par.minValue + rnd.nextDouble * par.range)
+        assert(newPar.getValue < newPar.maxValue && newPar.getValue > newPar.minValue, "newPar "
+          + newPar.getValue + " not between " + newPar.minValue + " and  " + newPar.maxValue)
+        newPar
+      }
+    NumericParameterArray(newParams, numSteps, rnd)
   }
 
   /** @return a new double array the same magnitude as the parameter list*/
   def asVector: Vector = {
-    val v = new Vector(this.size)
-    for (i <- 0 until this.size)
-      v.set(i, this.get(i).getValue)
+    val v = new Vector(size)
+    for (i <- 0 until size)
+      v.set(i, get(i).getValue)
     v
   }
-
-  def setNumSteps(numSteps: Int): Unit = this.numSteps = numSteps
-  def getNumSteps: Int = numSteps
 }

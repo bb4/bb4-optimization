@@ -1,14 +1,14 @@
 package com.barrybecker4.optimization.parameter.sampling
 
 import com.barrybecker4.optimization.parameter.NumericParameterArray
-import com.barrybecker4.optimization.parameter.types.Parameter
 import org.scalatest.FunSuite
+import scala.util.Random
 
 
 class NumericGlobalSamplerSuite extends FunSuite {
 
   test("1d sampling") {
-    val params = new NumericParameterArray(Array(0.5), Array(0.0), Array(1.0), Array("p"))
+    val params = new NumericParameterArray(Array(0.5), Array(0.0), Array(1.0), Array("p"), new Random(1))
     val sampler = new NumericGlobalSampler(params, 4)
 
     val result: Array[NumericParameterArray] = sampler.toArray
@@ -33,7 +33,7 @@ class NumericGlobalSamplerSuite extends FunSuite {
       Array(0.5, 0.4),
       Array(0.0, 0.0),
       Array(1.0, 2.0),
-      Array("p1", "p2")
+      Array("p1", "p2"), new Random(1)
     )
     val sampler = new NumericGlobalSampler(params, 4)
 
@@ -49,7 +49,7 @@ class NumericGlobalSamplerSuite extends FunSuite {
       Array(0.5, 0.4),
       Array(0.0, 0.0),
       Array(1.0, 2.0),
-      Array("p1", "p2")
+      Array("p1", "p2"), new Random(1)
     )
     val sampler = new NumericGlobalSampler(params, 16)
 

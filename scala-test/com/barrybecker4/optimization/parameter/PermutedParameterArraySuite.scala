@@ -76,9 +76,9 @@ class PermutedParameterArraySuite extends FunSuite {
   }
 
   private def createPermParameterArray(values: Array[Int]) = {
-    val params: Seq[Parameter] = for (i <- values.indices) yield {
+    val params: IndexedSeq[Parameter] = for (i <- values.indices) yield {
         new IntegerParameter(values(i), 0, values.length - 1, "param" + i)
       }
-    new PermutedParameterArray(params.toArray, new Random(1))
+    PermutedParameterArray(params, new Random(1))
   }
 }

@@ -12,7 +12,7 @@ class PermutedGlobalSampleSuite extends FunSuite {
     val num = 4
     val rnd = new Random(1)
     val params = for (i <- 0 until num) yield new IntegerParameter(i, 0, num - 1, "p" + i)
-    val pa = new PermutedParameterArray(params.toArray, rnd)
+    val pa = PermutedParameterArray(params, rnd)
     val sampler = new PermutedGlobalSampler(pa, 3)
 
     val result: Array[PermutedParameterArray] = sampler.toArray
@@ -39,7 +39,7 @@ class PermutedGlobalSampleSuite extends FunSuite {
     val num = 3
     val rnd = new Random(1)
     val params = for (i <- 0 until num) yield new IntegerParameter(i, 0, num - 1, "p" + i)
-    val pa = new PermutedParameterArray(params.toArray, rnd)
+    val pa = PermutedParameterArray(params, rnd)
     val sampler = new PermutedGlobalSampler(pa, 1)
 
     val result: Array[PermutedParameterArray] = sampler.toArray
@@ -55,7 +55,7 @@ class PermutedGlobalSampleSuite extends FunSuite {
     val num = 3
     val rnd = new Random(1)
     val params = for (i <- 0 until num) yield new IntegerParameter(i, 0, num - 1, "p" + i)
-    val pa = new PermutedParameterArray(params.toArray, rnd)
+    val pa = PermutedParameterArray(params, rnd)
     val sampler = new PermutedGlobalSampler(pa, 4)
 
     assertThrows[IllegalStateException] {

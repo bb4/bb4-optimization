@@ -4,6 +4,8 @@ import com.barrybecker4.common.math.MathUtil
 import org.scalatest.{BeforeAndAfter, FunSuite}
 import NumericParameterArraySuite.createParamArray
 
+import scala.util.Random
+
 
 /**
   * @author Barry Becker
@@ -15,11 +17,12 @@ object NumericParameterArraySuite {
   def createParamArray(value1: Double, value2: Double): NumericParameterArray = {
     assert(value1 >= MIN_VALUE && value1 <= MAX_VALUE)
     assert(value2 >= MIN_VALUE && value2 <= MAX_VALUE)
-    new NumericParameterArray(Array[Double](value1, value2), // values
+    new NumericParameterArray(
+      Array[Double](value1, value2), // values
       Array[Double](MIN_VALUE, MIN_VALUE), // min
       Array[Double](MAX_VALUE, MAX_VALUE), // max
-      Array[String]("A", "B") // names)
-    )
+      Array[String]("A", "B"), // names
+      new Random(1))
   }
 }
 
@@ -33,7 +36,7 @@ class NumericParameterArraySuite extends FunSuite with BeforeAndAfter {
 
   test("GetNumSteps") {
     params = createParamArray(.2, .3)
-    assertResult(10) { params.getNumSteps }
+    assertResult(10) { params.numSteps }
   }
 
   test("GetSamplePopulationSize") {

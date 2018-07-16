@@ -1,10 +1,7 @@
 // Copyright by Barry G. Becker, 2012 - 2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.parameter
 
-import com.barrybecker4.optimization.optimizee.Optimizee
-import com.barrybecker4.optimization.parameter.improvement.Improvement
 import com.barrybecker4.optimization.parameter.types.Parameter
-import scala.collection.mutable
 
 
 /**
@@ -19,10 +16,7 @@ trait ParameterArray {
     */
   def size: Int
 
-  /** @return a copy of ourselves. */
-  def copy: ParameterArray
-
-  /** @return the ith parameter in the array.*/
+  /** @return the ith parameter in the array. Consider using apply instead. */
   def get(i: Int): Parameter
 
   /** @return a reasonable size for a sampling of values from the parameter space.*/
@@ -44,7 +38,7 @@ trait ParameterArray {
 
   /** @param radius the size of the (1 std deviation) gaussian neighborhood to select a random nbr from
     *               (relative to each parameter range).
-    * @return the random nbr.
+    * @return the random neighbor.
     */
   def getRandomNeighbor(radius: Double): ParameterArray
 

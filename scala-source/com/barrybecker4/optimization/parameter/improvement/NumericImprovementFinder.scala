@@ -5,7 +5,21 @@ import com.barrybecker4.optimization.optimizee.Optimizee
 import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray, ParameterArrayWithFitness}
 
 import scala.collection.mutable
+import NumericImprovementFinder._
 
+object NumericImprovementFinder {
+
+  /** If the dot product of the new gradient with the old is less than this, then decrease the jump size. */
+  val MIN_DOT_PRODUCT = 0.3
+
+  /** If the dot product of the new gradient with the old is greater than this, then increase the jump size. */
+  val MAX_DOT_PRODUCT = 0.98
+}
+
+/**
+  * @param params parameters to improve
+  * @author Barry Becker
+  */
 class NumericImprovementFinder(var params: ParameterArrayWithFitness) {
 
   /** Try to find a parameterArray that is better than what we have now by evaluating using the optimizee passed in.
@@ -31,7 +45,7 @@ class NumericImprovementFinder(var params: ParameterArrayWithFitness) {
     val iter = new ImprovementIteration(params, oldGradient)
     var sumOfSqs: Double = 0
     for (i <- 0 until params.pa.size) {
-      val testParams = params.pa.copy
+      val testParams = params.pa
       sumOfSqs = iter.incSumOfSqs(i, sumOfSqs, optimizee, currentParams, testParams)
     }
     val gradLength = Math.sqrt(sumOfSqs)
@@ -55,9 +69,9 @@ class NumericImprovementFinder(var params: ParameterArrayWithFitness) {
     */
   private def findNewJumpSize(jumpSize: Double, dotProduct: Double) = {
     var newJumpSize = jumpSize
-    if (dotProduct > NumericParameterArray.MAX_DOT_PRODUCT)
+    if (dotProduct > MAX_DOT_PRODUCT)
       newJumpSize *= ImprovementStep.JUMP_SIZE_INC_FACTOR
-    else if (dotProduct < NumericParameterArray.MIN_DOT_PRODUCT)
+    else if (dotProduct < MIN_DOT_PRODUCT)
       newJumpSize *= ImprovementStep.JUMP_SIZE_DEC_FACTOR
     //println( "dotProduct = " + dotProduct + " new jumpsize = " + jumpSize );
     newJumpSize

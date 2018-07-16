@@ -2,15 +2,12 @@
 package com.barrybecker4.optimization.parameter
 
 import com.barrybecker4.common.math.MathUtil
-import com.barrybecker4.optimization.optimizee.Optimizee
 import com.barrybecker4.optimization.parameter.distancecalculators.DistanceCalculator
 import com.barrybecker4.optimization.parameter.distancecalculators.MagnitudeIgnoredDistanceCalculator
-import com.barrybecker4.optimization.parameter.improvement.DiscreteImprovementFinder
-import com.barrybecker4.optimization.parameter.improvement.Improvement
 import com.barrybecker4.optimization.parameter.sampling.VariableLengthGlobalSampler
 import com.barrybecker4.optimization.parameter.types.IntegerParameter
 import com.barrybecker4.optimization.parameter.types.Parameter
-import scala.collection.mutable
+import com.barrybecker4.optimization.parameter.VariableLengthIntArray.ADD_REMOVE_RADIUS_SOFTENER
 import scala.util.Random
 
 
@@ -19,42 +16,25 @@ object VariableLengthIntArray {
   /** The larger this number is the less likely we are to add/remove ints when finding a random neighbor */
   private val ADD_REMOVE_RADIUS_SOFTENER = 0.6
 
-  def createInstance(params: Array[Parameter], fullSet: Set[Int], rnd: Random): VariableLengthIntArray =
-    createInstance(params, fullSet, new MagnitudeIgnoredDistanceCalculator(), rnd)
-
-  def createInstance(params: Array[Parameter], fullSet: Set[Int], distanceCalculator: DistanceCalculator,
-                     rnd: Random) =
-    new VariableLengthIntArray(params, fullSet, distanceCalculator, rnd)
+  def createInstance(params: IndexedSeq[Parameter], fullSet: Set[Int], rnd: Random): VariableLengthIntArray =
+    VariableLengthIntArray(params, fullSet, new MagnitudeIgnoredDistanceCalculator(), rnd)
 }
 
 /**
   * Represents a 1 dimensional, variable length, array of unique integer parameters.
   * The order of the integers does not matter, but there cannot be duplicates.
+  * @param params  an array of params to initialize with.
+  * @param fullSet the full set of all integer parameters.
   * @author Barry Becker
   */
-class VariableLengthIntArray(theParams: Array[Parameter], rnd: Random)
-  extends AbstractParameterArray(theParams, rnd) {
+case class VariableLengthIntArray(params: IndexedSeq[Parameter], fullSet: Set[Int],
+                             distCalc: DistanceCalculator, rnd: Random = MathUtil.RANDOM)
+  extends AbstractParameterArray(params, rnd) {
 
-  private var fullSet: Set[Int] = _
-  private var fullSeq: Seq[Int] = _
-  private var distCalculator: DistanceCalculator = _
-
-  /** @param params  an array of params to initialize with.
-    * @param fullSet the full set of all integer parameters.
-    */
-  def this(params: Array[Parameter], fullSet: Set[Int], distCalc: DistanceCalculator,
-           rnd: Random = MathUtil.RANDOM) {
-    this(params, rnd)
-    this.fullSet = fullSet
-    this.fullSeq = fullSet.toArray
-    assert(distCalc != null)
-    this.distCalculator = distCalc
-  }
+  private var fullSeq: Seq[Int] = fullSet.toArray
 
   /** @return the maximum length of the variable length array */
   def getMaxLength: Int = fullSet.size
-
-  override protected def createInstance = new VariableLengthIntArray(Array[Parameter](), rnd)
 
   /** The distance computation will be quite different for this than a regular parameter array.
     * We want the distance to represent a measure of the amount of similarity between two instances.
@@ -64,7 +44,7 @@ class VariableLengthIntArray(theParams: Array[Parameter], rnd: Random)
     * Generally, the distance is greater the greater the number of parameters that are different.
     * @return the distance between this parameter array and another.
     */
-  override def distance(pa: ParameterArray): Double = distCalculator.calculateDistance(this, pa)
+  override def distance(pa: ParameterArray): Double = distCalc.calculateDistance(this, pa)
 
   /** Create a new permutation that is not too distant from what we have now.
     * The two ways a configuration of marked nodes can change is
@@ -75,7 +55,7 @@ class VariableLengthIntArray(theParams: Array[Parameter], rnd: Random)
     */
   override def getRandomNeighbor(radius: Double): VariableLengthIntArray = {
     if (size < 1) return this
-    val probAddRemove = radius / (VariableLengthIntArray.ADD_REMOVE_RADIUS_SOFTENER + radius)
+    val probAddRemove = radius / (ADD_REMOVE_RADIUS_SOFTENER + radius)
     var add = false
     var remove = false
     if (rnd.nextDouble < probAddRemove) {
@@ -83,16 +63,14 @@ class VariableLengthIntArray(theParams: Array[Parameter], rnd: Random)
       else remove = true
     }
     var numNodesToMove = 0
-    val nbr = this.copy.asInstanceOf[VariableLengthIntArray]
     //println(s"rad=$radius pAdd/Rm=$probAddRemove add=$add remove=$remove")
     if (add || remove) numNodesToMove = rnd.nextInt(Math.min(size, (radius + 1.5).toInt))
     else { // at least 1 will be moved
       numNodesToMove = 1 + rnd.nextInt((1.5 + radius).toInt)
     }
-    if (remove) removeRandomParam(nbr)
-    if (add) addRandomParam(nbr)
-    moveNodes(numNodesToMove, nbr)
-    nbr
+    if (remove) removeRandomParam()
+    if (add) addRandomParam()
+    moveNodes(numNodesToMove)
   }
 
   /** Add method to get a neighbor that improves some specified cost function */
@@ -100,7 +78,7 @@ class VariableLengthIntArray(theParams: Array[Parameter], rnd: Random)
     assert(indices.size <= getMaxLength,
       "The number of indices (" + indices.size + ") was greater than the size (" + size + ")")
     val newParams = for (i <- indices) yield createParam(fullSeq(i))
-    new VariableLengthIntArray(newParams.toArray, fullSet, distCalculator, rnd)
+    new VariableLengthIntArray(newParams.toIndexedSeq, fullSet, distCalc, rnd)
   }
 
   /** Globally sample the parameter space.
@@ -112,67 +90,54 @@ class VariableLengthIntArray(theParams: Array[Parameter], rnd: Random)
   override def findGlobalSamples(requestedNumSamples: Long) =
     new VariableLengthGlobalSampler(this, requestedNumSamples)
 
-  /** Try swapping parameters randomly until we find an improvement (if we can).
-  override def findIncrementalImprovement(optimizee: Optimizee, jumpSize: Double,
-                                          lastImprovement: Improvement,
-                                          cache: mutable.Set[ParameterArray]): Improvement = {
-    val finder = new DiscreteImprovementFinder()
-    finder.findIncrementalImprovement(optimizee, jumpSize, cache)
-  }*/
-
   /** @return get a random solution in the parameter space by selecting about half of the ints */
   override def getRandomSample: ParameterArray = {
     val shuffled = rnd.shuffle(fullSeq)
     val marked = shuffled.take((shuffled.length + 1) / 2)
     val newParams = marked.map(m => createParam(m))
-    new VariableLengthIntArray(newParams.toArray, fullSet, distCalculator, rnd)
-  }
-
-  /** @return a copy of ourselves */
-  override def copy: AbstractParameterArray = {
-    val copy = super.copy.asInstanceOf[VariableLengthIntArray]
-    copy.fullSet = this.fullSet
-    copy.distCalculator = this.distCalculator
-    copy
+    new VariableLengthIntArray(newParams.toIndexedSeq, fullSet, distCalc, rnd)
   }
 
   /** @param i the integer parameter's value. May be Negative
     * @return a new integer parameter.
     */
-  private def createParam(i: Int) = new IntegerParameter(i, if (i < 0) i
-    else 0, if (i >= 0) i
-    else 0, "p" + i)
+  private def createParam(i: Int) =
+    new IntegerParameter(i,
+      if (i < 0) i else 0,
+      if (i >= 0) i else 0,
+      "p" + i)
 
-  private def removeRandomParam(nbr: VariableLengthIntArray): Unit = {
+  private def removeRandomParam(): VariableLengthIntArray = {
     val indexToRemove = rnd.nextInt(size)
-    assert(nbr.size > 0)
-    nbr.params = nbr.params.zipWithIndex.filter(p => p._2 != indexToRemove).map(_._1)
+    VariableLengthIntArray(params.zipWithIndex.filter(p => p._2 != indexToRemove).map(_._1),
+      fullSet, distCalc, rnd)
   }
 
-  private def addRandomParam(nbr: VariableLengthIntArray): Unit = {
-    val freeNodes = getFreeNodes(nbr)
-    val newSize = nbr.size + 1
+  private def addRandomParam(): VariableLengthIntArray = {
+    val freeNodes = getFreeNodes
+    val newSize = size + 1
     assert(newSize <= getMaxLength)
-    var newParams = for (p <- nbr.params) yield p
+    var newParams = for (p <- params) yield p
 
     // randomly add one one of the free nodes to the list
     val value: Int = freeNodes(rnd.nextInt(freeNodes.size))
     newParams :+= createParam(value)
-    nbr.params = newParams
+    VariableLengthIntArray(newParams, fullSet,distCalc, rnd)
   }
 
   /** Select num free nodes randomly and swap them with num randomly selected marked nodes.
     * @param numNodesToMove number of nodes to move to new locations
-    * @param nbr            neighbor parameter array
     */
-  private def moveNodes(numNodesToMove: Int, nbr: VariableLengthIntArray): Unit = {
-    val freeNodes = getFreeNodes(nbr)
+  private def moveNodes(numNodesToMove: Int): VariableLengthIntArray = {
+    val freeNodes = getFreeNodes
     val numSelect = Math.min(freeNodes.size, numNodesToMove)
     val swapNodes = selectRandomNodes(numSelect, freeNodes)
+    val newParams = params.toArray
     for (i <- 0 until numSelect) {
-      val index = rnd.nextInt(nbr.size)
-      nbr.get(index).setValue(swapNodes(i))
+      val index = rnd.nextInt(size)
+      newParams(index) = get(index).setValue(swapNodes(i))
     }
+    VariableLengthIntArray(newParams, fullSet, distCalc, rnd)
   }
 
   private def selectRandomNodes(numNodesToSelect: Int, freeNodes: Seq[Int]): Seq[Int] = {
@@ -180,9 +145,9 @@ class VariableLengthIntArray(theParams: Array[Parameter], rnd: Random)
   }
 
   /** @return all the ints in fullSet that are not in nbr currently */
-  private def getFreeNodes(nbr: VariableLengthIntArray): Seq[Int] = {
+  private def getFreeNodes: Seq[Int] = {
     val markedNodes = (
-      for (p <- nbr.params)
+      for (p <- params)
         yield p.getValue.toInt
       ).toSet
     fullSet.diff(markedNodes).toSeq

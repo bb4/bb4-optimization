@@ -3,7 +3,6 @@ package com.barrybecker4.optimization.parameter
 
 import com.barrybecker4.common.format.FormatUtil
 import com.barrybecker4.optimization.parameter.types.Parameter
-
 import scala.util.Random
 
 
@@ -14,14 +13,11 @@ object AbstractParameterArray {
 
 /**
   * Represents a 1 dimensional array of parameters. This is the thing to be optimized.
-  * @param theParams the list of parameters
+  * @param params the list of parameters
   * @author Barry Becker
   */
-abstract class AbstractParameterArray(theParams: IndexedSeq[Parameter] = IndexedSeq[Parameter](), rnd: Random)
+abstract class AbstractParameterArray(params: IndexedSeq[Parameter] = IndexedSeq[Parameter](), rnd: Random)
     extends ParameterArray {
-
-  assert(theParams != null)
-  var params: IndexedSeq[Parameter] = theParams
 
   override def getSamplePopulationSize: Int = {
     var pop = 1
@@ -35,17 +31,7 @@ abstract class AbstractParameterArray(theParams: IndexedSeq[Parameter] = Indexed
   /** @return the number of parameters in the array. */
   override def size: Int = params.length
 
-  /** @return a copy of ourselves.*/
-  override def copy: AbstractParameterArray = {
-    val newParams = params.map(_.copy)
-    val pa = createInstance
-    pa.params = newParams
-    pa
-  }
-
-  protected def createInstance: AbstractParameterArray
-
-  /** @return the ith parameter in the array. */
+  /** @return the ith parameter in the array. Consider using apply instead. */
   override def get(i: Int): Parameter = params(i)
 
   override def toString: String = {

@@ -19,8 +19,8 @@ import scala.util.Random
   * the traveling salesman problem, for example.
   * @author Barry Becker
   */
-class PermutedParameterArray(theParams: Array[Parameter], rnd: Random)
-  extends AbstractParameterArray(theParams, rnd) {
+case class PermutedParameterArray(params: IndexedSeq[Parameter], rnd: Random)
+  extends AbstractParameterArray(params, rnd) {
 
   private val distanceCalculator: PermutedDistanceCalculator = new PermutedDistanceCalculator()
 
@@ -29,20 +29,13 @@ class PermutedParameterArray(theParams: Array[Parameter], rnd: Random)
   /** Permute the parameters according to the specified permutation
     * of 0 based indices.
     */
-  def setPermutation(indices: List[Integer]): Unit = {
+  def setPermutation(indices: List[Integer]): PermutedParameterArray = {
     assert(indices.size == size)
     val newParams = for (i <- indices) yield get(i)
-    params = newParams.toIndexedSeq
+    PermutedParameterArray(newParams.toIndexedSeq, rnd)
   }
 
-  override protected def createInstance = new PermutedParameterArray(rnd)
-
-  def reverse: ParameterArray = {
-    val paramCopy = this.copy
-    val len = size
-    paramCopy.params = this.params.reverse
-    paramCopy
-  }
+  def reverse: PermutedParameterArray = PermutedParameterArray(params.reverse, rnd)
 
   /**
     * The distance computation will be quite different for this than a regular parameter array.
@@ -64,9 +57,7 @@ class PermutedParameterArray(theParams: Array[Parameter], rnd: Random)
     if (size <= 1) return this
     val numToSwap = Math.max(1, (10.0 * radius * size / 100.0).toInt)
 
-
-    val nbr = this.copy.asInstanceOf[PermutedParameterArray]
-    val revisedParams = nbr.params.toArray
+    val revisedParams = params.toArray
 
     for (k <- 0 until numToSwap) {
       val index1 = rnd.nextInt(size)
@@ -79,8 +70,7 @@ class PermutedParameterArray(theParams: Array[Parameter], rnd: Random)
       revisedParams(index1) = revisedParams(index2)
       revisedParams(index2) = temp
     }
-    nbr.params = revisedParams.toIndexedSeq
-    nbr
+    PermutedParameterArray(revisedParams.toIndexedSeq, rnd)
   }
 
   /** Globally sample the parameter space.
@@ -88,12 +78,12 @@ class PermutedParameterArray(theParams: Array[Parameter], rnd: Random)
     *       and requestedNumSamples is large, it may not be possible to return this many unique samples.
     * @return some number of unique samples.
     */
-  override def findGlobalSamples(requestedNumSamples: Long) = new PermutedGlobalSampler(this, requestedNumSamples)
-
+  override def findGlobalSamples(requestedNumSamples: Long) =
+    new PermutedGlobalSampler(this, requestedNumSamples)
 
   /** @return get a completely random solution in the parameter space. */
   override def getRandomSample: ParameterArray = {
     val theParams: Array[Parameter] = rnd.shuffle(params.toSeq).toArray
-    new PermutedParameterArray(theParams, rnd)
+    PermutedParameterArray(theParams, rnd)
   }
 }

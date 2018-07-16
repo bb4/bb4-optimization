@@ -30,10 +30,7 @@ sealed trait SubsetSumVariation extends ProblemVariation {
     val numSet = this.getNumberSet.toSeq
     val params: IndexedSeq[Parameter] = for (i <- 0 until num by 3) yield createParam(numSet(i))
     val pa = new VariableLengthIntArray(
-      params.toArray, getNumberSet,
-      new MagnitudeDistanceCalculator,
-      new Random(1)
-    )
+      params, getNumberSet, new MagnitudeDistanceCalculator, new Random(1))
     // pa.setFitness(computeCost(pa))
     pa
   }
@@ -86,7 +83,7 @@ sealed trait SubsetSumVariation extends ProblemVariation {
     val params: IndexedSeq[Parameter] = for (i <- 0 until numNodes) yield createParam(i)
 
     ParameterArrayWithFitness(
-      new VariableLengthIntArray(params.toArray, getNumberSet, new MagnitudeDistanceCalculator, new Random(1)),
+      new VariableLengthIntArray(params, getNumberSet, new MagnitudeDistanceCalculator, new Random(1)),
       0)
   }
 

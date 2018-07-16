@@ -29,14 +29,14 @@ class NumericGlobalSampler(var params: NumericParameterArray, val requestedNumSa
     if (counter >= numSamples) throw new NoSuchElementException("ran out of samples.")
     if (counter == numSamples - 1) hasNext = false
     val index = samples.getIndexFromRaw(counter)
-    val nextSample = params.copy
-    for (j <- 0 until nextSample.size) {
-      val p = nextSample.get(j)
-      val increment = (p.maxValue - p.minValue) / samplingRate
-      p.setValue(p.minValue + increment / 2.0 + index(j) * increment)
-    }
+    val paramList =
+      for (j <- 0 until params.size) yield {
+        val p = params.get(j)
+        val increment = (p.maxValue - p.minValue) / samplingRate
+        p.setValue(p.minValue + increment / 2.0 + index(j) * increment)
+      }
     counter += 1
-    nextSample
+    NumericParameterArray(paramList, params.numSteps, params.rnd)
   }
 
   private def determineSamplingRate(requestedNumSamples: Long) = {
