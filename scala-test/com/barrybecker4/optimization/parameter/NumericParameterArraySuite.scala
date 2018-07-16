@@ -13,6 +13,7 @@ import scala.util.Random
 object NumericParameterArraySuite {
   private val MIN_VALUE = -20.0
   private val MAX_VALUE = 20.0
+  private val RAND = new Random(1)
 
   def createParamArray(value1: Double, value2: Double): NumericParameterArray = {
     assert(value1 >= MIN_VALUE && value1 <= MAX_VALUE)
@@ -22,7 +23,7 @@ object NumericParameterArraySuite {
       Array[Double](MIN_VALUE, MIN_VALUE), // min
       Array[Double](MAX_VALUE, MAX_VALUE), // max
       Array[String]("A", "B"), // names
-      new Random(1))
+      RAND)
   }
 }
 
