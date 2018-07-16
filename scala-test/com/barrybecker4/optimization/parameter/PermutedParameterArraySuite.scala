@@ -1,27 +1,28 @@
 package com.barrybecker4.optimization.parameter
 
-import com.barrybecker4.common.math.MathUtil
 import com.barrybecker4.optimization.parameter.types.{IntegerParameter, Parameter}
 import org.scalactic.{Equality, TolerantNumerics}
 import org.scalatest.{BeforeAndAfter, FunSuite}
-
 import scala.util.Random
+import com.barrybecker4.optimization.parameter.PermutedParameterArraySuite.RND
 
 /**
   * @author Barry Becker
   */
 object PermutedParameterArraySuite {
   private val TOL = 0.000001
+  private val RND = new Random(1)
 }
 
 class PermutedParameterArraySuite extends FunSuite {
 
-  implicit val doubleEq: Equality[Double] = TolerantNumerics.tolerantDoubleEquality(PermutedParameterArraySuite.TOL)
+  implicit val doubleEq: Equality[Double] =
+    TolerantNumerics.tolerantDoubleEquality(PermutedParameterArraySuite.TOL)
 
   test("PermutedNeighbor") {
-    val params = createPermParameterArray(Array[Int](0, 1, 2, 3, 4))
+    val params = createPermParameterArray(Array[Int](0, 1, 2, 3, 4), RND)
     val nbrParams = params.getRandomNeighbor(1.0)
-    val expNbr = createPermParameterArray(Array[Int](3, 1, 2, 0, 4))
+    val expNbr = createPermParameterArray(Array[Int](3, 1, 2, 0, 4), RND)
     assertResult(expNbr) { nbrParams }
   }
 
@@ -29,22 +30,22 @@ class PermutedParameterArraySuite extends FunSuite {
     * in the cyclic offset.
     */
   test("PermutedDistanceEqual") {
-    val params1 = createPermParameterArray(Array[Int](2, 1, 0, 3, 4))
-    val params2 = createPermParameterArray(Array[Int](1, 0, 3, 4, 2))
+    val params1 = createPermParameterArray(Array[Int](2, 1, 0, 3, 4), RND)
+    val params2 = createPermParameterArray(Array[Int](1, 0, 3, 4, 2), RND)
     assert(0.0 === params1.distance(params2))
   }
 
   /** One run of length 2. */
   test("PermutedDistanceAlmostEqual") {
-    val params1 = createPermParameterArray(Array[Int](2, 1, 0, 3, 4))
-    val params2 = createPermParameterArray(Array[Int](0, 1, 2, 3, 4))
+    val params1 = createPermParameterArray(Array[Int](2, 1, 0, 3, 4), RND)
+    val params2 = createPermParameterArray(Array[Int](0, 1, 2, 3, 4), RND)
     assert(6.0 === params1.distance(params2))
   }
 
   /** One run of length 3. */
   test("PermutedDistanceRunLength3") {
-    val params1 = createPermParameterArray(Array[Int](3, 1, 0, 2, 4))
-    val params2 = createPermParameterArray(Array[Int](4, 1, 3, 0, 2))
+    val params1 = createPermParameterArray(Array[Int](3, 1, 0, 2, 4), RND)
+    val params2 = createPermParameterArray(Array[Int](4, 1, 3, 0, 2), RND)
     assert(6.0 === params1.distance(params2))
   }
 
@@ -63,7 +64,7 @@ class PermutedParameterArraySuite extends FunSuite {
      |parameter[2] = param2 = 0 [0, 4.0]
      |parameter[3] = param1 = 2.0 [0, 4.0]
      |parameter[4] = param0 = 4.0 [0, 4.0]
-     |fitness = 0.0"""
+     |"""
       .stripMargin.replace("\r\n", "\n")) { params1.reverse.toString }
   }
 
@@ -75,10 +76,10 @@ class PermutedParameterArraySuite extends FunSuite {
     assert( 14.0 === params1.distance(params2))
   }
 
-  private def createPermParameterArray(values: Array[Int]) = {
+  private def createPermParameterArray(values: Array[Int], rnd: Random = new Random(1)) = {
     val params: IndexedSeq[Parameter] = for (i <- values.indices) yield {
         new IntegerParameter(values(i), 0, values.length - 1, "param" + i)
       }
-    PermutedParameterArray(params, new Random(1))
+    PermutedParameterArray(params, rnd)
   }
 }

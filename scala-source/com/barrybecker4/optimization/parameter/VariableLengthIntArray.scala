@@ -2,12 +2,12 @@
 package com.barrybecker4.optimization.parameter
 
 import com.barrybecker4.common.math.MathUtil
-import com.barrybecker4.optimization.parameter.distancecalculators.DistanceCalculator
-import com.barrybecker4.optimization.parameter.distancecalculators.MagnitudeIgnoredDistanceCalculator
+import com.barrybecker4.optimization.parameter.distancecalculators.{DistanceCalculator, MagnitudeDistanceCalculator, MagnitudeIgnoredDistanceCalculator}
 import com.barrybecker4.optimization.parameter.sampling.VariableLengthGlobalSampler
 import com.barrybecker4.optimization.parameter.types.IntegerParameter
 import com.barrybecker4.optimization.parameter.types.Parameter
-import com.barrybecker4.optimization.parameter.VariableLengthIntArray.ADD_REMOVE_RADIUS_SOFTENER
+import com.barrybecker4.optimization.parameter.VariableLengthIntArray._
+
 import scala.util.Random
 
 
@@ -16,8 +16,10 @@ object VariableLengthIntArray {
   /** The larger this number is the less likely we are to add/remove ints when finding a random neighbor */
   private val ADD_REMOVE_RADIUS_SOFTENER = 0.6
 
+  private val DIST_CALCULATOR = new MagnitudeDistanceCalculator()
+
   def createInstance(params: IndexedSeq[Parameter], fullSet: Set[Int], rnd: Random): VariableLengthIntArray =
-    VariableLengthIntArray(params, fullSet, new MagnitudeIgnoredDistanceCalculator(), rnd)
+    VariableLengthIntArray(params, fullSet, DIST_CALCULATOR, rnd)
 }
 
 /**
@@ -28,7 +30,7 @@ object VariableLengthIntArray {
   * @author Barry Becker
   */
 case class VariableLengthIntArray(params: IndexedSeq[Parameter], fullSet: Set[Int],
-                             distCalc: DistanceCalculator, rnd: Random = MathUtil.RANDOM)
+                             distCalc: DistanceCalculator = DIST_CALCULATOR, rnd: Random = MathUtil.RANDOM)
   extends AbstractParameterArray(params, rnd) {
 
   private var fullSeq: Seq[Int] = fullSet.toArray

@@ -62,13 +62,11 @@ case class PermutedParameterArray(params: IndexedSeq[Parameter], rnd: Random)
     for (k <- 0 until numToSwap) {
       val index1 = rnd.nextInt(size)
       var index2 = rnd.nextInt(size)
-      while ( {
-        index2 == index1
-      }) index2 = rnd.nextInt(size)
+      while (index2 == index1)
+        index2 = rnd.nextInt(size)
       // swap
-      val temp = revisedParams(index1)
-      revisedParams(index1) = revisedParams(index2)
-      revisedParams(index2) = temp
+      revisedParams(index1) = params(index1).setValue(params(index2).getValue)
+      revisedParams(index2) = params(index2).setValue(params(index1).getValue)
     }
     PermutedParameterArray(revisedParams.toIndexedSeq, rnd)
   }

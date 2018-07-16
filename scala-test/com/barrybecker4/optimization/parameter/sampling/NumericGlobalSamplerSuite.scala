@@ -15,13 +15,13 @@ class NumericGlobalSamplerSuite extends FunSuite {
     assertResult(
       """
         |parameter[0] = p = 0.125 [0, 1.00]
-        |fitness = 0.0
+        |
         |parameter[0] = p = 0.375 [0, 1.00]
-        |fitness = 0.0
+        |
         |parameter[0] = p = 0.625 [0, 1.00]
-        |fitness = 0.0
+        |
         |parameter[0] = p = 0.875 [0, 1.00]
-        |fitness = 0.0""".stripMargin.replaceAll("\r\n", "\n")) { result.mkString("")}
+        |""".stripMargin.replaceAll("\r\n", "\n")) { result.mkString("")}
 
     assertResult("0.125, 0.375, 0.625, 0.875") {
       result.map(p => p.get(0).getValue).mkString(", ")

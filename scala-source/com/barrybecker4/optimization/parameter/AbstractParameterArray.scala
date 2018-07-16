@@ -40,6 +40,7 @@ abstract class AbstractParameterArray(params: IndexedSeq[Parameter] = IndexedSeq
       sb.append("parameter[").append(i).append("] = ").append(get(i).toString)
       sb.append('\n')
     }
+    //sb.append("rnd="+rnd.toString)
     sb.toString
   }
 
