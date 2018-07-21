@@ -53,15 +53,15 @@ class NumericImprovementFinder(val startingParams: ParameterArrayWithFitness) ex
     }
     val gradLength = Math.sqrt(sumOfSqs)
     val step = new ImprovementStep(optimizee, iter, gradLength, cache, jumpSize, oldFitness)
-    currentParams = step.findNextParams(currentParams)
-    var newJumpSize = step.getJumpSize
+    val newParams = step.findNextParams(currentParams)
+    var newJumpSize = step.jumpSize
     // the improvement may be zero or negative, meaning it did not improve.
     val improvement = step.getImprovement
     val dotProduct = iter.gradient.normalizedDot(iter.oldGradient)
     println("dot between " + iter.gradient + " and " + iter.oldGradient+ " is " + dotProduct)
     newJumpSize = findNewJumpSize(newJumpSize, dotProduct)
-    iter.gradient.copyFrom(iter.oldGradient)
-    Improvement(currentParams, improvement, newJumpSize, Some(iter.gradient))
+    iter.oldGradient = iter.gradient
+    Improvement(newParams, improvement, newJumpSize, Some(iter.gradient))
   }
 
   /** If we are headed in pretty much the same direction as last time, then we increase the jumpSize.
@@ -76,7 +76,6 @@ class NumericImprovementFinder(val startingParams: ParameterArrayWithFitness) ex
       newJumpSize *= ImprovementStep.JUMP_SIZE_INC_FACTOR
     else if (dotProduct < MIN_DOT_PRODUCT)
       newJumpSize *= ImprovementStep.JUMP_SIZE_DEC_FACTOR
-    //println( "dotProduct = " + dotProduct + " new jumpsize = " + jumpSize );
     newJumpSize
   }
 }

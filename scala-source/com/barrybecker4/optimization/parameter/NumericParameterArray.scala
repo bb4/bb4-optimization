@@ -71,7 +71,7 @@ case class NumericParameterArray(params: IndexedSeq[Parameter],
 
     val newParams = for (i <- 0 until size) yield {
       val param = get(i)
-      var newParam = param.setValue(param.getValue + vec.get(i))
+      var newParam = param.setValue(param.getValue + vec(i))
       if (newParam.getValue > newParam.maxValue) {
         println("Warning param " +
           newParam.name + " is exceeding is maximum value. It is being pegged to that maximum of " + newParam.maxValue)
@@ -115,10 +115,5 @@ case class NumericParameterArray(params: IndexedSeq[Parameter],
   }
 
   /** @return a new double array the same magnitude as the parameter list*/
-  def asVector: Vector = {
-    val v = new Vector(size)
-    for (i <- 0 until size)
-      v.set(i, get(i).getValue)
-    v
-  }
+  def asVector: Vector = Vector(params.map(_.getValue))
 }

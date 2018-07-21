@@ -43,17 +43,19 @@ class DiscreteImprovementFinder(var params: ParameterArrayWithFitness) extends I
     do {
       val nbrParam = params.pa.getRandomNeighbor(jumpSize)
       fitnessDelta = 0
+
       if (!cache.contains(nbrParam)) {
         cache += nbrParam
-        var nbr: ParameterArrayWithFitness = null
-        if (optimizee.evaluateByComparison) {
-          fitnessDelta = optimizee.compareFitness(nbrParam, params.pa)
-          nbr = ParameterArrayWithFitness(nbrParam, params.fitness + fitnessDelta)
-        } else {
-          val fitness = optimizee.evaluateFitness(nbrParam)
-          fitnessDelta = params.fitness - fitness
-          nbr = ParameterArrayWithFitness(nbrParam, fitness)
-        }
+
+        val nbr: ParameterArrayWithFitness =
+          if (optimizee.evaluateByComparison) {
+            fitnessDelta = optimizee.compareFitness(nbrParam, params.pa)
+            ParameterArrayWithFitness(nbrParam, params.fitness + fitnessDelta)
+          } else {
+            val fitness = optimizee.evaluateFitness(nbrParam)
+            fitnessDelta = params.fitness - fitness
+            ParameterArrayWithFitness(nbrParam, fitness)
+          }
 
         if (fitnessDelta > 0)
           improvement = Improvement(nbr, fitnessDelta, jumpSize)
@@ -62,9 +64,7 @@ class DiscreteImprovementFinder(var params: ParameterArrayWithFitness) extends I
       jumpSize *= JUMP_SIZE_INCREASE
     } while (fitnessDelta <= 0 && numTries < MAX_TRIES)
 
-    println("incremental improvement = " + improvement.improvement + " numTries=" + numTries + " jumpSize=" + jumpSize
-      + "\n num nodes in improvedParams=" + improvement.parameters.pa.size
-      + " fit=" + improvement.parameters.fitness)
+    println("incremental improvement = " + improvement + " numTries=" + numTries)
     improvement
   }
 }

@@ -39,7 +39,6 @@ class HillClimbingStrategy(optimizee: Optimizee) extends OptimizationStrategy(op
     cache += currentParams.pa
 
     var improvement: Improvement = null
-    var improved = false
 
     // Iterate until there is no significant improvement between iterations.
     // IOW, when the jumpSize is too small (below some threshold).
@@ -51,11 +50,10 @@ class HillClimbingStrategy(optimizee: Optimizee) extends OptimizationStrategy(op
       numIterations += 1
       currentParams = improvement.parameters
       notifyOfChange(currentParams)
-      //improved = improvement.improvement < -fitnessEps
     } while (improvement.improved && !isOptimalFitnessReached(currentParams))
 
     println("The optimized parameters after " + numIterations + " iterations are " + currentParams)
-    println("Last improvement = " + improvement + " improved=" + improved)
+    println("Last improvement = " + improvement)
     currentParams
   }
 

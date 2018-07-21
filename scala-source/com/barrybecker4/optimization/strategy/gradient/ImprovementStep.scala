@@ -3,9 +3,7 @@ package com.barrybecker4.optimization.strategy.gradient
 
 import com.barrybecker4.optimization.optimizee.Optimizee
 import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray, ParameterArrayWithFitness}
-
 import scala.collection.mutable
-
 
 object ImprovementStep {
   /** continue optimization iteration until the improvement in fitness is less than this.  */
@@ -14,7 +12,7 @@ object ImprovementStep {
   /** Increase the size of the radius by this multiplier */
   private val RADIUS_EXPANDER = 1.5
 
-  val JUMP_SIZE_INC_FACTOR = 1.3
+  val JUMP_SIZE_INC_FACTOR = 1.2
   val JUMP_SIZE_DEC_FACTOR = 0.7
 }
 
@@ -29,7 +27,6 @@ class ImprovementStep(var optimizee: Optimizee, var iter: ImprovementIteration, 
   private var improvement = .0
   private var improved = false
 
-  def getJumpSize: Double = jumpSize
   def getImprovement: Double = improvement
 
   /** @param params the initial value for the parameters to optimize.
@@ -55,7 +52,7 @@ class ImprovementStep(var optimizee: Optimizee, var iter: ImprovementIteration, 
     var currentParams: NumericParameterArray = params.pa.asInstanceOf[NumericParameterArray]
     val oldParams = params
     iter.updateGradient(jumpSize, gradLength)
-    println(s"gradient = ${iter.gradient}. jumpSize="+ jumpSize);
+    println(s"gradient = ${iter.gradient}. jumpSize=" + jumpSize)
     currentParams = currentParams.add(iter.gradient)
     var gaussRadius = 0.01
     var sameParams = false
