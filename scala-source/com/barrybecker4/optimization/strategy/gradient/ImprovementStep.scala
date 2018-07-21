@@ -82,7 +82,7 @@ class ImprovementStep(var optimizee: Optimizee, var iter: ImprovementIteration, 
       newParams = oldParams
       if (!sameParams) { // we have not improved, try again with a reduced jump size.
         // This could happen, for example, if we overshot the goal.
-        println( "--Warning: the new params are worse so reduce the step size and try again")
+        println( "--Warning: the new params are worse, so reduce the step size and try again")
         println(s"  jumpSize=$jumpSize")
         jumpSize *= ImprovementStep.JUMP_SIZE_DEC_FACTOR
       }
