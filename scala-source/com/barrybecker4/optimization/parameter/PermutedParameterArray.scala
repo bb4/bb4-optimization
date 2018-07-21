@@ -2,10 +2,7 @@
 package com.barrybecker4.optimization.parameter
 
 import com.barrybecker4.common.math.MathUtil
-import com.barrybecker4.optimization.optimizee.Optimizee
-import com.barrybecker4.optimization.parameter.distancecalculators.{DistanceCalculator, PermutedDistanceCalculator}
-import com.barrybecker4.optimization.parameter.improvement.DiscreteImprovementFinder
-import com.barrybecker4.optimization.parameter.improvement.Improvement
+import com.barrybecker4.optimization.parameter.distancecalculators.PermutedDistanceCalculator
 import com.barrybecker4.optimization.parameter.sampling.PermutedGlobalSampler
 import com.barrybecker4.optimization.parameter.types.Parameter
 

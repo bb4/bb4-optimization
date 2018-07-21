@@ -25,7 +25,7 @@ object ParabolaFunctionConsts {
     0)
 
   // define the initialGuess in some bounded region of the 2-dimensional search space.
-  private val VALUES = Array(6.81, 7.93) // initialGuess
+  private val VALUES = Array(7.81, 4.93) // initialGuess
 
   private val MIN_VALS = Array(-10.0, -10.0)
   private val MAX_VALS = Array(10.0, 10.0)

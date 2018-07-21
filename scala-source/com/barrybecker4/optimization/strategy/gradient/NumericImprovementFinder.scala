@@ -1,4 +1,4 @@
-package com.barrybecker4.optimization.parameter.improvement
+package com.barrybecker4.optimization.strategy.gradient
 
 import com.barrybecker4.common.math.Vector
 import com.barrybecker4.optimization.optimizee.Optimizee
@@ -6,6 +6,7 @@ import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWi
 
 import scala.collection.mutable
 import NumericImprovementFinder._
+import ImprovementFinder.INITIAL_JUMP_SIZE
 
 object NumericImprovementFinder {
 
@@ -22,25 +23,27 @@ object NumericImprovementFinder {
   */
 class NumericImprovementFinder(val startingParams: ParameterArrayWithFitness) extends ImprovementFinder {
 
+
   /** Try to find a parameterArray that is better than what we have now by evaluating using the optimizee passed in.
     * Try swapping parameters randomly until we find an improvement (if we can).
     * @param optimizee something that can evaluate parameterArrays.
-    * @param jumpSize how far to move in the direction of improvement
     * @param cache  set of parameters that have already been tested. This is important for cases where the
     *               parameters are discrete and not continuous.
     * @return the improvement which contains the improved parameter array and possibly a revised jumpSize.
     */
-  def findIncrementalImprovement(optimizee: Optimizee, jumpSize: Double,
-                                 lastImprovement: Improvement,
+  def findIncrementalImprovement(optimizee: Optimizee, lastImprovement: Improvement,
                                  cache: mutable.Set[ParameterArray]): Improvement = {
     var currentParams: ParameterArrayWithFitness = null
     var oldGradient: Vector = null
+    var jumpSize: Double = 0
     if (lastImprovement == null) {
       currentParams = startingParams
+      jumpSize = INITIAL_JUMP_SIZE
     }
     if (lastImprovement != null) {
       currentParams = lastImprovement.parameters
       oldGradient = lastImprovement.gradient.get
+      jumpSize = lastImprovement.jumpSize
     }
     var oldFitness: Double = currentParams.fitness
     val iter = new ImprovementIteration(currentParams, oldGradient)
@@ -76,6 +79,4 @@ class NumericImprovementFinder(val startingParams: ParameterArrayWithFitness) ex
     //println( "dotProduct = " + dotProduct + " new jumpsize = " + jumpSize );
     newJumpSize
   }
-
-
 }

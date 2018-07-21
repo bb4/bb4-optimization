@@ -27,10 +27,10 @@ class GlobalHillClimbingStrategy(optimizee: Optimizee) extends OptimizationStrat
   override def doOptimization(params: ParameterArray,
                               fitnessRange: Double): ParameterArrayWithFitness = {
     val sampleResult = doSampleOptimization(params, fitnessRange)
-    doHillClimbingOptimization(sampleResult, fitnessRange)
+    doHillClimbingOptimization(sampleResult.pa, fitnessRange)
   }
 
-  private def doSampleOptimization(params: ParameterArray, fitnessRange: Double): ParameterArray = {
+  private def doSampleOptimization(params: ParameterArray, fitnessRange: Double) = {
     val gsStrategy = new GlobalSampleStrategy(optimizee)
     gsStrategy.setListener(listener)
     // 3 sample points along each dimension
@@ -40,9 +40,9 @@ class GlobalHillClimbingStrategy(optimizee: Optimizee) extends OptimizationStrat
     gsStrategy.doOptimization(params, fitnessRange)
   }
 
-  private def doHillClimbingOptimization(params: ParameterArray, fitnessRange: Double): ParameterArray = {
+  private def doHillClimbingOptimization(params: ParameterArray, fitnessRange: Double) = {
     val strategy = new HillClimbingStrategy(optimizee)
     strategy.setListener(listener)
-    strategy.doOptimization(params.pa, fitnessRange)
+    strategy.doOptimization(params, fitnessRange)
   }
 }

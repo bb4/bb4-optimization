@@ -1,5 +1,5 @@
 // Copyright by Barry G. Becker, 2000-2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
-package com.barrybecker4.optimization.parameter.improvement
+package com.barrybecker4.optimization.strategy.gradient
 
 import com.barrybecker4.common.math.MathUtil
 import com.barrybecker4.common.math.Vector
