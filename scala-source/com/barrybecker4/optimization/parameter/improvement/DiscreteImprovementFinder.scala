@@ -20,7 +20,7 @@ object DiscreteImprovementFinder {
   * Finds incremental improvement in a discrete problem space.
   * @author Barry Becker
   */
-class DiscreteImprovementFinder(var params: ParameterArrayWithFitness) {
+class DiscreteImprovementFinder(var params: ParameterArrayWithFitness) extends ImprovementFinder {
 
   /** Try to find a parameterArray that is better than what we have now by evaluating using the optimizee passed in.
     * Try swapping parameters randomly until we find an improvement (if we can).
@@ -31,6 +31,7 @@ class DiscreteImprovementFinder(var params: ParameterArrayWithFitness) {
     * @return the improvement which contains the improved parameter array and possibly a revised jumpSize.
     */
   def findIncrementalImprovement(optimizee: Optimizee, initialJumpSize: Double,
+                                 lastImprovement: Improvement,
                                  cache: mutable.Set[ParameterArray]): Improvement = {
     var numTries = 0
     var fitnessDelta = .0
@@ -51,7 +52,8 @@ class DiscreteImprovementFinder(var params: ParameterArrayWithFitness) {
           nbr = ParameterArrayWithFitness(nbrParam, fitness)
         }
 
-        if (fitnessDelta > 0) improvement = Improvement(nbr, fitnessDelta, jumpSize)
+        if (fitnessDelta > 0)
+          improvement = Improvement(nbr, fitnessDelta, jumpSize)
       }
       numTries += 1
       jumpSize *= JUMP_SIZE_INCREASE

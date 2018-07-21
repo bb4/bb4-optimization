@@ -26,7 +26,7 @@ trait Optimizee {
     * This method is used if evaluateByComparison returns false.
     * Zero is considered optimal. Higher values imply lesser fitness.
     * @param params the set of parameters to misc
-    * @return the fitness measure. The higher the better
+    * @return the fitness measure. The lower the better
     */
   def evaluateFitness(params: ParameterArray): Double
 

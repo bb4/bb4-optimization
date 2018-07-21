@@ -87,6 +87,13 @@ case class NumericParameterArray(params: IndexedSeq[Parameter],
     NumericParameterArray(newParams, numSteps, rnd)
   }
 
+  def incrementByEps(idx: Int, dir: Direction): NumericParameterArray = {
+    val newParams = for (i <- 0 until size) yield {
+      if (idx == i) get(i).incrementByEps(dir) else get(i)
+    }
+    NumericParameterArray(newParams, numSteps, rnd)
+  }
+
   /** @param radius the size of the (1 std deviation) gaussian neighborhood to select a random nbr from
     *               (relative to each parameter range).
     * @return the random nbr.

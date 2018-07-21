@@ -2,7 +2,7 @@ package com.barrybecker4.optimization.parameter.improvement
 
 import com.barrybecker4.common.math.Vector
 import com.barrybecker4.optimization.optimizee.Optimizee
-import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray, ParameterArrayWithFitness}
+import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 
 import scala.collection.mutable
 import NumericImprovementFinder._
@@ -17,10 +17,10 @@ object NumericImprovementFinder {
 }
 
 /**
-  * @param params parameters to improve
+  * @param startingParams parameters to improve
   * @author Barry Becker
   */
-class NumericImprovementFinder(var params: ParameterArrayWithFitness) {
+class NumericImprovementFinder(val startingParams: ParameterArrayWithFitness) extends ImprovementFinder {
 
   /** Try to find a parameterArray that is better than what we have now by evaluating using the optimizee passed in.
     * Try swapping parameters randomly until we find an improvement (if we can).
@@ -30,23 +30,23 @@ class NumericImprovementFinder(var params: ParameterArrayWithFitness) {
     *               parameters are discrete and not continuous.
     * @return the improvement which contains the improved parameter array and possibly a revised jumpSize.
     */
-  //def findIncrementalImprovement(optimizee: Optimizee, initialJumpSize: Double,
-  //                               cache: mutable.Set[ParameterArray]): Improvement = {
   def findIncrementalImprovement(optimizee: Optimizee, jumpSize: Double,
                                  lastImprovement: Improvement,
                                  cache: mutable.Set[ParameterArray]): Improvement = {
-    var currentParams = params
-    var oldFitness = currentParams.fitness
+    var currentParams: ParameterArrayWithFitness = null
     var oldGradient: Vector = null
-    if (lastImprovement != null) {
-      oldFitness = lastImprovement.parameters.fitness
-      oldGradient = lastImprovement.gradient
+    if (lastImprovement == null) {
+      currentParams = startingParams
     }
-    val iter = new ImprovementIteration(params, oldGradient)
+    if (lastImprovement != null) {
+      currentParams = lastImprovement.parameters
+      oldGradient = lastImprovement.gradient.get
+    }
+    var oldFitness: Double = currentParams.fitness
+    val iter = new ImprovementIteration(currentParams, oldGradient)
     var sumOfSqs: Double = 0
-    for (i <- 0 until params.pa.size) {
-      val testParams = params.pa
-      sumOfSqs = iter.incSumOfSqs(i, sumOfSqs, optimizee, currentParams, testParams)
+    for (i <- 0 until currentParams.pa.size) {
+      sumOfSqs += iter.incSumOfSqs(i, optimizee)
     }
     val gradLength = Math.sqrt(sumOfSqs)
     val step = new ImprovementStep(optimizee, iter, gradLength, cache, jumpSize, oldFitness)
@@ -55,10 +55,10 @@ class NumericImprovementFinder(var params: ParameterArrayWithFitness) {
     // the improvement may be zero or negative, meaning it did not improve.
     val improvement = step.getImprovement
     val dotProduct = iter.gradient.normalizedDot(iter.oldGradient)
-    //println("dot between " + iter.getGradient() + " and " + iter.getOldGradient()+ " is "+ dotProduct);
+    println("dot between " + iter.gradient + " and " + iter.oldGradient+ " is " + dotProduct)
     newJumpSize = findNewJumpSize(newJumpSize, dotProduct)
     iter.gradient.copyFrom(iter.oldGradient)
-    Improvement(currentParams, improvement, newJumpSize, iter.gradient)
+    Improvement(currentParams, improvement, newJumpSize, Some(iter.gradient))
   }
 
   /** If we are headed in pretty much the same direction as last time, then we increase the jumpSize.

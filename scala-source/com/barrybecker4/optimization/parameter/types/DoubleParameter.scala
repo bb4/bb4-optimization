@@ -16,9 +16,9 @@ object DoubleParameter {
     */
   private val NUM_STEPS = 30
 
-  def createGaussianParameter(theVal: Double, minVal: Double, maxVal: Double, paramName: String,
+  def createGaussianParameter(value: Double, minValue: Double, maxValue: Double, paramName: String,
                               normalizedMean: Double, stdDeviation: Double): DoubleParameter = {
-    DoubleParameter(theVal, minVal, maxVal, paramName,
+    DoubleParameter(value, minValue, maxValue, paramName,
       Some(new GaussianRedistribution(normalizedMean, stdDeviation)))
   }
 
@@ -32,15 +32,15 @@ object DoubleParameter {
 
 /**
   * Represents a double (i.e. floating point) parameter to an algorithm
-  * @param theVal       the initial or assign parameter value
+  * @param value       the initial or assign parameter value
   * @param minValue    the minimum value that this parameter is allowed to take on
   * @param maxValue    the maximum value that this parameter is allowed to take on
   * @param name of the parameter
   * @author Barry Becker
   */
-case class DoubleParameter(theVal: Double, minValue: Double, maxValue: Double, name: String,
+case class DoubleParameter(value: Double, minValue: Double, maxValue: Double, name: String,
                            redistFunc: Option[RedistributionFunction] = None)
-  extends AbstractParameter(theVal, minValue, maxValue, name, redistFunc) {
+  extends AbstractParameter(value, minValue, maxValue, name, redistFunc) {
 
   override def copy: Parameter =
     DoubleParameter(getValue, minValue, maxValue, name, redistFunc)
@@ -51,18 +51,18 @@ case class DoubleParameter(theVal: Double, minValue: Double, maxValue: Double, n
     new DoubleParameter(getRandomValue(rand), minValue, maxValue, name, redistFunc)
 
   override def tweakValue(r: Double, rand: Random): DoubleParameter =
-    DoubleParameter(tweakNumericValue(theVal, r, rand), minValue, maxValue, name, redistFunc)
+    DoubleParameter(tweakNumericValue(value, r, rand), minValue, maxValue, name, redistFunc)
 
   override def getIncrementForDirection(direction: Direction): Double = {
     val increment = direction.multiplier * (maxValue - minValue) / DoubleParameter.NUM_STEPS
-    if (theVal + increment > maxValue) 0
-    else if (theVal + increment < minValue) 0
+    if (value + increment > maxValue) maxValue
+    else if (value + increment < minValue) 0
     else increment
   }
 
   override def incrementByEps(direction: Direction): DoubleParameter = {
     val increment = getIncrementForDirection(direction)
-    DoubleParameter(theVal + increment, minValue, maxValue, name, redistFunc)
+    DoubleParameter(value + increment, minValue, maxValue, name, redistFunc)
   }
 
   override def setValue(value: Double): DoubleParameter = {

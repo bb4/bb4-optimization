@@ -1,9 +1,9 @@
 // Copyright by Barry G. Becker, 2000-2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.strategy
 
-import com.barrybecker4.optimization.parameter.improvement.{Improvement, NumericImprovementFinder}
+import com.barrybecker4.optimization.parameter.improvement.{DiscreteImprovementFinder, Improvement, ImprovementFinder, NumericImprovementFinder}
 import com.barrybecker4.optimization.optimizee.Optimizee
-import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
+import com.barrybecker4.optimization.parameter._
 
 import scala.collection.mutable
 import HillClimbingStrategy._
@@ -19,14 +19,14 @@ object HillClimbingStrategy {
 
 /**
   * Hill climbing optimization strategy.
-  * use a hardcoded static data interface to initialize.
-  * so it can be easily run in an applet without using resources.
+  * Also known as gradient descent. The latter is more accurate in this case because we are trying to
+  * find a minimum.
   * @param optimizee the thing to be optimized.
   * @author Barry Becker
   */
 class HillClimbingStrategy(optimizee: Optimizee) extends OptimizationStrategy(optimizee) {
 
-  /** Finds a local maxima (actually minima in this case).
+  /** Finds a local minimum.
     * It is a bit like newton's method, but in n dimensions.
     * If we make a jump and find that we are worse off than before, we will backtrack and reduce the stepsize so
     * that we can be guaranteed to improve my some amount on every iteration until the incremental improvement
@@ -36,7 +36,6 @@ class HillClimbingStrategy(optimizee: Optimizee) extends OptimizationStrategy(op
     * @return the optimized params.
     */
   override def doOptimization(params: ParameterArray, fitnessRange: Double): ParameterArrayWithFitness = {
-    //var currentParams = params.copy
     var jumpSize = INITIAL_JUMP_SIZE
     var currentParams =
       if (optimizee.evaluateByComparison) ParameterArrayWithFitness(params, Double.MaxValue)
@@ -51,20 +50,29 @@ class HillClimbingStrategy(optimizee: Optimizee) extends OptimizationStrategy(op
     var improvement: Improvement = null
     var improved = false
 
-    // iterate until there is no significant improvement between iterations,
-    // of the jumpSize is too small (below some threshold).
-    val impFinter = new NumericImprovementFinder(currentParams)
+    // Iterate until there is no significant improvement between iterations.
+    // IOW, when the jumpSize is too small (below some threshold).
+    val impFinder: ImprovementFinder = createImprovementFinder(currentParams)
+
     do {
-      //println( "iter=" + numIterations + " FITNESS = " + currentParams.getFitness() + "  ------------");
-      improvement = impFinter.findIncrementalImprovement(optimizee, jumpSize, improvement, cache)
+      println(s"iter=$numIterations FITNESS = ${currentParams.fitness} ------------")
+      improvement = impFinder.findIncrementalImprovement(optimizee, jumpSize, improvement, cache)
       numIterations += 1
       currentParams = improvement.parameters
       jumpSize = improvement.newJumpSize
       notifyOfChange(currentParams)
-      improved = improvement.improvement > fitnessEps
+      improved = improvement.improvement < -fitnessEps
     } while (improved && (jumpSize > JUMP_SIZE_EPS) && !isOptimalFitnessReached(currentParams))
     println("The optimized parameters after " + numIterations + " iterations are " + currentParams)
     println("Last improvement = " + improvement + " jumpSize=" + jumpSize + " improved=" + improved)
     currentParams
+  }
+
+  private def createImprovementFinder(params: ParameterArrayWithFitness): ImprovementFinder = {
+    params.pa match {
+      case npa: NumericParameterArray => new NumericImprovementFinder(params)
+      case dpa @ (_:PermutedParameterArray | _:VariableLengthIntArray) => new DiscreteImprovementFinder(params)
+      case _ => throw new IllegalArgumentException("Unexpected params type: " + params.pa.getClass.getName)
+    }
   }
 }

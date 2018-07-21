@@ -55,7 +55,7 @@ class ImprovementStep(var optimizee: Optimizee, var iter: ImprovementIteration, 
     var currentParams: NumericParameterArray = params.pa.asInstanceOf[NumericParameterArray]
     val oldParams = params
     iter.updateGradient(jumpSize, gradLength)
-    //log("gradient = " + iter.gradient + " jumpSize="+ jumpSize);
+    println(s"gradient = ${iter.gradient}. jumpSize="+ jumpSize);
     currentParams = currentParams.add(iter.gradient)
     var gaussRadius = 0.01
     var sameParams = false
@@ -71,21 +71,22 @@ class ImprovementStep(var optimizee: Optimizee, var iter: ImprovementIteration, 
     if (optimizee.evaluateByComparison) {
       val fitness = optimizee.compareFitness(currentParams, oldParams.pa)
       newParams = ParameterArrayWithFitness(currentParams, fitness)
-      if (fitness < 0) improved = false
+      if (fitness > 0) improved = false
       improvement = fitness
     }
     else {
       val fitness = optimizee.evaluateFitness(currentParams)
       newParams = ParameterArrayWithFitness(currentParams, fitness)
       if (fitness >= oldFitness) improved = false
-      improvement = oldFitness - fitness
+      improvement = fitness - oldFitness
     }
-    improved = improvement > 0
+    improved = improvement < 0
     if (!improved) {
       newParams = oldParams
       if (!sameParams) { // we have not improved, try again with a reduced jump size.
-        //log( "Warning: the new params are worse so reduce the step size and try again");
-        //log(numIterations, currentParams.getFitness(), jumpSize, Double.NaN, currentParams, "not improved");
+        // This could happen, for example, if we overshot the goal.
+        println( "--Warning: the new params are worse so reduce the step size and try again")
+        println(s"  jumpSize=$jumpSize")
         jumpSize *= ImprovementStep.JUMP_SIZE_DEC_FACTOR
       }
     }

@@ -11,6 +11,8 @@ import com.barrybecker4.optimization.parameter.{Direction, NumericParameterArray
 /**
   * Utility class for maintaining the data vectors for the iteration when hill climbing
   * over a numerical parameter space.
+  * @param params the params to improve.
+  * @param oldGradient last direction of improvement
   * @author Barry Becker
   */
 class ImprovementIteration(params: ParameterArrayWithFitness, var oldGradient: Vector = null) {
@@ -32,39 +34,39 @@ class ImprovementIteration(params: ParameterArrayWithFitness, var oldGradient: V
   /** Compute the squares in one of the iteration directions and add it to the running sum.
     * @return the sum of squares in one of the iteration directions.
     */
-  def incSumOfSqs(i: Int, sumOfSqs: Double, optimizee: Optimizee,
-                  params: ParameterArrayWithFitness, testParams: ParameterArray): Double = {
+  def incSumOfSqs(i: Int, optimizee: Optimizee): Double = {
 
-    var fwdFitness: Double = 0
-    var bwdFitness: Double = 0
-
-    val p: Parameter = testParams.get(i)
+    val p: Parameter = params.pa.get(i)
 
     // increment forward.
     delta.set(i, p.getIncrementForDirection(Direction.FORWARD))
-    var newParam = p.incrementByEps(Direction.FORWARD)
+    val nparams = params.pa.asInstanceOf[NumericParameterArray]
 
-    fwdFitness = findFitnessDelta(optimizee, params, testParams)
+    val forwardParams = nparams.incrementByEps(i, Direction.FORWARD)
+    val fwdFitnessDelta = findFitnessDelta(optimizee, params, forwardParams)
 
     // this checks the fitness on the other side (backwards).
-    newParam = p.incrementByEps(Direction.BACKWARD)
+    //val backwardParams = nparams.incrementByEps(i, Direction.BACKWARD)
+    //val bwdFitnessDelta = findFitnessDelta(optimizee, params, backwardParams)  // reverse second two params?
 
-    bwdFitness = findFitnessDelta(optimizee, params, testParams)
-
-    fitnessDelta.set(i, fwdFitness - bwdFitness)
-    sumOfSqs + (fitnessDelta.get(i) * fitnessDelta.get(i)) / (delta.get(i) * delta.get(i))
+    fitnessDelta.set(i, fwdFitnessDelta) // - bwdFitnessDelta)
+    println(s"fitDelta for $i = $fitnessDelta")
+    val d = delta.get(i)
+    assert(d != 0)
+    (fwdFitnessDelta * fwdFitnessDelta) / (d * d)
   }
 
   /** @param optimizee the thing being optimized
     * @param params the current parameters
     * @param testParams the new set of parameters being evaluated.
-    * @return the incremental change in fitness
+    * @return the incremental change in fitness. More negative means bigger move toward goal.
+    *         A positive value means it is moving away from goal.
     */
   private def findFitnessDelta(optimizee: Optimizee,
                                params: ParameterArrayWithFitness,
                                testParams: ParameterArray): Double = {
     if (optimizee.evaluateByComparison) optimizee.compareFitness( testParams, params.pa )
-    else params.fitness - optimizee.evaluateFitness( testParams )
+    else optimizee.evaluateFitness( testParams ) - params.fitness
   }
 
   /** Update gradient. Use EPS if the gradLength is 0. */
@@ -72,7 +74,8 @@ class ImprovementIteration(params: ParameterArrayWithFitness, var oldGradient: V
     val gradLen: Double = if (gradLength == 0)  MathUtil.EPS_MEDIUM else gradLength
     for (i <- 0 until delta.size) {
       val denominator = delta.get(i) * gradLen
-      gradient.set(i, jumpSize * fitnessDelta.get(i) / denominator)
+      gradient.set(i, -jumpSize * fitnessDelta.get(i) / denominator)
     }
+    println("gradient = " + gradient + " after updating from fitnessDelta = " + fitnessDelta.toString())
   }
 }

@@ -19,8 +19,10 @@ object SimulatedAnnealingStrategy {
   /** The number of iterations in the inner loop divided by the number of dimensions in the search space  */
   private val N = 10
   private val NUM_TEMP_ITERATIONS = 20
+
   /** the amount to drop the temperature on each temperature iteration.   */
   private val TEMP_DROP_FACTOR = 0.6
+
   /** the client should really set the tempMax using setTemperatureMax before running. */
   private val DEFAULT_TEMP_MAX = 1000.0
 }
@@ -97,7 +99,7 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
     bestParams
   }
 
-  /** Select a new point in the neighborhood of our current location
+  /** Select a new point in the neighborhood of our current location.
     * The neighborhood we select from has a radius of r.
     * Uses cache to avoid finding candidates that wre previously searched.
     * @param params      current location in the parameter space.
@@ -110,7 +112,7 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
     //double r = (tempMax/5.0+temperature) / (8.0*(N/5.0+ct)*tempMax);
     var curParams = params
     val r = 8 * temperature / ((N + ct) * tempMax)
-    var newParams = curParams.pa.getRandomNeighbor(r)
+    var newParams = params.pa.getRandomNeighbor(r)
 
     // Try to avoid getting the same point as one we have seen before
     var tempRad = r
@@ -128,18 +130,19 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
         optimizee.compareFitness(newParams, curParams.pa)
       else {
         newFitness = optimizee.evaluateFitness(newParams)
-        curParams.fitness - newFitness
+        newFitness - curParams.fitness
       }
-    val probability = Math.pow(Math.E, tempMax * deltaFitness / temperature)
+    val probability = Math.pow(Math.E, tempMax * -deltaFitness / temperature)
     val useWorseSolution = rnd.nextDouble < probability
-    if (deltaFitness > 0 || useWorseSolution) {
-      // Always select the solution if it has a better fitness,
-      // but sometimes select a worse solution if the second term evaluates to true.
-      curParams = ParameterArrayWithFitness(newParams, curParams.fitness + deltaFitness)
-    }
-    //println("T="+temperature+" ct="+ct+" dist="+dist+" deltaFitness="
-    //        + deltaFitness+"  currentFitness = "+ curParams.getFitness() );
-    log(ct, curParams, r, dist, FormatUtil.formatNumber(temperature))
-    curParams
+
+    val newParamsWithFitness =
+      if (deltaFitness < 0 || useWorseSolution) {
+        // Always select the solution if it has a better fitness,
+        // but sometimes select a worse solution if the second term evaluates to true.
+        ParameterArrayWithFitness(newParams, newFitness)
+      } else curParams
+
+    log(ct, newParamsWithFitness, r, dist, FormatUtil.formatNumber(temperature))
+    newParamsWithFitness
   }
 }
