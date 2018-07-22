@@ -16,6 +16,7 @@ class MagnitudeDistanceCalculator extends DistanceCalculator {
     *  - the length of the parameter array
     *  - the set of values in the parameter array.
     * Generally, the distance is greater the greater the number of parameters that are different.
+    * The order of the values is not important.
     * @return the distance between this parameter array and another.
     */
   override def calculateDistance(pa1: ParameterArray, pa2: ParameterArray): Double = {

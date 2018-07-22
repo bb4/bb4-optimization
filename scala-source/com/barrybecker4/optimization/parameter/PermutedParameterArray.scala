@@ -5,8 +5,6 @@ import com.barrybecker4.common.math.MathUtil
 import com.barrybecker4.optimization.parameter.distancecalculators.PermutedDistanceCalculator
 import com.barrybecker4.optimization.parameter.sampling.PermutedGlobalSampler
 import com.barrybecker4.optimization.parameter.types.Parameter
-
-import scala.collection.mutable
 import scala.util.Random
 
 /**

@@ -60,7 +60,7 @@ class HillClimbingStrategy(optimizee: Optimizee) extends OptimizationStrategy(op
   private def createImprovementFinder(params: ParameterArrayWithFitness): ImprovementFinder = {
     params.pa match {
       case npa: NumericParameterArray => new NumericImprovementFinder(params)
-      case dpa @ (_:PermutedParameterArray | _:VariableLengthIntArray) => new DiscreteImprovementFinder(params)
+      case dpa @ (_:PermutedParameterArray | _:VariableLengthIntSet) => new DiscreteImprovementFinder(params)
       case _ => throw new IllegalArgumentException("Unexpected params type: " + params.pa.getClass.getName)
     }
   }

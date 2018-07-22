@@ -2,7 +2,7 @@
 package com.barrybecker4.optimization.optimizee.optimizees.problems
 
 import com.barrybecker4.optimization.optimizee.optimizees.ErrorTolerances
-import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness, VariableLengthIntArray}
+import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness, VariableLengthIntSet}
 import com.barrybecker4.optimization.parameter.types.IntegerParameter
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType
 import com.barrybecker4.optimization.optimizee.optimizees.ProblemVariation
@@ -41,7 +41,7 @@ sealed trait DominatingSetVariation extends ProblemVariation {
     val params: Seq[IntegerParameter] =
       for (i <- 0 until num by 3) yield new IntegerParameter(i, 0, num - 1, "p" + i)
 
-    val pa = VariableLengthIntArray.createInstance(params.toIndexedSeq, getAllNodes, RND)
+    val pa = VariableLengthIntSet.createInstance(params.toIndexedSeq, getAllNodes, RND)
     //ParameterArrayWithFitness(pa, getScore(getMarked(pa)))
     pa
   }
@@ -93,7 +93,7 @@ sealed trait DominatingSetVariation extends ProblemVariation {
       for (i <- 0 until nodeList.length)
         yield new IntegerParameter(nodeList(i), 0, allNodes.size - 1, "p" + i)
 
-    ParameterArrayWithFitness(VariableLengthIntArray.createInstance(params, allNodes, RND), 0)
+    ParameterArrayWithFitness(VariableLengthIntSet.createInstance(params, allNodes, RND), 0)
   }
 }
 

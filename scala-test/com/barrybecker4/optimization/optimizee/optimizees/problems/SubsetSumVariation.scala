@@ -2,7 +2,7 @@
 package com.barrybecker4.optimization.optimizee.optimizees.problems
 
 import com.barrybecker4.optimization.optimizee.optimizees.{ErrorTolerances, ProblemVariation}
-import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness, VariableLengthIntArray}
+import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness, VariableLengthIntSet}
 import com.barrybecker4.optimization.parameter.distancecalculators.MagnitudeDistanceCalculator
 import com.barrybecker4.optimization.parameter.types.{IntegerParameter, Parameter}
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType
@@ -29,7 +29,7 @@ sealed trait SubsetSumVariation extends ProblemVariation {
     val num = this.getNumElements
     val numSet = this.getNumberSet.toSeq
     val params: IndexedSeq[Parameter] = for (i <- 0 until num by 3) yield createParam(numSet(i))
-    val pa = new VariableLengthIntArray(
+    val pa = new VariableLengthIntSet(
       params, getNumberSet, new MagnitudeDistanceCalculator, new Random(1))
     // pa.setFitness(computeCost(pa))
     pa
@@ -59,7 +59,7 @@ sealed trait SubsetSumVariation extends ProblemVariation {
     }
     val absSum = Math.abs(sum)
     if (absSum != 0.0) {
-      val maxLen = params.asInstanceOf[VariableLengthIntArray].getMaxLength.toDouble
+      val maxLen = params.asInstanceOf[VariableLengthIntSet].getMaxLength.toDouble
       (1.0 + (maxLen - params.size) / maxLen) * absSum
     } else absSum
   }
@@ -80,10 +80,10 @@ sealed trait SubsetSumVariation extends ProblemVariation {
   protected def createSolution(numberList: Int*): ParameterArrayWithFitness = {
     val numNodes = numberList.length
     assert(numNodes > 0, "There must be some values in a valid solution.")
-    val params: IndexedSeq[Parameter] = for (i <- 0 until numNodes) yield createParam(i)
+    val params = for (i <- 0 until numNodes) yield createParam(i)
 
     ParameterArrayWithFitness(
-      new VariableLengthIntArray(params, getNumberSet, new MagnitudeDistanceCalculator, new Random(1)),
+      new VariableLengthIntSet(params, getNumberSet, new MagnitudeDistanceCalculator, new Random(1)),
       0)
   }
 
@@ -125,7 +125,7 @@ case object TYPICAL_SS extends SubsetSumVariation {
 
 case object NO_SOLUTION extends  SubsetSumVariation {
   // none of the errors will be 0 because there is no solution that sums to 0.
-  val errorTolerances = ErrorTolerances(40.0, 0.7, 1.3, 0.7, 0.7, 0.7, 0.7, 0.7)
+  val errorTolerances = ErrorTolerances(40.0, 0.7, 1.3, 0.7, 0.7, 0.7, 0.7, 0.62)
 
   override protected def getNumberSet: Set[Int] =
     Set(-7, -33, -21, 5, -83, -29, -78, -113, -23, -34, -37, -41, -91, -9, -17)

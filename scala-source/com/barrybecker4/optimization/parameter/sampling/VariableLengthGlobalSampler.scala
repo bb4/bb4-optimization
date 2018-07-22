@@ -3,7 +3,7 @@ package com.barrybecker4.optimization.parameter.sampling
 
 import com.barrybecker4.common.math.combinatorics.Combinater
 import com.barrybecker4.optimization.parameter.ParameterArray
-import com.barrybecker4.optimization.parameter.VariableLengthIntArray
+import com.barrybecker4.optimization.parameter.VariableLengthIntSet
 import java.util.NoSuchElementException
 import scala.collection.mutable.ArrayBuffer
 
@@ -20,8 +20,8 @@ object VariableLengthGlobalSampler {
   * @param requestedNumSamples desired number of samples to retrieve. If very large, will get all of them.
   * @author Barry Becker
   */
-class VariableLengthGlobalSampler(var params: VariableLengthIntArray, val requestedNumSamples: Long)
-    extends AbstractGlobalSampler[VariableLengthIntArray] {
+class VariableLengthGlobalSampler(var params: VariableLengthIntSet, val requestedNumSamples: Long)
+    extends AbstractGlobalSampler[VariableLengthIntSet] {
 
   /** used to cache the samples already tried so we do not repeat them if the requestedNumSamples is small */
   private[sampling] val globalSamples = new ArrayBuffer[ParameterArray]()
@@ -43,7 +43,7 @@ class VariableLengthGlobalSampler(var params: VariableLengthIntArray, val reques
     combinator = new Combinater(params.getMaxLength)
 
 
-  override def next: VariableLengthIntArray = {
+  override def next: VariableLengthIntSet = {
     if (counter >= numSamples) throw new NoSuchElementException("ran out of samples.")
     if (counter == numSamples - 1) hasNext = false
     counter += 1
@@ -55,9 +55,9 @@ class VariableLengthGlobalSampler(var params: VariableLengthIntArray, val reques
     * @return the next random sample.
     */
   private def getNextRandomSample = {
-    var nextSample: VariableLengthIntArray = null
+    var nextSample: VariableLengthIntSet = null
     while (globalSamples.size < counter) {
-      nextSample = params.getRandomSample.asInstanceOf[VariableLengthIntArray]
+      nextSample = params.getRandomSample.asInstanceOf[VariableLengthIntSet]
       if (!globalSamples.contains(nextSample))
         globalSamples.append(nextSample)
     }
