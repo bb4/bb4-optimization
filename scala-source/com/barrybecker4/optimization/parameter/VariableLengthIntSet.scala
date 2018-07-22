@@ -12,7 +12,7 @@ import scala.util.Random
 object VariableLengthIntSet {
 
   /** The larger this number is the less likely we are to add/remove ints when finding a random neighbor */
-  private val ADD_REMOVE_RADIUS_SOFTENER = 0.6
+  private val ADD_REMOVE_RADIUS_SOFTENER = 0.5
 
   private val DIST_CALCULATOR = new MagnitudeDistanceCalculator()
 
@@ -64,7 +64,7 @@ class VariableLengthIntSet(params: IndexedSeq[Parameter], val fullSet: Set[Int],
       else remove = true
     }
     var numNodesToMove = 0
-    //println(s"rad=$radius pAdd/Rm=$probAddRemove add=$add remove=$remove")
+    println(s"rad=$radius pAdd/Rm=$probAddRemove add=$add remove=$remove")
     if (add || remove) numNodesToMove = rnd.nextInt(Math.min(size, (radius + 1.5).toInt))
     else { // at least 1 will be moved
       numNodesToMove = 1 + rnd.nextInt((1.5 + radius).toInt)
@@ -127,18 +127,23 @@ class VariableLengthIntSet(params: IndexedSeq[Parameter], val fullSet: Set[Int],
   }
 
   /** Select num free nodes randomly and swap them with num randomly selected marked nodes.
+    * If there are no free nodes, then we must resort to removing one so something changes.
     * @param numNodesToMove number of nodes to move to new locations
     */
   private def moveNodes(numNodesToMove: Int): VariableLengthIntSet = {
     val freeNodes = getFreeNodes
     val numSelect = Math.min(freeNodes.size, numNodesToMove)
-    val swapNodes = selectRandomNodes(numSelect, freeNodes)
-    val newParams = params.toArray
-    for (i <- 0 until numSelect) {
-      val index = rnd.nextInt(size)
-      newParams(index) = get(index).setValue(swapNodes(i))
+    if (numSelect == 0) {
+      removeRandomParam()
+    } else {
+      val swapNodes = selectRandomNodes(numSelect, freeNodes)
+      val newParams = params.toArray
+      for (i <- 0 until numSelect) {
+        val index = rnd.nextInt(size)
+        newParams(index) = get(index).setValue(swapNodes(i))
+      }
+      new VariableLengthIntSet(newParams, fullSet, distCalc, rnd)
     }
-    new VariableLengthIntSet(newParams, fullSet, distCalc, rnd)
   }
 
   private def selectRandomNodes(numNodesToSelect: Int, freeNodes: Seq[Int]): Seq[Int] = {

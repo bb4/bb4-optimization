@@ -50,7 +50,7 @@ abstract class AbstractParameterArray(params: IndexedSeq[Parameter] = IndexedSeq
     for (i <- 0 until size -1) {
       sb.append(FormatUtil.formatNumber(get(i).getValue)).append(", ")
     }
-    sb.append(FormatUtil.formatNumber(get(size - 1).getValue))
+    if (size > 0) sb.append(FormatUtil.formatNumber(get(size - 1).getValue))
     sb.toString
   }
 }

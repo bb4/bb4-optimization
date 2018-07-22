@@ -160,10 +160,16 @@ class VariableLengthIntSetSuite extends FunSuite with BeforeAndAfter{
     val nbr = params.getRandomNeighbor(1.2)
     assertResult(strip("""
         |parameter[0] = p2 = 2.0 [0, 2.0]
-        |parameter[1] = p-1 = -1.00 [-1.00, 0]
-        |parameter[2] = p3 = 3.0 [0, 3.0]
-        |parameter[3] = p-4 = -4.0 [-4.0, 0]
+        |parameter[1] = p3 = 3.0 [0, 3.0]
+        |parameter[2] = p-4 = -4.0 [-4.0, 0]
         |""")) { nbr.toString }
+
+    val nbr2 = params.getRandomNeighbor(1.2)
+    assertResult(strip("""
+       |parameter[0] = p-1 = -1.00 [-1.00, 0]
+       |parameter[1] = p3 = 3.0 [0, 3.0]
+       |parameter[2] = p-4 = -4.0 [-4.0, 0]
+       |""")) { nbr2.toString }
   }
 
   test("swap nodes (4 params). r =  0.3") {
@@ -171,9 +177,8 @@ class VariableLengthIntSetSuite extends FunSuite with BeforeAndAfter{
     val nbr = params.getRandomNeighbor(0.3)
     assertResult(strip("""
         |parameter[0] = p2 = 2.0 [0, 2.0]
-        |parameter[1] = p-1 = -1.00 [-1.00, 0]
-        |parameter[2] = p3 = 3.0 [0, 3.0]
-        |parameter[3] = p-4 = -4.0 [-4.0, 0]
+        |parameter[1] = p3 = 3.0 [0, 3.0]
+        |parameter[2] = p-4 = -4.0 [-4.0, 0]
         |""")) { nbr.toString }
   }
 
@@ -184,13 +189,12 @@ class VariableLengthIntSetSuite extends FunSuite with BeforeAndAfter{
         |parameter[0] = p2 = 2.0 [0, 2.0]
         |parameter[1] = p-5 = -5.0 [-5.0, 0]
         |parameter[2] = p-3 = -3.0 [-3.0, 0]
-        |parameter[3] = p6 = 6.0 [0, 6.0]
-        |parameter[4] = p-4 = -4.0 [-4.0, 0]
-        |parameter[5] = p3 = 3.0 [0, 3.0]
-        |parameter[6] = p-2 = -2.0 [-2.0, 0]
-        |parameter[7] = p-1 = -1.00 [-1.00, 0]
-        |parameter[8] = p5 = 5.0 [0, 5.0]
-        |parameter[9] = p-9 = -9.0 [-9.0, 0]
+        |parameter[3] = p-4 = -4.0 [-4.0, 0]
+        |parameter[4] = p3 = 3.0 [0, 3.0]
+        |parameter[5] = p-2 = -2.0 [-2.0, 0]
+        |parameter[6] = p-1 = -1.00 [-1.00, 0]
+        |parameter[7] = p5 = 5.0 [0, 5.0]
+        |parameter[8] = p-9 = -9.0 [-9.0, 0]
         |""")) { nbr.toString }
   }
 
@@ -201,13 +205,12 @@ class VariableLengthIntSetSuite extends FunSuite with BeforeAndAfter{
         |parameter[0] = p2 = 2.0 [0, 2.0]
         |parameter[1] = p-5 = -5.0 [-5.0, 0]
         |parameter[2] = p-3 = -3.0 [-3.0, 0]
-        |parameter[3] = p6 = 6.0 [0, 6.0]
-        |parameter[4] = p-4 = -4.0 [-4.0, 0]
-        |parameter[5] = p3 = 3.0 [0, 3.0]
-        |parameter[6] = p-2 = -2.0 [-2.0, 0]
-        |parameter[7] = p-1 = -1.00 [-1.00, 0]
-        |parameter[8] = p5 = 5.0 [0, 5.0]
-        |parameter[9] = p-9 = -9.0 [-9.0, 0]
+        |parameter[3] = p-4 = -4.0 [-4.0, 0]
+        |parameter[4] = p3 = 3.0 [0, 3.0]
+        |parameter[5] = p-2 = -2.0 [-2.0, 0]
+        |parameter[6] = p-1 = -1.00 [-1.00, 0]
+        |parameter[7] = p5 = 5.0 [0, 5.0]
+        |parameter[8] = p-9 = -9.0 [-9.0, 0]
         |""")) { nbr.toString }
   }
   private def getListFromIterator(iter: Iterator[VariableLengthIntSet]): Array[VariableLengthIntSet] =
