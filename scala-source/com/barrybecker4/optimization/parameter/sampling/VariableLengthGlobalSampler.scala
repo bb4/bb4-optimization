@@ -37,7 +37,7 @@ class VariableLengthGlobalSampler(var params: VariableLengthIntSet, val requeste
 
   useExhaustiveSearch = requestedNumSamples > VariableLengthGlobalSampler.CLOSE_FACTOR * totalConfigurations
 
-  /** Used to enumerate all possible permutations when doing exhaustive search */
+  /** Used to enumerate all possible combination when doing exhaustive search */
   private var combinator: Combinater = _
   if (useExhaustiveSearch)
     combinator = new Combinater(params.getMaxLength)
@@ -68,7 +68,8 @@ class VariableLengthGlobalSampler(var params: VariableLengthIntSet, val requeste
     * @return the next exhaustive sample.
     */
   private def getNextExhaustiveSample = {
-    val v1Params = params.getCombination(combinator.next.map(_.toInt))
+    val theNext = combinator.next()
+    val v1Params = params.getCombination(theNext.map(_.toInt))
     hasNext = combinator.hasNext
     v1Params
   }

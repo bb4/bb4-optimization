@@ -94,7 +94,7 @@ class VariableLengthIntSet(params: IndexedSeq[Parameter], val fullSeq: IndexedSe
   /** @return get a random solution in the parameter space by selecting about half of the ints */
   override def getRandomSample: ParameterArray = {
     val shuffled = rnd.shuffle(fullSeq)
-    val marked = shuffled.take((shuffled.length + 1) / 2)
+    val marked = shuffled.take(((shuffled.length - 1) * rnd.nextDouble()).toInt + 1)
     val newParams = marked.map(m => createParam(m))
     new VariableLengthIntSet(newParams, fullSeq, distCalc, rnd)
   }
