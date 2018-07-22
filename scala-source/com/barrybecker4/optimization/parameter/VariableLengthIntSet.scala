@@ -16,23 +16,23 @@ object VariableLengthIntSet {
 
   private val DIST_CALCULATOR = new MagnitudeDistanceCalculator()
 
-  def createInstance(params: IndexedSeq[Parameter], fullSet: Set[Int], rnd: Random): VariableLengthIntSet =
-    new VariableLengthIntSet(params, fullSet, DIST_CALCULATOR, rnd)
+  def createInstance(params: IndexedSeq[Parameter], fullSeq: IndexedSeq[Int], rnd: Random): VariableLengthIntSet =
+    new VariableLengthIntSet(params, fullSeq, DIST_CALCULATOR, rnd)
 }
 
 /**
   * Represents a 1 dimensional, variable length, set of unique integer parameters.
   * The order of the integers does not matter, but there cannot be duplicates. Immutable.
   * @param params  an array of params to initialize with.
-  * @param fullSet the full set of all integer parameters.
+  * @param fullSeq the full set of all integer parameters.
   * @author Barry Becker
   */
-class VariableLengthIntSet(params: IndexedSeq[Parameter], val fullSet: Set[Int],
+class VariableLengthIntSet(params: IndexedSeq[Parameter], val fullSeq: IndexedSeq[Int],
                            distCalc: DistanceCalculator = DIST_CALCULATOR, rnd: Random)
   extends AbstractParameterArray(params, rnd) {
 
   private val paramSet = params.toSet
-  private val fullSeq: Seq[Int] = fullSet.toArray
+  private val fullSet: Set[Int] = fullSeq.toSet
 
   /** @return the maximum length of the variable length array */
   def getMaxLength: Int = fullSet.size
@@ -64,7 +64,7 @@ class VariableLengthIntSet(params: IndexedSeq[Parameter], val fullSet: Set[Int],
       else remove = true
     }
     var numNodesToMove = 0
-    println(s"rad=$radius pAdd/Rm=$probAddRemove add=$add remove=$remove")
+    //println(s"rad=$radius pAdd/Rm=$probAddRemove add=$add remove=$remove")
     if (add || remove) numNodesToMove = rnd.nextInt(Math.min(size, (radius + 1.5).toInt))
     else { // at least 1 will be moved
       numNodesToMove = 1 + rnd.nextInt((1.5 + radius).toInt)
@@ -79,7 +79,7 @@ class VariableLengthIntSet(params: IndexedSeq[Parameter], val fullSet: Set[Int],
     assert(indices.size <= getMaxLength,
       "The number of indices (" + indices.size + ") was greater than the max size (" + size + ")")
     val newParams = for (i <- indices) yield createParam(fullSeq(i))
-    new VariableLengthIntSet(newParams.toIndexedSeq, fullSet, distCalc, rnd)
+    new VariableLengthIntSet(newParams.toIndexedSeq, fullSeq, distCalc, rnd)
   }
 
   /** Globally sample the parameter space.
@@ -96,7 +96,7 @@ class VariableLengthIntSet(params: IndexedSeq[Parameter], val fullSet: Set[Int],
     val shuffled = rnd.shuffle(fullSeq)
     val marked = shuffled.take((shuffled.length + 1) / 2)
     val newParams = marked.map(m => createParam(m))
-    new VariableLengthIntSet(newParams.toIndexedSeq, fullSet, distCalc, rnd)
+    new VariableLengthIntSet(newParams, fullSeq, distCalc, rnd)
   }
 
   /** @param i the integer parameter's value. May be Negative
@@ -111,7 +111,7 @@ class VariableLengthIntSet(params: IndexedSeq[Parameter], val fullSet: Set[Int],
   private def removeRandomParam(): VariableLengthIntSet = {
     val indexToRemove = rnd.nextInt(size)
     new VariableLengthIntSet(params.zipWithIndex.filter(p => p._2 != indexToRemove).map(_._1),
-      fullSet, distCalc, rnd)
+      fullSeq, distCalc, rnd)
   }
 
   private def addRandomParam(): VariableLengthIntSet = {
@@ -123,7 +123,7 @@ class VariableLengthIntSet(params: IndexedSeq[Parameter], val fullSet: Set[Int],
     // randomly add one one of the free nodes to the list
     val value: Int = freeNodes(rnd.nextInt(freeNodes.size))
     newParams :+= createParam(value)
-    new VariableLengthIntSet(newParams, fullSet, distCalc, rnd)
+    new VariableLengthIntSet(newParams, fullSeq, distCalc, rnd)
   }
 
   /** Select num free nodes randomly and swap them with num randomly selected marked nodes.
@@ -142,7 +142,7 @@ class VariableLengthIntSet(params: IndexedSeq[Parameter], val fullSet: Set[Int],
         val index = rnd.nextInt(size)
         newParams(index) = get(index).setValue(swapNodes(i))
       }
-      new VariableLengthIntSet(newParams, fullSet, distCalc, rnd)
+      new VariableLengthIntSet(newParams, fullSeq, distCalc, rnd)
     }
   }
 
@@ -162,6 +162,7 @@ class VariableLengthIntSet(params: IndexedSeq[Parameter], val fullSet: Set[Int],
 
   def canEqual(other: Any): Boolean = other.isInstanceOf[VariableLengthIntSet]
 
+  /** @return true if equal. The values must be the same, but the order does not matter */
   override def equals(other: Any): Boolean = other match {
     case that: VariableLengthIntSet =>
       (that canEqual this) &&

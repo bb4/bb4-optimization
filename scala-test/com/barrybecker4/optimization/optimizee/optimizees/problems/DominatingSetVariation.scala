@@ -27,7 +27,7 @@ sealed trait DominatingSetVariation extends ProblemVariation {
   private lazy val exactSolutionCost: Double = computeCost(getExactSolution.pa)
 
   /** @return an array of the node ineices in the graph */
-  def getAllNodes: Set[Int] = (0 until adjacencies.size).toSet
+  def getAllNodes: IndexedSeq[Int] = 0 until adjacencies.size
 
   /** The graph containing the node adjacency information */
   protected def adjacencies: Graph

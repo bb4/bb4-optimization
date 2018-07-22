@@ -17,20 +17,20 @@ object SubsetSumVariation {
 sealed trait SubsetSumVariation extends ProblemVariation {
 
   /** @return the number of nodes in the graph */
-  def getNumElements: Int = getNumberSet.size
+  def getNumElements: Int = getNumberSeq.size
 
   /** The graph containing the node adjacency information */
-  protected def getNumberSet: Set[Int]
+  protected def getNumberSeq: IndexedSeq[Int]
 
   /** Some random initial set of marked nodes.
     * One half or one third of the nodes is probably a good starting point.
     */
   def getInitialGuess: ParameterArray = {
     val num = this.getNumElements
-    val numSet = this.getNumberSet.toSeq
+    val numSet = this.getNumberSeq.toSeq
     val params: IndexedSeq[Parameter] = for (i <- 0 until num by 3) yield createParam(numSet(i))
     val pa = new VariableLengthIntSet(
-      params, getNumberSet, new MagnitudeDistanceCalculator, new Random(1))
+      params, getNumberSeq, new MagnitudeDistanceCalculator, new Random(1))
     // pa.setFitness(computeCost(pa))
     pa
   }
@@ -83,7 +83,7 @@ sealed trait SubsetSumVariation extends ProblemVariation {
     val params = for (i <- 0 until numNodes) yield createParam(i)
 
     ParameterArrayWithFitness(
-      new VariableLengthIntSet(params, getNumberSet, new MagnitudeDistanceCalculator, new Random(1)),
+      new VariableLengthIntSet(params, getNumberSeq, new MagnitudeDistanceCalculator, new Random(1)),
       0)
   }
 
@@ -101,7 +101,7 @@ case object SIMPLE_SS extends SubsetSumVariation {
   val errorTolerances =
     ErrorTolerances(0.0, 0.0, 8.0, 6.4, 7.3, 7.3, 0.0)
 
-  override protected def getNumberSet: Set[Int] = Set(-7, -3, -2, 5, 8)
+  override protected def getNumberSeq = Array(-7, -3, -2, 5, 8)
 
   override def getExactSolution: ParameterArrayWithFitness = createSolution(-3, -2, 5)
 
@@ -112,8 +112,8 @@ case object SIMPLE_SS extends SubsetSumVariation {
 case object TYPICAL_SS extends SubsetSumVariation {
   val errorTolerances = ErrorTolerances(0.0, 0.5, 0.5, 1.25, 0.5, 0.5, 0.0)
 
-  override protected def getNumberSet: Set[Int] =
-    Set(-7, -33, -21, 5, 83, -29, -78, 213, 123, -34, -37, -41, 91, -8, -17)
+  override protected def getNumberSeq =
+    Array(-7, -33, -21, 5, 83, -29, -78, 213, 123, -34, -37, -41, 91, -8, -17)
 
   // This is one of several possible solutions that gives an optimal fitness of 0
   override def getExactSolution: ParameterArrayWithFitness =
@@ -127,8 +127,8 @@ case object NO_SOLUTION extends  SubsetSumVariation {
   // none of the errors will be 0 because there is no solution that sums to 0.
   val errorTolerances = ErrorTolerances(40.0, 0.7, 1.3, 0.7, 0.7, 0.7, 0.7, 0.62)
 
-  override protected def getNumberSet: Set[Int] =
-    Set(-7, -33, -21, 5, -83, -29, -78, -113, -23, -34, -37, -41, -91, -9, -17)
+  override protected def getNumberSeq =
+    Array(-7, -33, -21, 5, -83, -29, -78, -113, -23, -34, -37, -41, -91, -9, -17)
 
   /** There is no solution - i.e. no values that sum to 0. */
   override def getExactSolution: ParameterArrayWithFitness = createSolution(-7)
