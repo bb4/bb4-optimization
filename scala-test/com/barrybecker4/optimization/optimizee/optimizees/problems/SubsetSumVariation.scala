@@ -27,11 +27,10 @@ sealed trait SubsetSumVariation extends ProblemVariation {
     */
   def getInitialGuess: ParameterArray = {
     val num = this.getNumElements
-    val numSet = this.getNumberSeq.toSeq
+    val numSet = this.getNumberSeq
     val params: IndexedSeq[Parameter] = for (i <- 0 until num by 3) yield createParam(numSet(i))
     val pa = new VariableLengthIntSet(
       params, getNumberSeq, new MagnitudeDistanceCalculator, new Random(1))
-    // pa.setFitness(computeCost(pa))
     pa
   }
 
@@ -46,7 +45,7 @@ sealed trait SubsetSumVariation extends ProblemVariation {
   /** Approximate value of maxCost - minCost */
   def getFitnessRange: Double
 
-  /** We assume that the parameter array contains 0 based integers.
+  /** Assume that the parameter array contains 0 based integers.
     * Penalize the case when there is only 1 value (and it is not 0).
     * @param params last best guess at subset.
     * @return the total cost of the subset represented by param.  In this case the absolute sum of the marked values.
@@ -125,7 +124,7 @@ case object TYPICAL_SS extends SubsetSumVariation {
 
 case object NO_SOLUTION extends  SubsetSumVariation {
   // none of the errors will be 0 because there is no solution that sums to 0.
-  val errorTolerances = ErrorTolerances(40.0, 0.7, 1.3, 0.7, 0.7, 0.7, 0.7, 0.62)
+  val errorTolerances = ErrorTolerances(1.62, 0.7, 1.3, 0.7, 0.7, 0.7, 0.7, 0.63)
 
   override protected def getNumberSeq =
     Array(-7, -33, -21, 5, -83, -29, -78, -113, -23, -34, -37, -41, -91, -9, -17)

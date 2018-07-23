@@ -7,7 +7,6 @@ import com.barrybecker4.optimization.parameter.types.IntegerParameter
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType
 import com.barrybecker4.optimization.optimizee.optimizees.ProblemVariation
 import DominatingSetVariation._
-
 import scala.util.Random
 
 
@@ -141,7 +140,7 @@ case object TYPICAL_DS extends DominatingSetVariation {
     List(0, 23, 24)
   ))
 
-  val errorTolerances = ErrorTolerances(16.0, 2.01, 1.21, 1.2, 1.2, 1.2, 0)
+  val errorTolerances = ErrorTolerances(3.6, 2.01, 1.21, 1.2, 1.2, 1.2, 0)
 
   /** This is one of several possible solutions that gives an optimal fitness of 0 */
   override def getExactSolution: ParameterArrayWithFitness = createSolution(6, 7, 8, 19, 21, 24)

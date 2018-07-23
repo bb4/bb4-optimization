@@ -4,8 +4,6 @@ import com.barrybecker4.optimization.parameter.distancecalculators.{DistanceCalc
 import com.barrybecker4.optimization.parameter.types.{IntegerParameter, Parameter}
 import org.scalatest.{BeforeAndAfter, FunSuite}
 import com.barrybecker4.common.testsupport.strip
-import com.barrybecker4.optimization.parameter.VariableLengthIntSet.createInstance
-
 import scala.util.Random
 
 

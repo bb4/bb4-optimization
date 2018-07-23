@@ -5,12 +5,15 @@ import com.barrybecker4.common.math.combinatorics.Combinater
 import com.barrybecker4.optimization.parameter.ParameterArray
 import com.barrybecker4.optimization.parameter.VariableLengthIntSet
 import java.util.NoSuchElementException
+
+import com.barrybecker4.common.math.MathUtil
+
 import scala.collection.mutable.ArrayBuffer
 
 
 object VariableLengthGlobalSampler {
   /** If the requestedNumSamples is within this percent of the total, then use exhaustive search */
-  private val CLOSE_FACTOR = 0.5
+  private val CLOSE_FACTOR = 0.4
 }
 
 /**
@@ -29,11 +32,14 @@ class VariableLengthGlobalSampler(var params: VariableLengthIntSet, val requeste
   /** becomes true if the requestedNumSamples is close to the total number of permutations in the space */
   private var useExhaustiveSearch = false
 
-  var totalConfigurations: Long = Long.MaxValue
-  if (params.getMaxLength <= 60) totalConfigurations = Math.pow(2.0, params.getMaxLength).toLong
+  var totalConfigurations: Long =
+    if (params.getMaxLength <= 60)
+      (1 to params.getMaxLength).map(x => MathUtil.combination(params.getMaxLength, x).longValue()).sum
+    else Long.MaxValue
+
   // if the requested number of samples is close to the total number of configurations,
   // then just search through all possible configurations.
-  numSamples = requestedNumSamples
+  numSamples = Math.min(requestedNumSamples, totalConfigurations)
 
   useExhaustiveSearch = requestedNumSamples > VariableLengthGlobalSampler.CLOSE_FACTOR * totalConfigurations
 
@@ -44,7 +50,7 @@ class VariableLengthGlobalSampler(var params: VariableLengthIntSet, val requeste
 
 
   override def next: VariableLengthIntSet = {
-    if (counter >= numSamples) throw new NoSuchElementException("ran out of samples.")
+    if (counter >= numSamples) throw new NoSuchElementException("ran out of samples. There are only " + numSamples)
     if (counter == numSamples - 1) hasNext = false
     counter += 1
     if (useExhaustiveSearch) getNextExhaustiveSample
