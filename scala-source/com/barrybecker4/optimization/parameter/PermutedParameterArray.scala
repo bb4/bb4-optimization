@@ -24,7 +24,7 @@ case class PermutedParameterArray(params: IndexedSeq[Parameter], rnd: Random)
   /** Permute the parameters according to the specified permutation
     * of 0 based indices.
     */
-  def setPermutation(indices: List[Integer]): PermutedParameterArray = {
+  def setPermutation(indices: List[Int]): PermutedParameterArray = {
     assert(indices.size == size)
     val newParams = for (i <- indices) yield get(i)
     PermutedParameterArray(newParams.toIndexedSeq, rnd)
@@ -76,7 +76,7 @@ case class PermutedParameterArray(params: IndexedSeq[Parameter], rnd: Random)
 
   /** @return get a completely random solution in the parameter space. */
   override def getRandomSample: ParameterArray = {
-    val theParams: Array[Parameter] = rnd.shuffle(params.toSeq).toArray
+    val theParams: Array[Parameter] = rnd.shuffle(params).toArray
     PermutedParameterArray(theParams, rnd)
   }
 }

@@ -14,7 +14,7 @@ object DoubleParameter {
   /** Approximate number of steps to take when marching across one of the parameter dimensions.
     * used to calculate the stepsize in a dimension direction.
     */
-  private val NUM_STEPS = 1000
+  private val NUM_STEPS = 10000  // or 1000
 
   def createGaussianParameter(value: Double, minValue: Double, maxValue: Double, paramName: String,
                               normalizedMean: Double, stdDeviation: Double): DoubleParameter = {

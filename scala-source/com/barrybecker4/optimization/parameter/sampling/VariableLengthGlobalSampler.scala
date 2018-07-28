@@ -5,9 +5,6 @@ import com.barrybecker4.common.math.combinatorics.Combinater
 import com.barrybecker4.optimization.parameter.ParameterArray
 import com.barrybecker4.optimization.parameter.VariableLengthIntSet
 import java.util.NoSuchElementException
-
-import com.barrybecker4.common.math.MathUtil
-
 import scala.collection.mutable.ArrayBuffer
 
 
@@ -21,6 +18,7 @@ object VariableLengthGlobalSampler {
   * If the number of samples requested is really large, then all possible values will be returned.
   * @param params an array of params to initialize with.
   * @param requestedNumSamples desired number of samples to retrieve. If very large, will get all of them.
+  *                            IOW, you get min(requestedNumSample, totalConfigurations)
   * @author Barry Becker
   */
 class VariableLengthGlobalSampler(var params: VariableLengthIntSet, val requestedNumSamples: Long)
@@ -34,13 +32,13 @@ class VariableLengthGlobalSampler(var params: VariableLengthIntSet, val requeste
 
   var totalConfigurations: Long =
     if (params.getMaxLength <= 60)
-      (1 to params.getMaxLength).map(x => MathUtil.combination(params.getMaxLength, x).longValue()).sum
+      Math.pow(2, params.getMaxLength).toLong - 1
     else Long.MaxValue
+  println("total configs = " + totalConfigurations)
 
   // if the requested number of samples is close to the total number of configurations,
   // then just search through all possible configurations.
   numSamples = Math.min(requestedNumSamples, totalConfigurations)
-
   useExhaustiveSearch = requestedNumSamples > VariableLengthGlobalSampler.CLOSE_FACTOR * totalConfigurations
 
   /** Used to enumerate all possible combination when doing exhaustive search */
@@ -50,8 +48,10 @@ class VariableLengthGlobalSampler(var params: VariableLengthIntSet, val requeste
 
 
   override def next: VariableLengthIntSet = {
-    if (counter >= numSamples) throw new NoSuchElementException("ran out of samples. There are only " + numSamples)
-    if (counter == numSamples - 1) hasNext = false
+    if (counter >= totalConfigurations)
+      throw new NoSuchElementException("ran out of samples. There are only " + totalConfigurations)
+    if (counter == numSamples - 1)
+      hasNext = false
     counter += 1
     if (useExhaustiveSearch) getNextExhaustiveSample
     else getNextRandomSample
@@ -75,8 +75,7 @@ class VariableLengthGlobalSampler(var params: VariableLengthIntSet, val requeste
     */
   private def getNextExhaustiveSample = {
     val theNext = combinator.next()
-    val v1Params = params.getCombination(theNext.map(_.toInt))
-    hasNext = combinator.hasNext
+    val v1Params = params.getCombination(theNext)
     v1Params
   }
 }

@@ -22,6 +22,7 @@ object PermutedGlobalSampler {
   * If the number of samples requested is really large, then all possible values will be returned.
   * @param params an array of params to initialize with.
   * @param requestedNumSamples desired number of samples to retrieve. If very large, will get all of them.
+  *                            IOW, you get min(requestedNumSample, totalConfigurations)
   * @author Barry Becker
   */
 class PermutedGlobalSampler(var params: PermutedParameterArray, val requestedNumSamples: Long)
@@ -33,7 +34,10 @@ class PermutedGlobalSampler(var params: PermutedParameterArray, val requestedNum
 
   // if the requested number of samples is close to the total number of permutations,
   // then we could just enumerate the permutations.
-  numSamples = requestedNumSamples
+  numSamples =
+    if (numPermutations.compareTo(BigInteger.valueOf(Long.MaxValue)) < 0)
+      Math.min(requestedNumSamples, numPermutations.longValue())
+    else requestedNumSamples
 
   /** becomes true if the requestedNumSamples is close to the total number of permutations in the space */
   private val useExhaustiveSearch = {
@@ -77,7 +81,7 @@ class PermutedGlobalSampler(var params: PermutedParameterArray, val requestedNum
     */
   private def getNextExhaustiveSample = {
     val pParams = params.setPermutation(permuter.next)
-    hasNext = permuter.hasNext
+    //hasNext = permuter.hasNext
     pParams
   }
 }

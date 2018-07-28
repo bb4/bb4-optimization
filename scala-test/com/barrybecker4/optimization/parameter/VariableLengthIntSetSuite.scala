@@ -112,14 +112,14 @@ class VariableLengthIntSetSuite extends FunSuite with BeforeAndAfter{
     assertResult(4000) { params.getSamplePopulationSize }
   }
 
-  test("Find0GlobalSamples") {
+  test("Find 0 GlobalSamples") {
     params = createDistArray(Array(2, -1, 3, -1))
     assertThrows[NoSuchElementException] {
       getListFromIterator(params.findGlobalSamples(0))
     }
   }
 
-  test("Find1GlobalSamples") {
+  test("Find 1 GlobalSamples") {
     params = createDistArray(Array(2, -1, 3))
     val samples = getListFromIterator(params.findGlobalSamples(1))
     assertResult(1) { samples.length }
@@ -129,13 +129,13 @@ class VariableLengthIntSetSuite extends FunSuite with BeforeAndAfter{
     assertResult(expParams) { samples }
   }
 
-  test("Find2GlobalSamples") {
+  test("Find 2 GlobalSamples") {
     params = createDistArray(Array(2, -1, 3, -4))
     val samples = getListFromIterator(params.findGlobalSamples(2))
     assertResult(2) { samples.length }
   }
 
-  test("Find3GlobalSamples") {
+  test("Find 3 GlobalSamples") {
     params = createDistArray(Array(2, -1, 3, -4))
     val samples = getListFromIterator(params.findGlobalSamples(3))
     assertResult(3) { samples.length }
@@ -143,26 +143,46 @@ class VariableLengthIntSetSuite extends FunSuite with BeforeAndAfter{
 
   /* This may a problem because there are not 4 global samples of 3 values.
      The only combinations are 2 -1, -1 3, 2 3. */
-  test("Find4GlobalSamples") {
+  test("Find 4 GlobalSamples") {
     params = createDistArray(Array(2, -1, 3))
     val samples = getListFromIterator(params.findGlobalSamples(4))
     assertResult(4) { samples.length }
     val expParams = Array(
-      createDistArray(Seq(-1), Array(2, -1, 3)),
       createDistArray(Seq(2), Array(2, -1, 3)),
-      createDistArray(Seq(3, 2), Array(2, -1, 3)),
-      createDistArray(Seq(2, -1), Array(2, -1, 3))
+      createDistArray(Seq(-1), Array(2, -1, 3)),
+      createDistArray(Seq(2, -1), Array(2, -1, 3)),
+      createDistArray(Seq(3), Array(2, -1, 3))
     )
     assertResult(expParams) { samples }
   }
 
-  test("Find10GlobalSamples") {
+  /* This may a problem because there are not 4 global samples of 3 values.
+     The only combinations are 2 -1, -1 3, 2 3. */
+  test("Find 9 GlobalSamples when only 7") {
+    params = createDistArray(Array(2, -1, 3))
+    val samples = getListFromIterator(params.findGlobalSamples(9))
+    assertResult(7) { samples.length }
+  }
+
+  test("Find 10 GlobalSamples") {
     params = createDistArray(Array(2, -1, 3, -5, 3, -4, -2, -3, 5, -9, 6))
     val samples = getListFromIterator(params.findGlobalSamples(10))
     assertResult(10)  { samples.length }
   }
 
-  test("Find97GlobalSamples") {
+  test("Find 15 GlobalSamples when only 15") {
+    params = createDistArray(Array(2, -1, 3, -4))
+    val samples = getListFromIterator(params.findGlobalSamples(15))
+    assertResult(15) { samples.length }
+  }
+
+  test("Find 97 GlobalSamples from array of 6 elements") {
+    params = createDistArray(Array(2, -1, 3, -4, -7, 9, 7))
+    val samples = getListFromIterator(params.findGlobalSamples(97))
+    assertResult(97) { samples.length }
+  }
+
+  test("Find 97 GlobalSamples when only 15") {
     params = createDistArray(Array(2, -1, 3, -4))
     val samples = getListFromIterator(params.findGlobalSamples(97))
     assertResult(15) { samples.length }
