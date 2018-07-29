@@ -28,7 +28,7 @@ sealed trait SubsetSumVariation extends ProblemVariation {
   def getInitialGuess: ParameterArray = {
     val num = this.getNumElements
     val numSet = this.getNumberSeq
-    val params: IndexedSeq[Parameter] = for (i <- 0 until num by 3) yield createParam(numSet(i))
+    val params: IndexedSeq[Parameter] = for (i <- 0 until num by numSet.length / 2) yield createParam(numSet(i))
     val pa = new VariableLengthIntSet(
       params, getNumberSeq, new MagnitudeDistanceCalculator, new Random(1))
     pa
@@ -98,7 +98,7 @@ sealed trait SubsetSumVariation extends ProblemVariation {
 
 case object SIMPLE_SS extends SubsetSumVariation {
   val errorTolerances =
-    ErrorTolerances(0.0, 0.0, 8.0, 6.4, 7.3, 7.3, 0.0)
+    ErrorTolerances(0.0, 0.0, 6.4, 6.4, 7.3, 7.3, 0.0)
 
   override protected def getNumberSeq = Array(-7, -3, -2, 5, 8)
 
@@ -109,7 +109,7 @@ case object SIMPLE_SS extends SubsetSumVariation {
 
 
 case object TYPICAL_SS extends SubsetSumVariation {
-  val errorTolerances = ErrorTolerances(0.0, 0.5, 0.5, 1.25, 0.5, 0.5, 0.0)
+  val errorTolerances = ErrorTolerances(0.0, 0.5, 0.5, 1.0, 0.5, 0.5, 0.0)
 
   override protected def getNumberSeq =
     Array(-7, -33, -21, 5, 83, -29, -78, 213, 123, -34, -37, -41, 91, -8, -17)

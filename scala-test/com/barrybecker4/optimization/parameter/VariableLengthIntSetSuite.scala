@@ -5,6 +5,7 @@ import com.barrybecker4.optimization.parameter.types.{IntegerParameter, Paramete
 import org.scalatest.{BeforeAndAfter, FunSuite}
 import com.barrybecker4.common.testsupport.strip
 import scala.util.Random
+import com.barrybecker4.optimization.parameter.VariableLengthIntSet.createParam
 
 
 class VariableLengthIntSetSuite extends FunSuite with BeforeAndAfter{
@@ -102,6 +103,12 @@ class VariableLengthIntSetSuite extends FunSuite with BeforeAndAfter{
     assertResult(expected) { combo }
   }
 
+  test("getCombination of all values") {
+    val combo = params.getCombination(Array(1, 0, 3, 2))
+    val expected = createIntArray(Array(2, -1, 3, -4), Array(2, -1, 3, -4))
+    assertResult(expected) { combo }
+  }
+
   test("GetSamplePopulationSizeWhenSmall"){
     params = createDistArray(Array(2, -1, 3, -4))
     assertResult(256) { params.getSamplePopulationSize }
@@ -188,16 +195,51 @@ class VariableLengthIntSetSuite extends FunSuite with BeforeAndAfter{
     assertResult(15) { samples.length }
   }
 
-  test("swap nodes (4 params). r = 1.2") {
+  test("random neighbor (4 params). r = 1.6") {
     params = createDistArray(Array(2, -1, 3, -4))
-    val nbr = params.getRandomNeighbor(1.2)
+    val radius = 1.6
+
+    val nbr = params.getRandomNeighbor(radius)
+    assertResult(strip("""
+         |parameter[0] = p2 = 2.0 [0, 2.0]
+         |parameter[1] = p3 = 3.0 [0, 3.0]
+         |parameter[2] = p-4 = -4.0 [-4.0, 0]
+         |""")) { nbr.toString }
+
+    val nbr2 = params.getRandomNeighbor(radius)
+    assertResult(strip("""
+         |parameter[0] = p-1 = -1.00 [-1.00, 0]
+         |parameter[1] = p3 = 3.0 [0, 3.0]
+         |parameter[2] = p-4 = -4.0 [-4.0, 0]
+         |""")) { nbr2.toString }
+
+    val nbr3 = params.getRandomNeighbor(radius)
+    assertResult(strip("""
+         |parameter[0] = p-1 = -1.00 [-1.00, 0]
+         |parameter[1] = p3 = 3.0 [0, 3.0]
+         |parameter[2] = p-4 = -4.0 [-4.0, 0]
+         |""")) { nbr2.toString }
+  }
+
+  test("random neighbor (4 params). r = 1.2") {
+    params = createDistArray(Array(2, -1, 3, -4))
+    val radius = 1.2
+
+    val nbr = params.getRandomNeighbor(radius)
     assertResult(strip("""
         |parameter[0] = p2 = 2.0 [0, 2.0]
         |parameter[1] = p3 = 3.0 [0, 3.0]
         |parameter[2] = p-4 = -4.0 [-4.0, 0]
         |""")) { nbr.toString }
 
-    val nbr2 = params.getRandomNeighbor(1.2)
+    val nbr2 = params.getRandomNeighbor(radius)
+    assertResult(strip("""
+       |parameter[0] = p-1 = -1.00 [-1.00, 0]
+       |parameter[1] = p3 = 3.0 [0, 3.0]
+       |parameter[2] = p-4 = -4.0 [-4.0, 0]
+       |""")) { nbr2.toString }
+
+    val nbr3 = params.getRandomNeighbor(radius)
     assertResult(strip("""
        |parameter[0] = p-1 = -1.00 [-1.00, 0]
        |parameter[1] = p3 = 3.0 [0, 3.0]
@@ -205,19 +247,62 @@ class VariableLengthIntSetSuite extends FunSuite with BeforeAndAfter{
        |""")) { nbr2.toString }
   }
 
-  test("swap nodes (4 params). r =  0.3") {
+  test("random neighbor (4 params). r =  0.3") {
     params = createDistArray(Array(2, -1, 3, -4))
-    val nbr = params.getRandomNeighbor(0.3)
+    val radius = 0.3
+
+    val nbr = params.getRandomNeighbor(radius)
     assertResult(strip("""
         |parameter[0] = p2 = 2.0 [0, 2.0]
         |parameter[1] = p3 = 3.0 [0, 3.0]
         |parameter[2] = p-4 = -4.0 [-4.0, 0]
         |""")) { nbr.toString }
+
+    val nbr2 = params.getRandomNeighbor(radius)
+    assertResult(strip("""
+       |parameter[0] = p-1 = -1.00 [-1.00, 0]
+       |parameter[1] = p3 = 3.0 [0, 3.0]
+       |parameter[2] = p-4 = -4.0 [-4.0, 0]
+       |""")) { nbr2.toString }
+
+    val nbr3 = params.getRandomNeighbor(radius)
+    assertResult(strip("""
+       |parameter[0] = p2 = 2.0 [0, 2.0]
+       |parameter[1] = p-1 = -1.00 [-1.00, 0]
+       |parameter[2] = p3 = 3.0 [0, 3.0]
+       |""")) { nbr3.toString }
   }
 
-  test("swap nodes (11 params). r = 1.2") {
+  test("random neighbor (4 params). r =  0.1") {
+    params = createDistArray(Array(2, -1, 3, -4))
+    val radius = 0.1
+
+    val nbr = params.getRandomNeighbor(radius)
+    assertResult(strip("""
+                         |parameter[0] = p2 = 2.0 [0, 2.0]
+                         |parameter[1] = p3 = 3.0 [0, 3.0]
+                         |parameter[2] = p-4 = -4.0 [-4.0, 0]
+                         |""")) { nbr.toString }
+
+    val nbr2 = params.getRandomNeighbor(radius)
+    assertResult(strip("""
+                         |parameter[0] = p2 = 2.0 [0, 2.0]
+                         |parameter[1] = p-1 = -1.00 [-1.00, 0]
+                         |parameter[2] = p-4 = -4.0 [-4.0, 0]
+                         |""")) { nbr2.toString }
+
+    val nbr3 = params.getRandomNeighbor(radius)
+    assertResult(strip("""
+                         |parameter[0] = p-1 = -1.00 [-1.00, 0]
+                         |parameter[1] = p3 = 3.0 [0, 3.0]
+                         |parameter[2] = p-4 = -4.0 [-4.0, 0]
+                         |""")) { nbr3.toString }
+  }
+
+  test("random neighbor (all 11 params). r = 1.2") {
     params = createDistArray(Array(2, -1, 3, -5, 3, -4, -2, -3, 5, -9, 6))
-    val nbr = params.getRandomNeighbor(1.2)
+    val radius = 1.2
+    val nbr = params.getRandomNeighbor(radius)
     assertResult(strip("""
         |parameter[0] = p2 = 2.0 [0, 2.0]
         |parameter[1] = p-1 = -1.00 [-1.00, 0]
@@ -229,11 +314,25 @@ class VariableLengthIntSetSuite extends FunSuite with BeforeAndAfter{
         |parameter[7] = p-9 = -9.0 [-9.0, 0]
         |parameter[8] = p6 = 6.0 [0, 6.0]
         |""")) { nbr.toString }
+
+    val nbr2 = params.getRandomNeighbor(radius)
+    assertResult(strip("""
+       |parameter[0] = p2 = 2.0 [0, 2.0]
+       |parameter[1] = p-1 = -1.00 [-1.00, 0]
+       |parameter[2] = p3 = 3.0 [0, 3.0]
+       |parameter[3] = p-5 = -5.0 [-5.0, 0]
+       |parameter[4] = p-4 = -4.0 [-4.0, 0]
+       |parameter[5] = p-2 = -2.0 [-2.0, 0]
+       |parameter[6] = p-3 = -3.0 [-3.0, 0]
+       |parameter[7] = p5 = 5.0 [0, 5.0]
+       |parameter[8] = p-9 = -9.0 [-9.0, 0]
+       |""")) { nbr2.toString }
   }
 
   test("swap nodes (11 params). r =  0.3") {
     params = createDistArray(Array(2, -1, 3, -5, 3, -4, -2, -3, 5, -9, 6))
-    val nbr = params.getRandomNeighbor(0.3)
+    val radius = 0.3
+    val nbr = params.getRandomNeighbor(radius)
     assertResult(strip("""
         |parameter[0] = p2 = 2.0 [0, 2.0]
         |parameter[1] = p-1 = -1.00 [-1.00, 0]
@@ -245,6 +344,63 @@ class VariableLengthIntSetSuite extends FunSuite with BeforeAndAfter{
         |parameter[7] = p-9 = -9.0 [-9.0, 0]
         |parameter[8] = p6 = 6.0 [0, 6.0]
         |""")) { nbr.toString }
+
+    val nbr2 = params.getRandomNeighbor(radius)
+    assertResult(strip("""
+         |parameter[0] = p2 = 2.0 [0, 2.0]
+         |parameter[1] = p-1 = -1.00 [-1.00, 0]
+         |parameter[2] = p3 = 3.0 [0, 3.0]
+         |parameter[3] = p-5 = -5.0 [-5.0, 0]
+         |parameter[4] = p-4 = -4.0 [-4.0, 0]
+         |parameter[5] = p-2 = -2.0 [-2.0, 0]
+         |parameter[6] = p-3 = -3.0 [-3.0, 0]
+         |parameter[7] = p5 = 5.0 [0, 5.0]
+         |parameter[8] = p-9 = -9.0 [-9.0, 0]
+         |""")) { nbr2.toString }
+  }
+
+  test("random neighbor (5 of 11 params). r = 1.2") {
+    params = createDistArray(Seq(-4, -9, 2, 6, 3), Array(2, -1, 3, -5, 3, -4, -2, -3, 5, -9, 6))
+    val radius = 1.2
+    val nbr = params.getRandomNeighbor(radius)
+    assertResult(strip("""
+         |parameter[0] = p-4 = -4.0 [-4.0, 0]
+         |parameter[1] = p-9 = -9.0 [-9.0, 0]
+         |parameter[2] = p2 = 2.0 [0, 2.0]
+         |parameter[3] = p6 = 6.0 [0, 6.0]
+         |parameter[4] = p3 = 3.0 [0, 3.0]
+         |""")) { nbr.toString }
+
+    val nbr2 = params.getRandomNeighbor(radius)
+    assertResult(strip("""
+         |parameter[0] = p-4 = -4.0 [-4.0, 0]
+         |parameter[1] = p-9 = -9.0 [-9.0, 0]
+         |parameter[2] = p2 = 2.0 [0, 2.0]
+         |parameter[3] = p6 = 6.0 [0, 6.0]
+         |parameter[4] = p3 = 3.0 [0, 3.0]
+         |""")) { nbr2.toString }
+  }
+
+  test("swap nodes (5 of 11 params). r =  0.3") {
+    params = createDistArray(Seq(-4, -9, 2, 6, 3), Array(2, -1, 3, -5, 3, -4, -2, -3, 5, -9, 6))
+    val radius = 0.3
+    val nbr = params.getRandomNeighbor(radius)
+    assertResult(strip("""
+         |parameter[0] = p-4 = -4.0 [-4.0, 0]
+         |parameter[1] = p-9 = -9.0 [-9.0, 0]
+         |parameter[2] = p2 = 2.0 [0, 2.0]
+         |parameter[3] = p6 = 6.0 [0, 6.0]
+         |parameter[4] = p3 = 3.0 [0, 3.0]
+         |""")) { nbr.toString }
+
+    val nbr2 = params.getRandomNeighbor(radius)
+    assertResult(strip("""
+         |parameter[0] = p-4 = -4.0 [-4.0, 0]
+         |parameter[1] = p-9 = -9.0 [-9.0, 0]
+         |parameter[2] = p2 = 2.0 [0, 2.0]
+         |parameter[3] = p6 = 6.0 [0, 6.0]
+         |parameter[4] = p3 = 3.0 [0, 3.0]
+         |""")) { nbr2.toString }
   }
   private def getListFromIterator(iter: Iterator[VariableLengthIntSet]): Array[VariableLengthIntSet] =
     iter.toArray
@@ -269,16 +425,11 @@ class VariableLengthIntSetSuite extends FunSuite with BeforeAndAfter{
   }
 
   private def createDistArray(numbers: Seq[Int], fullList: IndexedSeq[Int]) = {
+    assert(numbers.size == numbers.toSet.size, "There must not be duplicates")
     val params = for (i <- numbers) yield createParam(i)
     VariableLengthIntSet.createInstance(params.toIndexedSeq, fullList, rnd)
   }
 
   def createDistIgnoredArray(numberList: IndexedSeq[Int]): VariableLengthIntSet =
     createArray(new MagnitudeIgnoredDistanceCalculator, numberList)
-
-  private def createParam(i: Int): Parameter = {
-    val min = if (i < 0) i else 0
-    val max = if (i >= 0) i else 0
-    new IntegerParameter(i, min, max, "p" + i)
-  }
 }

@@ -41,7 +41,6 @@ sealed trait DominatingSetVariation extends ProblemVariation {
       for (i <- 0 until num by 3) yield new IntegerParameter(i, 0, num - 1, "p" + i)
 
     val pa = VariableLengthIntSet.createInstance(params.toIndexedSeq, getAllNodes, RND)
-    //ParameterArrayWithFitness(pa, getScore(getMarked(pa)))
     pa
   }
 

@@ -19,9 +19,9 @@ class DoubleParameterSuite extends ParameterSuite[Double] {
 
   override protected def expectedNaturalValue = 2.0
 
-  override protected def expectedForwardEpsChange = 2.16666666667
+  override protected def expectedForwardEpsChange = 2.0005
 
-  override protected def expectedBackwardEpsChange = 1.8333333333333333
+  override protected def expectedBackwardEpsChange = 1.9995
 
   override protected def expectedTweakedValues: Array[Double] =
     Array(

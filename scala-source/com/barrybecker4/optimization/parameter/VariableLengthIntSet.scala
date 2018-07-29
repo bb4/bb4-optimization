@@ -18,6 +18,13 @@ object VariableLengthIntSet {
 
   def createInstance(params: IndexedSeq[Parameter], fullSeq: IndexedSeq[Int], rnd: Random): VariableLengthIntSet =
     new VariableLengthIntSet(params, fullSeq, DIST_CALCULATOR, rnd)
+
+  /** @return one of the int params in the array with specified value */
+  def createParam(i: Int): Parameter = {
+    val min = if (i < 0) i else 0
+    val max = if (i >= 0) i else 0
+    new IntegerParameter(i, min, max, "p" + i)
+  }
 }
 
 /**
@@ -65,12 +72,18 @@ class VariableLengthIntSet(params: IndexedSeq[Parameter], val fullSeq: IndexedSe
     }
     var numNodesToMove = 0
     //println(s"rad=$radius pAdd/Rm=$probAddRemove add=$add remove=$remove")
-    if (add || remove) numNodesToMove = rnd.nextInt(Math.min(size, (radius + 1.5).toInt))
+    if (add || remove) numNodesToMove = rnd.nextInt(Math.min(size, (radius + 1.4).toInt))
     else { // at least 1 will be moved
-      numNodesToMove = 1 + rnd.nextInt((1.5 + radius).toInt)
+      numNodesToMove = 1 + rnd.nextInt((1.1 + radius).toInt)
     }
-    if (remove) removeRandomParam()
-    if (add) addRandomParam()
+    if (remove) {
+      // possibly add more that one depending on radius
+      removeRandomParam()
+    }
+    if (add) {
+      // possibly remove more that one depending on radius
+      addRandomParam()
+    }
     moveNodes(numNodesToMove)
   }
 
@@ -138,9 +151,16 @@ class VariableLengthIntSet(params: IndexedSeq[Parameter], val fullSeq: IndexedSe
     } else {
       val swapNodes = selectRandomNodes(numSelect, freeNodes)
       val newParams = params.toArray
-      for (i <- 0 until numSelect) {
-        val index = rnd.nextInt(size)
-        newParams(index) = get(index).setValue(swapNodes(i))
+
+      val randomIndices = (for (i <- 0 until numSelect) yield rnd.nextInt(freeNodes.size)).sorted
+      var ct = 0
+
+      for (i <- params.indices) yield {
+        if (ct < numSelect && i == randomIndices(ct)) {
+          val v = freeNodes(randomIndices(ct))
+          ct += 1
+          createParam(v)
+        } else params(i)
       }
       new VariableLengthIntSet(newParams, fullSeq, distCalc, rnd)
     }
@@ -150,7 +170,7 @@ class VariableLengthIntSet(params: IndexedSeq[Parameter], val fullSeq: IndexedSe
     rnd.shuffle(freeNodes).take(numNodesToSelect)
   }
 
-  /** @return all the ints in fullSet that are not in nbr currently */
+  /** @return all the ints in fullSet that are not currently used */
   private def getFreeNodes: Seq[Int] = {
     val markedNodes = (
       for (p <- params)
