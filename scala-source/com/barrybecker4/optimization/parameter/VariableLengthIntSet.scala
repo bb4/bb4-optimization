@@ -12,7 +12,7 @@ import scala.util.Random
 object VariableLengthIntSet {
 
   /** The larger this number is the less likely we are to add/remove ints when finding a random neighbor */
-  private val ADD_REMOVE_RADIUS_SOFTENER = 0.5
+  private val ADD_REMOVE_RADIUS_SOFTENER = 0.5  // was 0.5
 
   private val DIST_CALCULATOR = new MagnitudeDistanceCalculator()
 
@@ -72,21 +72,22 @@ class VariableLengthIntSet(params: IndexedSeq[Parameter], val fullSeq: IndexedSe
       if ((rnd.nextDouble() > 0.5 || size <= 1) && size < getMaxLength - 1) add = true
       else remove = true
     }
-    var numNodesToMove = 0
-    //println(s"rad=$radius pAdd/Rm=$probAddRemove add=$add remove=$remove")
-    numNodesToMove =
-      if (add || remove) rnd.nextInt(Math.min(size, (radius + 1.4).toInt))
-      else 1 + rnd.nextInt((1.1 + radius).toInt) // at least 1 will be moved
+    var numNodesToMove =
+      if (add || remove) rnd.nextInt(Math.min(size, (radius + 1.1).toInt))
+      else 1 + rnd.nextInt((1.4 + radius).toInt) // at least 1 will be moved
 
     var result =
       if (remove) removeRandomParams(numToRemove(radius))
       else if (add) addRandomParams(numToAdd(radius))
       else this
+    assert(add || remove || numNodesToMove > 0)
     result.moveNodes(numNodesToMove)
   }
 
-  private def numToRemove(radius: Double): Int = skewedNumToSelect(radius, params.length - 2)
-  private def numToAdd(radius: Double): Int = skewedNumToSelect(radius, fullSet.size - params.size)
+  private def numToRemove(radius: Double): Int =
+    skewedNumToSelect(radius, params.length - 2)
+  private def numToAdd(radius: Double): Int =
+    skewedNumToSelect(radius, fullSet.size - params.size)
 
   private def skewedNumToSelect(radius: Double, len: Int): Int = {
     val upper = (radius / 2.0 * Math.abs(rnd.nextGaussian()) * len).toInt
@@ -130,18 +131,15 @@ class VariableLengthIntSet(params: IndexedSeq[Parameter], val fullSeq: IndexedSe
   private def removeRandomParams(num: Int): VariableLengthIntSet = {
     val rndIndices = rnd.shuffle(params.indices.toIndexedSeq)
     val indicesToRemove = rndIndices.take(num).toSet
-    println("removing " + indicesToRemove.mkString(", ") + " from " + params.length)
+    //println("removing " + indicesToRemove.mkString(", ") + " from " + params.length)
     new VariableLengthIntSet(params.zipWithIndex.filter(p => !indicesToRemove.contains(p._2)).map(_._1),
       fullSeq, distCalc, rnd)
   }
 
   private def addRandomParams(num: Int): VariableLengthIntSet = {
-    val intsToAdd = rnd.shuffle(getFreeNodes)
+    val intsToAdd = rnd.shuffle(getFreeNodes).take(num)
     assert(size + intsToAdd.size <= getMaxLength)
-    var newParams = for (p <- params) yield p
-    println("adding " + intsToAdd.mkString(", ") + " to " + params.length)
-    newParams ++= intsToAdd.map(createParam)
-    new VariableLengthIntSet(newParams, fullSeq, distCalc, rnd)
+    new VariableLengthIntSet(params ++ intsToAdd.map(createParam), fullSeq, distCalc, rnd)
   }
 
   /** Select num free nodes randomly and swap them with num randomly selected marked nodes.
@@ -149,30 +147,31 @@ class VariableLengthIntSet(params: IndexedSeq[Parameter], val fullSeq: IndexedSe
     * @param numNodesToMove number of nodes to move to new locations
     */
   private def moveNodes(numNodesToMove: Int): VariableLengthIntSet = {
+    if (numNodesToMove == 0) return this
     val freeNodes = getFreeNodes
-    val numSelect = Math.min(freeNodes.size, numNodesToMove)
+    val numSelect = Array(freeNodes.size, params.size, numNodesToMove).min
     if (numSelect == 0) {
       removeRandomParams(1)
     } else {
-      val swapNodes = selectRandomNodes(numSelect, freeNodes)
-      val newParams = params.toArray
 
-      val randomIndices = (for (i <- 0 until numSelect) yield rnd.nextInt(freeNodes.size)).sorted
+      val randomIndices = rnd.shuffle(params.indices.toIndexedSeq).take(numSelect).sorted
+      val randomFreeIndices = rnd.shuffle(freeNodes.indices.toIndexedSeq).take(numSelect)
+
       var ct = 0
+      //println("current set = " + params.map(_.getValue).mkString(", "))
+      //println("rnd indices to swap: " + randomIndices.mkString(", "))
+      //println("free nodes: " + freeNodes.mkString(" "))
 
-      for (i <- params.indices) yield {
+      val newParams = for (i <- params.indices) yield {   // debug
         if (ct < numSelect && i == randomIndices(ct)) {
-          val v = freeNodes(randomIndices(ct))
+          val v = freeNodes(randomFreeIndices(ct))
           ct += 1
           createParam(v)
         } else params(i)
       }
+      //println("new paramValss after exchanges: " + newParams.map(_.getValue).mkString(", "))
       new VariableLengthIntSet(newParams, fullSeq, distCalc, rnd)
     }
-  }
-
-  private def selectRandomNodes(numNodesToSelect: Int, freeNodes: Seq[Int]): Seq[Int] = {
-    rnd.shuffle(freeNodes).take(numNodesToSelect)
   }
 
   /** @return all the ints in fullSet that are not currently used */

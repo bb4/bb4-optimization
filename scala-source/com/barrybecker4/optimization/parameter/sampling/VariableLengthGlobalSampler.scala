@@ -34,7 +34,6 @@ class VariableLengthGlobalSampler(var params: VariableLengthIntSet, val requeste
     if (params.getMaxLength <= 60)
       Math.pow(2, params.getMaxLength).toLong - 1
     else Long.MaxValue
-  println("total configs = " + totalConfigurations)
 
   // if the requested number of samples is close to the total number of configurations,
   // then just search through all possible configurations.

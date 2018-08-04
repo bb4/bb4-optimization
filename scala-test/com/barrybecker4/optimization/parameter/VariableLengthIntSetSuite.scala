@@ -1,7 +1,6 @@
 package com.barrybecker4.optimization.parameter
 
 import com.barrybecker4.optimization.parameter.distancecalculators.{DistanceCalculator, MagnitudeIgnoredDistanceCalculator}
-import com.barrybecker4.optimization.parameter.types.{IntegerParameter, Parameter}
 import org.scalatest.{BeforeAndAfter, FunSuite}
 import com.barrybecker4.common.testsupport.strip
 import scala.util.Random
@@ -198,12 +197,29 @@ class VariableLengthIntSetSuite extends FunSuite with BeforeAndAfter{
   test("random neighbor (4 params). r = 1.6") {
     params = createDistArray(Array(2, -1, 3, -4))
     val radius = 1.6
-    val nbrs = for (i <- 1 to 3) yield { params.getRandomNeighbor(radius).intValues }
+    val nbrs = for (i <- 1 to 20) yield { params.getRandomNeighbor(radius).intValues }
 
     assertResult(strip(
       """2, -1, 3
-        |2, -4
-        |2, -1, 3""".stripMargin)) {
+        |-1, 3, -4
+        |2, -1, -4
+        |-1, 3, -4
+        |2, -1, -4
+        |2, -4, 3
+        |2, -1, 3
+        |2, 3, -4
+        |2, -1, 3
+        |-1, 3, -4
+        |2, -1, 3
+        |2, -1, 3
+        |2, 3
+        |2, -1, 3
+        |2, 3
+        |-1, 3, -4
+        |2, -1, -4
+        |-4, 3
+        |2, 3, -4
+        |-1, 3, -4""".stripMargin)) {
       nbrs.map(_.mkString(", ")).mkString("\n")
     }
   }
@@ -211,12 +227,29 @@ class VariableLengthIntSetSuite extends FunSuite with BeforeAndAfter{
   test("random neighbor (4 params). r = 1.2") {
     params = createDistArray(Array(2, -1, 3, -4))
     val radius = 1.2
-    val nbrs = for (i <- 1 to 3) yield { params.getRandomNeighbor(radius).intValues }
+    val nbrs = for (i <- 1 to 20) yield { params.getRandomNeighbor(radius).intValues }
 
     assertResult(strip(
       """2, -1, 3
-        |-1, -4
-        |-1, 3""")) {
+        |-1, 3, -4
+        |2, -1, -4
+        |-1, 3, -4
+        |2, -1, -4
+        |2, -4, 3
+        |2, -1, 3
+        |2, 3, -4
+        |2, -1, 3
+        |-1, 3, -4
+        |2, -1, 3
+        |2, -1, 3
+        |2, 3, -4
+        |2, -1, 3
+        |2, 3
+        |-1, 3, -4
+        |2, -1, -4
+        |-4, 3
+        |2, -1, -4
+        |-1, 3, -4""")) {
       nbrs.map(_.mkString(", ")).mkString("\n")
     }
   }
@@ -224,12 +257,16 @@ class VariableLengthIntSetSuite extends FunSuite with BeforeAndAfter{
   test("random neighbor (4 params). r =  0.3") {
     params = createDistArray(Array(2, -1, 3, -4))
     val radius = 0.3
-    val nbrs = for (i <- 1 to 3) yield { params.getRandomNeighbor(radius).intValues }
+    val nbrs = for (i <- 1 to 7) yield { params.getRandomNeighbor(radius).intValues }
 
     assertResult(strip(
       """2, -1, 3
-        |-1, -4
-        |2, 3, -4""")) {
+        |-1, 3, -4
+        |2, -1, -4
+        |-1, 3, -4
+        |2, -1, -4
+        |-1, 3, -4
+        |2, -1, 3""")) {
       nbrs.map(_.mkString(", ")).mkString("\n")
     }
   }
@@ -237,12 +274,16 @@ class VariableLengthIntSetSuite extends FunSuite with BeforeAndAfter{
   test("random neighbor (4 params). r =  0.1") {
     params = createDistArray(Array(2, -1, 3, -4))
     val radius = 0.1
-    val nbrs = for (i <- 1 to 3) yield { params.getRandomNeighbor(radius).intValues }
+    val nbrs = for (i <- 1 to 7) yield { params.getRandomNeighbor(radius).intValues }
 
     assertResult(strip(
       """2, -1, 3
         |2, -1, 3
-        |-1, 3, -4""")) {
+        |-1, 3, -4
+        |2, -1, -4
+        |2, -1, -4
+        |2, -1, 3
+        |2, -1, -4""")) {
       nbrs.map(_.mkString(", ")).mkString("\n")
     }
   }
@@ -255,11 +296,11 @@ class VariableLengthIntSetSuite extends FunSuite with BeforeAndAfter{
     assertResult(strip(
       """2, -1, 3, -5, -4, -3, 5, -9, 6
         |2, -1, 3, -5, -4, -2, -3, 5, 6
-        |2, -5, -2, -3
-        |-9
-        |2, -1, 3, -5, -4, -2, -3, 5, 6
+        |2, -5, -2, -3, 6
         |2, -1, 3, -5, -4, -2, 5, -9, 6
-        |-4""")) {
+        |2, -4
+        |2, -1, 3, -5, -2, -3, -4, -9, 6
+        |2, -1, 3, -5, -4, -2, -3, 5, 6""")) {
       nbrs.map(_.mkString(", ")).mkString("\n")
     }
   }
@@ -272,11 +313,11 @@ class VariableLengthIntSetSuite extends FunSuite with BeforeAndAfter{
     assertResult(strip(
       """2, -1, 3, -5, -4, -3, 5, -9, 6
         |2, -1, 3, -5, -4, -2, -3, 5, 6
-        |2, -1, -5, -2, -3, 5, -9, 6
-        |2, -1, 3, -2, -3, 5, -9
-        |2, -1, 3, -5, -4, -3, -9, 6
         |2, -1, -5, -4, -2, -3, 5, -9, 6
-        |2, 3, -4, -2, -3, 5, -9, 6""")) {
+        |2, -1, 3, -5, -4, -2, 5, -9, 6
+        |2, -1, 3, -4, -2, -3, 5, -9, 6
+        |2, -1, 3, -5, -2, -3, -9, 6
+        |2, -1, 3, -5, -4, -2, 5, -9, 6""")) {
       nbrs.map(_.mkString(", ")).mkString("\n")
     }
   }
@@ -284,16 +325,19 @@ class VariableLengthIntSetSuite extends FunSuite with BeforeAndAfter{
   test("random neighbor (5 of 11 params). r = 1.2") {
     params = createDistArray(Seq(-4, -9, 2, 6, 3), Array(2, -1, 3, -5, 3, -4, -2, -3, 5, -9, 6))
     val radius = 1.2
-    val nbrs = for (i <- 1 to 7) yield { params.getRandomNeighbor(radius).intValues }
+    val nbrs = for (i <- 1 to 10) yield { params.getRandomNeighbor(radius).intValues }
 
     assertResult(strip(
-      """-4, -9, 2, 6, 3
-        |-4, -9, 2, 6, 3
-        |-4, -9, 2, 6, 3
-        |-4, -9, 2, 6, -5, -3, 5, -2, -1
-        |-4, -9, 2, 6, 3, -5, -1, 5, -3
-        |-4, 2, 6
-        |-4, -9, 2, 6, 3""")) {
+      """-4, -9, -5, 6, 3
+        |-9, 6, 2
+        |-4, 6, -3
+        |-3, -9, 2, 6, 3, -1, -5, -2
+        |-4, -9, 2, 3
+        |-9, 2, 6, 3
+        |-4, -9, -1, 6, 3
+        |2, 3
+        |-4, 5, 2, -1, 3
+        |-3, -9, 2, 6, 3, -2""")) {
       nbrs.map(_.mkString(", ")).mkString("\n")
     }
   }
@@ -304,31 +348,67 @@ class VariableLengthIntSetSuite extends FunSuite with BeforeAndAfter{
     val nbrs = for (i <- 1 to 7) yield { params.getRandomNeighbor(radius).intValues }
 
     assertResult(strip(
-      """-4, -9, 2, 6, 3
-        |-4, -9, 2, 6, 3
-        |-4, -9, 2, 6, 3
-        |-4, -9, 2, 6, -2, -5, -1, 5, -3
-        |-4, -9, 2, 6, 3
-        |-4, -9, 2, 6, 3
-        |-4, -9, 3""")) {
+      """-4, -9, -5, 6, 3
+        |-9, 2, 6, 3
+        |-4, -9, 2, 6, 3, -2
+        |-4, -9, -3, 6, 3
+        |-4, -9, -1, 6, 3
+        |-4, 2, 6, 3
+        |-4, -9, 2, -3, 3""")) {
       nbrs.map(_.mkString(", ")).mkString("\n")
     }
   }
 
+  test("random neighbor (5 of 11 params). r =  0.1") {
+    params = createDistArray(Seq(-4, -9, 2, 6, 3), Array(2, -1, 3, -5, 3, -4, -2, -3, 5, -9, 6))
+    val radius = 0.1
+    val nbrs = for (i <- 1 to 7) yield { params.getRandomNeighbor(radius).intValues }
+
+    assertResult(strip(
+      """-4, -9, -5, 6, 3
+        |-9, 2, 6, 3
+        |-4, -9, 2, 6, 3, -2
+        |-4, -9, -3, 6, 3
+        |-4, -9, -1, 6, 3
+        |-4, -9, 2, -2, 3
+        |-4, -2, 2, 6, 3""")) {
+      nbrs.map(_.mkString(", ")).mkString("\n")
+    }
+  }
+
+  test("random neighbor (5 of 11 params). r =  0.01") {
+    params = createDistArray(Seq(-4, -9, 2, 6, 3), Array(2, -1, 3, -5, 3, -4, -2, -3, 5, -9, 6))
+    val radius = 0.01
+    val nbrs = for (i <- 1 to 7) yield { params.getRandomNeighbor(radius).intValues }
+
+    assertResult(strip(
+      """-4, -9, -5, 6, 3
+        |5, -9, 2, 6, 3
+        |-4, 5, 2, 6, 3
+        |-4, -9, 2, -5, 3
+        |-4, -9, 2, 6, 3, -2
+        |-4, -9, -3, 6, 3
+        |-4, -9, -2, 6, 3""")) {
+      nbrs.map(_.mkString(", ")).mkString("\n")
+    }
+  }
 
   test("random neighbor (3 of 12 params). r = 1.2") {
     params = createDistArray(Seq(-9, 2, 3), Array(2, -1, 3, -5, 3, -4, -2, -3, 5, -9, 6, -7))
     val radius = 1.2
-    val nbrs = for (i <- 1 to 7) yield { params.getRandomNeighbor(radius).intValues }
+    val nbrs = for (i <- 1 to 10) yield { params.getRandomNeighbor(radius).intValues }
 
     assertResult(strip(
-      """-9, 2, 3
-        |-9, 3
-        |-9, 2, 3
-        |-9, 2, 3, -2, -4, -1, -5, 5, -7, 6
-        |-9
-        |-9, 2, 3
-        |-9, 2, 3""")) {
+      """-9, -5, 3
+        |-3, 2, -1
+        |-9, 2, 3, -5, -7, -2, -3, -1
+        |-9, 2, 3, 6, -4, -7, -2, -5, 5, -3, -1
+        |-9, 2, 3, -7, -2, -5, -1, -4, 5, 6
+        |-9, -4, 3, 5
+        |-9, 5
+        |2, 3
+        |-2, 2, 3, -1, -3
+        |-9, 2, 3, -1, -4, -5, -3, -2, 6, 5, -7""")) {
       nbrs.map(_.mkString(", ")).mkString("\n")
     }
   }
@@ -336,16 +416,75 @@ class VariableLengthIntSetSuite extends FunSuite with BeforeAndAfter{
   test("random neighbor (3 of 12 params). r =  0.3") {
     params = createDistArray(Seq(-9, 2, 3), Array(2, -1, 3, -5, 3, -4, -2, -3, 5, -9, 6, -7))
     val radius = 0.3
-    val nbrs = for (i <- 1 to 7) yield { params.getRandomNeighbor(radius).intValues }
+    val nbrs = for (i <- 1 to 10) yield {
+      params.getRandomNeighbor(radius).intValues
+    }
 
     assertResult(strip(
-      """-9, 2, 3
-        |3
-        |-9, 2, 3
-        |-9, 2, 3, 6, -3, -1, -5, -2, -4, 5
-        |-9, 2, 3
-        |2
-        |-9, 2, 3""")) {
+      """-9, -5, 3
+        |-3, 2, 3
+        |-9, 2, 3, -5
+        |-9, 6, 3
+        |-5, 2, 3
+        |2, 3
+        |2, 3
+        |-9, 2, 3, -1
+        |-9, 2, -1
+        |6, 2, 3""")) {
+      nbrs.map(_.mkString(", ")).mkString("\n")
+    }
+  }
+
+  test("random neighbor (3 of 12 params). r =  0.1") {
+    params = createDistArray(Seq(-9, 2, 3), Array(2, -1, 3, -5, 3, -4, -2, -3, 5, -9, 6, -7))
+    val radius = 0.1
+    val nbrs = for (i <- 1 to 20) yield {
+      params.getRandomNeighbor(radius).intValues
+    }
+
+    assertResult(strip(
+      """-9, -5, 3
+        |-3, 2, 3
+        |-9, 6, 3
+        |-7, 2, 3
+        |-9, -5, 3
+        |-9, -3, 3
+        |-9, 5, 3
+        |-5, 2, 3
+        |-9, -1, 3
+        |-5, 2, 3
+        |-2, 2, 3
+        |-1, 2, 3
+        |-9, 2, -7
+        |-9, 2, 3, -3
+        |-9, -2, 3
+        |-9, -2, 3
+        |-9, 2
+        |-9, 2, -2
+        |-5, 2, 3
+        |-9, 2, 6""")) {
+      nbrs.map(_.mkString(", ")).mkString("\n")
+    }
+  }
+
+  test("random neighbor (3 of 12 params). r =  0.01") {
+    params = createDistArray(Seq(-9, 2, 3), Array(2, -1, 3, -5, 3, -4, -2, -3, 5, -9, 6, -7))
+    val radius = 0.01
+    val nbrs = for (i <- 1 to 10) yield {
+      params.getRandomNeighbor(radius).intValues
+    }
+
+    assertResult(strip(
+      """-9, -5, 3
+        |-3, 2, 3
+        |-9, 6, 3
+        |-7, 2, 3
+        |-9, -5, 3
+        |-9, -3, 3
+        |-9, 5, 3
+        |-5, 2, 3
+        |-9, -1, 3
+        |-5, 2, 3""")) {
       nbrs.map(_.mkString(", ")).mkString("\n")
     }
   }
