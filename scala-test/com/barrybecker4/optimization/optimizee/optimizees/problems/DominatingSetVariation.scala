@@ -11,7 +11,7 @@ import scala.util.Random
 
 
 object DominatingSetVariation {
-  val VALUES = IndexedSeq(SIMPLE_DS, PENTAGRAM_DS, TYPICAL_DS)
+  val VALUES = IndexedSeq(SIMPLE_DS, PENTAGRAM_DS, TYPICAL_DS) //
   val ONE_HOP_WEIGHT = 0.6  // amount to penalize vertices not one hop from the cover
   val RND = new Random(1)
 }
@@ -139,7 +139,7 @@ case object TYPICAL_DS extends DominatingSetVariation {
     List(0, 23, 24)
   ))
 
-  val errorTolerances = ErrorTolerances(3.6, 2.01, 1.21, 1.2, 1.2, 1.2, 0)
+  val errorTolerances = ErrorTolerances(3.6, 2.1, 1.6, 1.2, 1.2, 1.2, 0)
 
   /** This is one of several possible solutions that gives an optimal fitness of 0 */
   override def getExactSolution: ParameterArrayWithFitness = createSolution(6, 7, 8, 19, 21, 24)

@@ -489,6 +489,29 @@ class VariableLengthIntSetSuite extends FunSuite with BeforeAndAfter{
     }
   }
 
+
+  test("random neighbor (3 of 12 params). r =  0.0001") {
+    params = createDistArray(Seq(-9, 2, 3), Array(2, -1, 3, -5, 3, -4, -2, -3, 5, -9, 6, -7))
+    val radius = 0.0001
+    val nbrs = for (i <- 1 to 10) yield {
+      params.getRandomNeighbor(radius).intValues
+    }
+
+    assertResult(strip(
+      """-9, -5, 3
+        |-3, 2, 3
+        |-9, 6, 3
+        |-7, 2, 3
+        |-9, -5, 3
+        |-9, -3, 3
+        |-9, 5, 3
+        |-5, 2, 3
+        |-9, -1, 3
+        |-5, 2, 3""")) {
+      nbrs.map(_.mkString(", ")).mkString("\n")
+    }
+  }
+
   private def getListFromIterator(iter: Iterator[VariableLengthIntSet]): Array[VariableLengthIntSet] =
     iter.toArray
 
