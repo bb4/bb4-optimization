@@ -11,7 +11,7 @@ import scala.util.Random
 
 
 object SubsetSumVariation {
-  val VALUES = IndexedSeq(SIMPLE_SS, TYPICAL_SS, NO_SOLUTION)
+  val VALUES = IndexedSeq(TYPICAL_SS) // , SIMPLE_SS, NO_SOLUTION
 }
 
 sealed trait SubsetSumVariation extends ProblemVariation {

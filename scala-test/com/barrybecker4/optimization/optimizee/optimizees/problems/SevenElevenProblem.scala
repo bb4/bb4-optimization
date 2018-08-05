@@ -23,7 +23,7 @@ import scala.util.Random
   * eliminating combinations until you are left with:
   * 316, 125, 120, 150
   * as being the only solution.
-  * Our choice of evaluation function to maximize is somewhat arbitrary.
+  * Our choice of evaluation function to minimize is somewhat arbitrary.
   * When this function evaluates to 0, we have a solution.
   *
   * @see ParabolaMinFunctionProblem for an easier optimization example.
@@ -53,7 +53,7 @@ object SevenElevenProblem {
     new NumericParameterArray(EXACT_SOLUTION_PARAMS, rnd = RAND), 0)
 
   // @@ exp errors.
-  private val FITNESS_RANGE = 5000000.0
+  private val FITNESS_RANGE = 9000000.0
 
   /** This finds the solution for the above optimization problem.  */
   def main(args: Array[String]): Unit = {
@@ -74,7 +74,7 @@ class SevenElevenProblem extends OptimizeeProblem {
 
   /** The choice of fitness function here is somewhat arbitrary.
     * I chose to use:
-    * -bs( p1 + p2 + p3 + p4 - 711) cubed + abs(711000000 - p1 * p2 * p3 * p4)
+    * abs( p1 + p2 + p3 + p4 - 711) cubed + abs(711000000 - p1 * p2 * p3 * p4)/1000000
     * or
     * abs(711 - sum) + abs(711000000 - product)/1000000
     * This is 0 when the constraints are satisfied, something greater than 0 when not.

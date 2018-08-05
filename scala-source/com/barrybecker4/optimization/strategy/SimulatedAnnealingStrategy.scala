@@ -82,7 +82,7 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
     do { // temperature iteration (temperature drops each time through)
       currentParams = bestParams
       do {
-        currentParams = findNeighbor(currentParams, ct, temperature)
+        currentParams = findNeighbor(currentParams, ct, temperature, fitnessRange)
         if (currentParams.fitness < bestParams.fitness) {
           bestParams = currentParams
           notifyOfChange(bestParams)
@@ -108,7 +108,7 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
     * @return neighboring point that is hopefully better than params.
     */
   private def findNeighbor(params: ParameterArrayWithFitness,
-                           ct: Int, temperature: Double): ParameterArrayWithFitness = {
+                           ct: Int, temperature: Double, fitnessRange: Double): ParameterArrayWithFitness = {
     //double r = (tempMax/5.0+temperature) / (8.0*(N/5.0+ct)*tempMax);
     var curParams = params
     val r = 8 * temperature / ((N + ct) * tempMax)
@@ -132,7 +132,7 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
         newFitness = optimizee.evaluateFitness(newParams)
         newFitness - curParams.fitness
       }
-    val probability = Math.pow(Math.E, tempMax * -deltaFitness / temperature)
+    val probability = Math.pow(Math.E, tempMax * -deltaFitness / (fitnessRange * temperature))
     val useWorseSolution = rnd.nextDouble < probability
 
     val newParamsWithFitness =
