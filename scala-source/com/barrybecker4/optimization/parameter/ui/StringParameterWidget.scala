@@ -36,7 +36,7 @@ class StringParameterWidget(val param: Parameter, val listener: ParameterChangeL
     * @param e the item event
     */
   override def actionPerformed(e: ActionEvent): Unit = {
-    parameter.setValue(dropdown.getSelectedIndex)
+    parameter = parameter.setValue(dropdown.getSelectedIndex)
     doNotification()
   }
 

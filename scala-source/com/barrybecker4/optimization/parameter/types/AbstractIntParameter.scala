@@ -29,7 +29,7 @@ abstract class AbstractIntParameter(theVal: Int, minVal: Int, maxVal: Int, param
   override def isIntegerOnly: Boolean = true
   protected def isOrdered = true
 
-  /** increments the parameter based on the number of steps to get from one end of the range to the other.
+  /** Increments the parameter based on the number of steps to get from one end of the range to the other.
     * If we are already at the max end of the range, then we can only move in the other direction if at all.
     * @param direction forward or backward.
     * @return the size of the increment taken
@@ -38,9 +38,9 @@ abstract class AbstractIntParameter(theVal: Int, minVal: Int, maxVal: Int, param
     new IntegerParameter((getValue + direction.multiplier).toInt, minVal, maxVal, paramName, redisFunc)
   }
 
-  override def setValue(value: Double): IntegerParameter = {
+  override def setValue(value: Double): Parameter = {
     val retValue =
-      if (redisFunc != null) {
+      if (redisFunc.isDefined) {
         val v = (value - minVal) / (range + 1.0)
         minVal + (range + 1.0) * redisFunc.get.getInverseFunctionValue(v)
       } else value

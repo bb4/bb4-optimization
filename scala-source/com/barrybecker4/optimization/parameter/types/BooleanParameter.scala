@@ -34,6 +34,15 @@ case class BooleanParameter(bValue: Boolean, name: String, redistFunc: Option[Bo
   override def tweakValue(r: Double, rand: Random): BooleanParameter =
     new BooleanParameter(if (tweakIntValue(r, rand) == 0) true else false, name, redistFunc)
 
+  override def setValue(value: Double): BooleanParameter = {
+    val retValue =
+      if (redistFunc.isDefined) {
+        val v = (value - minValue) / (range + 1.0)
+        minValue + (range + 1.0) * redistFunc.get.getInverseFunctionValue(v)
+      } else value
+    new BooleanParameter(if (retValue.toInt == 1) true else false, name, redistFunc)
+  }
+
   /** @return true if getValue is odd. */
   override def getNaturalValue: Any = (getValue.toInt % 2) == 1
 

@@ -13,6 +13,7 @@ import java.awt._
   */
 class DoubleParameterWidget(param: Parameter, listener: ParameterChangeListener)
     extends ParameterWidget(param, listener) with SliderChangeListener {
+
   private var slider: LabeledSlider = _
 
   /** Create a ui widget appropriate for the parameter type. */
@@ -25,7 +26,7 @@ class DoubleParameterWidget(param: Parameter, listener: ParameterChangeListener)
 
   /** @param slider the slider that changed. */
   override def sliderChanged(slider: LabeledSlider): Unit = {
-    parameter.setValue(slider.getValue)
+    parameter = parameter.setValue(slider.getValue)
     doNotification()
   }
 

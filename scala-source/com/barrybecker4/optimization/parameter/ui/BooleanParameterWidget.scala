@@ -13,7 +13,7 @@ import java.awt.event.ItemListener
 /**
   * @author Barry Becker
   */
-class BooleanParameterWidget(val param: Parameter, val listener: ParameterChangeListener)
+class BooleanParameterWidget(param: Parameter, val listener: ParameterChangeListener)
     extends ParameterWidget(param, listener) with ItemListener {
 
   private var cb: JCheckBox = _
@@ -32,7 +32,7 @@ class BooleanParameterWidget(val param: Parameter, val listener: ParameterChange
     * @param e the item event
     */
   override def itemStateChanged(e: ItemEvent): Unit = {
-    parameter.setValue(if (cb.isSelected) 1 else 0)
+    parameter = parameter.setValue(if (cb.isSelected) 1 else 0)
     doNotification()
   }
 
