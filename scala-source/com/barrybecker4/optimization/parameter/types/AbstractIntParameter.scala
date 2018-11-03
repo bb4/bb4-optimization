@@ -38,15 +38,6 @@ abstract class AbstractIntParameter(theVal: Int, minVal: Int, maxVal: Int, param
     new IntegerParameter((getValue + direction.multiplier).toInt, minVal, maxVal, paramName, redisFunc)
   }
 
-  override def setValue(value: Double): Parameter = {
-    val retValue =
-      if (redisFunc.isDefined) {
-        val v = (value - minVal) / (range + 1.0)
-        minVal + (range + 1.0) * redisFunc.get.getInverseFunctionValue(v)
-      } else value
-    new IntegerParameter(retValue.toInt, minVal, maxVal, paramName, redisFunc)
-  }
-
   override def getValue: Double = {
     if (redisFunc.isDefined) {
       val v = (theVal - minVal) / (range + 1.0)

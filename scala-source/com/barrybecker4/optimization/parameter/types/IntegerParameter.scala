@@ -44,6 +44,15 @@ case class IntegerParameter(theVal: Double, minValue: Double, maxValue: Double, 
   override def incrementByEps(direction: Direction): IntegerParameter =
     new IntegerParameter((getValue + direction.multiplier).toInt, minValue, maxValue, name, redisFunc)
 
+  override def setValue(value: Double): IntegerParameter = {
+    val retValue =
+      if (redisFunc.isDefined) {
+        val v = (value - minValue) / (range + 1.0)
+        minValue + (range + 1.0) * redisFunc.get.getInverseFunctionValue(v)
+      } else value
+    new IntegerParameter(retValue.toInt, minValue, maxValue, name, redisFunc)
+  }
+
   override def getValue: Double = {
     if (redisFunc.isDefined) {
       val v = (theVal - minValue) / (range + 1.0)

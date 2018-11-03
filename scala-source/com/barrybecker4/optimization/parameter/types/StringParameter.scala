@@ -8,7 +8,7 @@ import scala.util.Random
 
 
 /**
-  * Represents a general parameter to an algorithm
+  * Represents a String values parameter to an algorithm
   * @author Barry Becker
   */
 case class StringParameter(index: Int, values: IndexedSeq[String], name: String,
@@ -30,6 +30,15 @@ case class StringParameter(index: Int, values: IndexedSeq[String], name: String,
 
   override def tweakValue(r: Double, rand: Random): StringParameter =
     StringParameter(tweakIntValue(r, rand), values, name, redistFunc)
+
+  override def setValue(value: Double): StringParameter = {
+    val retValue =
+      if (redistFunc.isDefined) {
+        val v = (value - minValue) / (range + 1.0)
+        minValue + (range + 1.0) * redistFunc.get.getInverseFunctionValue(v)
+      } else value
+    StringParameter(retValue.toInt, values, name, redistFunc)
+  }
 
   override def getNaturalValue: Any =
     values(getValue.toInt)
