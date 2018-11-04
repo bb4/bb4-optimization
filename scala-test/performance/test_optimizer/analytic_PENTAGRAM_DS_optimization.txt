@@ -1,0 +1,1 @@
+iteration,	fitness,	jumpSize,	dotprod,	p0,	p3,	p6,	p9,	comment 
