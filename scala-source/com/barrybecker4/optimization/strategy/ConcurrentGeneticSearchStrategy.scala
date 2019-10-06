@@ -7,7 +7,7 @@ import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWi
 
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
-
+import scala.collection.parallel.CollectionConverters._
 
 /**
   * Concurrent (i.e. parallelized) Genetic Algorithm (evolutionary) optimization strategy.

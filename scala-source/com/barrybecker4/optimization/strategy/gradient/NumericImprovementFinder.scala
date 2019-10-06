@@ -58,7 +58,7 @@ class NumericImprovementFinder(val startingParams: ParameterArrayWithFitness) ex
     // the improvement may be zero or negative, meaning it did not improve.
     val improvement = step.getImprovement
     val dotProduct = iter.gradient.normalizedDot(iter.oldGradient)
-    println("dot between " + iter.gradient + " and " + iter.oldGradient+ " is " + dotProduct)
+    //// println("dot between " + iter.gradient + " and " + iter.oldGradient+ " is " + dotProduct)
     newJumpSize = findNewJumpSize(newJumpSize, dotProduct)
     iter.oldGradient = iter.gradient
     Improvement(newParams, improvement, newJumpSize, Some(iter.gradient))

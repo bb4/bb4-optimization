@@ -66,11 +66,13 @@ class Logger(var sLogFile: String) {
     * @param jumpSize  the distance we moved in parameter space since the last iteration.
     * @param params    the params to write.
     */
-  final def write(iteration: Int, fitness: Double, jumpSize: Double, distance: Double, params: ParameterArray, comment: String): Unit = {
+  final def write(iteration: Int, fitness: Double, jumpSize: Double,
+    distance: Double, params: ParameterArray, comment: String): Unit = {
     val sep = SEPARATOR
-    val rowText = iteration + sep + FormatUtil.formatNumber(fitness) +
-      sep + FormatUtil.formatNumber(jumpSize) +
-      sep + FormatUtil.formatNumber(distance) + sep + params.toCSVString + sep + comment
+    val rowText = s"""$iteration$sep${FormatUtil.formatNumber(fitness)}
+      $sep${FormatUtil.formatNumber(jumpSize)}
+      $sep${FormatUtil.formatNumber(distance)}
+      $sep${params.toCSVString}$sep$comment"""
     if (sLogFile == null) {
       println("<no logfile>: " + rowText)
       return

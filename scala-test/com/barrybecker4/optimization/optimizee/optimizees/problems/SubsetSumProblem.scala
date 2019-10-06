@@ -17,7 +17,7 @@ object SubsetSumProblem {
     val problem = new SubsetSumProblem(NO_SOLUTION)
     val optimizer = new Optimizer(problem, Some(LOG_FILE_HOME + "domSet_optimization.txt"))
     val initialGuess = problem.getInitialGuess
-    System.out.println("initial guess=" + initialGuess + " all=" + initialGuess.asInstanceOf[VariableLengthIntSet].getMaxLength)
+    //System.out.println("initial guess=" + initialGuess + " all=" + initialGuess.asInstanceOf[VariableLengthIntSet].getMaxLength)
     val solution = optimizer.doOptimization(GLOBAL_HILL_CLIMBING,
       initialGuess, problem.getFitnessRange, new Random(1))
     OptimizeeProblem.showSolution(problem, solution)

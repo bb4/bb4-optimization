@@ -30,7 +30,7 @@ import scala.util.Random
   * @author Barry Becker
   */
 object SevenElevenProblem {
-  private val INITIAL_GUESS_PARAMS: Array[Parameter] = Array(
+  private val INITIAL_GUESS_PARAMS: IndexedSeq[Parameter] = IndexedSeq(
     new IntegerParameter(100, 0, 708, "p1"),
     new IntegerParameter(200, 0, 708, "p2"),
     new IntegerParameter(200, 0, 708, "p3"),
@@ -42,7 +42,7 @@ object SevenElevenProblem {
   private val P4 = 150
   private val RAND = new Random(1)
   /** these may be in any order, however */
-  private val EXACT_SOLUTION_PARAMS: Array[Parameter] = Array(
+  private val EXACT_SOLUTION_PARAMS: IndexedSeq[Parameter] = IndexedSeq(
     new IntegerParameter(P1, 0, 708, "p1"),
     new IntegerParameter(P2, 0, 708, "p2"),
     new IntegerParameter(P3, 0, 708, "p3"),

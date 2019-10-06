@@ -11,7 +11,7 @@ import scala.util.Random
 
 
 object SubsetSumVariation {
-  val VALUES = IndexedSeq(TYPICAL_SS) // , SIMPLE_SS, NO_SOLUTION
+  val VALUES: IndexedSeq[TYPICAL_SS.type] = IndexedSeq(TYPICAL_SS) // , SIMPLE_SS, NO_SOLUTION
 }
 
 sealed trait SubsetSumVariation extends ProblemVariation {
@@ -100,7 +100,7 @@ case object SIMPLE_SS extends SubsetSumVariation {
   val errorTolerances =
     ErrorTolerances(0.0, 0.0, 6.4, 6.4, 7.3, 7.3, 0.0)
 
-  override protected def getNumberSeq = Array(-7, -3, -2, 5, 8)
+  override protected def getNumberSeq = IndexedSeq(-7, -3, -2, 5, 8)
 
   override def getExactSolution: ParameterArrayWithFitness = createSolution(-3, -2, 5)
 
@@ -112,7 +112,7 @@ case object TYPICAL_SS extends SubsetSumVariation {
   val errorTolerances = ErrorTolerances(0.0, 0.5, 0.5, 1.0, 0.5, 0.5, 0.0)
 
   override protected def getNumberSeq =
-    Array(-7, -33, -21, 5, 83, -29, -78, 213, 123, -34, -37, -41, 91, -8, -17)
+    IndexedSeq(-7, -33, -21, 5, 83, -29, -78, 213, 123, -34, -37, -41, 91, -8, -17)
 
   // This is one of several possible solutions that gives an optimal fitness of 0
   override def getExactSolution: ParameterArrayWithFitness =
@@ -127,7 +127,7 @@ case object NO_SOLUTION extends  SubsetSumVariation {
   val errorTolerances = ErrorTolerances(1.62, 0.7, 1.3, 0.7, 0.7, 0.7, 0.7, 0.63)
 
   override protected def getNumberSeq =
-    Array(-7, -33, -21, 5, -83, -29, -78, -113, -23, -34, -37, -41, -91, -9, -17)
+    IndexedSeq(-7, -33, -21, 5, -83, -29, -78, -113, -23, -34, -37, -41, -91, -9, -17)
 
   /** There is no solution - i.e. no values that sum to 0. */
   override def getExactSolution: ParameterArrayWithFitness = createSolution(-7)

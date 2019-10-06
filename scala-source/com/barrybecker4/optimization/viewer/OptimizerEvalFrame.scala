@@ -31,7 +31,7 @@ class OptimizerEvalFrame(var logFile: String, val testProblems: Seq[OptimizeePro
   this.setVisible(true)
 
   def this(logFile: String, testProblem: OptimizeeProblem) {
-    this(logFile, Array[OptimizeeProblem](testProblem))
+    this(logFile, IndexedSeq[OptimizeeProblem](testProblem))
   }
 
   private def createContent(testProblems: Seq[OptimizeeProblem]) = {

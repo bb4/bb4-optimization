@@ -45,15 +45,15 @@ class HillClimbingStrategy(optimizee: Optimizee) extends OptimizationStrategy(op
     val impFinder: ImprovementFinder = createImprovementFinder(currentParams)
 
     do {
-      println(s"iter=$numIterations FITNESS = ${currentParams.fitness} ------------")
+      //// println(s"iter=$numIterations FITNESS = ${currentParams.fitness} ------------")
       improvement = impFinder.findIncrementalImprovement(optimizee, improvement, cache)
       numIterations += 1
       currentParams = improvement.parameters
       notifyOfChange(currentParams)
     } while (improvement.improved && !isOptimalFitnessReached(currentParams))
 
-    println("The optimized parameters after " + numIterations + " iterations are " + currentParams)
-    println("Last improvement = " + improvement)
+    //// println("The optimized parameters after " + numIterations + " iterations are " + currentParams)
+    //// println("Last improvement = " + improvement)
     currentParams
   }
 

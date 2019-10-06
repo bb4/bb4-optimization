@@ -75,6 +75,6 @@ class ImprovementIteration(params: ParameterArrayWithFitness, var oldGradient: V
       val denominator = delta(i) * gradLen
       gradient = gradient.set(i, -jumpSize * fitnessDelta(i) / denominator)
     }
-    println("gradient = " + gradient + " after updating from fitnessDelta = " + fitnessDelta.toString())
+    //// println("gradient = " + gradient + " after updating from fitnessDelta = " + fitnessDelta.toString())
   }
 }

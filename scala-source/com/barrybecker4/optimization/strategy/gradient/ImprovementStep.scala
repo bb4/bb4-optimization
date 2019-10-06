@@ -52,7 +52,7 @@ class ImprovementStep(var optimizee: Optimizee, var iter: ImprovementIteration, 
     var currentParams: NumericParameterArray = params.pa.asInstanceOf[NumericParameterArray]
     val oldParams = params
     iter.updateGradient(jumpSize, gradLength)
-    println(s"gradient = ${iter.gradient}. jumpSize=" + jumpSize)
+    //// println(s"gradient = ${iter.gradient}. jumpSize=" + jumpSize)
     currentParams = currentParams.add(iter.gradient)
     var gaussRadius = 0.01
     var sameParams = false

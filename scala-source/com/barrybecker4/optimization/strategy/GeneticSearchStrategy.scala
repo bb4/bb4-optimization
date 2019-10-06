@@ -274,7 +274,7 @@ class GeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM)
   private def printPopulation(population: List[_], limit: Int): Unit = {
     var i = 0
     while (i < population.size && i < limit) {
-      println(i + ": " + population(i))
+      println("$i: ${population(i)}")
       i += 1
     }
     println("")

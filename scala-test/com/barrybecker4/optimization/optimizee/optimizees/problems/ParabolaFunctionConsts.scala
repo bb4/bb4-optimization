@@ -15,7 +15,7 @@ object ParabolaFunctionConsts {
   val P1 = 1.0
   val P2 = 2.0
 
-  private val EXACT_SOLUTION_PARAMS: Array[Parameter] = Array(
+  private val EXACT_SOLUTION_PARAMS: IndexedSeq[Parameter] = IndexedSeq(
     new DoubleParameter(P1, 0.0, 3.0, "p1"),
     new DoubleParameter(P2, 0.0, 3.0, "p2")
   )

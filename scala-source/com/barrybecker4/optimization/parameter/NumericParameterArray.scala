@@ -13,13 +13,13 @@ object NumericParameterArray {
   /** default number of steps to go from the min to the max */
   val DEFAULT_NUM_STEPS = 10
 
-  def createParams(vals: Array[Double], minVals: Array[Double], maxVals: Array[Double],
-                   names: Array[String]): Array[Parameter] = {
+  def createParams(vals: IndexedSeq[Double], minVals: IndexedSeq[Double], maxVals: IndexedSeq[Double],
+                   names: IndexedSeq[String]): IndexedSeq[Parameter] = {
     val len = vals.length
     val params = for (i <- 0 until len) yield {
       new DoubleParameter(vals(i), minVals(i), maxVals(i), names(i))
     }
-    params.toArray
+    params
   }
 }
 
@@ -39,9 +39,21 @@ case class NumericParameterArray(params: IndexedSeq[Parameter],
     * @param maxVals the maximum value allowed for each parameter respectively.
     * @param names   the display name for each parameter in the array.
     */
-  def this(vals: Array[Double], minVals: Array[Double], maxVals: Array[Double],
-           names: Array[String], rnd: Random) {
+  def this(vals: IndexedSeq[Double], minVals: IndexedSeq[Double], maxVals: IndexedSeq[Double],
+           names: IndexedSeq[String], rnd: Random) {
     this(createParams(vals, minVals, maxVals, names), DEFAULT_NUM_STEPS, rnd)
+  }
+
+  /** Constructor if all the parameters are DoubleParameters
+    * @param vals the values for each parameter.
+    * @param minVals the minimum value allowed for each parameter respectively.
+    * @param maxVals the maximum value allowed for each parameter respectively.
+    * @param names   the display name for each parameter in the array.
+    */
+  def this(vals: Array[Double], minVals: Array[Double], maxVals: Array[Double],
+    names: Array[String], rnd: Random) {
+    this(createParams(vals.toIndexedSeq, minVals.toIndexedSeq, maxVals.toIndexedSeq, names.toIndexedSeq),
+      DEFAULT_NUM_STEPS, rnd)
   }
 
   /** Globally sample the parameter space with a uniform distribution.
