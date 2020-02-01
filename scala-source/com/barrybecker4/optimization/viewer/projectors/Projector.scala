@@ -3,7 +3,7 @@ package com.barrybecker4.optimization.viewer.projectors
 
 import com.barrybecker4.optimization.parameter.ParameterArray
 import javax.vecmath.Point2d
-import com.barrybecker4.common.math.Range
+import com.barrybecker4.math.Range
 
 /**
   * A method for projecting from high dimensional space to 2d.

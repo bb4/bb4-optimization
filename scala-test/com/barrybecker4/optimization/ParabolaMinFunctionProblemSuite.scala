@@ -1,6 +1,6 @@
 package com.barrybecker4.optimization
 
-import com.barrybecker4.common.math.MathUtil
+import com.barrybecker4.math.MathUtil
 import com.barrybecker4.optimization.optimizee.OptimizerTestSuite
 import com.barrybecker4.optimization.optimizee.optimizees.problems.{ParabolaMinFunctionProblem, ParabolaMinVariation}
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType

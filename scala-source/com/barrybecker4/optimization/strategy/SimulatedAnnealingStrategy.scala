@@ -2,7 +2,7 @@
 package com.barrybecker4.optimization.strategy
 
 import com.barrybecker4.common.format.FormatUtil
-import com.barrybecker4.common.math.MathUtil
+import com.barrybecker4.math.MathUtil
 import com.barrybecker4.optimization.optimizee.Optimizee
 import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 import SimulatedAnnealingStrategy._

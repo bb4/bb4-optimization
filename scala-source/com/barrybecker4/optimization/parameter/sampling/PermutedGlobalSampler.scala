@@ -3,8 +3,8 @@ package com.barrybecker4.optimization.parameter.sampling
 
 import java.math.BigInteger
 
-import com.barrybecker4.common.math.MathUtil
-import com.barrybecker4.common.math.combinatorics.Permuter
+import com.barrybecker4.math.MathUtil
+import com.barrybecker4.math.combinatorics.Permuter
 import com.barrybecker4.optimization.parameter.ParameterArray
 import com.barrybecker4.optimization.parameter.PermutedParameterArray
 import PermutedGlobalSampler.CLOSE_FACTOR

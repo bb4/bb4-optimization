@@ -1,8 +1,8 @@
 // Copyright by Barry G. Becker, 2000-2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.parameter.redistribution
 
-import com.barrybecker4.common.math.Range
-import com.barrybecker4.common.math.function.{Function, InvertibleFunction}
+import com.barrybecker4.math.Range
+import com.barrybecker4.math.function.{Function, InvertibleFunction}
 import RedistributionFunction.verifyInRange
 
 

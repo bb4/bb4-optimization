@@ -5,7 +5,7 @@ import com.barrybecker4.optimization.optimizee.Optimizee
 import GeneticSearchStrategy._
 import com.barrybecker4.common.concurrency.ThreadUtil
 import com.barrybecker4.common.format.FormatUtil
-import com.barrybecker4.common.math.MathUtil
+import com.barrybecker4.math.MathUtil
 import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random

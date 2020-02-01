@@ -3,7 +3,7 @@ package com.barrybecker4.optimization.viewer.model
 
 import java.awt.Point
 
-import com.barrybecker4.common.math.Range
+import com.barrybecker4.math.Range
 import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 import com.barrybecker4.optimization.viewer.NavigationListener
 import com.barrybecker4.optimization.viewer.projectors.Projector

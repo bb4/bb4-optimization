@@ -1,6 +1,6 @@
 package com.barrybecker4.optimization.optimizee
 
-import com.barrybecker4.common.math.MathUtil
+import com.barrybecker4.math.MathUtil
 import com.barrybecker4.common.util.FileUtil
 import com.barrybecker4.optimization.Optimizer
 import com.barrybecker4.optimization.optimizee.optimizees.{OptimizeeProblem, ProblemVariation}

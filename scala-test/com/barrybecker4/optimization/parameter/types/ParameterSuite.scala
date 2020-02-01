@@ -1,7 +1,7 @@
 // Copyright by Barry G. Becker, 2013-2014. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.parameter.types
 
-import com.barrybecker4.common.math.MathUtil
+import com.barrybecker4.math.MathUtil
 import com.barrybecker4.optimization.parameter.Direction
 import org.junit.Assert.assertEquals
 import org.scalatest.{BeforeAndAfter, FunSuite}

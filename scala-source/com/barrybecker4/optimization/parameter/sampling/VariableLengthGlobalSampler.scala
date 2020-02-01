@@ -1,7 +1,7 @@
 // Copyright by Barry G. Becker, 2013 - 2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.parameter.sampling
 
-import com.barrybecker4.common.math.combinatorics.Combinater
+import com.barrybecker4.math.combinatorics.Combinater
 import com.barrybecker4.optimization.parameter.ParameterArray
 import com.barrybecker4.optimization.parameter.VariableLengthIntSet
 import java.util.NoSuchElementException

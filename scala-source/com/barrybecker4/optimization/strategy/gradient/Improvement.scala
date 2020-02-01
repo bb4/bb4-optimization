@@ -1,7 +1,7 @@
 // Copyright by Barry G. Becker, 2000-2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.strategy.gradient
 
-import com.barrybecker4.common.math.Vector
+import com.barrybecker4.math.Vector
 import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 import Improvement.JUMP_SIZE_EPS
 
