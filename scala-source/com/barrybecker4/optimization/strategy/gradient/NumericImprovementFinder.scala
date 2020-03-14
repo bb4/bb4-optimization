@@ -1,6 +1,6 @@
 package com.barrybecker4.optimization.strategy.gradient
 
-import com.barrybecker4.math.Vector
+import com.barrybecker4.math.linear.Vector
 import com.barrybecker4.optimization.optimizee.Optimizee
 import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 

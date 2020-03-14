@@ -2,7 +2,7 @@
 package com.barrybecker4.optimization.parameter
 
 import com.barrybecker4.math.MathUtil
-import com.barrybecker4.math.Vector
+import com.barrybecker4.math.linear.Vector
 import com.barrybecker4.optimization.parameter.sampling.NumericGlobalSampler
 import com.barrybecker4.optimization.parameter.types.{DoubleParameter, Parameter}
 import NumericParameterArray._
