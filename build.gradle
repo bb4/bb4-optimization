@@ -16,7 +16,7 @@ plugins {
 }
 description = 'A Scala library project containing a collection of heuristic optimization algorithms.'
 group = 'com.barrybecker4'
-version = '1.6-SNAPSHOT'
+version = '1.6'
 ext {
     archivesBaseName = 'bb4-optimization'
     mainClass = "com.barrybecker4.optimization.viewer.OptimizerEvalFrame"
