@@ -15,7 +15,7 @@ abstract class AbstractGlobalSampler[E] extends Iterator[E] {
   /** Globally sample the parameter space.
     * @return the next sample.
     */
-  override def next: E
+  override def next(): E
 
   /** counts up to the number of samples as we iterate */
   protected var counter = 0

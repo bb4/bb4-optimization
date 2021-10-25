@@ -53,7 +53,7 @@ class GlobalSampleStrategy(optimizee: Optimizee) extends OptimizationStrategy(op
     var done = false
 
     while (samples.hasNext && !done) {
-      val sample = samples.next
+      val sample = samples.next()
       var fitness =
         if (optimizee.evaluateByComparison) optimizee.compareFitness(sample, params)
         else optimizee.evaluateFitness(sample)

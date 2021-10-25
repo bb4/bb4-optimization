@@ -68,7 +68,7 @@ class VariableLengthIntSet(params: IndexedSeq[Parameter], val fullSeq: IndexedSe
     val probAddRemove = radius / (ADD_REMOVE_RADIUS_SOFTENER + radius)
     var add = false
     var remove = false
-    if (rnd.nextDouble < probAddRemove) {
+    if (rnd.nextDouble() < probAddRemove) {
       if ((rnd.nextDouble() > 0.5 || size <= 1) && size < getMaxLength - 1) add = true
       else remove = true
     }

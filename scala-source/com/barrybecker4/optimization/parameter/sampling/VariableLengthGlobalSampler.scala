@@ -46,7 +46,7 @@ class VariableLengthGlobalSampler(var params: VariableLengthIntSet, val requeste
     combinator = new Combinater(params.getMaxLength)
 
 
-  override def next: VariableLengthIntSet = {
+  override def next(): VariableLengthIntSet = {
     if (counter >= totalConfigurations)
       throw new NoSuchElementException("ran out of samples. There are only " + totalConfigurations)
     if (counter == numSamples - 1)

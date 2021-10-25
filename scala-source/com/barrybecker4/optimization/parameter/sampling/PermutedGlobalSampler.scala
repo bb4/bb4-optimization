@@ -55,7 +55,7 @@ class PermutedGlobalSampler(var params: PermutedParameterArray, val requestedNum
   private val globalSamples = new ArrayBuffer[ParameterArray]()
 
 
-  override def next: PermutedParameterArray = {
+  override def next(): PermutedParameterArray = {
     if (counter >= numSamples) throw new IllegalStateException("ran out of samples.")
     if (counter == numSamples - 1) hasNext = false
     counter += 1
@@ -80,8 +80,8 @@ class PermutedGlobalSampler(var params: PermutedParameterArray, val requestedNum
     * @return the next exhaustive sample.
     */
   private def getNextExhaustiveSample = {
-    val pParams = params.setPermutation(permuter.next)
-    //hasNext = permuter.hasNext
+    val pParams = params.setPermutation(permuter.next())
+    //hasNext = permuter.hasNext()
     pParams
   }
 }

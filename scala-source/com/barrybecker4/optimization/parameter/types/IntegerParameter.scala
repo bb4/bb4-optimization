@@ -57,7 +57,7 @@ case class IntegerParameter(theVal: Double, minValue: Double, maxValue: Double, 
     if (redisFunc.isDefined) {
       val v = (theVal - minValue) / (range + 1.0)
       val rv = redisFunc.get.getValue(v)
-      (rv * (range + (1.0 - MathUtil.EPS)) + minValue).round
+      (rv * (range + (1.0 - MathUtil.EPS)) + minValue).round.toDouble
     } else theVal
   }
 

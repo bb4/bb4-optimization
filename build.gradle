@@ -4,9 +4,10 @@ buildscript {
     repositories {
         // retrieve the shared gradle build scripts from here
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/"}
+        maven { url "https://oss.sonatype.org/content/repositories/releases" }
     }
     dependencies {
-        classpath 'com.barrybecker4:bb4-gradle:1.6-SNAPSHOT'
+        classpath 'com.barrybecker4:bb4-gradle:1.6.2'
     }
 }
 
@@ -26,7 +27,7 @@ apply from: project.buildscript.classLoader.getResource('bb4.gradle').toURI()
 dependencies {
     // starting in scala 2.13, parallel collections must be included separately
     compile group: 'org.scala-lang.modules', name: 'scala-parallel-collections_2.13', version: '0.2.0'
-    compile 'com.barrybecker4:bb4-ui:1.6-SNAPSHOT'
+    compile 'com.barrybecker4:bb4-ui:1.6'
 }
 
 apply from: project.buildscript.classLoader.getResource('bb4-publish.gradle').toURI()

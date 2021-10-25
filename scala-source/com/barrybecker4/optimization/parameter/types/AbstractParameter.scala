@@ -28,14 +28,14 @@ abstract class AbstractParameter(value: Double,
 
   val range: Double = maxValue - minValue
 
-  def this(value: Double, minVal: Double, maxVal: Double, paramName: String) {
+  def this(value: Double, minVal: Double, maxVal: Double, paramName: String) = {
     this(value, minVal, maxVal, paramName, None)
   }
 
   protected def tweakNumericValue(v: Double, r: Double, rand: Random): Double = {
     assert(Math.abs(r) <= 1.5)
     if (r == 0) return v // no change in the param.
-    val change = rand.nextGaussian * r * range
+    val change = rand.nextGaussian() * r * range
     var newValue = v + change
     if (newValue > maxValue) newValue = maxValue
     else if (newValue < minValue) newValue = minValue
@@ -45,7 +45,7 @@ abstract class AbstractParameter(value: Double,
   override def getIncrementForDirection(direction: Direction): Double = direction.multiplier
 
   protected def getRandomValue(rand: Random): Double =
-    minValue + rand.nextDouble * range
+    minValue + rand.nextDouble() * range
 
   protected def findNewValue(proposedNewValue: Double): Double = {
     validateRange(proposedNewValue)

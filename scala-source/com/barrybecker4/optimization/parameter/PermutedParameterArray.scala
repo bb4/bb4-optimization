@@ -19,7 +19,7 @@ case class PermutedParameterArray(params: IndexedSeq[Parameter], rnd: Random)
 
   private val distanceCalculator: PermutedDistanceCalculator = new PermutedDistanceCalculator()
 
-  def this(rnd: Random = MathUtil.RANDOM) { this(IndexedSeq[Parameter](), rnd)}
+  def this(rnd: Random = MathUtil.RANDOM) = { this(IndexedSeq[Parameter](), rnd)}
 
   /** Permute the parameters according to the specified permutation
     * of 0 based indices.

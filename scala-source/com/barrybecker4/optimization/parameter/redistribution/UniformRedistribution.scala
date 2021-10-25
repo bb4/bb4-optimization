@@ -26,7 +26,7 @@ class UniformRedistribution extends RedistributionFunction {
     *                      (must be in increasing order)
     * @param specialValueProbabilities sum of all special value probabilities must be less than or equal to one.
     */
-  def this(specialValues: Array[Double], specialValueProbabilities: Array[Double]) {
+  def this(specialValues: Array[Double], specialValueProbabilities: Array[Double]) = {
     this()
     this.specialValues = specialValues
     this.specialValueProbabilities = specialValueProbabilities

@@ -40,7 +40,7 @@ case class NumericParameterArray(params: IndexedSeq[Parameter],
     * @param names   the display name for each parameter in the array.
     */
   def this(vals: IndexedSeq[Double], minVals: IndexedSeq[Double], maxVals: IndexedSeq[Double],
-           names: IndexedSeq[String], rnd: Random) {
+           names: IndexedSeq[String], rnd: Random) = {
     this(createParams(vals, minVals, maxVals, names), DEFAULT_NUM_STEPS, rnd)
   }
 
@@ -51,7 +51,7 @@ case class NumericParameterArray(params: IndexedSeq[Parameter],
     * @param names   the display name for each parameter in the array.
     */
   def this(vals: Array[Double], minVals: Array[Double], maxVals: Array[Double],
-    names: Array[String], rnd: Random) {
+    names: Array[String], rnd: Random) = {
     this(createParams(vals.toIndexedSeq, minVals.toIndexedSeq, maxVals.toIndexedSeq, names.toIndexedSeq),
       DEFAULT_NUM_STEPS, rnd)
   }
@@ -118,7 +118,7 @@ case class NumericParameterArray(params: IndexedSeq[Parameter],
     val newParams =
       for (k <- 0 until size) yield {
         val par = get(k)
-        val newPar = par.setValue(par.minValue + rnd.nextDouble * par.range)
+        val newPar = par.setValue(par.minValue + rnd.nextDouble() * par.range)
         assert(newPar.getValue < newPar.maxValue && newPar.getValue > newPar.minValue, "newPar "
           + newPar.getValue + " not between " + newPar.minValue + " and  " + newPar.maxValue)
         newPar

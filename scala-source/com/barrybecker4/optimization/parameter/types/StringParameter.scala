@@ -15,7 +15,7 @@ case class StringParameter(index: Int, values: IndexedSeq[String], name: String,
                            redistFunc: Option[RedistributionFunction] = None)
     extends AbstractIntParameter(index, 0, values.length - 1, name, redistFunc) {
 
-  def this(theVal: Enum[_], enumValues: IndexedSeq[Enum[_]], paramName: String) {
+  def this(theVal: Enum[_], enumValues: IndexedSeq[Enum[_]], paramName: String) = {
     this(theVal.ordinal(), enumValues.map(_.toString), paramName, None)
   }
 

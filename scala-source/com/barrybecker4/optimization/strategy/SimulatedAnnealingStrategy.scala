@@ -133,7 +133,7 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
         newFitness - curParams.fitness
       }
     val probability = Math.pow(Math.E, tempMax * -deltaFitness / (fitnessRange * temperature))
-    val useWorseSolution = rnd.nextDouble < probability
+    val useWorseSolution = rnd.nextDouble() < probability
 
     val newParamsWithFitness =
       if (deltaFitness < 0 || useWorseSolution) {

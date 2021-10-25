@@ -17,11 +17,11 @@ abstract class AbstractIntParameter(theVal: Int, minVal: Int, maxVal: Int, param
   extends AbstractParameter(theVal.toDouble, minVal.toDouble, maxVal.toDouble, paramName, redisFunc) {
 
   protected def getRandomVal(rand: Random): Int =
-    (minVal + rand.nextDouble * range).round.toInt
+    (minVal + rand.nextDouble() * range).round.toInt
 
   protected def tweakIntValue(radius: Double, rand: Random): Int = {
       if (isOrdered) super.tweakNumericValue(theVal, radius, rand).round.toInt
-      else if (rand.nextDouble < radius)  // if not ordered, then just randomize with probability r
+      else if (rand.nextDouble() < radius)  // if not ordered, then just randomize with probability r
         getRandomVal(rand)
       else theVal.toInt
   }
@@ -42,7 +42,7 @@ abstract class AbstractIntParameter(theVal: Int, minVal: Int, maxVal: Int, param
     if (redisFunc.isDefined) {
       val v = (theVal - minVal) / (range + 1.0)
       val rv = redisFunc.get.getValue(v)
-      (rv * (range + (1.0 - MathUtil.EPS)) + minVal).round
+      (rv * (range + (1.0 - MathUtil.EPS)) + minVal).round.toDouble
     } else theVal
   }
 

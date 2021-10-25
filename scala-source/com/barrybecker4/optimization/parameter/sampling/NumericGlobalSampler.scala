@@ -25,7 +25,7 @@ class NumericGlobalSampler(var params: NumericParameterArray, val requestedNumSa
   private val samples = new MultiDimensionalIndexer(dims)
   numSamples = samples.getNumValues
 
-  override def next: NumericParameterArray = {
+  override def next(): NumericParameterArray = {
     if (counter >= numSamples) throw new NoSuchElementException("ran out of samples.")
     if (counter == numSamples - 1) hasNext = false
     val index = samples.getIndexFromRaw(counter)

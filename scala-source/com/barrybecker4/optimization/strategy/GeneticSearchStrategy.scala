@@ -207,7 +207,7 @@ class GeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM)
     while (k < desiredPopulationSize) {
       // loop over the keepers until all replacements found.
       // Select randomly, but skewed toward the better ones
-      val r = rnd.nextDouble
+      val r = rnd.nextDouble()
       val keeperIndex: Int = (r * r * keepSize).toInt
       //k % keepSize;
       val p = population(keeperIndex)

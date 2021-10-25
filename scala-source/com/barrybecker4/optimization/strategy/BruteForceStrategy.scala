@@ -23,7 +23,7 @@ class BruteForceStrategy(optimizee: Optimizee) extends OptimizationStrategy(opti
     var bestParams: ParameterArrayWithFitness = ParameterArrayWithFitness(params, Double.MaxValue)
     var done = false
     while (samples.hasNext && !done) {
-      val sample = samples.next
+      val sample = samples.next()
       val fitness =
         if (optimizee.evaluateByComparison) optimizee.compareFitness(sample, params)
         else optimizee.evaluateFitness(sample)
