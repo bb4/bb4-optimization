@@ -4,14 +4,16 @@ package com.barrybecker4.optimization.parameter.types
 import com.barrybecker4.math.MathUtil
 import com.barrybecker4.optimization.parameter.Direction
 import org.junit.Assert.assertEquals
-import org.scalatest.{BeforeAndAfter, FunSuite}
+import org.scalatest.BeforeAndAfter
+import org.scalatest.funsuite.AnyFunSuite
+
 import scala.util.Random
 
 /**
   * Base class for all parameter test classes
   * @author Barry Becker
   */
-abstract class ParameterSuite[T] extends FunSuite with BeforeAndAfter {
+abstract class ParameterSuite[T] extends AnyFunSuite with BeforeAndAfter {
   /** instance under test */
   protected var parameter: Parameter = _
   protected var rand: Random = _

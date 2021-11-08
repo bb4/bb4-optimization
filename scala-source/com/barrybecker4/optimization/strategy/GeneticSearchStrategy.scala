@@ -3,7 +3,6 @@ package com.barrybecker4.optimization.strategy
 
 import com.barrybecker4.optimization.optimizee.Optimizee
 import GeneticSearchStrategy._
-import com.barrybecker4.common.concurrency.ThreadUtil
 import com.barrybecker4.common.format.FormatUtil
 import com.barrybecker4.math.MathUtil
 import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
@@ -109,7 +108,7 @@ class GeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM)
                           fitnessRange: Double): ParameterArrayWithFitness = {
     var currentBest = lastBest
     var ct = 0
-    var deltaFitness = .0
+    var deltaFitness = -1.0
     var numWithNoImprovement = 0
 
     var lowThresh = 0.005* fitnessRange  // shrink if less than this
@@ -119,7 +118,8 @@ class GeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM)
     //println("findNewBest: recent best =" + recentBest);
     // each iteration represents a new generation of the population.
     var pop = population
-    do {
+    while (!(deltaFitness >= -improvementEpsilon && numWithNoImprovement > MAX_ITER_NO_IMPRV)
+      && !isOptimalFitnessReached(currentBest) && (ct <= MAX_ITERATIONS)) {
       pop = cullPopulation(pop)
       replaceCulledWithKeeperVariants(pop, pop.size)
       currentBest = pop.min //evaluatePopulation(pop, recentBest.pa)
@@ -139,8 +139,7 @@ class GeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM)
       if (deltaFitness > -improvementEpsilon) {
         numWithNoImprovement += 1
       }
-    } while (!(deltaFitness >= -improvementEpsilon && numWithNoImprovement > MAX_ITER_NO_IMPRV)
-        && !isOptimalFitnessReached(currentBest) && (ct <= MAX_ITERATIONS))
+    }
 
     if (isOptimalFitnessReached(currentBest))
       println("stopped because we found the optimal fitness.")

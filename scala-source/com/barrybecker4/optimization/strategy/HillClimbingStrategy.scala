@@ -30,7 +30,7 @@ class HillClimbingStrategy(optimizee: Optimizee) extends OptimizationStrategy(op
       if (optimizee.evaluateByComparison) ParameterArrayWithFitness(params, Double.MaxValue)
       else ParameterArrayWithFitness(params, optimizee.evaluateFitness(params))
 
-    var numIterations = 0
+    var numIterations = 1
     log(0, currentParams, 0.0, 0.0, "initial test")
     notifyOfChange(currentParams)
 
@@ -38,19 +38,19 @@ class HillClimbingStrategy(optimizee: Optimizee) extends OptimizationStrategy(op
     val cache = mutable.HashSet[ParameterArray]()
     cache += currentParams.pa
 
-    var improvement: Improvement = null
-
     // Iterate until there is no significant improvement between iterations.
     // IOW, when the jumpSize is too small (below some threshold).
     val impFinder: ImprovementFinder = createImprovementFinder(currentParams)
+    var improvement: Improvement = impFinder.findIncrementalImprovement(optimizee, null, cache)
+    currentParams = improvement.parameters
 
-    do {
+    while (improvement.improved && !isOptimalFitnessReached(currentParams)) {
       //// println(s"iter=$numIterations FITNESS = ${currentParams.fitness} ------------")
       improvement = impFinder.findIncrementalImprovement(optimizee, improvement, cache)
       numIterations += 1
       currentParams = improvement.parameters
       notifyOfChange(currentParams)
-    } while (improvement.improved && !isOptimalFitnessReached(currentParams))
+    }
 
     //// println("The optimized parameters after " + numIterations + " iterations are " + currentParams)
     //// println("Last improvement = " + improvement)

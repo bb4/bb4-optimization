@@ -1,11 +1,11 @@
 package com.barrybecker4.optimization.parameter.sampling
 
 import com.barrybecker4.optimization.parameter.NumericParameterArray
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import scala.util.Random
 
 
-class NumericGlobalSamplerSuite extends FunSuite {
+class NumericGlobalSamplerSuite extends AnyFunSuite {
 
   test("1d sampling") {
     val params = new NumericParameterArray(Array(0.5), Array(0.0), Array(1.0), Array("p"), new Random(1))

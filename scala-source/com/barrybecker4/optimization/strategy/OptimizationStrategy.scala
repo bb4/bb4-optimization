@@ -47,7 +47,7 @@ abstract class OptimizationStrategy(var optimizee: Optimizee) {
     */
   private[strategy] def isOptimalFitnessReached(currentBest: ParameterArrayWithFitness) = {
     var optimalFitnessReached = false
-    if (!optimizee.evaluateByComparison) {
+    if (!optimizee.evaluateByComparison && currentBest != null) {
       assert(optimizee.getOptimalFitness >= 0)
       optimalFitnessReached = currentBest.fitness <= optimizee.getOptimalFitness
     }

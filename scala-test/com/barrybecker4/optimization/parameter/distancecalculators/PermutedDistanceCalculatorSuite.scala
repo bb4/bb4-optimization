@@ -2,12 +2,13 @@ package com.barrybecker4.optimization.parameter.distancecalculators
 
 import com.barrybecker4.optimization.parameter.PermutedParameterArray
 import com.barrybecker4.optimization.parameter.types.{IntegerParameter, Parameter}
-import org.scalatest.{BeforeAndAfter, FunSuite}
+import org.scalatest.BeforeAndAfter
+import org.scalatest.funsuite.AnyFunSuite
 
 import scala.util.Random
 
 
-class PermutedDistanceCalculatorSuite extends FunSuite with BeforeAndAfter {
+class PermutedDistanceCalculatorSuite extends AnyFunSuite with BeforeAndAfter {
 
   val calc = new PermutedDistanceCalculator()
   var rnd: Random = _

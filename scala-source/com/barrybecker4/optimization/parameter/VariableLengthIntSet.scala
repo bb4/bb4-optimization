@@ -108,7 +108,7 @@ class VariableLengthIntSet(params: IndexedSeq[Parameter], val fullSeq: IndexedSe
     *     many unique samples.
     * @return some number of unique samples.
     */
-  override def findGlobalSamples(requestedNumSamples: Long) =
+  override def findGlobalSamples(requestedNumSamples: Long): Iterator[VariableLengthIntSet] =
     new VariableLengthGlobalSampler(this, requestedNumSamples)
 
   /** @return get a random solution in the parameter space by selecting about half of the ints */

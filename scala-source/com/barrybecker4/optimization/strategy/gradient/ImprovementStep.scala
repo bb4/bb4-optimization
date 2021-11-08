@@ -33,13 +33,13 @@ class ImprovementStep(var optimizee: Optimizee, var iter: ImprovementIteration, 
     * @return the parameters to try next.
     */
   def findNextParams(params: ParameterArrayWithFitness): ParameterArrayWithFitness = {
-    var currentParams = params
     val maxTries = 100
-    var numTries = 0
-    do {
+    var currentParams = findNextCandidateParams(params)
+    var numTries = 1
+    while (!improved && (jumpSize > ImprovementStep.JUMP_SIZE_EPS) && numTries < maxTries) {
       currentParams = findNextCandidateParams(currentParams)
       numTries += 1
-    } while (!improved && (jumpSize > ImprovementStep.JUMP_SIZE_EPS) && numTries < maxTries)
+    }
     currentParams
   }
 

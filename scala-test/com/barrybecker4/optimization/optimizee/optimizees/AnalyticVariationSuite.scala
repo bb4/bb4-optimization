@@ -1,14 +1,12 @@
 package com.barrybecker4.optimization.optimizee.optimizees
 
 import com.barrybecker4.optimization.optimizee.optimizees.problems.ParabolaFunctionConsts
-import com.barrybecker4.optimization.optimizee.optimizees.problems.ParabolaMinVariation
 import com.barrybecker4.optimization.parameter.{NumericParameterArraySuite, ParameterArray}
 import AnalyticVariationSuite.TOL
 import ParabolaFunctionConsts._
 import com.barrybecker4.optimization.optimizee.optimizees.problems.ParabolaMinVariation
-import com.barrybecker4.optimization.optimizee.optimizees.problems.ParabolaMinVariation
 import org.scalactic.{Equality, TolerantNumerics}
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 
 object AnalyticVariationSuite {
@@ -19,7 +17,7 @@ object AnalyticVariationSuite {
   * Verify that the minimum value of each variation is the same (1001).
   * @author Barry Becker
   */
-class AnalyticVariationSuite extends FunSuite {
+class AnalyticVariationSuite extends AnyFunSuite {
 
   implicit val doubleEq: Equality[Double] = TolerantNumerics.tolerantDoubleEquality(TOL)
 

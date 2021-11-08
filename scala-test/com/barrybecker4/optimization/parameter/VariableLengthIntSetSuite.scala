@@ -1,13 +1,15 @@
 package com.barrybecker4.optimization.parameter
 
 import com.barrybecker4.optimization.parameter.distancecalculators.{DistanceCalculator, MagnitudeIgnoredDistanceCalculator}
-import org.scalatest.{BeforeAndAfter, FunSuite}
+import org.scalatest.BeforeAndAfter
 import com.barrybecker4.common.testsupport.strip
+
 import scala.util.Random
 import com.barrybecker4.optimization.parameter.VariableLengthIntSet.createParam
+import org.scalatest.funsuite.AnyFunSuite
 
 
-class VariableLengthIntSetSuite extends FunSuite with BeforeAndAfter{
+class VariableLengthIntSetSuite extends AnyFunSuite with BeforeAndAfter{
 
   private var params: VariableLengthIntSet = _
   private var rnd: Random = _

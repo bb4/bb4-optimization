@@ -52,14 +52,14 @@ class PermutedDistanceCalculator {
     k = 1
     var j = findCorrespondingEntryIndex(pa2, len, pa1.get(idx))
     var matchFound = false
-    var matched = false
-    do {
+    var matched = true
+    while (matched && k <= len) {
       i = (i + 1) % len
       j = (j + 1) % len
       k += 1
       matched = pa1.get(i).getValue == pa2.get(j).getValue
       matchFound |= matched
-    } while (matched && k <= len)
+    }
     val runLength = k - 1
     if (matchFound) runLengths.append(runLength)
     runLength

@@ -6,7 +6,8 @@ import com.barrybecker4.optimization.Optimizer
 import com.barrybecker4.optimization.optimizee.optimizees.{OptimizeeProblem, ProblemVariation}
 import com.barrybecker4.optimization.parameter.ParameterArray
 import com.barrybecker4.optimization.strategy._
-import org.scalatest.{BeforeAndAfter, FunSuite}
+import org.scalatest.BeforeAndAfter
+import org.scalatest.funsuite.AnyFunSuite
 
 import scala.util.Random
 
@@ -53,7 +54,7 @@ object OptimizerTestSuite {
   }
 }
 
-abstract class OptimizerTestSuite extends FunSuite with BeforeAndAfter {
+abstract class OptimizerTestSuite extends AnyFunSuite with BeforeAndAfter {
   before {
     MathUtil.RANDOM.setSeed(0)
   }

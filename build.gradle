@@ -2,21 +2,20 @@
 
 buildscript {
     repositories {
-        // retrieve the shared gradle build scripts from here
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/"}
-        maven { url "https://oss.sonatype.org/content/repositories/releases" }
+        maven { url "https://oss.sonatype.org/content/repositories/releases/" }
     }
     dependencies {
-        classpath 'com.barrybecker4:bb4-gradle:1.6.2'
+        classpath 'com.barrybecker4:bb4-gradle:1.7-SNAPSHOT'
     }
 }
 
 plugins {
-    id "com.github.maiflai.scalatest" version "0.26" // needed to run scala tests
+    id "com.github.maiflai.scalatest" version "0.31" // needed to run scala tests
 }
 description = 'A Scala library project containing a collection of heuristic optimization algorithms.'
 group = 'com.barrybecker4'
-version = '1.6'
+version = '1.7-SNAPSHOT'
 ext {
     archivesBaseName = 'bb4-optimization'
     mainClass = "com.barrybecker4.optimization.viewer.OptimizerEvalFrame"
@@ -26,8 +25,8 @@ apply from: project.buildscript.classLoader.getResource('bb4.gradle').toURI()
 
 dependencies {
     // starting in scala 2.13, parallel collections must be included separately
-    compile group: 'org.scala-lang.modules', name: 'scala-parallel-collections_2.13', version: '0.2.0'
-    compile 'com.barrybecker4:bb4-ui:1.6'
+    implementation 'org.scala-lang.modules:scala-parallel-collections_3:1.0.4'
+    implementation 'com.barrybecker4:bb4-ui:1.6'
 }
 
 apply from: project.buildscript.classLoader.getResource('bb4-publish.gradle').toURI()

@@ -2,9 +2,10 @@ package com.barrybecker4.optimization.parameter
 
 import com.barrybecker4.optimization.parameter.types.{IntegerParameter, Parameter}
 import org.scalactic.{Equality, TolerantNumerics}
-import org.scalatest.{BeforeAndAfter, FunSuite}
+
 import scala.util.Random
 import com.barrybecker4.optimization.parameter.PermutedParameterArraySuite.RND
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
   * @author Barry Becker
@@ -14,7 +15,7 @@ object PermutedParameterArraySuite {
   private val RND = new Random(1)
 }
 
-class PermutedParameterArraySuite extends FunSuite {
+class PermutedParameterArraySuite extends AnyFunSuite {
 
   implicit val doubleEq: Equality[Double] =
     TolerantNumerics.tolerantDoubleEquality(PermutedParameterArraySuite.TOL)

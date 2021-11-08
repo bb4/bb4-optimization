@@ -33,10 +33,9 @@ class DiscreteImprovementFinder(var startingParams: ParameterArrayWithFitness) e
                                  lastImprovement: Improvement,
                                  cache: mutable.Set[ParameterArray]): Improvement = {
     var numTries = 0
-    var fitnessDelta = .0
+    var fitnessDelta = 1.0
     var jumpSize = .0
     var currentParams: ParameterArrayWithFitness = null
-
 
     if (lastImprovement == null) {
       currentParams = startingParams
@@ -49,10 +48,9 @@ class DiscreteImprovementFinder(var startingParams: ParameterArrayWithFitness) e
 
     var improvement = Improvement(currentParams, 0, jumpSize)
 
-
-    do {
+    while (fitnessDelta >= 0 && numTries < MAX_TRIES) {
       val nbrParam = currentParams.pa.getRandomNeighbor(jumpSize)
-      fitnessDelta = 0
+      fitnessDelta = .0
 
       if (!cache.contains(nbrParam)) {
         cache += nbrParam
@@ -72,7 +70,7 @@ class DiscreteImprovementFinder(var startingParams: ParameterArrayWithFitness) e
       }
       numTries += 1
       jumpSize *= JUMP_SIZE_INCREASE
-    } while (fitnessDelta >= 0 && numTries < MAX_TRIES)
+    }
 
     println("incremental improvement = " + improvement + " numTries=" + numTries)
     improvement

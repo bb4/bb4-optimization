@@ -79,21 +79,23 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
     // store the best solution we found at any given temperature iteration and use that as the initial
     // start of the next temperature iteration.
     var currentParams: ParameterArrayWithFitness = null
-    do { // temperature iteration (temperature drops each time through)
+
+    while (currentParams == null || (temperature > tempMin && !isOptimalFitnessReached(currentParams))) {
+      // temperature iteration (temperature drops each time through)
       currentParams = bestParams
-      do {
+      while (ct < N * currentParams.pa.size && !isOptimalFitnessReached(currentParams)) {
         currentParams = findNeighbor(currentParams, ct, temperature, fitnessRange)
         if (currentParams.fitness < bestParams.fitness) {
           bestParams = currentParams
           notifyOfChange(bestParams)
         }
         ct += 1
-      } while (ct < N * currentParams.pa.size && !isOptimalFitnessReached(currentParams))
+      }
       ct = 0
       // keep Reducing the temperature until it reaches tempMin
       temperature *= TEMP_DROP_FACTOR
       println("temp = " + temperature + " tempMin = " + tempMin + "\n bestParams = " + bestParams)
-    } while (temperature > tempMin && !isOptimalFitnessReached(currentParams))
+    }
     //println("T=" + temperature + "  currentFitness = " + bestParams.getFitness());
     log(ct, bestParams, 0, 0, FormatUtil.formatNumber(temperature))
     bestParams

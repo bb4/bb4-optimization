@@ -2,11 +2,11 @@ package com.barrybecker4.optimization.parameter.sampling
 
 import com.barrybecker4.optimization.parameter.PermutedParameterArray
 import com.barrybecker4.optimization.parameter.types.IntegerParameter
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 import scala.util.Random
 
-class PermutedGlobalSampleSuite extends FunSuite {
+class PermutedGlobalSampleSuite extends AnyFunSuite {
 
   test("sampling when 4 permuted items - 3 permutations") {
     val num = 4

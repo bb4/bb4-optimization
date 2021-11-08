@@ -1,8 +1,9 @@
 package com.barrybecker4.optimization.parameter
 
 import com.barrybecker4.math.MathUtil
-import org.scalatest.{BeforeAndAfter, FunSuite}
+import org.scalatest.{BeforeAndAfter}
 import NumericParameterArraySuite.createParamArray
+import org.scalatest.funsuite.AnyFunSuite
 
 import scala.util.Random
 
@@ -27,7 +28,7 @@ object NumericParameterArraySuite {
   }
 }
 
-class NumericParameterArraySuite extends FunSuite with BeforeAndAfter {
+class NumericParameterArraySuite extends AnyFunSuite with BeforeAndAfter {
 
   private var params: NumericParameterArray = _
 
