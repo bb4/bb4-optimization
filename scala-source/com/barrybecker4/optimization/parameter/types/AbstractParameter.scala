@@ -48,13 +48,13 @@ abstract class AbstractParameter(value: Double,
     minValue + rand.nextDouble() * range
 
   protected def findNewValue(proposedNewValue: Double): Double = {
-    validateRange(proposedNewValue)
+    val proposedValue = ensureRange(proposedNewValue)
 
     // if there is a redistribution function, we need to apply its inverse.
     if (redistributionFunction.isDefined) {
-      val v = (proposedNewValue - minValue) / range
+      val v = (proposedValue - minValue) / range
       minValue + range * redistributionFunction.get.getInverseFunctionValue(v)
-    } else proposedNewValue
+    } else proposedValue
   }
 
   override def toString: String = {
@@ -86,8 +86,10 @@ abstract class AbstractParameter(value: Double,
     retValue
   }
 
-  private def validateRange(value: Double): Unit = {
+  private def ensureRange(value: Double): Double = 
+    Math.min(maxValue, Math.max(minValue, value))
+    
+  private def validateRange(value: Double): Unit = 
     assert(value >= minValue && value <= maxValue,
       "Value " + value + " outside range [" + minValue + ", " + maxValue + "] for parameter " + name)
-  }
 }

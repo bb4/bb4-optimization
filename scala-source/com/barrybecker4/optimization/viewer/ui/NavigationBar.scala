@@ -1,10 +1,12 @@
 // Copyright by Barry G. Becker, 2000-2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
-package com.barrybecker4.optimization.viewer
+package com.barrybecker4.optimization.viewer.ui
+
+import com.barrybecker4.optimization.viewer.ui.{NavigationBar, OptimizationViewable}
+import com.barrybecker4.ui.components.{GradientButton, TexturedToolBar}
+import com.barrybecker4.ui.util.GUIUtil
 
 import java.awt.Dimension
 import java.awt.event.{ActionEvent, ActionListener}
-import com.barrybecker4.ui.components.{GradientButton, TexturedToolBar}
-import com.barrybecker4.ui.util.GUIUtil
 import javax.swing.{Box, Icon, ImageIcon}
 
 

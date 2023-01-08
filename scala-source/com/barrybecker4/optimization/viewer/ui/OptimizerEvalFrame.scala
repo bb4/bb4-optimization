@@ -1,21 +1,13 @@
 // Copyright by Barry G. Becker, 2000-2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
-package com.barrybecker4.optimization.viewer
+package com.barrybecker4.optimization.viewer.ui
+
+import com.barrybecker4.optimization.optimizee.optimizees.{OptimizeeProblem, TrivialProblem}
+import com.barrybecker4.optimization.viewer.ui.{OptimizerEvalPanel, TopControls}
+import com.barrybecker4.ui.application.ApplicationFrame
 
 import java.awt.BorderLayout
-import com.barrybecker4.optimization.optimizee.optimizees.{OptimizeeProblem, TrivialProblem}
-import com.barrybecker4.ui.application.ApplicationFrame
 import javax.swing.JPanel
 
-
-object OptimizerEvalFrame {
-  /**
-    * demonstrate with a trivial one parameter problem
-    */
-  def main(args: Array[String]): Unit = {
-    val testProblem = new TrivialProblem
-    new OptimizerEvalFrame("test/temp.txt", testProblem)
-  }
-}
 
 /**
   * Show iteration steps to the 2d solution.

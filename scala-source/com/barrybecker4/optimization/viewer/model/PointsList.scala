@@ -5,8 +5,8 @@ import java.awt.Point
 
 import com.barrybecker4.math.Range
 import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
-import com.barrybecker4.optimization.viewer.NavigationListener
 import com.barrybecker4.optimization.viewer.projectors.Projector
+import com.barrybecker4.optimization.viewer.ui.NavigationListener
 import javax.vecmath.Point2d
 
 import scala.collection.mutable.ArrayBuffer

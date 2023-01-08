@@ -1,10 +1,12 @@
 // Copyright by Barry G. Becker, 2000-2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
-package com.barrybecker4.optimization.viewer
+package com.barrybecker4.optimization.viewer.ui
+
+import com.barrybecker4.optimization.optimizee.optimizees.OptimizeeProblem
+import com.barrybecker4.optimization.strategy.OptimizationStrategyType
+import com.barrybecker4.optimization.viewer.ui.{NavigationBar, OptimizationViewable}
 
 import java.awt.BorderLayout
 import java.awt.event.{ActionEvent, ActionListener}
-import com.barrybecker4.optimization.optimizee.optimizees.OptimizeeProblem
-import com.barrybecker4.optimization.strategy.OptimizationStrategyType
 import javax.swing.{JComboBox, JPanel}
 
 

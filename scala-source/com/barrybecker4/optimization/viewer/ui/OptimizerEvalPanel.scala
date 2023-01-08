@@ -1,23 +1,19 @@
 // Copyright by Barry G. Becker, 2000-2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
-package com.barrybecker4.optimization.viewer
+package com.barrybecker4.optimization.viewer.ui
 
-import com.barrybecker4.optimization.OptimizationListener
-import com.barrybecker4.optimization.Optimizer
 import com.barrybecker4.optimization.optimizee.optimizees.OptimizeeProblem
 import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType
 import com.barrybecker4.optimization.viewer.model.PointsList
 import com.barrybecker4.optimization.viewer.projectors.SimpleProjector
+import com.barrybecker4.optimization.viewer.rendering.PointsListRenderer
+import com.barrybecker4.optimization.viewer.ui.{OptimizationViewable, OptimizerEvalPanel}
+import com.barrybecker4.optimization.{OptimizationListener, Optimizer}
+
+import java.awt.*
+import java.awt.event.{MouseEvent, MouseListener, MouseMotionListener}
 import javax.swing.JPanel
 import javax.vecmath.Point2d
-import java.awt.Color
-import java.awt.Dimension
-import java.awt.Graphics
-import java.awt.Graphics2D
-import java.awt.Point
-import java.awt.event.MouseEvent
-import java.awt.event.MouseListener
-import java.awt.event.MouseMotionListener
 
 
 object OptimizerEvalPanel {

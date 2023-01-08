@@ -2,7 +2,7 @@ package com.barrybecker4.optimization.optimizee.optimizees
 
 import com.barrybecker4.common.util.FileUtil
 import com.barrybecker4.optimization.optimizee.optimizees.problems._
-import com.barrybecker4.optimization.viewer.OptimizerEvalFrame
+import com.barrybecker4.optimization.viewer.ui.OptimizerEvalFrame
 
 /**
   * This is a simple search space to test the optimization package.
