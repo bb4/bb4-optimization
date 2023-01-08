@@ -11,8 +11,11 @@ import com.barrybecker4.optimization.parameter.ParameterArray
 abstract class AbsoluteOptimizee extends Optimizee {
   override def evaluateByComparison = false
 
+  /** Since lower fitness numbers are better, we subtract the fitness for params2 from params1
+    * @return the amount that params1 are better than params2. May be positive if params2 are better than params1.
+    */
   override def compareFitness(params1: ParameterArray, params2: ParameterArray): Double =
-    evaluateFitness(params1) - evaluateFitness(params2)
+     evaluateFitness(params2) - evaluateFitness(params1)
 
   /** Optional. Override this only if you know that there is some optimal fitness that you need to reach.
     * @return optimal fitness value. Terminate search when reached.

@@ -32,7 +32,7 @@ abstract class OptimizeeProblem extends Optimizee {
 
   override def getOptimalFitness = 0
   override def compareFitness(a: ParameterArray, b: ParameterArray) =
-    throw new UnsupportedOperationException("compareFitness not supperted for " + this.getClass.getName)
+    throw new UnsupportedOperationException("compareFitness not supported for " + this.getClass.getName)
   override def toString: String = getName
 
   /** @return approximate range of fitness values (usually 0 to this number). */
