@@ -31,4 +31,11 @@ dependencies {
     implementation 'com.barrybecker4:bb4-common:1.8-SNAPSHOT'
 }
 
+// Without this, the build failed in jenkins with the error:
+// Entry performance/test_optimizer/analytic_ABS_SINUSOIDAL_optimization.txt
+// is a duplicate but no duplicate handling strategy has been set.
+rootProject.tasks.named("processTestResources") {
+    duplicatesStrategy = DuplicatesStrategy.WARN
+}
+
 apply from: project.buildscript.classLoader.getResource('bb4-publish.gradle').toURI()
