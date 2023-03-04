@@ -15,6 +15,6 @@ object BooleanRedistribution {
   * @param percentTrue percent chance that the boolean parameter will have the value true. must be in range 0 to 1.0.
   * @author Barry Becker
   */
-class BooleanRedistribution(val percentTrue: Double)
+case class BooleanRedistribution(val percentTrue: Double)
   extends DiscreteRedistribution(2, SPECIAL_VALUES, getSpecialValueProbs(percentTrue)) {
 }

@@ -22,7 +22,7 @@ object GaussianRedistribution {
   * Convert the uniform distribution to a normal (gaussian) one.
   * @author Barry Becker
   */
-class GaussianRedistribution(var mean: Double, var stdDeviation: Double) extends RedistributionFunction {
+case class GaussianRedistribution(var mean: Double, var stdDeviation: Double) extends RedistributionFunction {
 
   verifyInRange(mean)
   private val errorFunction = new ErrorFunction
