@@ -23,7 +23,7 @@ abstract class AbstractIntParameter(theVal: Int, minVal: Int, maxVal: Int, param
       if (isOrdered) super.tweakNumericValue(theVal, radius, rand).round.toInt
       else if (rand.nextDouble() < radius)  // if not ordered, then just randomize with probability r
         getRandomVal(rand)
-      else theVal.toInt
+      else theVal
   }
 
   override def isIntegerOnly: Boolean = true

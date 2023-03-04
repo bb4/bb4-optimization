@@ -24,8 +24,8 @@ class TopControls(var logFile: String, val testProblems: Seq[OptimizeeProblem],
   private var testProblem = testProblems.head
 
   setLayout(new BorderLayout)
-  val navBar = new NavigationBar(viewable)
-  val comboPanel: JPanel = createStrategyCombo
+  private val navBar = new NavigationBar(viewable)
+  private val comboPanel: JPanel = createStrategyCombo
   if (testProblems.length > 1) {
     testProblemDropDown = new JComboBox[OptimizeeProblem](testProblems.toArray)
     testProblemDropDown.addActionListener(this)

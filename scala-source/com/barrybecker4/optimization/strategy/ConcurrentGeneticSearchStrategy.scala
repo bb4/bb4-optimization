@@ -40,9 +40,8 @@ class ConcurrentGeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUt
     workers.par.foreach(x => x.run()) // run workers in parallel
 
     for (worker <- workers) {
-      val eworker = worker.asInstanceOf[EvaluationWorker]
-      if (eworker.getResult < bestFitness.fitness)
-        bestFitness = eworker.getCandidateWithFitness
+      if (worker.getResult < bestFitness.fitness)
+        bestFitness = worker.getCandidateWithFitness
     }
     bestFitness
   }

@@ -29,8 +29,8 @@ object PointsList {
 class PointsList(var rawSolutionPosition: Point2d, var edgeSize: Int, var projector: Projector)
    extends NavigationListener {
 
-  private var rawPoints = ArrayBuffer[Point2d]()
-  private var paramArrays = ArrayBuffer[ParameterArrayWithFitness]()
+  private val rawPoints = ArrayBuffer[Point2d]()
+  private val paramArrays = ArrayBuffer[ParameterArrayWithFitness]()
 
   private var rangeX: Range = _
   private var rangeY: Range = _

@@ -72,11 +72,11 @@ class VariableLengthIntSet(params: IndexedSeq[Parameter], val fullSeq: IndexedSe
       if ((rnd.nextDouble() > 0.5 || size <= 1) && size < getMaxLength - 1) add = true
       else remove = true
     }
-    var numNodesToMove =
+    val numNodesToMove =
       if (add || remove) rnd.nextInt(Math.min(size, (radius + 1.1).toInt))
       else 1 + rnd.nextInt((1.4 + radius).toInt) // at least 1 will be moved
 
-    var result =
+    val result =
       if (remove) removeRandomParams(numToRemove(radius))
       else if (add) addRandomParams(numToAdd(radius))
       else this
@@ -129,7 +129,7 @@ class VariableLengthIntSet(params: IndexedSeq[Parameter], val fullSeq: IndexedSe
       "p" + i)
 
   private def removeRandomParams(num: Int): VariableLengthIntSet = {
-    val rndIndices = rnd.shuffle(params.indices.toIndexedSeq)
+    val rndIndices = rnd.shuffle(params.indices)
     val indicesToRemove = rndIndices.take(num).toSet
     //println("removing " + indicesToRemove.mkString(", ") + " from " + params.length)
     new VariableLengthIntSet(params.zipWithIndex.filter(p => !indicesToRemove.contains(p._2)).map(_._1),
@@ -154,8 +154,8 @@ class VariableLengthIntSet(params: IndexedSeq[Parameter], val fullSeq: IndexedSe
       removeRandomParams(1)
     } else {
 
-      val randomIndices = rnd.shuffle(params.indices.toIndexedSeq).take(numSelect).sorted
-      val randomFreeIndices = rnd.shuffle(freeNodes.indices.toIndexedSeq).take(numSelect)
+      val randomIndices = rnd.shuffle(params.indices).take(numSelect).sorted
+      val randomFreeIndices = rnd.shuffle(freeNodes.indices).take(numSelect)
 
       var ct = 0
       //println("current set = " + params.map(_.getValue).mkString(", "))

@@ -30,7 +30,7 @@ class VariableLengthGlobalSampler(var params: VariableLengthIntSet, val requeste
   /** becomes true if the requestedNumSamples is close to the total number of permutations in the space */
   private var useExhaustiveSearch = false
 
-  var totalConfigurations: Long =
+  private var totalConfigurations: Long =
     if (params.getMaxLength <= 60)
       Math.pow(2, params.getMaxLength).toLong - 1
     else Long.MaxValue

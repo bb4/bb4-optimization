@@ -13,7 +13,7 @@ import RedistributionFunction.verifyInRange
   * want to have special probabilities in an otherwise uniform distribution.
   * @author Barry Becker
   */
-class UniformRedistribution extends RedistributionFunction {
+class UniformRedistribution() extends RedistributionFunction {
 
   protected var specialValues: Array[Double] = _
   protected var specialValueProbabilities: Array[Double] = _

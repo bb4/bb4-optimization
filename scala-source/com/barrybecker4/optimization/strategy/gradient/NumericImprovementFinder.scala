@@ -11,10 +11,10 @@ import ImprovementFinder.INITIAL_JUMP_SIZE
 object NumericImprovementFinder {
 
   /** If the dot product of the new gradient with the old is less than this, then decrease the jump size. */
-  val MIN_DOT_PRODUCT = 0.3
+  private val MIN_DOT_PRODUCT = 0.3
 
   /** If the dot product of the new gradient with the old is greater than this, then increase the jump size. */
-  val MAX_DOT_PRODUCT = 0.98
+  private val MAX_DOT_PRODUCT = 0.98
 }
 
 /**
@@ -45,7 +45,7 @@ class NumericImprovementFinder(val startingParams: ParameterArrayWithFitness) ex
       oldGradient = lastImprovement.gradient.get
       jumpSize = lastImprovement.jumpSize
     }
-    var oldFitness: Double = currentParams.fitness
+    val oldFitness: Double = currentParams.fitness
     val iter = new ImprovementIteration(currentParams, oldGradient)
     var sumOfSqs: Double = 0
     for (i <- 0 until currentParams.pa.size) {

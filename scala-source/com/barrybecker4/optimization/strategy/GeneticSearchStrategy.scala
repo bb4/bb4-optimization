@@ -111,8 +111,8 @@ class GeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM)
     var deltaFitness = -1.0
     var numWithNoImprovement = 0
 
-    var lowThresh = 0.005* fitnessRange  // shrink if less than this
-    var highThresh = 0.05 * fitnessRange // grow if more than this
+    val lowThresh = 0.005* fitnessRange  // shrink if less than this
+    val highThresh = 0.05 * fitnessRange // grow if more than this
 
     var recentBest = lastBest
     //println("findNewBest: recent best =" + recentBest);

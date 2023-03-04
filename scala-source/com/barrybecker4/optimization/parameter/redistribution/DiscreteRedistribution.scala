@@ -12,8 +12,8 @@ package com.barrybecker4.optimization.parameter.redistribution
   * @param discreteSpecialValueProbabilities sum of all special value probabilities must be less than or equal to one.
   * @author Barry Becker
   */
-case class DiscreteRedistribution(numValues: Int, discreteSpecialValues: Array[Int],
-                                  discreteSpecialValueProbabilities: Array[Double]) extends UniformRedistribution {
+class DiscreteRedistribution(numValues: Int, discreteSpecialValues: Array[Int],
+                             discreteSpecialValueProbabilities: Array[Double]) extends UniformRedistribution {
 
   val len: Int = discreteSpecialValues.length
   specialValues = new Array[Double](len)

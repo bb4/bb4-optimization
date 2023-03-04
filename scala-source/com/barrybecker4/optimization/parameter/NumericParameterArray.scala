@@ -11,7 +11,7 @@ import scala.util.Random
 
 object NumericParameterArray {
   /** default number of steps to go from the min to the max */
-  val DEFAULT_NUM_STEPS = 10
+  private val DEFAULT_NUM_STEPS = 10
 
   def createParams(vals: IndexedSeq[Double], minVals: IndexedSeq[Double], maxVals: IndexedSeq[Double],
                    names: IndexedSeq[String]): IndexedSeq[Parameter] = {

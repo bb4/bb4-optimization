@@ -112,7 +112,7 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
   private def findNeighbor(params: ParameterArrayWithFitness,
                            ct: Int, temperature: Double, fitnessRange: Double): ParameterArrayWithFitness = {
     //double r = (tempMax/5.0+temperature) / (8.0*(N/5.0+ct)*tempMax);
-    var curParams = params
+    val curParams = params
     val r = 8 * temperature / ((N + ct) * tempMax)
     var newParams = params.pa.getRandomNeighbor(r)
 

@@ -14,7 +14,7 @@ import java.util.NoSuchElementException
 class NumericGlobalSampler(var params: NumericParameterArray, val requestedNumSamples: Long)
     extends AbstractGlobalSampler[NumericParameterArray] {
 
-  val dims = new Array[Int](params.size)
+  private val dims = new Array[Int](params.size)
 
   /** number of discrete samples to take along each parameter */
   private val samplingRate = determineSamplingRate(requestedNumSamples)

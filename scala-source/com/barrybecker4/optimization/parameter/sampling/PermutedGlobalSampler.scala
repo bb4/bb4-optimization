@@ -30,7 +30,7 @@ class PermutedGlobalSampler(var params: PermutedParameterArray, val requestedNum
 
   // See page 13 in How to Solve It.
   // Divide by 2 because it does not matter which param we start with.
-  val numPermutations: BigInteger = MathUtil.bigFactorial(params.size).divide(BigInteger.valueOf(2))
+  private val numPermutations: BigInteger = MathUtil.bigFactorial(params.size).divide(BigInteger.valueOf(2))
 
   // if the requested number of samples is close to the total number of permutations,
   // then we could just enumerate the permutations.
