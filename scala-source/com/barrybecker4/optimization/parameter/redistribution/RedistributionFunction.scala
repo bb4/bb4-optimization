@@ -16,9 +16,8 @@ object RedistributionFunction {
 /**
   * Responsible for defining the probability distribution for selecting random parameter values.
   * Derived classes will define the different sorts of redistribution functions.
-  * @author Barry Becker
   */
-trait RedistributionFunction extends Function {
+trait RedistributionFunction extends Object with Function {
 
   /** the discretized redistribution function */
   protected var redistributionFunction: InvertibleFunction = _
@@ -47,7 +46,7 @@ trait RedistributionFunction extends Function {
     newValue
   }
 
-  override def getDomain = Range(0, 1.0)
+  override def getDomain: Range = Range(0, 1.0)
 
   protected def initializeFunction(): Unit
 }

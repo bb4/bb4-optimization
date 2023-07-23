@@ -27,7 +27,7 @@ dependencies {
     // starting in scala 2.13, parallel collections must be included separately
     implementation 'org.scala-lang.modules:scala-parallel-collections_3:1.0.4'
     implementation 'com.barrybecker4:bb4-ui:1.8-SNAPSHOT'
-    implementation 'com.barrybecker4:bb4-math:1.7'
+    implementation 'com.barrybecker4:bb4-math:1.8-SNAPSHOT'
     implementation 'com.barrybecker4:bb4-common:1.8-SNAPSHOT'
 }
 

@@ -4,11 +4,7 @@ A collection of heuristic optimization algorithms.
 The algorithms are implemented mostly as described by Michalewicz and Fogel in ["How to Solve It: Modern Heuristics"](http://www.amazon.com/How-Solve-It-Modern-Heuristics/dp/3540224947)
 
 An Optimizer uses a specified optimization strategy (see OptimizationStrategyType) to optimize an Optimizee.
-Optimization is nearly the same thing as search. In the puzzle implementations in bb4-puzzles, optimization
-is used to search for a solution using the genetic algorithm strategy. In the two player game implementations in bb4-games,
-optimization is used to help the computer to learn to play better. In bb4-simulations, optimization is use to have the 
-snake learn how to move efficiently.
-
+Optimization is nearly the same thing as search. In [bb4-puzzles](https://github.com/bb4/bb4-puzzles), [bb4-games](https://github.com/bb4/bb4-games), and [bb4-simulations](https://github.com/bb4/bb4-simulations) implementations, various types of optimization strategies from this library are used to search for solutions.
 
 ### How to Build
 Type 'gradlew build' at the root (or ./gradlew if running in Cygwin). This is mainly a library project, but there are several interesting test cases that can be viewed visually.
