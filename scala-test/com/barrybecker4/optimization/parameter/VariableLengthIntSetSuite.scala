@@ -9,7 +9,7 @@ import com.barrybecker4.optimization.parameter.VariableLengthIntSet.createParam
 import org.scalatest.funsuite.AnyFunSuite
 
 
-class VariableLengthIntSetSuite extends AnyFunSuite with BeforeAndAfter{
+class VariableLengthIntSetSuite extends AnyFunSuite with BeforeAndAfter {
 
   private var params: VariableLengthIntSet = _
   private var rnd: Random = _

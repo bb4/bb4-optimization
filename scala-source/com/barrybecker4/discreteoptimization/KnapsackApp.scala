@@ -1,7 +1,7 @@
 package com.barrybecker4.discreteoptimization
 
-import com.barrybecker4.discreteoptimization.knapsack.model.{KnapsackItem, KnapsackProblem, KnapsackSolution}
-import com.barrybecker4.discreteoptimization.knapsack.solver.KnapsackTrivialGreedySolver
+import com.barrybecker4.discreteoptimization.knapsack.model.{Item, Problem, ProblemParser, Solution}
+import com.barrybecker4.discreteoptimization.knapsack.solver.GreedySolver
 
 import java.io.*
 import java.util
@@ -13,6 +13,13 @@ import scala.io.Source
 object KnapsackApp {
 
   /** Read the instance, solve it, and print the solution in the standard output
+    *
+    * awPVV, ./data/ks_30_0, solver.py, Knapsack Problem 1
+    * hHYWS, ./data/ks_50_0, solver.py, Knapsack Problem 2
+    * JwWnx, ./data/ks_200_0, solver.py, Knapsack Problem 3
+    * Z2tMt, ./data/ks_400_0, solver.py, Knapsack Problem 4
+    * PUIxa, ./data/ks_1000_0, solver.py, Knapsack Problem 5
+    * AKXWc, ./data/ks_10000_0, solver.py, Knapsack Problem 6
     */
   def main(args: Array[String]): Unit = {
     val fileName = getFileName(args)
@@ -20,11 +27,10 @@ object KnapsackApp {
       println("No filename provided!")
       return
     }
-    // read the lines out of the file
-    val lines: IndexedSeq[String] = Source.fromFile(fileName).getLines.toIndexedSeq
-    val problem: KnapsackProblem = parseProblem(lines)
-    val solution = KnapsackTrivialGreedySolver(problem).findItems()
-    solution.printFormatted()
+
+    val problem: Problem = ProblemParser().parseProblem(fileName)
+    val solution = GreedySolver().findItems(problem)
+    println(solution.serialize())
   }
 
   private def getFileName(args: Array[String]): String = {
@@ -37,19 +43,4 @@ object KnapsackApp {
     }
     fileName
   }
-
-  private def parseProblem(lines: IndexedSeq[String]): KnapsackProblem = {
-    // parse the data in the file
-    val firstLine = lines(0).split("\\s+")
-    val numItems = firstLine(0).toInt
-    val capacity = firstLine(1).toInt
-    var items = IndexedSeq[KnapsackItem]()
-    for (i <- 0 until numItems) {
-      val line = lines(i + 1)
-      val parts = line.split("\\s+")
-      items :+= KnapsackItem(i, parts(0).toInt, parts(1).toInt)
-    }
-    KnapsackProblem(capacity, items)
-  }
-
 }

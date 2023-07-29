@@ -1,14 +1,14 @@
 package com.barrybecker4.discreteoptimization.knapsack.solver
 
-import com.barrybecker4.discreteoptimization.knapsack.model.{KnapsackProblem, KnapsackSolution}
+import com.barrybecker4.discreteoptimization.knapsack.model.{Problem, Solution}
 
 
-case class KnapsackTrivialGreedySolver(problem: KnapsackProblem) {
+case class TrivialGreedySolver() extends KnapsackSolver {
 
   /** A trivial greedy algorithm for filling the knapsack.
     * It takes items in-order until the knapsack is full
     */
-  def findItems(): KnapsackSolution = {
+  def findItems(problem: Problem): Solution = {
     var totalValue = 0
     var weight = 0
     val taken = new Array[Int](problem.numItems)
@@ -20,7 +20,7 @@ case class KnapsackTrivialGreedySolver(problem: KnapsackProblem) {
       }
       else taken(item.index) = 0
     }
-    KnapsackSolution(totalValue, taken)
+    Solution(totalValue, taken)
   }
   
 }

@@ -1,5 +1,5 @@
 package com.barrybecker4.discreteoptimization.knapsack.model
 
-case class KnapsackProblem(capacity: Int, items: IndexedSeq[KnapsackItem]) {
+case class Problem(capacity: Int, items: IndexedSeq[Item]) {
   def numItems: Int = items.length
 }
