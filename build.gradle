@@ -19,7 +19,7 @@ version = '1.8-SNAPSHOT'
 ext {
     archivesBaseName = 'bb4-optimization'
     //mainClass = "com.barrybecker4.optimization.viewer.OptimizerEvalApp"
-    mainClass = "com.barrybecker4.discreteoptimization.Solution"
+    mainClass = "com.barrybecker4.discreteoptimization.KnapsackApp"
 }
 
 apply from: project.buildscript.classLoader.getResource('bb4.gradle').toURI()

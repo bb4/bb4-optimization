@@ -1,6 +1,6 @@
 package com.barrybecker4.discreteoptimization
 
-object Solution {
+object AnyIntApp {
   def main(args: Array[String]): Unit = {
     val input = scala.io.StdIn.readInt()
     val result = processInput(input)
