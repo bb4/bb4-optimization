@@ -1,7 +1,7 @@
 package com.barrybecker4.discreteoptimization
 
 import com.barrybecker4.discreteoptimization.knapsack.model.{Item, Problem, ProblemParser, Solution}
-import com.barrybecker4.discreteoptimization.knapsack.solver.GreedySolver
+import com.barrybecker4.discreteoptimization.knapsack.solver.{GreedySolver, HybridSolver}
 
 import java.io.*
 import java.util
@@ -29,7 +29,7 @@ object KnapsackApp {
     }
 
     val problem: Problem = ProblemParser().parseProblem(fileName)
-    val solution = GreedySolver().findItems(problem)
+    val solution = HybridSolver().findItems(problem)
     println(solution.serialize())
   }
 

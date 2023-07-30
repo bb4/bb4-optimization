@@ -5,27 +5,30 @@ import com.barrybecker4.discreteoptimization.knapsack.model.{Item, Problem, Solu
 
 case class PerfectSolver() extends KnapsackSolver {
 
-  
+
   /** A greedy algorithm for filling the knapsack.
     * It sorts them by value/weight, then takes items in-order until the knapsack is full.
     */
   def findItems(problem: Problem): Solution = {
 
-    val sortedItems = problem.items.sortWith(_.valuePerWeight > _.valuePerWeight)
-    var takenSet: Set[Int] = Set()
-
-    var totalValue = 0
-    var weight = 0
-    for (item <- sortedItems) {
-      if (weight + item.weight <= problem.capacity) {
-        takenSet += item.index
-        totalValue += item.value
-        weight += item.weight
-      }
+    if (problem.numItems == 1) {
+      val item = problem.items(0)
+      if (item.value < problem.capacity) Solution(item.value, List(1), true)
+      else Solution(0, List(0), true)
     }
-
-    val taken: Array[Int] = problem.items.map(item => if (takenSet.contains(item.index)) 1 else 0).toArray
-    Solution(totalValue, taken)
+    else {
+      val (item, rest) = (problem.items.head, problem.items.tail)
+      val candidate1 = findItems(Problem(problem.capacity, rest))
+      
+      if (item.weight < problem.capacity) {
+        val candidate2 = findItems(Problem(problem.capacity - item.weight, rest))
+        if (candidate1.totalValue > item.value + candidate2.totalValue)
+          Solution(candidate1.totalValue, 0 :: candidate1.taken, true)
+        else
+          Solution(item.value + candidate2.totalValue, 1 :: candidate2.taken, true)
+      }
+      else Solution(candidate1.totalValue, 0 :: candidate1.taken, true)
+    }
   }
   
 }

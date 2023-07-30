@@ -23,7 +23,7 @@ case class GreedySolver() extends KnapsackSolver {
       }
     }
 
-    val taken: Array[Int] = problem.items.map(item => if (takenSet.contains(item.index)) 1 else 0).toArray
+    val taken: List[Int] = problem.items.map(item => if (takenSet.contains(item.index)) 1 else 0).toList
     Solution(totalValue, taken)
   }
   

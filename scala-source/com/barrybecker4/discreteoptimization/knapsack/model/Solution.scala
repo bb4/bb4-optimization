@@ -1,6 +1,6 @@
 package com.barrybecker4.discreteoptimization.knapsack.model
 
-case class Solution(totalValue: Int, taken: Array[Int], perfect: Boolean = false) {
+case class Solution(totalValue: Int, taken: List[Int], perfect: Boolean = false) {
 
   // Serialize solution in the course's specified output format
   def serialize(): String = {

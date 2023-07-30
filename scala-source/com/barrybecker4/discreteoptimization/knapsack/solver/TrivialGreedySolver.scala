@@ -11,14 +11,14 @@ case class TrivialGreedySolver() extends KnapsackSolver {
   def findItems(problem: Problem): Solution = {
     var totalValue = 0
     var weight = 0
-    val taken = new Array[Int](problem.numItems)
+    var taken: List[Int] = List()
     for (item <- problem.items) {
       if (weight + item.weight <= problem.capacity) {
-        taken(item.index) = 1
+        taken :+= 1
         totalValue += item.value
         weight += item.weight
       }
-      else taken(item.index) = 0
+      else taken :+= 0
     }
     Solution(totalValue, taken)
   }
