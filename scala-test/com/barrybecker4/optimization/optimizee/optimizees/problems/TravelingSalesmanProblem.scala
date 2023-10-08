@@ -15,12 +15,14 @@ object TravelingSalesmanProblem {
 
   /** Finds the solution for the above optimization problem. */
   def main(args: Array[String]): Unit = {
-    val v = TSP_SIMPLE
+    val v = TSP_SIMPLE // TSP_STANDARD // TSP_US_CAPITALS // TSP_SIMPLE
     val problem = new TravelingSalesmanProblem(v)
     val optimizer = new Optimizer(problem, Some(LOG_FILE_HOME + "tsp_optimization.txt"))
     val initialGuess = problem.getInitialGuess
+
     val solution = optimizer.doOptimization(SIMULATED_ANNEALING,
       initialGuess, v.getFitnessRange, new Random(1))
+
     showSolution(problem, solution)
   }
 }

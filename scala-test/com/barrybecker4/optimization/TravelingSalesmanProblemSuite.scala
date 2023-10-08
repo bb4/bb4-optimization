@@ -8,6 +8,7 @@ import com.barrybecker4.optimization.strategy.{BRUTE_FORCE, OptimizationStrategy
   * @author Barry Becker
   */
 class TravelingSalesmanProblemSuite extends OptimizerTestSuite {
+  
   test("BruteForce") {
     doTest(BRUTE_FORCE)
   }

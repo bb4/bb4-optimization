@@ -13,7 +13,7 @@ import scala.util.Random
 
 object TravelingSalesmanVariation {
   val RANDOM = new Random(1)
-  val VALUES = IndexedSeq(TSP_SIMPLE, TSP_STANDARD)//, TSP_US_CAPITALS)
+  val VALUES = IndexedSeq(TSP_SIMPLE) //, TSP_STANDARD, TSP_US_CAPITALS)
 }
 
 sealed trait TravelingSalesmanVariation  extends ProblemVariation {
@@ -235,7 +235,7 @@ case object TSP_US_CAPITALS extends TravelingSalesmanVariation {
   override def getShortestPathLength = 10627.75
 
   override def getExactSolution: ParameterArrayWithFitness = {
-    val solution = createSolution(Array[Int](2, 4)) // not knoen
+    val solution = createSolution(Array[Int](2, 4)) // not known
     ParameterArrayWithFitness(solution, 0)
   }
 

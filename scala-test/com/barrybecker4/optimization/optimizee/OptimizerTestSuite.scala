@@ -50,7 +50,7 @@ object OptimizerTestSuite {
     }
     println("\n************************************************************************")
     println("The solution to the Problem using " + optType + " is :\n" + solution + "\nWhich evaluates to: " +
-      solution.fitness + " with error= " + error)
+      solution.fitness + " with error = " + error)
   }
 }
 
