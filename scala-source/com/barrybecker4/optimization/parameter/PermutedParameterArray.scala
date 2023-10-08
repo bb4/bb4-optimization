@@ -71,11 +71,11 @@ case class PermutedParameterArray(params: IndexedSeq[Parameter], rnd: Random)
     *       and requestedNumSamples is large, it may not be possible to return this many unique samples.
     * @return some number of unique samples.
     */
-  override def findGlobalSamples(requestedNumSamples: Long) =
+  override def findGlobalSamples(requestedNumSamples: Long): Iterator[PermutedParameterArray] =
     new PermutedGlobalSampler(this, requestedNumSamples)
 
   /** @return get a completely random solution in the parameter space. */
-  override def getRandomSample: ParameterArray = {
+  override def getRandomSample: PermutedParameterArray = {
     PermutedParameterArray(rnd.shuffle(params), rnd)
   }
 }

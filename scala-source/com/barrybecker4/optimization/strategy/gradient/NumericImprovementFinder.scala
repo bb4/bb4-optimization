@@ -2,10 +2,10 @@ package com.barrybecker4.optimization.strategy.gradient
 
 import com.barrybecker4.math.linear.Vector
 import com.barrybecker4.optimization.optimizee.Optimizee
-import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
+import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray, ParameterArrayWithFitness}
 
 import scala.collection.mutable
-import NumericImprovementFinder._
+import NumericImprovementFinder.*
 import ImprovementFinder.INITIAL_JUMP_SIZE
 
 object NumericImprovementFinder {
@@ -21,7 +21,7 @@ object NumericImprovementFinder {
   * @param startingParams parameters to improve
   * @author Barry Becker
   */
-class NumericImprovementFinder(val startingParams: ParameterArrayWithFitness) extends ImprovementFinder {
+class NumericImprovementFinder(val startingParams: ParameterArrayWithFitness[NumericParameterArray]) extends ImprovementFinder[NumericParameterArray] {
 
 
   /** Try to find a parameterArray that is better than what we have now by evaluating using the optimizee passed in.
@@ -31,9 +31,9 @@ class NumericImprovementFinder(val startingParams: ParameterArrayWithFitness) ex
     *               parameters are discrete and not continuous.
     * @return the improvement which contains the improved parameter array and possibly a revised jumpSize.
     */
-  def findIncrementalImprovement(optimizee: Optimizee, lastImprovement: Improvement,
-                                 cache: mutable.Set[ParameterArray]): Improvement = {
-    var currentParams: ParameterArrayWithFitness = null
+  def findIncrementalImprovement(optimizee: Optimizee[NumericParameterArray], lastImprovement: Improvement[NumericParameterArray],
+                                 cache: mutable.Set[NumericParameterArray]): Improvement[NumericParameterArray] = {
+    var currentParams: ParameterArrayWithFitness[NumericParameterArray] = null
     var oldGradient: Vector = null
     var jumpSize: Double = 0
     if (lastImprovement == null) {

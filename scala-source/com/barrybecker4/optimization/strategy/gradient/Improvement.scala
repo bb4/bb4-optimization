@@ -17,7 +17,7 @@ object Improvement {
   * @param gradient (optional) direction that we are currently moving in if any.
   * @author Barry Becker
   */
-case class Improvement(parameters: ParameterArrayWithFitness,
+case class Improvement[P <: ParameterArray](parameters: ParameterArrayWithFitness[P],
                        improvement: Double, jumpSize: Double, gradient: Option[Vector] = None) {
 
   def improved: Boolean = improvement < 0 /* -fitnessEps*/ && jumpSize > JUMP_SIZE_EPS

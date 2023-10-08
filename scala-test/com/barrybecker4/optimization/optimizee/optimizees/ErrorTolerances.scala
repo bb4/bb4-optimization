@@ -1,7 +1,8 @@
 // Copyright by Barry G. Becker, 2013-2014. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.optimizee.optimizees
 
-import com.barrybecker4.optimization.strategy._
+import com.barrybecker4.optimization.parameter.ParameterArray
+import com.barrybecker4.optimization.strategy.*
 
 /** Some common tolerances to use in tests */
 object ErrorTolerances {
@@ -20,7 +21,7 @@ case class ErrorTolerances(globalSampling: Double, globalHillClimbing: Double, h
              simAnnealing: Double, geneticSearch: Double, concurrentGeneticSearch: Double,
              stateSpace: Double = 0, bruteForce: Double = 0) {
 
-  private val percentValues = Map[OptimizationStrategyType, Double](
+  private val percentValues = Map[OptimizationStrategyType[? < ParameterArray], Double](
     GLOBAL_SAMPLING -> globalSampling,
     GLOBAL_HILL_CLIMBING -> globalHillClimbing,
     HILL_CLIMBING -> hillClimbing,
@@ -33,5 +34,5 @@ case class ErrorTolerances(globalSampling: Double, globalHillClimbing: Double, h
   )
 
 
-  def getErrorTolerancePercent(opt: OptimizationStrategyType): Double = percentValues(opt)
+  def getErrorTolerancePercent(opt: OptimizationStrategyType[? < ParameterArray]): Double = percentValues(opt)
 }

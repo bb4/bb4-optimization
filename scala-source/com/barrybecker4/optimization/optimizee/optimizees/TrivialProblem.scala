@@ -2,7 +2,7 @@
 package com.barrybecker4.optimization.optimizee.optimizees
 
 import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray, ParameterArrayWithFitness}
-import TrivialProblem._
+import TrivialProblem.*
 
 import scala.util.Random
 
@@ -19,9 +19,9 @@ object TrivialProblem {
   * A trivial one dimensional example implementation of an OptimizeeProblem
   * @author Barry Becker
   */
-class TrivialProblem extends OptimizeeProblem {
+class TrivialProblem extends OptimizeeProblem[NumericParameterArray] {
 
-  override def getExactSolution: ParameterArrayWithFitness = EXACT_SOLUTION
+  override def getExactSolution: ParameterArrayWithFitness[NumericParameterArray] = EXACT_SOLUTION
 
   override def getInitialGuess = new NumericParameterArray(
     Array(0.5), Array(0.0), Array(1.0), Array[String]("param1"), new Random(1)
@@ -30,5 +30,5 @@ class TrivialProblem extends OptimizeeProblem {
   override def getFitnessRange = 1.0
   override def getName = "Trivial Test Problem"
   override def evaluateByComparison = false
-  override def evaluateFitness(params: ParameterArray): Double = EXACT_SOLUTION.pa.distance(params)
+  override def evaluateFitness(params: NumericParameterArray): Double = EXACT_SOLUTION.pa.distance(params)
 }

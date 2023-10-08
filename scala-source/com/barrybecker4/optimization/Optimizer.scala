@@ -4,7 +4,7 @@ package com.barrybecker4.optimization
 import com.barrybecker4.math.MathUtil
 import com.barrybecker4.optimization.optimizee.Optimizee
 import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
-import com.barrybecker4.optimization.strategy.OptimizationStrategyType
+import com.barrybecker4.optimization.strategy.{OptimizationStrategy, OptimizationStrategyType}
 
 import scala.util.Random
 
@@ -28,9 +28,9 @@ import scala.util.Random
   * @param optimizationLogFile (optional) used to log info as optimization proceeds
   * @author Barry Becker
   */
-class Optimizer(val optimizee: Optimizee, optimizationLogFile: Option[String] = None) {
+class Optimizer[P <: ParameterArray](val optimizee: Optimizee[P], optimizationLogFile: Option[String] = None) {
 
-  protected var listener: OptimizationListener = _
+  protected var listener: OptimizationListener[P] = _
   private val logger: Option[Logger] =
     if (optimizationLogFile.isDefined) Some(new Logger(optimizationLogFile.get)) else None
 
@@ -40,11 +40,11 @@ class Optimizer(val optimizee: Optimizee, optimizationLogFile: Option[String] = 
     * @param fitnessRange     the approximate range (max-min) of the fitness values
     * @return the solution to the optimization problem.
     */
-  def doOptimization(optimizationType: OptimizationStrategyType,
-                     params: ParameterArray, fitnessRange: Double,
-                     rnd: Random = MathUtil.RANDOM): ParameterArrayWithFitness = {
+  def doOptimization(optimizationType: OptimizationStrategyType[P],
+                     params: P, fitnessRange: Double,
+                     rnd: Random = MathUtil.RANDOM): ParameterArrayWithFitness[P] = {
 
-    val optStrategy = optimizationType.getStrategy(optimizee, fitnessRange, rnd)
+    val optStrategy: OptimizationStrategy[P] = optimizationType.getStrategy(optimizee, fitnessRange, rnd)
     if (logger.isDefined) {
       logger.get.initialize(params)
       optStrategy.setLogger(logger.get)
@@ -53,7 +53,7 @@ class Optimizer(val optimizee: Optimizee, optimizationLogFile: Option[String] = 
     optStrategy.doOptimization(params, fitnessRange)
   }
 
-  def setListener(lnr: OptimizationListener): Unit = {
+  def setListener(lnr: OptimizationListener[P]): Unit = {
     listener = lnr
   }
 }

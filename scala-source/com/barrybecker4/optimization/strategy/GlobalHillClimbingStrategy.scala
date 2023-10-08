@@ -2,7 +2,7 @@
 package com.barrybecker4.optimization.strategy
 
 import com.barrybecker4.optimization.optimizee.Optimizee
-import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
+import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray, ParameterArrayWithFitness}
 
 
 object GlobalHillClimbingStrategy {
@@ -16,7 +16,7 @@ object GlobalHillClimbingStrategy {
   * @param optimizee the thing to be optimized.
   * @author Barry Becker
   */
-class GlobalHillClimbingStrategy(optimizee: Optimizee) extends OptimizationStrategy(optimizee) {
+class GlobalHillClimbingStrategy(optimizee: Optimizee[NumericParameterArray]) extends OptimizationStrategy[NumericParameterArray](optimizee) {
 
   /**
     * Perform the optimization of the optimizee.
@@ -24,13 +24,13 @@ class GlobalHillClimbingStrategy(optimizee: Optimizee) extends OptimizationStrat
     * @param fitnessRange the approximate absolute value of the fitnessRange.
     * @return optimized params
     */
-  override def doOptimization(params: ParameterArray,
-                              fitnessRange: Double): ParameterArrayWithFitness = {
+  override def doOptimization(params: NumericParameterArray,
+                              fitnessRange: Double): ParameterArrayWithFitness[NumericParameterArray] = {
     val sampleResult = doSampleOptimization(params, fitnessRange)
     doHillClimbingOptimization(sampleResult.pa, fitnessRange)
   }
 
-  private def doSampleOptimization(params: ParameterArray, fitnessRange: Double) = {
+  private def doSampleOptimization(params: NumericParameterArray, fitnessRange: Double) = {
     val gsStrategy = new GlobalSampleStrategy(optimizee)
     gsStrategy.setListener(listener)
     // 3 sample points along each dimension
@@ -40,7 +40,7 @@ class GlobalHillClimbingStrategy(optimizee: Optimizee) extends OptimizationStrat
     gsStrategy.doOptimization(params, fitnessRange)
   }
 
-  private def doHillClimbingOptimization(params: ParameterArray, fitnessRange: Double) = {
+  private def doHillClimbingOptimization(params: NumericParameterArray, fitnessRange: Double) = {
     val strategy = new HillClimbingStrategy(optimizee)
     strategy.setListener(listener)
     strategy.doOptimization(params, fitnessRange)

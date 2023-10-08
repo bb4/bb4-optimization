@@ -7,7 +7,7 @@ import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWi
 
 object OptimizeeProblem {
 
-  def showSolution(problem: OptimizeeProblem, solution: ParameterArrayWithFitness): Unit = {
+  def showSolution(problem: OptimizeeProblem[ParameterArray], solution: ParameterArrayWithFitness[ParameterArray]): Unit = {
     println("\n************************************************************************")
     println("The solution to the " + problem.getName + " test problem is :\n" + solution)
     println("Which evaluates to: " + solution.fitness)
@@ -19,19 +19,19 @@ object OptimizeeProblem {
   * Abstract base class for optimizer test problems.
   * @author Barry Becker
   */
-abstract class OptimizeeProblem extends Optimizee {
+abstract class OptimizeeProblem[P <: ParameterArray] extends Optimizee[P] {
 
   /** @return the exact solution for this problem. */
-  def getExactSolution: ParameterArrayWithFitness
+  def getExactSolution: ParameterArrayWithFitness[P]
 
-  def getInitialGuess: ParameterArray
+  def getInitialGuess: P
 
   /** @return distance from the exact solution as the error. */
-  def getError(solution: ParameterArrayWithFitness): Double =
+  def getError(solution: ParameterArrayWithFitness[P]): Double =
     100.0 * (solution.fitness - getOptimalFitness) / getFitnessRange
 
   override def getOptimalFitness = 0
-  override def compareFitness(a: ParameterArray, b: ParameterArray) =
+  override def compareFitness(a: P, b: P) =
     throw new UnsupportedOperationException("compareFitness not supported for " + this.getClass.getName)
   override def toString: String = getName
 

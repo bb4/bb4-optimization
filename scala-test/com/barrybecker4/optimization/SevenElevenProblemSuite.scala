@@ -15,7 +15,7 @@ object SevenElevenProblemSuite {
 }
 
 class SevenElevenProblemSuite extends OptimizerTestSuite {
-  override protected def doTest(optType: OptimizationStrategyType): Unit = {
+  override protected def doTest(optType: OptimizationStrategyType[NumericParameterType]): Unit = {
     val problem = new SevenElevenProblem
     val optimizer = new Optimizer(problem, Some(LOG_FILE_HOME + "sevenEleven_optimization.txt"))
     val initialGuess = problem.getInitialGuess

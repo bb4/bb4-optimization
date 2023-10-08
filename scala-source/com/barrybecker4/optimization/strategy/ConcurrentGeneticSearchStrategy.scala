@@ -17,7 +17,7 @@ import scala.collection.parallel.CollectionConverters._
   * @param optimizee the thing to be optimized.
   * @author Barry Becker
   */
-class ConcurrentGeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM)
+class ConcurrentGeneticSearchStrategy[P <: ParameterArray](optimizee: Optimizee[P], rnd: Random = MathUtil.RANDOM)
   extends GeneticSearchStrategy(optimizee, rnd) {
 
   /**
@@ -32,8 +32,8 @@ class ConcurrentGeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUt
     * @param previousBest the best solution from the previous iteration
     * @return the new best solution.
     */
-  override protected def evaluatePopulation(population: ArrayBuffer[ParameterArray],
-                                            previousBest: ParameterArray): ParameterArrayWithFitness = {
+  override protected def evaluatePopulation(population: ArrayBuffer[P],
+                                            previousBest: P): ParameterArrayWithFitness[P] = {
     var bestFitness = ParameterArrayWithFitness(previousBest, Double.MaxValue)
     val workers = population.map(candidate => new EvaluationWorker(candidate, previousBest))
 
@@ -47,7 +47,7 @@ class ConcurrentGeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUt
   }
 
   /** Does the evaluation for each candidate in a different thread. */
-  private class EvaluationWorker(var candidate: ParameterArray, var params: ParameterArray) extends Runnable {
+  private class EvaluationWorker(var candidate: P, var params: P) extends Runnable {
     private var fitness = .0
 
     override def run(): Unit = {

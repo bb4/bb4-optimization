@@ -10,7 +10,7 @@ import com.barrybecker4.optimization.parameter.ParameterArray
   *
   * @author Barry Becker
   */
-trait Optimizee {
+trait Optimizee[P <: ParameterArray] {
 
   /** @return the name of the thing to be optimized */
   def getName: String
@@ -28,12 +28,12 @@ trait Optimizee {
     * @param params the set of parameters to misc
     * @return the fitness measure. The lower the better
     */
-  def evaluateFitness(params: ParameterArray): Double
+  def evaluateFitness(params: P): Double
 
   /** Compares two sets of parameters.  Used if evaluateByComparison returns true.
     * @return the amount that params1 are better than params2. May be positive if params2 are better than params1.
     */
-  def compareFitness(params1: ParameterArray, params2: ParameterArray): Double
+  def compareFitness(params1: P, params2: P): Double
 
   /** if non-0, then we terminate when the fitness reaches this value.
     * @return the best (largest) expected fitness value.

@@ -1,6 +1,7 @@
 // Copyright by Barry G. Becker, 2000-2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.viewer.ui
 
+import com.barrybecker4.optimization.parameter.ParameterArray
 import com.barrybecker4.optimization.viewer.ui.{NavigationBar, OptimizationViewable}
 import com.barrybecker4.ui.components.{GradientButton, TexturedToolBar}
 import com.barrybecker4.ui.util.GUIUtil
@@ -23,7 +24,7 @@ object NavigationBar {
   * @param navListener the thing that will consume the navigation events for panning and zooming.
   * @author Barry Becker
   */
-class NavigationBar(var navListener: OptimizationViewable)
+class NavigationBar[P <: ParameterArray](var navListener: OptimizationViewable[P])
   extends TexturedToolBar(GUIUtil.getIcon(NavigationBar.IMAGE_PATH + "ocean_trans_10.png")) {
 
   setListener(new NavBarListener)

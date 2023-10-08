@@ -13,7 +13,7 @@ import scala.collection.mutable
   * @param optimizee the thing to be optimized.
   * @author Barry Becker
   */
-class HillClimbingStrategy(optimizee: Optimizee) extends OptimizationStrategy(optimizee) {
+class HillClimbingStrategy(optimizee: Optimizee[NumericParameterArray]) extends OptimizationStrategy[NumericParameterArray](optimizee) {
 
   /** Finds a local minimum.
     * It is a bit like Newton's method, but in n dimensions.
@@ -24,7 +24,7 @@ class HillClimbingStrategy(optimizee: Optimizee) extends OptimizationStrategy(op
     * @param fitnessRange the approximate absolute value of the fitnessRange.
     * @return the optimized params.
     */
-  override def doOptimization(params: ParameterArray, fitnessRange: Double): ParameterArrayWithFitness = {
+  override def doOptimization(params: NumericParameterArray, fitnessRange: Double): ParameterArrayWithFitness[NumericParameterArray] = {
 
     var currentParams =
       if (optimizee.evaluateByComparison) ParameterArrayWithFitness(params, Double.MaxValue)
@@ -35,13 +35,13 @@ class HillClimbingStrategy(optimizee: Optimizee) extends OptimizationStrategy(op
     notifyOfChange(currentParams)
 
     // Use cache to avoid repeats. This can be a real issue if we have a discrete problem space.
-    val cache = mutable.HashSet[ParameterArray]()
+    val cache = mutable.HashSet[NumericParameterArray]()
     cache += currentParams.pa
 
     // Iterate until there is no significant improvement between iterations.
     // IOW, when the jumpSize is too small (below some threshold).
-    val impFinder: ImprovementFinder = createImprovementFinder(currentParams)
-    var improvement: Improvement = impFinder.findIncrementalImprovement(optimizee, null, cache)
+    val impFinder: ImprovementFinder[NumericParameterArray] = createImprovementFinder(currentParams)
+    var improvement: Improvement[NumericParameterArray] = impFinder.findIncrementalImprovement(optimizee, null, cache)
     currentParams = improvement.parameters
 
     while (improvement.improved && !isOptimalFitnessReached(currentParams)) {
@@ -57,11 +57,12 @@ class HillClimbingStrategy(optimizee: Optimizee) extends OptimizationStrategy(op
     currentParams
   }
 
-  private def createImprovementFinder(params: ParameterArrayWithFitness): ImprovementFinder = {
+  private def createImprovementFinder(params: ParameterArrayWithFitness[NumericParameterArray]): ImprovementFinder[NumericParameterArray] = {
     params.pa match {
       case npa: NumericParameterArray => new NumericImprovementFinder(params)
-      case dpa @ (_:PermutedParameterArray | _:VariableLengthIntSet) => new DiscreteImprovementFinder(params)
-      case _ => throw new IllegalArgumentException("Unexpected params type: " + params.pa.getClass.getName)
+      //case ppa: PermutedParameterArray => new DiscreteImprovementFinder(params)
+      //case vlpa: VariableLengthIntSet => new DiscreteImprovementFinder(params)
+      //case _ => throw new IllegalArgumentException("Unexpected params type: " + params.pa.getClass.getName)
     }
   }
 }

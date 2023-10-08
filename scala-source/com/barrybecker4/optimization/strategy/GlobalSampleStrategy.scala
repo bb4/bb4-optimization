@@ -2,8 +2,8 @@
 package com.barrybecker4.optimization.strategy
 
 import com.barrybecker4.optimization.optimizee.Optimizee
-import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
-import GlobalSampleStrategy._
+import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray, ParameterArrayWithFitness}
+import GlobalSampleStrategy.*
 
 
 object GlobalSampleStrategy {
@@ -17,7 +17,7 @@ object GlobalSampleStrategy {
   * @param optimizee the thing to be optimized.
   * @author Barry Becker
   */
-class GlobalSampleStrategy(optimizee: Optimizee) extends OptimizationStrategy(optimizee) {
+class GlobalSampleStrategy(optimizee: Optimizee[NumericParameterArray]) extends OptimizationStrategy[NumericParameterArray](optimizee) {
 
   /** the user should set this explicitly. */
   private var numSample = DEFAULT_NUM_SAMPLES
@@ -47,7 +47,7 @@ class GlobalSampleStrategy(optimizee: Optimizee) extends OptimizationStrategy(op
     * @param fitnessRange the approximate absolute value of the fitnessRange.
     * @return best solution found using global sampling.
     */
-  override def doOptimization(params: ParameterArray, fitnessRange: Double): ParameterArrayWithFitness = {
+  override def doOptimization(params: NumericParameterArray, fitnessRange: Double): ParameterArrayWithFitness[NumericParameterArray] = {
     val samples = params.findGlobalSamples(numSample)
     var bestParams = ParameterArrayWithFitness(params, Double.MaxValue)
     var done = false

@@ -21,8 +21,8 @@ object ImprovementStep {
   * @param optimizee the thing to be optimized.
   * @author Barry Becker
   */
-class ImprovementStep(var optimizee: Optimizee, var iter: ImprovementIteration, var gradLength: Double,
-                      var cache: mutable.Set[ParameterArray], var jumpSize: Double, var oldFitness: Double) {
+class ImprovementStep(var optimizee: Optimizee[NumericParameterArray], var iter: ImprovementIteration, var gradLength: Double,
+                      var cache: mutable.Set[NumericParameterArray], var jumpSize: Double, var oldFitness: Double) {
 
   private var improvement = .0
   private var improved = false
@@ -32,7 +32,7 @@ class ImprovementStep(var optimizee: Optimizee, var iter: ImprovementIteration, 
   /** @param params the initial value for the parameters to optimize.
     * @return the parameters to try next.
     */
-  def findNextParams(params: ParameterArrayWithFitness): ParameterArrayWithFitness = {
+  def findNextParams(params: ParameterArrayWithFitness[NumericParameterArray]): ParameterArrayWithFitness[NumericParameterArray] = {
     val maxTries = 100
     var currentParams = findNextCandidateParams(params)
     var numTries = 1
@@ -48,8 +48,8 @@ class ImprovementStep(var optimizee: Optimizee, var iter: ImprovementIteration, 
     * @param params parameter to find neighbor of.
     * @return nearby location with better fitness if there is one.
     */
-  private def findNextCandidateParams(params: ParameterArrayWithFitness): ParameterArrayWithFitness = {
-    var currentParams: NumericParameterArray = params.pa.asInstanceOf[NumericParameterArray]
+  private def findNextCandidateParams(params: ParameterArrayWithFitness[NumericParameterArray]): ParameterArrayWithFitness[NumericParameterArray] = {
+    var currentParams: NumericParameterArray = params.pa
     val oldParams = params
     iter.updateGradient(jumpSize, gradLength)
     //// println(s"gradient = ${iter.gradient}. jumpSize=" + jumpSize)
@@ -64,7 +64,7 @@ class ImprovementStep(var optimizee: Optimizee, var iter: ImprovementIteration, 
     }
     cache += currentParams
 
-    var newParams: ParameterArrayWithFitness = null
+    var newParams: ParameterArrayWithFitness[NumericParameterArray] = null
     if (optimizee.evaluateByComparison) {
       val fitness = optimizee.compareFitness(currentParams, oldParams.pa)
       newParams = ParameterArrayWithFitness(currentParams, fitness)

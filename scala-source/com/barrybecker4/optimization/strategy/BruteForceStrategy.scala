@@ -10,7 +10,7 @@ import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWi
   * @param optimizee the thing to be optimized.
   * @author Barry Becker
   */
-class BruteForceStrategy(optimizee: Optimizee) extends OptimizationStrategy(optimizee) {
+class BruteForceStrategy[P <: ParameterArray](optimizee: Optimizee[P]) extends OptimizationStrategy[P](optimizee) {
 
   /** Systematically search the entire global space and return the best of the samples.
     * Stops if the optimal fitness is reached.
@@ -18,17 +18,17 @@ class BruteForceStrategy(optimizee: Optimizee) extends OptimizationStrategy(opti
     * @param fitnessRange the approximate absolute value of the fitnessRange.
     * @return best solution found using global sampling.
     */
-  override def doOptimization(params: ParameterArray, fitnessRange: Double): ParameterArrayWithFitness = {
+  override def doOptimization(params: P, fitnessRange: Double): ParameterArrayWithFitness[P] = {
     val samples = params.findGlobalSamples(Long.MaxValue)
-    var bestParams: ParameterArrayWithFitness = ParameterArrayWithFitness(params, Double.MaxValue)
+    var bestParams: ParameterArrayWithFitness[P] = ParameterArrayWithFitness(params, Double.MaxValue)
     var done = false
     while (samples.hasNext && !done) {
       val sample = samples.next()
       val fitness =
-        if (optimizee.evaluateByComparison) optimizee.compareFitness(sample, params)
-        else optimizee.evaluateFitness(sample)
+        if (optimizee.evaluateByComparison) optimizee.compareFitness(sample.asInstanceOf[P], params)
+        else optimizee.evaluateFitness(sample.asInstanceOf[P])
       if (fitness < bestParams.fitness) {
-        bestParams = ParameterArrayWithFitness(sample, fitness)
+        bestParams = ParameterArrayWithFitness(sample.asInstanceOf[P], fitness)
         notifyOfChange(bestParams)
       }
       if (isOptimalFitnessReached(bestParams))

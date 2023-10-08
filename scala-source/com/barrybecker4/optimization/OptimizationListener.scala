@@ -8,6 +8,6 @@ import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWi
   * Called whenever the optimizer has improved its optimization of the optimizee.
   * @author Barry Becker
   */
-trait OptimizationListener {
-  def optimizerChanged(params: ParameterArrayWithFitness): Unit
+trait OptimizationListener[P <: ParameterArray] {
+  def optimizerChanged(params: ParameterArrayWithFitness[P]): Unit
 }

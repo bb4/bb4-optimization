@@ -2,6 +2,7 @@
 package com.barrybecker4.optimization.viewer.ui
 
 import com.barrybecker4.optimization.optimizee.optimizees.OptimizeeProblem
+import com.barrybecker4.optimization.parameter.ParameterArray
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType
 import com.barrybecker4.optimization.viewer.ui.{NavigationBar, OptimizationViewable}
 
@@ -15,19 +16,19 @@ import javax.swing.{JComboBox, JPanel}
   *
   * @author Barry Becker
   */
-class TopControls(var logFile: String, val testProblems: Seq[OptimizeeProblem],
-                  var viewable: OptimizationViewable)
+class TopControls[P <: ParameterArray](var logFile: String, val testProblems: Seq[OptimizeeProblem[P]],
+                  var viewable: OptimizationViewable[P])
      extends JPanel with ActionListener {
 
-  private var strategyDropDown: JComboBox[OptimizationStrategyType] = _
-  private var testProblemDropDown: JComboBox[OptimizeeProblem] = _
+  private var strategyDropDown: JComboBox[OptimizationStrategyType[? <: ParameterArray]] = _
+  private var testProblemDropDown: JComboBox[OptimizeeProblem[P]] = _
   private var testProblem = testProblems.head
 
   setLayout(new BorderLayout)
   private val navBar = new NavigationBar(viewable)
   private val comboPanel: JPanel = createStrategyCombo
   if (testProblems.length > 1) {
-    testProblemDropDown = new JComboBox[OptimizeeProblem](testProblems.toArray)
+    testProblemDropDown = new JComboBox[OptimizeeProblem[P]](testProblems.toArray)
     testProblemDropDown.addActionListener(this)
     comboPanel.add(testProblemDropDown)
   }
@@ -38,7 +39,7 @@ class TopControls(var logFile: String, val testProblems: Seq[OptimizeeProblem],
 
   private def createStrategyCombo = {
     val strategyPanel = new JPanel
-    strategyDropDown = new JComboBox[OptimizationStrategyType](OptimizationStrategyType.VALUES)
+    strategyDropDown = new JComboBox(OptimizationStrategyType.VALUES)
     strategyPanel.add(strategyDropDown)
     strategyDropDown.addActionListener(this)
     strategyPanel
@@ -50,14 +51,14 @@ class TopControls(var logFile: String, val testProblems: Seq[OptimizeeProblem],
       showOptimization()
     }
     if (e.getSource eq testProblemDropDown) {
-      testProblem = testProblemDropDown.getSelectedItem.asInstanceOf[OptimizeeProblem]
+      testProblem = testProblemDropDown.getSelectedItem.asInstanceOf[OptimizeeProblem[P]]
       println("changed test problem to " + testProblem)
       showOptimization()
     }
   }
 
   def showOptimization(): Unit = {
-    val strategy = strategyDropDown.getSelectedItem.asInstanceOf[OptimizationStrategyType]
+    val strategy = strategyDropDown.getSelectedItem.asInstanceOf[OptimizationStrategyType[P]]
     viewable.showOptimization(strategy, testProblem, logFile)
   }
 }

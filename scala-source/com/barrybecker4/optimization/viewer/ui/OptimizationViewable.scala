@@ -3,6 +3,7 @@ package com.barrybecker4.optimization.viewer.ui
 
 import com.barrybecker4.optimization.OptimizationListener
 import com.barrybecker4.optimization.optimizee.optimizees.OptimizeeProblem
+import com.barrybecker4.optimization.parameter.ParameterArray
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType
 import com.barrybecker4.optimization.viewer.ui.NavigationListener
 
@@ -11,9 +12,9 @@ import com.barrybecker4.optimization.viewer.ui.NavigationListener
   * Classes that can show a visualization of an optimization should implement this interface.
   * @author Barry Becker
   */
-trait OptimizationViewable extends OptimizationListener with NavigationListener {
+trait OptimizationViewable[P <: ParameterArray] extends OptimizationListener[P] with NavigationListener {
 
-  def showOptimization(strategy: OptimizationStrategyType,
-                       testProblem: OptimizeeProblem, logFile: String): Unit
+  def showOptimization(strategy: OptimizationStrategyType[P],
+                       testProblem: OptimizeeProblem[P], logFile: String): Unit
 
 }

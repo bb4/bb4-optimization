@@ -4,7 +4,7 @@ package com.barrybecker4.optimization.optimizee.optimizees.problems
 import com.barrybecker4.optimization.Optimizer
 import com.barrybecker4.optimization.optimizee.OptimizerTestSuite.LOG_FILE_HOME
 import com.barrybecker4.optimization.optimizee.optimizees.OptimizeeProblem
-import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness, VariableLengthIntSet}
+import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray, ParameterArrayWithFitness, VariableLengthIntSet}
 import com.barrybecker4.optimization.strategy.{GLOBAL_HILL_CLIMBING, OptimizationStrategyType}
 
 import scala.util.Random
@@ -30,7 +30,7 @@ object SubsetSumProblem {
   * http://en.wikipedia.org/wiki/Subset_sum_problem
   * @author Barry Becker
   */
-class SubsetSumProblem(var variation: SubsetSumVariation) extends OptimizeeProblem {
+class SubsetSumProblem(var variation: SubsetSumVariation) extends OptimizeeProblem[NumericParameterArray] {
 
   override def getName: String = "Subset Sum: " + variation.getName
 
@@ -40,11 +40,11 @@ class SubsetSumProblem(var variation: SubsetSumVariation) extends OptimizeeProbl
   /** Use the cost matrix for the TSP variation to determine this.
     * @return fitness value
     */
-  override def evaluateFitness(a: ParameterArray): Double = variation.evaluateFitness(a)
+  override def evaluateFitness(a: NumericParameterArray): Double = variation.evaluateFitness(a)
 
   override def getExactSolution: ParameterArrayWithFitness = variation.getExactSolution
 
-  override def getInitialGuess: ParameterArray = variation.getInitialGuess
+  override def getInitialGuess: NumericParameterArray = variation.getInitialGuess
 
   override def getFitnessRange: Double = variation.getFitnessRange
 }

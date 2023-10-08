@@ -6,6 +6,7 @@ import com.barrybecker4.optimization.parameter.sampling.VariableLengthGlobalSamp
 import com.barrybecker4.optimization.parameter.types.IntegerParameter
 import com.barrybecker4.optimization.parameter.types.Parameter
 import com.barrybecker4.optimization.parameter.VariableLengthIntSet._
+import com.barrybecker4.optimization.parameter.ParameterArray
 import scala.util.Random
 
 
@@ -54,7 +55,7 @@ class VariableLengthIntSet(params: IndexedSeq[Parameter], val fullSeq: IndexedSe
     * Generally, the distance is greater the greater the number of parameters that are different.
     * @return the distance between this parameter array and another.
     */
-  override def distance(pa: ParameterArray): Double = distCalc.calculateDistance(this, pa)
+  override def distance(pa: ParameterArray): Double = distCalc.calculateDistance(this, pa.asInstanceOf[VariableLengthIntSet])
 
   /** Create a new permutation that is not too distant from what we have now.
     * The two ways a configuration of marked nodes can change is
@@ -112,7 +113,7 @@ class VariableLengthIntSet(params: IndexedSeq[Parameter], val fullSeq: IndexedSe
     new VariableLengthGlobalSampler(this, requestedNumSamples)
 
   /** @return get a random solution in the parameter space by selecting about half of the ints */
-  override def getRandomSample: ParameterArray = {
+  override def getRandomSample: VariableLengthIntSet = {
     val shuffled = rnd.shuffle(fullSeq)
     val marked = shuffled.take(((shuffled.length - 1) * rnd.nextDouble()).toInt + 1)
     val newParams = marked.map(m => createParam(m))

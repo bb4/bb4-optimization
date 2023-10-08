@@ -2,6 +2,7 @@
 package com.barrybecker4.optimization.viewer.ui
 
 import com.barrybecker4.optimization.optimizee.optimizees.{OptimizeeProblem, TrivialProblem}
+import com.barrybecker4.optimization.parameter.ParameterArray
 import com.barrybecker4.optimization.viewer.ui.{OptimizerEvalPanel, TopControls}
 import com.barrybecker4.ui.application.ApplicationFrame
 
@@ -14,7 +15,7 @@ import javax.swing.JPanel
   * @param logFile where logs will go
   * @author Barry Becker
   */
-class OptimizerEvalFrame(var logFile: String, val testProblems: Seq[OptimizeeProblem])
+class OptimizerEvalFrame[P <: ParameterArray](var logFile: String, val testProblems: Seq[OptimizeeProblem[P]])
 
   extends ApplicationFrame("Optimization Animation") {
   this.setSize(OptimizerEvalPanel.SIZE)
@@ -22,13 +23,13 @@ class OptimizerEvalFrame(var logFile: String, val testProblems: Seq[OptimizeePro
   this.pack()
   this.setVisible(true)
 
-  def this(logFile: String, testProblem: OptimizeeProblem) = {
-    this(logFile, IndexedSeq[OptimizeeProblem](testProblem))
+  def this(logFile: String, testProblem: OptimizeeProblem[P]) = {
+    this(logFile, IndexedSeq[OptimizeeProblem[P]](testProblem))
   }
 
-  private def createContent(testProblems: Seq[OptimizeeProblem]) = {
+  private def createContent(testProblems: Seq[OptimizeeProblem[P]]) = {
     val mainPanel = new JPanel(new BorderLayout)
-    val evalPanel = new OptimizerEvalPanel
+    val evalPanel = new OptimizerEvalPanel[P]
     val topControls = new TopControls(logFile, testProblems, evalPanel)
     mainPanel.add(topControls, BorderLayout.NORTH)
     mainPanel.add(evalPanel, BorderLayout.CENTER)

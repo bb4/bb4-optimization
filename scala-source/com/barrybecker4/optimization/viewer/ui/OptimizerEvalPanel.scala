@@ -28,22 +28,22 @@ object OptimizerEvalPanel {
   * To pan, simply click and drag.
   * @author Barry Becker
   */
-class OptimizerEvalPanel() extends JPanel
-    with OptimizationListener with OptimizationViewable with MouseListener with MouseMotionListener {
+class OptimizerEvalPanel[P <: ParameterArray]() extends JPanel
+    with OptimizationListener[P] with OptimizationViewable[P] with MouseListener with MouseMotionListener {
 
   private val renderer = new PointsListRenderer
   private val projector = new SimpleProjector
-  private var pointsList: PointsList = _
+  private var pointsList: PointsList[P] = _
   private var dragStartPosition: Point = _
 
   this.setPreferredSize(OptimizerEvalPanel.SIZE)
   this.addMouseListener(this)
   this.addMouseMotionListener(this)
 
-  def doTest(optType: OptimizationStrategyType, optimizer: Optimizer,
-             solutionPosition: Point2d, initialGuess: ParameterArray, fitnessRange: Double): Unit = {
+  def doTest(optType: OptimizationStrategyType[P], optimizer: Optimizer[P],
+             solutionPosition: Point2d, initialGuess: P, fitnessRange: Double): Unit = {
     pointsList = new PointsList(solutionPosition, OptimizerEvalPanel.EDGE_SIZE, projector)
-    var solution: ParameterArrayWithFitness = null
+    var solution: ParameterArrayWithFitness[P] = null
     try
       solution = optimizer.doOptimization(optType, initialGuess, fitnessRange)
     catch {
@@ -61,11 +61,11 @@ class OptimizerEvalPanel() extends JPanel
   /** Called whenever the optimizer strategy moves incrementally toward the solution.
     * @param params we assume there is only two.
     */
-  override def optimizerChanged(params: ParameterArrayWithFitness): Unit =
+  override def optimizerChanged(params: ParameterArrayWithFitness[P]): Unit =
     pointsList.addPoint(params)
 
   /** Show the optimization results in the ui. */
-  override def showOptimization(strategy: OptimizationStrategyType, testProblem: OptimizeeProblem, logFile: String): Unit = {
+  override def showOptimization(strategy: OptimizationStrategyType[P], testProblem: OptimizeeProblem[P], logFile: String): Unit = {
     val params = testProblem.getExactSolution
     // have strategy for projecting n-dimensions down to two.
     val solutionPosition = projector.project(params.pa)
@@ -80,7 +80,7 @@ class OptimizerEvalPanel() extends JPanel
     val dim: Dimension = this.getSize
     g2.setColor(OptimizerEvalPanel.BG_COLOR)
     g2.fillRect(0, 0, dim.getWidth.toInt, dim.getHeight.toInt)
-    renderer.render(pointsList, g2)
+    renderer.render(pointsList.asInstanceOf[PointsList[Nothing]], g2)
   }
 
   override def pan(offset: Point2d): Unit = {

@@ -10,7 +10,7 @@ import com.barrybecker4.optimization.parameter.types.Parameter
   * @author Barry Becker
   */
 trait ParameterArray {
-
+  
   /** Some parameter arrays may have variable numbers of parameters.
     * @return the number of parameters in the array.
     */
@@ -28,7 +28,7 @@ trait ParameterArray {
     *   many unique samples. In this case all possibilities will be returned.
     * @return an iterator that is capable of producing the specified number of unique samples.
     */
-  def findGlobalSamples(requestedNumSamples: Long): Iterator[_ <: ParameterArray]
+  def findGlobalSamples(requestedNumSamples: Long): Iterator[? <: ParameterArray]
 
   /** Some measure of the distance between parameter arrays of the same type.
     * The way this is computed is very implementation dependent.

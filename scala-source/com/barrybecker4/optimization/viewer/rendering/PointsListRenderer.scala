@@ -25,9 +25,9 @@ object PointsListRenderer {
   * Panel for showing the optimization visually.
   * @author Barry Becker
   */
-class PointsListRenderer {
+class PointsListRenderer[P <: ParameterArray] {
 
-  def render(points: PointsList, g2: Graphics2D): Unit = {
+  def render(points: PointsList[P], g2: Graphics2D): Unit = {
     if (points.getSolutionPosition != null) drawSolution(g2, points.getSolutionPosition)
     val numPoints = points.size
     for (i <- 1 until numPoints) {
@@ -37,7 +37,7 @@ class PointsListRenderer {
   }
 
   private def drawVector(g2: Graphics2D, lastPoint: Point, currentPoint: Point, rawPoint: Point2d,
-                         params: ParameterArrayWithFitness, isLast: Boolean): Unit = {
+                         params: ParameterArrayWithFitness[P], isLast: Boolean): Unit = {
     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
     g2.setStroke(PointsListRenderer.LINE_STROKE)
     g2.setColor(PointsListRenderer.VECTOR_COLOR)

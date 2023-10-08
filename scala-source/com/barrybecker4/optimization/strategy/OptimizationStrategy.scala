@@ -14,18 +14,18 @@ import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWi
   * @param optimizee The thing to be optimized
   * @author Barry Becker
   */
-abstract class OptimizationStrategy(var optimizee: Optimizee) {
+abstract class OptimizationStrategy[P <: ParameterArray](var optimizee: Optimizee[P]) {
 
   private var logger: Logger = _
   /** listen for optimization changed events. useful for debugging.  */
-  protected var listener: OptimizationListener = _
+  protected var listener: OptimizationListener[P] = _
 
   /** @param logger the file that will record the results */
   def setLogger(logger: Logger): Unit = {
     this.logger = logger
   }
 
-  protected def log(iteration: Int, params: ParameterArrayWithFitness,
+  protected def log(iteration: Int, params: ParameterArrayWithFitness[P],
                     jumpSize: Double, deltaFitness: Double,
                     msg: String): Unit = {
     if (logger != null) logger.write(iteration, params.fitness, jumpSize, deltaFitness, params.pa, msg)
@@ -35,9 +35,9 @@ abstract class OptimizationStrategy(var optimizee: Optimizee) {
     * @param fitnessRange  the approximate absolute value of the fitnessRange.
     * @return optimized parameters.
     */
-  def doOptimization(initialParams: ParameterArray, fitnessRange: Double): ParameterArrayWithFitness
+  def doOptimization(initialParams: P, fitnessRange: Double): ParameterArrayWithFitness[P]
 
-  def setListener(listener: OptimizationListener): Unit = {
+  def setListener(listener: OptimizationListener[P]): Unit = {
     this.listener = listener
   }
 
@@ -45,7 +45,7 @@ abstract class OptimizationStrategy(var optimizee: Optimizee) {
     * @param currentBest current best parameter set.
     * @return true if the optimal fitness has been reached.
     */
-  private[strategy] def isOptimalFitnessReached(currentBest: ParameterArrayWithFitness) = {
+  private[strategy] def isOptimalFitnessReached(currentBest: ParameterArrayWithFitness[P]) = {
     var optimalFitnessReached = false
     if (!optimizee.evaluateByComparison && currentBest != null) {
       assert(optimizee.getOptimalFitness >= 0)
@@ -54,7 +54,7 @@ abstract class OptimizationStrategy(var optimizee: Optimizee) {
     optimalFitnessReached
   }
 
-  private[strategy] def notifyOfChange(params: ParameterArrayWithFitness): Unit = {
+  private[strategy] def notifyOfChange(params: ParameterArrayWithFitness[P]): Unit = {
     if (listener != null) listener.optimizerChanged(params)
   }
 }

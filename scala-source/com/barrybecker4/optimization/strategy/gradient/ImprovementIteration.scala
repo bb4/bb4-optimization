@@ -7,6 +7,7 @@ import com.barrybecker4.optimization.optimizee.Optimizee
 import com.barrybecker4.optimization.parameter.types.Parameter
 import com.barrybecker4.optimization.parameter.{Direction, NumericParameterArray, ParameterArray, ParameterArrayWithFitness}
 
+
 /**
   * Utility class for maintaining the data vectors for the iteration when hill climbing
   * over a numerical parameter space.
@@ -14,14 +15,14 @@ import com.barrybecker4.optimization.parameter.{Direction, NumericParameterArray
   * @param oldGradient last direction of improvement
   * @author Barry Becker
   */
-class ImprovementIteration(params: ParameterArrayWithFitness, var oldGradient: Vector = null) {
+class ImprovementIteration(params: ParameterArrayWithFitness[NumericParameterArray], var oldGradient: Vector = null) {
 
-  private var delta: Vector = params.pa.asInstanceOf[NumericParameterArray].asVector
-  private var fitnessDelta: Vector = params.pa.asInstanceOf[NumericParameterArray].asVector
-  var gradient: Vector = params.pa.asInstanceOf[NumericParameterArray].asVector
+  private var delta: Vector = params.pa.asVector
+  private var fitnessDelta: Vector = params.pa.asVector
+  var gradient: Vector = params.pa.asVector
 
   if (oldGradient == null) {
-    this.oldGradient = params.pa.asInstanceOf[NumericParameterArray].asVector
+    this.oldGradient = params.pa.asVector
 
     // initialize the old gradient to the unit vector (any random direction will do)
     for (i <- 0 until params.pa.size) {
@@ -33,13 +34,13 @@ class ImprovementIteration(params: ParameterArrayWithFitness, var oldGradient: V
   /** Compute the squares in one of the iteration directions and add it to the running sum.
     * @return the sum of squares in one of the iteration directions.
     */
-  def incSumOfSqs(i: Int, optimizee: Optimizee): Double = {
+  def incSumOfSqs(i: Int, optimizee: Optimizee[NumericParameterArray]): Double = {
 
     val p: Parameter = params.pa.get(i)
 
     // increment forward.
     delta = delta.set(i, p.getIncrementForDirection(Direction.FORWARD))
-    val nparams = params.pa.asInstanceOf[NumericParameterArray]
+    val nparams = params.pa
 
     val forwardParams = nparams.incrementByEps(i, Direction.FORWARD)
     val fwdFitnessDelta = findFitnessDelta(optimizee, params, forwardParams)
@@ -61,11 +62,11 @@ class ImprovementIteration(params: ParameterArrayWithFitness, var oldGradient: V
     * @return the incremental change in fitness. More negative means bigger move toward goal.
     *         A positive value means it is moving away from goal.
     */
-  private def findFitnessDelta(optimizee: Optimizee,
-                               params: ParameterArrayWithFitness,
-                               testParams: ParameterArray): Double = {
-    if (optimizee.evaluateByComparison) optimizee.compareFitness( testParams, params.pa )
-    else optimizee.evaluateFitness( testParams ) - params.fitness
+  private def findFitnessDelta(optimizee: Optimizee[NumericParameterArray],
+                               params: ParameterArrayWithFitness[NumericParameterArray],
+                               testParams: NumericParameterArray): Double = {
+    if (optimizee.evaluateByComparison) optimizee.compareFitness(testParams, params.pa )
+    else optimizee.evaluateFitness(testParams) - params.fitness
   }
 
   /** Update gradient. Use EPS if the gradLength is 0. */

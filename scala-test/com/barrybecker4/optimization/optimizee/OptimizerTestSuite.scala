@@ -81,10 +81,10 @@ abstract class OptimizerTestSuite extends AnyFunSuite with BeforeAndAfter {
   /** Run test for given optimization type
     * @param optType the optimization type to use.
     */
-  protected def doTest(optType: OptimizationStrategyType): Unit
+  protected def doTest(optType: OptimizationStrategyType[? <: ParameterArray]): Unit
 
-  protected def verifyProblem(problem: OptimizeeProblem,
-                              variation: ProblemVariation, optType: OptimizationStrategyType): Unit = {
+  protected def verifyProblem(problem: OptimizeeProblem[ParameterArray],
+                              variation: ProblemVariation, optType: OptimizationStrategyType[ParameterArray]): Unit = {
     val logFile = OptimizerTestSuite.LOG_FILE_HOME + "analytic_" + variation + "_optimization.txt"
     val optimizer = new Optimizer(problem, Some(logFile))
     val initialGuess = problem.getInitialGuess

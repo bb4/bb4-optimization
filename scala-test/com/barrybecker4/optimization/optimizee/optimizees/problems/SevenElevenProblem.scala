@@ -65,7 +65,7 @@ object SevenElevenProblem {
   }
 }
 
-class SevenElevenProblem extends OptimizeeProblem {
+class SevenElevenProblem extends OptimizeeProblem[NumericParameterArray] {
 
   /** Evaluate directly, not by comparing with a different trial. */
   override def evaluateByComparison = false
@@ -81,7 +81,7 @@ class SevenElevenProblem extends OptimizeeProblem {
     * @param a the position in the search space given values of p1, p2, p4, p4.
     * @return fitness value
     */
-  override def evaluateFitness(a: ParameterArray): Double = {
+  override def evaluateFitness(a: NumericParameterArray): Double = {
     val sum = a.get(0).getValue + a.get(1).getValue + a.get(2).getValue + a.get(3).getValue
     val product = a.get(0).getValue * a.get(1).getValue * a.get(2).getValue * a.get(3).getValue
     Math.abs(711.0 - sum) + Math.abs(711000000.0 - product) / 1000000.0
@@ -89,7 +89,7 @@ class SevenElevenProblem extends OptimizeeProblem {
 
   override def getExactSolution: ParameterArrayWithFitness = SevenElevenProblem.EXACT_SOLUTION
 
-  override def getInitialGuess: ParameterArray = SevenElevenProblem.INITIAL_GUESS
+  override def getInitialGuess: NumericParameterArray = SevenElevenProblem.INITIAL_GUESS
 
   override def getFitnessRange: Double = SevenElevenProblem.FITNESS_RANGE
 }

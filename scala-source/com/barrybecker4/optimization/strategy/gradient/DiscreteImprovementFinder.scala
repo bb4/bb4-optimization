@@ -20,7 +20,7 @@ object DiscreteImprovementFinder {
   * Finds incremental improvement in a discrete problem space.
   * @author Barry Becker
   */
-class DiscreteImprovementFinder(var startingParams: ParameterArrayWithFitness) extends ImprovementFinder {
+class DiscreteImprovementFinder[P <: ParameterArray](var startingParams: ParameterArrayWithFitness[P]) extends ImprovementFinder[P] {
 
   /** Try to find a parameterArray that is better than what we have now by evaluating using the optimizee passed in.
     * Try swapping parameters randomly until we find an improvement (if we can).
@@ -29,13 +29,13 @@ class DiscreteImprovementFinder(var startingParams: ParameterArrayWithFitness) e
     *               parameters are discrete and not continuous.
     * @return the improvement which contains the improved parameter array and possibly a revised jumpSize.
     */
-  def findIncrementalImprovement(optimizee: Optimizee,
-                                 lastImprovement: Improvement,
-                                 cache: mutable.Set[ParameterArray]): Improvement = {
+  def findIncrementalImprovement(optimizee: Optimizee[P],
+                                 lastImprovement: Improvement[P],
+                                 cache: mutable.Set[P]): Improvement[P] = {
     var numTries = 0
     var fitnessDelta = 1.0
     var jumpSize = .0
-    var currentParams: ParameterArrayWithFitness = null
+    var currentParams: ParameterArrayWithFitness[P] = null
 
     if (lastImprovement == null) {
       currentParams = startingParams
@@ -49,13 +49,13 @@ class DiscreteImprovementFinder(var startingParams: ParameterArrayWithFitness) e
     var improvement = Improvement(currentParams, 0, jumpSize)
 
     while (fitnessDelta >= 0 && numTries < MAX_TRIES) {
-      val nbrParam = currentParams.pa.getRandomNeighbor(jumpSize)
+      val nbrParam = currentParams.pa.getRandomNeighbor(jumpSize).asInstanceOf[P]
       fitnessDelta = .0
 
       if (!cache.contains(nbrParam)) {
         cache += nbrParam
 
-        val nbr: ParameterArrayWithFitness =
+        val nbr: ParameterArrayWithFitness[P] =
           if (optimizee.evaluateByComparison) {
             fitnessDelta = optimizee.compareFitness(nbrParam, currentParams.pa)
             ParameterArrayWithFitness(nbrParam, currentParams.fitness + fitnessDelta)

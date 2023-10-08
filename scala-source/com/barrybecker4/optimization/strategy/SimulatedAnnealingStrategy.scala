@@ -33,13 +33,13 @@ object SimulatedAnnealingStrategy {
   * so it can be easily run in an applet without using resources.
   * @param optimizee the thing to be optimized.
   */
-class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM)
+class SimulatedAnnealingStrategy[P <: ParameterArray](optimizee: Optimizee[P], rnd: Random = MathUtil.RANDOM)
   extends OptimizationStrategy(optimizee) {
 
   private var tempMax = SimulatedAnnealingStrategy.DEFAULT_TEMP_MAX
 
   /** keep track of points that were searched */
-  private val cache: Set[ParameterArray] = Set()
+  private val cache: Set[P] = Set()
 
   /** @param tempMax the initial temperature at the start of the simulated annealing process (before cooling) */
   def setMaxTemperature(tempMax: Double): Unit = {
@@ -67,7 +67,7 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
     * @param fitnessRange the approximate absolute value of the fitnessRange.
     * @return the optimized params.
     */
-  override def doOptimization(params: ParameterArray, fitnessRange: Double): ParameterArrayWithFitness = {
+  override def doOptimization(params: P, fitnessRange: Double): ParameterArrayWithFitness[P] = {
     var ct = 0
     var temperature = tempMax
     val tempMin = tempMax / Math.pow(2.0, NUM_TEMP_ITERATIONS)
@@ -78,7 +78,7 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
 
     // store the best solution we found at any given temperature iteration and use that as the initial
     // start of the next temperature iteration.
-    var currentParams: ParameterArrayWithFitness = null
+    var currentParams: ParameterArrayWithFitness[P] = null
 
     while (currentParams == null || (temperature > tempMin && !isOptimalFitnessReached(currentParams))) {
       // temperature iteration (temperature drops each time through)
@@ -109,18 +109,18 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
     * @param temperature current temperature. Gets cooler with every successive temperature iteration.
     * @return neighboring point that is hopefully better than params.
     */
-  private def findNeighbor(params: ParameterArrayWithFitness,
-                           ct: Int, temperature: Double, fitnessRange: Double): ParameterArrayWithFitness = {
+  private def findNeighbor(params: ParameterArrayWithFitness[P],
+                           ct: Int, temperature: Double, fitnessRange: Double): ParameterArrayWithFitness[P] = {
     //double r = (tempMax/5.0+temperature) / (8.0*(N/5.0+ct)*tempMax);
     val curParams = params
     val r = 8 * temperature / ((N + ct) * tempMax)
-    var newParams = params.pa.getRandomNeighbor(r)
+    var newParams: P = params.pa.getRandomNeighbor(r).asInstanceOf[P]
 
     // Try to avoid getting the same point as one we have seen before
     var tempRad = r
     var i = 0
     while (cache.contains(newParams) && i < 10) {
-      newParams = curParams.pa.getRandomNeighbor(tempRad)
+      newParams = curParams.pa.getRandomNeighbor(tempRad).asInstanceOf[P]
       tempRad *= 1.05
       i += 1
     }

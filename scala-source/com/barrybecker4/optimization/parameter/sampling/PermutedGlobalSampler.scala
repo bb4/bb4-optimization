@@ -69,7 +69,7 @@ class PermutedGlobalSampler(var params: PermutedParameterArray, val requestedNum
   private def getNextRandomSample = {
     var nextSample: PermutedParameterArray = null
     while (globalSamples.size < counter) {
-      nextSample = params.getRandomSample.asInstanceOf[PermutedParameterArray]
+      nextSample = params.getRandomSample
       if (!globalSamples.contains(nextSample))
         globalSamples.append(nextSample)
     }
@@ -81,7 +81,6 @@ class PermutedGlobalSampler(var params: PermutedParameterArray, val requestedNum
     */
   private def getNextExhaustiveSample = {
     val pParams = params.setPermutation(permuter.next())
-    //hasNext = permuter.hasNext()
     pParams
   }
 }

@@ -4,7 +4,7 @@ package com.barrybecker4.optimization.optimizee.optimizees.problems
 import com.barrybecker4.optimization.Optimizer
 import com.barrybecker4.optimization.optimizee.OptimizerTestSuite.LOG_FILE_HOME
 import com.barrybecker4.optimization.optimizee.optimizees.OptimizeeProblem
-import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
+import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness, PermutedParameterArray}
 import com.barrybecker4.optimization.strategy.SIMULATED_ANNEALING
 import OptimizeeProblem.showSolution
 
@@ -32,7 +32,7 @@ object TravelingSalesmanProblem {
   * @author Barry Becker
   */
 class TravelingSalesmanProblem(val variation: TravelingSalesmanVariation = TSP_SIMPLE)
-    extends OptimizeeProblem {
+    extends OptimizeeProblem[PermutedParameterArray] {
 
   override def getName: String = "TSP: " + variation.getName
 
@@ -42,11 +42,11 @@ class TravelingSalesmanProblem(val variation: TravelingSalesmanVariation = TSP_S
   /** Use the cost matrix for the TSP variation to determine this.
     * @return fitness value
     */
-  override def evaluateFitness(a: ParameterArray): Double = variation.evaluateFitness(a)
+  override def evaluateFitness(a: PermutedParameterArray): Double = variation.evaluateFitness(a)
 
   override def getExactSolution: ParameterArrayWithFitness = variation.getExactSolution
 
-  override def getInitialGuess: ParameterArray = variation.getInitialGuess
+  override def getInitialGuess: PermutedParameterArray = variation.getInitialGuess
 
   override def getFitnessRange: Double = variation.getFitnessRange
 }

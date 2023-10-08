@@ -14,7 +14,7 @@ object ImprovementFinder {
   * Find gradient in direction of maximal improvement and move incrementally toward the solution.
   * @author Barry Becker
   */
-trait ImprovementFinder {
+trait ImprovementFinder[P <: ParameterArray] {
 
   /** Try to find a parameterArray that is better than what we have now by evaluating using the optimizee passed in.
     * Try swapping parameters randomly until we find an improvement (if we can).
@@ -23,6 +23,6 @@ trait ImprovementFinder {
     *               parameters are discrete and not continuous.
     * @return the improvement which contains the improved parameter array and possibly a revised jumpSize.
     */
-  def findIncrementalImprovement(optimizee: Optimizee, improvement: Improvement,
-                                 cache: mutable.Set[ParameterArray]): Improvement
+  def findIncrementalImprovement(optimizee: Optimizee[P], improvement: Improvement[P],
+                                 cache: mutable.Set[P]): Improvement[P]
 }

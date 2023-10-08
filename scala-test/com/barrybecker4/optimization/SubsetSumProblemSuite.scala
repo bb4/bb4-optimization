@@ -14,7 +14,7 @@ class SubsetSumProblemSuite extends OptimizerTestSuite {
     doTest(BRUTE_FORCE)
   }
 
-  override protected def doTest(optimizationType: OptimizationStrategyType): Unit = {
+  override protected def doTest(optimizationType: OptimizationStrategyType[NumericParameterType]): Unit = {
     for (variation <- SubsetSumVariation.VALUES) {
       val problem = new SubsetSumProblem(variation)
       verifyProblem(problem, variation, optimizationType)

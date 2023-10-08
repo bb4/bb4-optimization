@@ -26,11 +26,11 @@ object PointsList {
   * @param rawSolutionPosition where we hope to wind up at.
   * @author Barry Becker
   */
-class PointsList(var rawSolutionPosition: Point2d, var edgeSize: Int, var projector: Projector)
+class PointsList[P <: ParameterArray](var rawSolutionPosition: Point2d, var edgeSize: Int, var projector: Projector)
    extends NavigationListener {
 
   private val rawPoints = ArrayBuffer[Point2d]()
-  private val paramArrays = ArrayBuffer[ParameterArrayWithFitness]()
+  private val paramArrays = ArrayBuffer[ParameterArrayWithFitness[P]]()
 
   private var rangeX: Range = _
   private var rangeY: Range = _
@@ -40,7 +40,7 @@ class PointsList(var rawSolutionPosition: Point2d, var edgeSize: Int, var projec
 
   def getRawPoint(i: Int): Point2d = rawPoints(i)
 
-  def getParamArrayForPoint(i: Int): ParameterArrayWithFitness = paramArrays(i)
+  def getParamArrayForPoint(i: Int): ParameterArrayWithFitness[P] = paramArrays(i)
 
   def getScaledPoint(i: Int): Point = {
     val pt: Point2d = rawPoints(i)
@@ -53,7 +53,7 @@ class PointsList(var rawSolutionPosition: Point2d, var edgeSize: Int, var projec
     * Does first time initialization.
     * @param params the parameter array to add to the list.
     */
-  def addPoint(params: ParameterArrayWithFitness): Unit = {
+  def addPoint(params: ParameterArrayWithFitness[P]): Unit = {
     if (rangeX == null) {
       rangeX = projector.getXRange(params.pa)
       rangeY = projector.getYRange(params.pa)
