@@ -1,34 +1,26 @@
 // Copyright by Barry G. Becker, 2013. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 
-buildscript {
-    repositories {
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/"}
-        maven { url "https://oss.sonatype.org/content/repositories/releases/" }
-    }
-    dependencies {
-        classpath 'com.barrybecker4:bb4-gradle:1.8-SNAPSHOT'
-    }
+plugins {
+    id 'com.barrybecker4.bb4.scala-library' version '2.0-SNAPSHOT'
+    id 'com.barrybecker4.bb4.publish' version '2.0-SNAPSHOT'
+    id 'com.barrybecker4.bb4.application' version '2.0-SNAPSHOT'
 }
 
-plugins {
-    id "com.github.maiflai.scalatest" version "0.32" // needed to run scala tests
-}
 description = 'A Scala library project containing a collection of heuristic optimization algorithms.'
 group = 'com.barrybecker4'
-version = '1.8-SNAPSHOT'
-ext {
-    archivesBaseName = 'bb4-optimization'
-    mainClass = "com.barrybecker4.optimization.viewer.OptimizerEvalApp"
-}
+version = '2.0-SNAPSHOT'
 
-apply from: project.buildscript.classLoader.getResource('bb4.gradle').toURI()
+bb4 {
+    archivesBaseName.set('bb4-optimization')
+    mainClass.set('com.barrybecker4.optimization.viewer.OptimizerEvalApp')
+}
 
 dependencies {
     // starting in scala 2.13, parallel collections must be included separately
     implementation 'org.scala-lang.modules:scala-parallel-collections_3:1.0.4'
-    implementation 'com.barrybecker4:bb4-ui:1.8-SNAPSHOT'
-    implementation 'com.barrybecker4:bb4-math:1.8-SNAPSHOT'
-    implementation 'com.barrybecker4:bb4-common:1.8-SNAPSHOT'
+    implementation 'com.barrybecker4:bb4-ui:2.0-SNAPSHOT'
+    implementation 'com.barrybecker4:bb4-math:2.0-SNAPSHOT'
+    implementation 'com.barrybecker4:bb4-common:2.0-SNAPSHOT'
 }
 
 // Without this, the build failed in jenkins with the error:
@@ -37,5 +29,3 @@ dependencies {
 rootProject.tasks.named("processTestResources") {
     duplicatesStrategy = DuplicatesStrategy.WARN
 }
-
-apply from: project.buildscript.classLoader.getResource('bb4-publish.gradle').toURI()

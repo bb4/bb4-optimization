@@ -3,7 +3,7 @@ package com.barrybecker4.optimization.parameter.types
 
 import com.barrybecker4.math.MathUtil
 import com.barrybecker4.optimization.parameter.Direction
-import org.junit.Assert.assertEquals
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.scalatest.BeforeAndAfter
 import org.scalatest.funsuite.AnyFunSuite
 
@@ -53,12 +53,12 @@ abstract class ParameterSuite[T] extends AnyFunSuite with BeforeAndAfter {
 
   test("IncrementByEpsForward(") {
     val newParam = parameter.incrementByEps(Direction.FORWARD)
-    assertEquals("Unexpected eps forward", expectedForwardEpsChange, newParam.getValue, MathUtil.EPS_MEDIUM)
+    assertEquals(expectedForwardEpsChange, newParam.getValue, MathUtil.EPS_MEDIUM, "Unexpected eps forward")
   }
 
   test("IncrementByEpsBackward") {
     val newParam = parameter.incrementByEps(Direction.BACKWARD)
-    assertEquals("Unexpected eps backward", expectedBackwardEpsChange, newParam.getValue, MathUtil.EPS_MEDIUM)
+    assertEquals(expectedBackwardEpsChange, newParam.getValue, MathUtil.EPS_MEDIUM, "Unexpected eps backward")
   }
 
   test("tweaked values") {

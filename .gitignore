@@ -12,3 +12,6 @@ out/
 test/performance/
 test/results/
 test/temp.txt
+.vscode/settings.json
+.bloop/
+.metals/
