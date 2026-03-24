@@ -63,8 +63,8 @@ class PointsList(var rawSolutionPosition: Point2d, var edgeSize: Int, var projec
   }
 
   override def pan(offset: Point2d): Unit = {
-    adjustXRange(offset.x * rangeX.getExtent)
-    adjustYRange(offset.y * rangeY.getExtent)
+    adjustXRange(offset.x * safeExtent(rangeX))
+    adjustYRange(offset.y * safeExtent(rangeY))
   }
 
   private def adjustXRange(xOffset: Double): Unit =
@@ -74,14 +74,14 @@ class PointsList(var rawSolutionPosition: Point2d, var edgeSize: Int, var projec
     rangeY = Range(rangeY.min + yOffset, rangeY.max + yOffset)
 
   override def zoomIn(): Unit = {
-    val xOffset: Double = 0.5 * PointsList.ZOOM_IN_INCREMENT * rangeX.getExtent
-    val yOffset: Double = 0.5 * PointsList.ZOOM_IN_INCREMENT * rangeY.getExtent
+    val xOffset: Double = 0.5 * PointsList.ZOOM_IN_INCREMENT * safeExtent(rangeX)
+    val yOffset: Double = 0.5 * PointsList.ZOOM_IN_INCREMENT * safeExtent(rangeY)
     adjustRanges(xOffset, yOffset)
   }
 
   override def zoomOut(): Unit = {
-    val xOffset: Double = -0.5 * PointsList.ZOOM_OUT_INCREMENT * rangeX.getExtent
-    val yOffset: Double = -0.5 * PointsList.ZOOM_OUT_INCREMENT * rangeY.getExtent
+    val xOffset: Double = -0.5 * PointsList.ZOOM_OUT_INCREMENT * safeExtent(rangeX)
+    val yOffset: Double = -0.5 * PointsList.ZOOM_OUT_INCREMENT * safeExtent(rangeY)
     adjustRanges(xOffset, yOffset)
   }
 
@@ -92,11 +92,17 @@ class PointsList(var rawSolutionPosition: Point2d, var edgeSize: Int, var projec
 
   private def getScaledXValue(value: Double): Int = {
     if (rangeX == null) return 0
-    (edgeSize * (value - rangeX.min) / rangeX.getExtent).toInt
+    (edgeSize * (value - rangeX.min) / safeExtent(rangeX)).toInt
   }
 
   private def getScaledYValue(value: Double): Int = {
     if (rangeY == null) return 0
-    (edgeSize * (value - rangeY.min) / rangeY.getExtent).toInt
+    (edgeSize * (value - rangeY.min) / safeExtent(rangeY)).toInt
+  }
+
+  /** Avoid NaN when projector returns a zero-width range. */
+  private def safeExtent(r: Range): Double = {
+    val e = r.getExtent
+    if (e > 0 && !e.isNaN && !e.isInfinite) e else 1.0
   }
 }

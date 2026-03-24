@@ -9,6 +9,8 @@ import javax.vecmath.Point2d
 /**
   * This simple projector strategy simply adds the even dimension values together to get an x coordinate,
   * and adds the odd dimension values together to get a y coordinate.
+  * For a single-parameter array, Y is taken equal to X so the view has a non-degenerate range and the
+  * path is visible in 2D (diagonal). The same mirroring applies if only odd-indexed parameters exist.
   * TODO: create a PCS projector
   *
   * @author Barry Becker
@@ -22,12 +24,28 @@ class SimpleProjector extends Projector {
       if (i % 2 == 0) xVal += v
       else yVal += v
     }
+    if (!hasEvenIndexedParams(params)) xVal = yVal
+    else if (!hasOddIndexedParams(params)) yVal = xVal
     new Point2d(xVal, yVal)
   }
 
-  override def getXRange(params: ParameterArray): Range = findRange(params, 0)
+  override def getXRange(params: ParameterArray): Range = {
+    val r = findRange(params, 0)
+    if (rangeHasPositiveExtent(r)) r
+    else findRange(params, 1)
+  }
 
-  override def getYRange(params: ParameterArray): Range = findRange(params, 1)
+  override def getYRange(params: ParameterArray): Range = {
+    val r = findRange(params, 1)
+    if (rangeHasPositiveExtent(r)) r
+    else findRange(params, 0)
+  }
+
+  private def hasEvenIndexedParams(params: ParameterArray): Boolean = params.size >= 1
+
+  private def hasOddIndexedParams(params: ParameterArray): Boolean = params.size >= 2
+
+  private def rangeHasPositiveExtent(r: Range): Boolean = r.getExtent > 0
 
   private def findRange(params: ParameterArray, modulus: Int) = {
     var min: Double = 0
