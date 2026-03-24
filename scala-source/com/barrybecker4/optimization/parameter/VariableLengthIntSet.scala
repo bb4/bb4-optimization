@@ -65,6 +65,17 @@ class VariableLengthIntSet(params: IndexedSeq[Parameter], val fullSeq: IndexedSe
     */
   override def getRandomNeighbor(radius: Double): VariableLengthIntSet = {
     if (size < 1) return this
+    val (add, remove, numNodesToMove) = neighborMutationPlan(radius)
+    val result =
+      if (remove) removeRandomParams(numToRemove(radius))
+      else if (add) addRandomParams(numToAdd(radius))
+      else this
+    assert(add || remove || numNodesToMove > 0)
+    result.moveNodes(numNodesToMove)
+  }
+
+  /** Whether to add/remove nodes vs swap, and how many node moves for the swap phase. */
+  private def neighborMutationPlan(radius: Double): (Boolean, Boolean, Int) = {
     val probAddRemove = radius / (ADD_REMOVE_RADIUS_SOFTENER + radius)
     var add = false
     var remove = false
@@ -74,14 +85,8 @@ class VariableLengthIntSet(params: IndexedSeq[Parameter], val fullSeq: IndexedSe
     }
     val numNodesToMove =
       if (add || remove) rnd.nextInt(Math.min(size, (radius + 1.1).toInt))
-      else 1 + rnd.nextInt((1.4 + radius).toInt) // at least 1 will be moved
-
-    val result =
-      if (remove) removeRandomParams(numToRemove(radius))
-      else if (add) addRandomParams(numToAdd(radius))
-      else this
-    assert(add || remove || numNodesToMove > 0)
-    result.moveNodes(numNodesToMove)
+      else 1 + rnd.nextInt((1.4 + radius).toInt)
+    (add, remove, numNodesToMove)
   }
 
   private def numToRemove(radius: Double): Int =
@@ -98,7 +103,7 @@ class VariableLengthIntSet(params: IndexedSeq[Parameter], val fullSeq: IndexedSe
   def getCombination(indices: Seq[Int]): VariableLengthIntSet = {
     assert(indices.size <= getMaxLength,
       "The number of indices (" + indices.size + ") was greater than the max size (" + size + ")")
-    val newParams = for (i <- indices) yield createParam(fullSeq(i))
+    val newParams = for (i <- indices) yield VariableLengthIntSet.createParam(fullSeq(i))
     new VariableLengthIntSet(newParams.toIndexedSeq, fullSeq, distCalc, rnd)
   }
 
@@ -115,18 +120,9 @@ class VariableLengthIntSet(params: IndexedSeq[Parameter], val fullSeq: IndexedSe
   override def getRandomSample: ParameterArray = {
     val shuffled = rnd.shuffle(fullSeq)
     val marked = shuffled.take(((shuffled.length - 1) * rnd.nextDouble()).toInt + 1)
-    val newParams = marked.map(m => createParam(m))
+    val newParams = marked.map(m => VariableLengthIntSet.createParam(m))
     new VariableLengthIntSet(newParams, fullSeq, distCalc, rnd)
   }
-
-  /** @param i the integer parameter's value. May be Negative
-    * @return a new integer parameter.
-    */
-  private def createParam(i: Int) =
-    new IntegerParameter(i,
-      if (i < 0) i else 0,
-      if (i >= 0) i else 0,
-      "p" + i)
 
   private def removeRandomParams(num: Int): VariableLengthIntSet = {
     val rndIndices = rnd.shuffle(params.indices)
@@ -139,7 +135,7 @@ class VariableLengthIntSet(params: IndexedSeq[Parameter], val fullSeq: IndexedSe
   private def addRandomParams(num: Int): VariableLengthIntSet = {
     val intsToAdd = rnd.shuffle(getFreeNodes).take(num)
     assert(size + intsToAdd.size <= getMaxLength)
-    new VariableLengthIntSet(params ++ intsToAdd.map(createParam), fullSeq, distCalc, rnd)
+    new VariableLengthIntSet(params ++ intsToAdd.map(VariableLengthIntSet.createParam), fullSeq, distCalc, rnd)
   }
 
   /** Select num free nodes randomly and swap them with num randomly selected marked nodes.
@@ -150,28 +146,22 @@ class VariableLengthIntSet(params: IndexedSeq[Parameter], val fullSeq: IndexedSe
     if (numNodesToMove == 0) return this
     val freeNodes = getFreeNodes
     val numSelect = Array(freeNodes.size, params.size, numNodesToMove).min
-    if (numSelect == 0) {
-      removeRandomParams(1)
-    } else {
+    if (numSelect == 0) removeRandomParams(1)
+    else swapMarkedWithFreeNodes(numSelect, freeNodes)
+  }
 
-      val randomIndices = rnd.shuffle(params.indices).take(numSelect).sorted
-      val randomFreeIndices = rnd.shuffle(freeNodes.indices).take(numSelect)
-
-      var ct = 0
-      //println("current set = " + params.map(_.getValue).mkString(", "))
-      //println("rnd indices to swap: " + randomIndices.mkString(", "))
-      //println("free nodes: " + freeNodes.mkString(" "))
-
-      val newParams = for (i <- params.indices) yield {   // debug
-        if (ct < numSelect && i == randomIndices(ct)) {
-          val v = freeNodes(randomFreeIndices(ct))
-          ct += 1
-          createParam(v)
-        } else params(i)
-      }
-      //println("new paramValss after exchanges: " + newParams.map(_.getValue).mkString(", "))
-      new VariableLengthIntSet(newParams, fullSeq, distCalc, rnd)
+  private def swapMarkedWithFreeNodes(numSelect: Int, freeNodes: Seq[Int]): VariableLengthIntSet = {
+    val randomIndices = rnd.shuffle(params.indices).take(numSelect).sorted
+    val randomFreeIndices = rnd.shuffle(freeNodes.indices).take(numSelect)
+    var ct = 0
+    val newParams = for (i <- params.indices) yield {
+      if (ct < numSelect && i == randomIndices(ct)) {
+        val v = freeNodes(randomFreeIndices(ct))
+        ct += 1
+        VariableLengthIntSet.createParam(v)
+      } else params(i)
     }
+    new VariableLengthIntSet(newParams, fullSeq, distCalc, rnd)
   }
 
   /** @return all the ints in fullSet that are not currently used */
@@ -189,7 +179,7 @@ class VariableLengthIntSet(params: IndexedSeq[Parameter], val fullSeq: IndexedSe
   /** @return true if equal. The values must be the same, but the order does not matter */
   override def equals(other: Any): Boolean = other match {
     case that: VariableLengthIntSet =>
-      (that canEqual this) &&
+      (that.canEqual(this)) &&
         paramSet == that.paramSet &&
         fullSet == that.fullSet
     case _ => false

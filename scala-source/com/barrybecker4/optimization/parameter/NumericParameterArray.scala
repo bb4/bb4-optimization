@@ -92,7 +92,7 @@ case class NumericParameterArray(params: IndexedSeq[Parameter],
       if (newParam.getValue < newParam.minValue) {
         println("Warning param " +
           newParam.name + " is exceeding is minimum value. It is being pegged to that minimum of " + newParam.minValue)
-        newParam.setValue(newParam.minValue)
+        newParam = newParam.setValue(newParam.minValue)
       }
       newParam
     }

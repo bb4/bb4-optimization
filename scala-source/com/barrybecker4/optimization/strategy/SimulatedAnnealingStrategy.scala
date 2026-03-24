@@ -6,6 +6,7 @@ import com.barrybecker4.math.MathUtil
 import com.barrybecker4.optimization.optimizee.Optimizee
 import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 import SimulatedAnnealingStrategy._
+
 import scala.util.Random
 
 
@@ -38,8 +39,8 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
 
   private var tempMax = SimulatedAnnealingStrategy.DEFAULT_TEMP_MAX
 
-  /** keep track of points that were searched */
-  private val cache: Set[ParameterArray] = Set()
+  /** Initial guess; used to store comparable fitness when `evaluateByComparison` is true. */
+  private var initialParams: ParameterArray = _
 
   /** @param tempMax the initial temperature at the start of the simulated annealing process (before cooling) */
   def setMaxTemperature(tempMax: Double): Unit = {
@@ -68,13 +69,14 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
     * @return the optimized params.
     */
   override def doOptimization(params: ParameterArray, fitnessRange: Double): ParameterArrayWithFitness = {
+    initialParams = params
     var ct = 0
     var temperature = tempMax
     val tempMin = tempMax / Math.pow(2.0, NUM_TEMP_ITERATIONS)
     var bestParams =
       if (!optimizee.evaluateByComparison)
         ParameterArrayWithFitness(params, optimizee.evaluateFitness(params))
-      else ParameterArrayWithFitness(params, Double.MaxValue)
+      else ParameterArrayWithFitness(params, optimizee.compareFitness(params, initialParams))
 
     // store the best solution we found at any given temperature iteration and use that as the initial
     // start of the next temperature iteration.
@@ -103,7 +105,6 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
 
   /** Select a new point in the neighborhood of our current location.
     * The neighborhood we select from has a radius of r.
-    * Uses cache to avoid finding candidates that wre previously searched.
     * @param params      current location in the parameter space.
     * @param ct          iteration count.
     * @param temperature current temperature. Gets cooler with every successive temperature iteration.
@@ -111,40 +112,38 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
     */
   private def findNeighbor(params: ParameterArrayWithFitness,
                            ct: Int, temperature: Double, fitnessRange: Double): ParameterArrayWithFitness = {
-    //double r = (tempMax/5.0+temperature) / (8.0*(N/5.0+ct)*tempMax);
     val curParams = params
     val r = 8 * temperature / ((N + ct) * tempMax)
-    var newParams = params.pa.getRandomNeighbor(r)
-
-    // Try to avoid getting the same point as one we have seen before
-    var tempRad = r
-    var i = 0
-    while (cache.contains(newParams) && i < 10) {
-      newParams = curParams.pa.getRandomNeighbor(tempRad)
-      tempRad *= 1.05
-      i += 1
-    }
-
+    val newParams = params.pa.getRandomNeighbor(r)
     val dist = curParams.pa.distance(newParams)
-    var newFitness = .0
-    val deltaFitness =
-      if (optimizee.evaluateByComparison)
-        optimizee.compareFitness(newParams, curParams.pa)
-      else {
-        newFitness = optimizee.evaluateFitness(newParams)
-        newFitness - curParams.fitness
-      }
-    val probability = Math.pow(Math.E, tempMax * -deltaFitness / (fitnessRange * temperature))
-    val useWorseSolution = rnd.nextDouble() < probability
-
+    val (deltaFitness, newFitness) = deltaAndAbsoluteFitness(newParams, curParams)
+    val useWorseSolution = metropolisAcceptWorse(deltaFitness, temperature, fitnessRange)
     val newParamsWithFitness =
-      if (deltaFitness < 0 || useWorseSolution) {
-        // Always select the solution if it has a better fitness,
-        // but sometimes select a worse solution if the second term evaluates to true.
-        ParameterArrayWithFitness(newParams, newFitness)
-      } else curParams
-
+      if (deltaFitness < 0 || useWorseSolution) acceptedState(newParams, newFitness)
+      else curParams
     log(ct, newParamsWithFitness, r, dist, FormatUtil.formatNumber(temperature))
     newParamsWithFitness
+  }
+
+  /** @return (delta for Metropolis, absolute fitness of newParams when not comparison mode; 0.0 if comparison) */
+  private def deltaAndAbsoluteFitness(newParams: ParameterArray, curParams: ParameterArrayWithFitness): (Double, Double) =
+    if (optimizee.evaluateByComparison) {
+      val d = optimizee.compareFitness(newParams, curParams.pa)
+      (d, 0.0)
+    } else {
+      val nf = optimizee.evaluateFitness(newParams)
+      (nf - curParams.fitness, nf)
+    }
+
+  private def metropolisAcceptWorse(deltaFitness: Double, temperature: Double, fitnessRange: Double): Boolean = {
+    val probability = Math.pow(Math.E, tempMax * -deltaFitness / (fitnessRange * temperature))
+    rnd.nextDouble() < probability
+  }
+
+  private def acceptedState(newParams: ParameterArray, newFitness: Double): ParameterArrayWithFitness = {
+    val storedFitness =
+      if (optimizee.evaluateByComparison) optimizee.compareFitness(newParams, initialParams)
+      else newFitness
+    ParameterArrayWithFitness(newParams, storedFitness)
   }
 }

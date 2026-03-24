@@ -139,7 +139,7 @@ case object TYPICAL_DS extends DominatingSetVariation {
     List(0, 23, 24)
   ))
 
-  val errorTolerances = ErrorTolerances(3.6, 1.2, 4.01, 1.6, 1.2, 1.2)
+  val errorTolerances = ErrorTolerances(3.6, 0.5, 3.0, 1.6, 1.2, 1.2)
 
   /** This is one of several possible solutions that gives an optimal fitness of 0 */
   override def getExactSolution: ParameterArrayWithFitness = createSolution(6, 7, 8, 19, 21, 24)

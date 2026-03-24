@@ -21,41 +21,19 @@ class ConcurrentGeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUt
   extends GeneticSearchStrategy(optimizee, rnd) {
 
   /**
-    * Note: this method assigns a fitness value to each member of the population.
-    *
-    * Evaluate the members of the population - either directly, or by
-    * comparing them against the initial params value passed in (including params).
-    *
-    * Create a thread for each evaluation and don't continue until they are all done (countDown latch or gate)
-    *
-    * @param population   the population to evaluate
-    * @param previousBest the best solution from the previous iteration
-    * @return the new best solution.
+    * Parallel re-evaluation of comparison-mode fitness for each member vs `baseline`.
     */
-  override protected def evaluatePopulation(population: ArrayBuffer[ParameterArray],
-                                            previousBest: ParameterArray): ParameterArrayWithFitness = {
-    var bestFitness = ParameterArrayWithFitness(previousBest, Double.MaxValue)
-    val workers = population.map(candidate => new EvaluationWorker(candidate, previousBest))
-
-    workers.par.foreach(x => x.run()) // run workers in parallel
-
-    for (worker <- workers) {
-      if (worker.getResult < bestFitness.fitness)
-        bestFitness = worker.getCandidateWithFitness
+  override protected def reevaluatePopulationFitness(population: ArrayBuffer[ParameterArrayWithFitness],
+                                                     baseline: ParameterArray): Unit = {
+    if (!optimizee.evaluateByComparison) return
+    val updated = population.indices.par.map { i =>
+      val p = population(i).pa
+      ParameterArrayWithFitness(p, optimizee.compareFitness(p, baseline))
+    }.toIndexedSeq
+    var i = 0
+    while (i < population.size) {
+      population(i) = updated(i)
+      i += 1
     }
-    bestFitness
-  }
-
-  /** Does the evaluation for each candidate in a different thread. */
-  private class EvaluationWorker(var candidate: ParameterArray, var params: ParameterArray) extends Runnable {
-    private var fitness = .0
-
-    override def run(): Unit = {
-      if (optimizee.evaluateByComparison) fitness = optimizee.compareFitness(candidate, params)
-      else fitness = optimizee.evaluateFitness(candidate)
-    }
-
-    private[strategy] def getResult = fitness
-    private[strategy] def getCandidateWithFitness = ParameterArrayWithFitness(candidate, fitness)
   }
 }

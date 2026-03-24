@@ -4,7 +4,6 @@ package com.barrybecker4.optimization.strategy
 import com.barrybecker4.optimization.Logger
 import com.barrybecker4.optimization.OptimizationListener
 import com.barrybecker4.optimization.optimizee.Optimizee
-import com.barrybecker4.optimization.Optimizer
 import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 
 

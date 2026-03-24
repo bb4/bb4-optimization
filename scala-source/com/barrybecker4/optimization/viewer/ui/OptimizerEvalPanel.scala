@@ -7,7 +7,6 @@ import com.barrybecker4.optimization.strategy.OptimizationStrategyType
 import com.barrybecker4.optimization.viewer.model.PointsList
 import com.barrybecker4.optimization.viewer.projectors.SimpleProjector
 import com.barrybecker4.optimization.viewer.rendering.PointsListRenderer
-import com.barrybecker4.optimization.viewer.ui.{OptimizationViewable, OptimizerEvalPanel}
 import com.barrybecker4.optimization.{OptimizationListener, Optimizer}
 
 import java.awt.*
@@ -75,7 +74,7 @@ class OptimizerEvalPanel() extends JPanel
   }
 
   override def paintComponent(g: Graphics): Unit = {
-    super.paintComponents(g)
+    super.paintComponent(g)
     val g2 = g.asInstanceOf[Graphics2D]
     val dim: Dimension = this.getSize
     g2.setColor(OptimizerEvalPanel.BG_COLOR)

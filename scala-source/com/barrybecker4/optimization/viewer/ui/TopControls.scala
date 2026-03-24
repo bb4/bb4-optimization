@@ -38,7 +38,7 @@ class TopControls(var logFile: String, val testProblems: Seq[OptimizeeProblem],
 
   private def createStrategyCombo = {
     val strategyPanel = new JPanel
-    strategyDropDown = new JComboBox[OptimizationStrategyType](OptimizationStrategyType.VALUES)
+    strategyDropDown = new JComboBox[OptimizationStrategyType](OptimizationStrategyType.valuesForUi)
     strategyPanel.add(strategyDropDown)
     strategyDropDown.addActionListener(this)
     strategyPanel

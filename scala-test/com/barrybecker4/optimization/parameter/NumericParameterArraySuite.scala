@@ -1,6 +1,7 @@
 package com.barrybecker4.optimization.parameter
 
 import com.barrybecker4.math.MathUtil
+import com.barrybecker4.math.linear.Vector
 import org.scalatest.{BeforeAndAfter}
 import NumericParameterArraySuite.createParamArray
 import org.scalatest.funsuite.AnyFunSuite
@@ -44,6 +45,14 @@ class NumericParameterArraySuite extends AnyFunSuite with BeforeAndAfter {
   test("GetSamplePopulationSize") {
     params = NumericParameterArraySuite.createParamArray(.2, .3)
     assertResult(144) { params.getSamplePopulationSize }
+  }
+
+  test("add clamps first coordinate to min when vector pushes below range") {
+    params = createParamArray(0.2, 0.3)
+    val delta = Vector(IndexedSeq(-100.0, 0.0))
+    val result = params.add(delta)
+    assertResult(NumericParameterArraySuite.MIN_VALUE) { result.get(0).getValue }
+    assertResult(0.3) { result.get(1).getValue }
   }
 
   test("Find0GlobalSamples") {
