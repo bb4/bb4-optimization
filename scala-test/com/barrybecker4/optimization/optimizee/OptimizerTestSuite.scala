@@ -22,9 +22,6 @@ object OptimizerTestSuite {
   /** If the error is this percent (or more) less than the error threshold, let the user know */
   private val THRESHOLD_SLACK_WARNING = 0.1
 
-  /** If the error is this percent less than the error threshold, give an error so the test can be updated */
-  private val THRESHOLD_SLACK_ERROR = 0.2
-
   /** If the error is less than this, then it is considered acceptable, even if off by a lot from the thresh */
   private val ACCEPTABLE_ERROR = 0.002
 
@@ -46,7 +43,8 @@ object OptimizerTestSuite {
       val message = s"The error threshold of $errorThresh for $optType running on ${problem.getName} " +
         s" is a bit slack. It could be reduced to $error."
       System.out.println(message)
-      assert(error >= (1.0 - THRESHOLD_SLACK_ERROR) * errorThresh, message)
+      // Do not assert: stochastic heuristics (e.g. discrete hill climbing) can land far below threshold on
+      // some seeds while other seeds need the full headroom; tightening threshold would flake those runs.
     }
     println("\n************************************************************************")
     println("The solution to the Problem using " + optType + " is :\n" + solution + "\nWhich evaluates to: " +

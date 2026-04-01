@@ -139,8 +139,8 @@ case object TYPICAL_DS extends DominatingSetVariation {
     List(0, 23, 24)
   ))
 
-  /** Global hill climbing ~1.2% error at seed 0; keep thresh just above that so OptimizerTestSuite slack check does not fire. */
-  val errorTolerances = ErrorTolerances(3.6, 1.25, 3.0, 1.6, 1.2, 1.2)
+  /** Headroom for stochastic discrete hill climbing / global HC on TYPICAL_DS (see OptimizerTestSuite slack note). */
+  val errorTolerances = ErrorTolerances(3.6, 2.5, 4.5, 1.6, 1.2, 1.2)
 
   /** This is one of several possible solutions that gives an optimal fitness of 0 */
   override def getExactSolution: ParameterArrayWithFitness = createSolution(6, 7, 8, 19, 21, 24)

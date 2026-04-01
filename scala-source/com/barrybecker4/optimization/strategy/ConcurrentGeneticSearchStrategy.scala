@@ -1,4 +1,4 @@
-// Copyright by Barry G. Becker, 2001-2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
+// Copyright by Barry G. Becker, 2001-2026. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.strategy
 
 import com.barrybecker4.math.MathUtil
@@ -17,8 +17,11 @@ import scala.collection.parallel.CollectionConverters._
   * @param optimizee the thing to be optimized.
   * @author Barry Becker
   */
-class ConcurrentGeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM)
-  extends GeneticSearchStrategy(optimizee, rnd) {
+class ConcurrentGeneticSearchStrategy(
+    optimizee: Optimizee,
+    rnd: Random = MathUtil.RANDOM,
+    config: GeneticConfig = GeneticConfig()
+) extends GeneticSearchStrategy(optimizee, rnd, config) {
 
   /**
     * Parallel re-evaluation of comparison-mode fitness for each member vs `baseline`.
