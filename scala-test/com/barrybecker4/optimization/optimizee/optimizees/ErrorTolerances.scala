@@ -27,9 +27,8 @@ case class ErrorTolerances(globalSampling: Double, globalHillClimbing: Double, h
     SIMULATED_ANNEALING -> simAnnealing,
     GENETIC_SEARCH -> geneticSearch,
     CONCURRENT_GENETIC_SEARCH -> concurrentGeneticSearch,
-    // STATE_SPACE -> stateSpace,
-    // the error for brute force should always be 0.
-    BRUTE_FORCE-> bruteForce
+    STATE_SPACE_SEARCH -> stateSpace,
+    BRUTE_FORCE -> bruteForce
   )
 
 

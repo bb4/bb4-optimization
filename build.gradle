@@ -29,3 +29,20 @@ dependencies {
 rootProject.tasks.named("processTestResources") {
     duplicatesStrategy = DuplicatesStrategy.WARN
 }
+
+// Default unit tests exclude slow integration suite; run `./gradlew slowTest` for extra cases.
+tasks.named('test', Test) {
+    filter {
+        excludeTestsMatching '*SlowIntegrationSuite*'
+    }
+}
+
+tasks.register('slowTest', Test) {
+    group = 'verification'
+    description = 'Runs SlowIntegrationSuite (extra TSP / subset-sum / dominating-set cases).'
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    filter {
+        includeTestsMatching '*SlowIntegrationSuite*'
+    }
+}
