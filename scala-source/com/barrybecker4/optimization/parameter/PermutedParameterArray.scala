@@ -30,6 +30,13 @@ case class PermutedParameterArray(params: IndexedSeq[Parameter], rnd: Random)
     PermutedParameterArray(newParams.toIndexedSeq, rnd)
   }
 
+  /**
+    * Same permutation and parameter values with a new [[Random]] (e.g. multistart hill climbing).
+    * Subclasses that carry domain state beyond [[params]] should override to preserve their concrete type.
+    */
+  def forkWithRnd(newRnd: Random): PermutedParameterArray =
+    PermutedParameterArray(params, newRnd)
+
   def reverse: PermutedParameterArray = PermutedParameterArray(params.reverse, rnd)
 
   /**

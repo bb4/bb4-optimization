@@ -77,12 +77,12 @@ class GlobalHillClimbingStrategy(optimizee: Optimizee) extends OptimizationStrat
     val rnd = new Random(salt)
     val newPa = s.pa match {
       case v: VariableLengthIntSet =>
-        val paramsSeq = (0 until v.size).map(v.get).toIndexedSeq
+        val paramsSeq = (0 until v.size).map(v.get)
         VariableLengthIntSet.createInstance(paramsSeq, v.fullSeq, rnd)
       case n: NumericParameterArray =>
         NumericParameterArray(n.params, n.numSteps, rnd)
       case p: PermutedParameterArray =>
-        PermutedParameterArray(p.params, rnd)
+        p.forkWithRnd(rnd)
       case other => other
     }
     ParameterArrayWithFitness(newPa, s.fitness)
