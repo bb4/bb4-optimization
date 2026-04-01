@@ -9,9 +9,6 @@ import ImprovementFinder.INITIAL_JUMP_SIZE
 
 
 object DiscreteImprovementFinder {
-  /** don't try more than this many times to find improvement on any iteration */
-  private val MAX_TRIES = 1000
-
   private val JUMP_SIZE_DECREASE = 0.98
   private val JUMP_SIZE_INCREASE = 1.01
 }
@@ -41,7 +38,7 @@ class DiscreteImprovementFinder(var startingParams: ParameterArrayWithFitness,
 
     var improvement = Improvement(currentParams, 0, jumpSize)
 
-    while (fitnessDelta >= 0 && numTries < MAX_TRIES) {
+    while (fitnessDelta >= 0 && numTries < DISCRETE_MAX_TRIES) {
       val nbrParam = currentParams.pa.getRandomNeighbor(jumpSize)
       fitnessDelta = .0
 

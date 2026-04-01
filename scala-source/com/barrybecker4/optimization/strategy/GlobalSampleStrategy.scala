@@ -3,6 +3,8 @@ package com.barrybecker4.optimization.strategy
 
 import com.barrybecker4.optimization.optimizee.Optimizee
 import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
+
+import scala.collection.mutable
 import GlobalSampleStrategy._
 
 
@@ -23,7 +25,9 @@ class GlobalSampleStrategy(optimizee: Optimizee) extends OptimizationStrategy(op
   private var numSample = DEFAULT_NUM_SAMPLES
 
   /**
-    * @param samplingRate the rate at which to sample along each dimension when trying guesses globally.
+    * Requested sample budget for numeric spaces: [[com.barrybecker4.optimization.parameter.sampling.NumericGlobalSampler]]
+    * chooses about `floor(requested^(1/numDims))` grid points per dimension (total samples ≈ that value raised to `numDims`).
+    * For other [[ParameterArray]] types, semantics follow their `findGlobalSamples` implementation.
     */
   def setSamplingRate(samplingRate: Int): Unit = {
     assert(samplingRate > 0)
@@ -67,5 +71,48 @@ class GlobalSampleStrategy(optimizee: Optimizee) extends OptimizationStrategy(op
         done = true
     }
     bestParams
+  }
+
+  /**
+    * Same sampling and evaluation as [[doOptimization]], but retains the `k` best distinct samples
+    * (lowest fitness first). Used for multistart local search.
+    */
+  private[strategy] def doOptimizationTopK(params: ParameterArray, fitnessRange: Double, k: Int)
+    : Seq[ParameterArrayWithFitness] = {
+    val kClamped = math.max(1, k)
+    val samples = params.findGlobalSamples(numSample)
+    var globalBest = ParameterArrayWithFitness(params, Double.MaxValue)
+    var done = false
+    val worstIsHead: Ordering[ParameterArrayWithFitness] =
+      Ordering.by[ParameterArrayWithFitness, Double](_.fitness).reverse
+    val pq = mutable.PriorityQueue.empty[ParameterArrayWithFitness](using worstIsHead)
+
+    while (samples.hasNext && !done) {
+      val sample = samples.next()
+      val fitness =
+        if (optimizee.evaluateByComparison) optimizee.compareFitness(sample, params)
+        else optimizee.evaluateFitness(sample)
+      val candidate = ParameterArrayWithFitness(sample, fitness)
+      if (fitness < globalBest.fitness) {
+        globalBest = candidate
+        notifyOfChange(globalBest)
+      }
+      if (pq.size < kClamped) pq.enqueue(candidate)
+      else if (fitness < pq.head.fitness) {
+        pq.dequeue()
+        pq.enqueue(candidate)
+      }
+      if (isOptimalFitnessReached(globalBest))
+        done = true
+    }
+    if (globalBest.fitness == Double.MaxValue) IndexedSeq.empty
+    else {
+      val sorted = pq.toArray.sortBy(_.fitness).toIndexedSeq
+      // Prepend first-seen global best so tie-breaking matches [[doOptimization]]; multistart's first local run matches legacy.
+      // Do not dedupe by set equality: distinct ParameterArray instances share one Random; deduping would drop repeats but
+      // leave later seeds in the list, consuming the RNG before the primary hill climb and changing its trajectory.
+      val merged = globalBest +: sorted.filterNot(_.pa eq globalBest.pa)
+      merged.take(kClamped)
+    }
   }
 }

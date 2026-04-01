@@ -27,7 +27,7 @@ enum OptimizationStrategyType {
     case GLOBAL_SAMPLING =>
       "Sparsely sample the space and return the best sample."
     case GLOBAL_HILL_CLIMBING =>
-      "Start with the best global sampling and hill climb from there."
+      "Global sampling, then hill climb from each of the best few samples; return the best local optimum."
     case HILL_CLIMBING =>
       "Search method which always marches toward the direction of greatest improvement."
     case SIMULATED_ANNEALING =>

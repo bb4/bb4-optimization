@@ -1,4 +1,4 @@
-// Copyright by Barry G. Becker, 2000-2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
+// Copyright by Barry G. Becker, 2000-2026. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.strategy.gradient
 
 import com.barrybecker4.optimization.optimizee.Optimizee
@@ -6,8 +6,6 @@ import com.barrybecker4.optimization.parameter.{NumericParameterArray, Parameter
 import scala.collection.mutable
 
 object ImprovementStep {
-  /** continue optimization iteration until the improvement in fitness is less than this.  */
-  protected val JUMP_SIZE_EPS = 0.000000001
 
   /** Increase the size of the radius by this multiplier */
   private val RADIUS_EXPANDER = 1.5
@@ -38,7 +36,7 @@ class ImprovementStep(var optimizee: Optimizee, var iter: ImprovementIteration, 
     val maxTries = 100
     var currentParams = findNextCandidateParams(params)
     var numTries = 1
-    while (!improved && (jumpSize > ImprovementStep.JUMP_SIZE_EPS) && numTries < maxTries) {
+    while (!improved && (jumpSize > JUMP_SIZE_EPS) && numTries < maxTries) {
       currentParams = findNextCandidateParams(currentParams)
       numTries += 1
     }
@@ -54,7 +52,6 @@ class ImprovementStep(var optimizee: Optimizee, var iter: ImprovementIteration, 
     var currentParams: NumericParameterArray = params.pa.asInstanceOf[NumericParameterArray]
     val oldParams = params
     iter.updateGradient(jumpSize, gradLength)
-    //// println(s"gradient = ${iter.gradient}. jumpSize=" + jumpSize)
     currentParams = currentParams.add(iter.gradient)
     var gaussRadius = 0.01
     var sameParams = false
@@ -73,13 +70,11 @@ class ImprovementStep(var optimizee: Optimizee, var iter: ImprovementIteration, 
       val deltaFitness = optimizee.compareFitness(currentParams, oldParams.pa)
       val fitness = optimizee.compareFitness(currentParams, baselineParams)
       newParams = ParameterArrayWithFitness(currentParams, fitness)
-      if (deltaFitness > 0) improved = false
       improvement = deltaFitness
     }
     else {
       val fitness = optimizee.evaluateFitness(currentParams)
       newParams = ParameterArrayWithFitness(currentParams, fitness)
-      if (fitness >= oldFitness) improved = false
       improvement = fitness - oldFitness
     }
     improved = improvement < 0

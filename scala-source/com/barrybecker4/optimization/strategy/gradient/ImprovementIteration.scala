@@ -1,4 +1,4 @@
-// Copyright by Barry G. Becker, 2000-2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
+// Copyright by Barry G. Becker, 2000-2026. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.strategy.gradient
 
 import com.barrybecker4.math.MathUtil
@@ -11,23 +11,28 @@ import com.barrybecker4.optimization.parameter.{Direction, NumericParameterArray
   * Utility class for maintaining the data vectors for the iteration when hill climbing
   * over a numerical parameter space.
   * @param params the params to improve.
-  * @param oldGradient last direction of improvement
+  * @param numericPa same as `params.pa` as numeric array (caller guarantees type).
+  * @param priorGradient direction from the previous step, if any; otherwise a default unit direction is used.
   * @author Barry Becker
   */
-class ImprovementIteration(params: ParameterArrayWithFitness, var oldGradient: Vector = null) {
+class ImprovementIteration(
+  params: ParameterArrayWithFitness,
+  numericPa: NumericParameterArray,
+  priorGradient: Option[Vector] = None
+) {
 
-  private var delta: Vector = params.pa.asInstanceOf[NumericParameterArray].asVector
-  private var fitnessDelta: Vector = params.pa.asInstanceOf[NumericParameterArray].asVector
-  var gradient: Vector = params.pa.asInstanceOf[NumericParameterArray].asVector
+  private var delta: Vector = numericPa.asVector
+  private var fitnessDelta: Vector = numericPa.asVector
+  var gradient: Vector = numericPa.asVector
 
-  if (oldGradient == null) {
-    this.oldGradient = params.pa.asInstanceOf[NumericParameterArray].asVector
-
-    // initialize the old gradient to the unit vector (any random direction will do)
-    for (i <- 0 until params.pa.size) {
-      this.oldGradient.set(i, 1.0)
-    }
-    this.oldGradient = this.oldGradient.normalize
+  var oldGradient: Vector = priorGradient match {
+    case Some(g) => g
+    case None =>
+      var og = numericPa.asVector
+      for (i <- 0 until numericPa.size) {
+        og = og.set(i, 1.0)
+      }
+      og.normalize
   }
 
   /** Compute the squares in one of the iteration directions and add it to the running sum.
@@ -35,11 +40,10 @@ class ImprovementIteration(params: ParameterArrayWithFitness, var oldGradient: V
     */
   def incSumOfSqs(i: Int, optimizee: Optimizee): Double = {
 
-    val p: Parameter = params.pa.get(i)
-    val nparams = params.pa.asInstanceOf[NumericParameterArray]
-    val forwardParams = nparams.incrementByEps(i, Direction.FORWARD)
+    val p: Parameter = numericPa.get(i)
+    val forwardParams = numericPa.incrementByEps(i, Direction.FORWARD)
     val fwdFitnessDelta = findFitnessDelta(optimizee, params, forwardParams)
-    val backwardParams = nparams.incrementByEps(i, Direction.BACKWARD)
+    val backwardParams = numericPa.incrementByEps(i, Direction.BACKWARD)
     val bwdFitnessDelta = findFitnessDelta(optimizee, params, backwardParams)
 
     val baseValue = p.getValue
@@ -75,18 +79,17 @@ class ImprovementIteration(params: ParameterArrayWithFitness, var oldGradient: V
   private def findFitnessDelta(optimizee: Optimizee,
                                params: ParameterArrayWithFitness,
                                testParams: ParameterArray): Double = {
-    if (optimizee.evaluateByComparison) optimizee.compareFitness( testParams, params.pa )
-    else optimizee.evaluateFitness( testParams ) - params.fitness
+    if (optimizee.evaluateByComparison) optimizee.compareFitness(testParams, params.pa)
+    else optimizee.evaluateFitness(testParams) - params.fitness
   }
 
   /** Update gradient. Use EPS if the gradLength is 0. */
   def updateGradient(jumpSize: Double, gradLength: Double): Unit = {
-    val gradLen: Double = if (gradLength == 0)  MathUtil.EPS_MEDIUM else gradLength
+    val gradLen: Double = if (gradLength == 0) MathUtil.EPS_MEDIUM else gradLength
     for (i <- 0 until delta.size) {
       val safeDelta = if (Math.abs(delta(i)) < MathUtil.EPS_MEDIUM) MathUtil.EPS_MEDIUM else delta(i)
       val denominator = safeDelta * gradLen
       gradient = gradient.set(i, -jumpSize * fitnessDelta(i) / denominator)
     }
-    //// println("gradient = " + gradient + " after updating from fitnessDelta = " + fitnessDelta.toString())
   }
 }
