@@ -61,9 +61,10 @@ class DiscreteImprovementFinder(var startingParams: ParameterArrayWithFitness,
 
         if (fitnessDelta < 0)
           improvement = Improvement(nbr, fitnessDelta, jumpSize)
-        jumpSize *= JUMP_SIZE_INCREASE
       }
+      // Widen search radius every try (including cache hits) so we do not stall when many neighbors repeat.
       numTries += 1
+      jumpSize *= JUMP_SIZE_INCREASE
     }
 
     trace("incremental improvement = " + improvement + " numTries=" + numTries)
