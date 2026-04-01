@@ -34,19 +34,20 @@ class HillClimbingStrategy(optimizee: Optimizee) extends OptimizationStrategy(op
     log(0, currentParams, 0.0, 0.0, "initial test")
     notifyOfChange(currentParams)
 
-    // Use cache to avoid repeats. This can be a real issue if we have a discrete problem space.
+    // Use cache to avoid repeats in discrete spaces; it has little value in continuous numeric spaces.
+    val useCache = isDiscreteProblem(currentParams.pa)
     val cache = mutable.HashSet[ParameterArray]()
-    cache += currentParams.pa
+    if (useCache) cache += currentParams.pa
 
     // Iterate until there is no significant improvement between iterations.
     // IOW, when the jumpSize is too small (below some threshold).
-    val impFinder: ImprovementFinder = createImprovementFinder(currentParams)
-    var improvement: Improvement = impFinder.findIncrementalImprovement(optimizee, null, cache)
+    val impFinder: ImprovementFinder = createImprovementFinder(currentParams, params, useCache)
+    var improvement: Improvement = impFinder.findIncrementalImprovement(optimizee, None, cache)
     currentParams = improvement.parameters
 
     while (improvement.improved && !isOptimalFitnessReached(currentParams)) {
       //// println(s"iter=$numIterations FITNESS = ${currentParams.fitness} ------------")
-      improvement = impFinder.findIncrementalImprovement(optimizee, improvement, cache)
+      improvement = impFinder.findIncrementalImprovement(optimizee, Some(improvement), cache)
       numIterations += 1
       currentParams = improvement.parameters
       notifyOfChange(currentParams)
@@ -57,11 +58,21 @@ class HillClimbingStrategy(optimizee: Optimizee) extends OptimizationStrategy(op
     currentParams
   }
 
-  private def createImprovementFinder(params: ParameterArrayWithFitness): ImprovementFinder = {
+  private def createImprovementFinder(params: ParameterArrayWithFitness,
+                                      baseline: ParameterArray,
+                                      useCache: Boolean): ImprovementFinder = {
     params.pa match {
-      case npa: NumericParameterArray => new NumericImprovementFinder(params)
-      case dpa @ (_:PermutedParameterArray | _:VariableLengthIntSet) => new DiscreteImprovementFinder(params)
+      case _: NumericParameterArray =>
+        new NumericImprovementFinder(params, baseline, useCache, msg => trace(msg))
+      case _: PermutedParameterArray | _: VariableLengthIntSet =>
+        new DiscreteImprovementFinder(params, baseline, msg => trace(msg))
       case _ => throw new IllegalArgumentException("Unexpected params type: " + params.pa.getClass.getName)
     }
+  }
+
+  private def isDiscreteProblem(params: ParameterArray): Boolean = params match {
+    case _: PermutedParameterArray | _: VariableLengthIntSet => true
+    case n: NumericParameterArray => (0 until n.size).exists(i => n.get(i).isIntegerOnly)
+    case _ => false
   }
 }

@@ -36,23 +36,34 @@ class ImprovementIteration(params: ParameterArrayWithFitness, var oldGradient: V
   def incSumOfSqs(i: Int, optimizee: Optimizee): Double = {
 
     val p: Parameter = params.pa.get(i)
-
-    // increment forward.
-    delta = delta.set(i, p.getIncrementForDirection(Direction.FORWARD))
     val nparams = params.pa.asInstanceOf[NumericParameterArray]
-
     val forwardParams = nparams.incrementByEps(i, Direction.FORWARD)
     val fwdFitnessDelta = findFitnessDelta(optimizee, params, forwardParams)
+    val backwardParams = nparams.incrementByEps(i, Direction.BACKWARD)
+    val bwdFitnessDelta = findFitnessDelta(optimizee, params, backwardParams)
 
-    // this checks the fitness on the other side (backwards).
-    //val backwardParams = nparams.incrementByEps(i, Direction.BACKWARD)
-    //val bwdFitnessDelta = findFitnessDelta(optimizee, params, backwardParams) // reverse?
+    val baseValue = p.getValue
+    val forwardValue = forwardParams.get(i).getValue
+    val backwardValue = backwardParams.get(i).getValue
+    val hasForwardStep = forwardValue != baseValue
+    val hasBackwardStep = backwardValue != baseValue
 
-    fitnessDelta = fitnessDelta.set(i, fwdFitnessDelta) // - bwdFitnessDelta)
-    println(s"fitDelta for $i = $fitnessDelta")
+    val (effectiveFitnessDelta, effectiveDelta) =
+      if (hasForwardStep && hasBackwardStep) {
+        // Central difference: (f(x+h) - f(x-h)) / (2h)
+        (fwdFitnessDelta - bwdFitnessDelta, forwardValue - backwardValue)
+      } else if (hasForwardStep) {
+        (fwdFitnessDelta, forwardValue - baseValue)
+      } else if (hasBackwardStep) {
+        (bwdFitnessDelta, backwardValue - baseValue)
+      } else {
+        (0.0, p.getIncrementForDirection(Direction.FORWARD))
+      }
+
+    fitnessDelta = fitnessDelta.set(i, effectiveFitnessDelta)
+    delta = delta.set(i, effectiveDelta)
     val d = delta(i)
-    assert(d != 0)
-    (fwdFitnessDelta * fwdFitnessDelta) / (d * d)
+    if (d == 0.0) 0.0 else (effectiveFitnessDelta * effectiveFitnessDelta) / (d * d)
   }
 
   /** @param optimizee the thing being optimized
@@ -72,7 +83,8 @@ class ImprovementIteration(params: ParameterArrayWithFitness, var oldGradient: V
   def updateGradient(jumpSize: Double, gradLength: Double): Unit = {
     val gradLen: Double = if (gradLength == 0)  MathUtil.EPS_MEDIUM else gradLength
     for (i <- 0 until delta.size) {
-      val denominator = delta(i) * gradLen
+      val safeDelta = if (Math.abs(delta(i)) < MathUtil.EPS_MEDIUM) MathUtil.EPS_MEDIUM else delta(i)
+      val denominator = safeDelta * gradLen
       gradient = gradient.set(i, -jumpSize * fitnessDelta(i) / denominator)
     }
     //// println("gradient = " + gradient + " after updating from fitnessDelta = " + fitnessDelta.toString())

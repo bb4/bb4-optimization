@@ -23,6 +23,6 @@ trait ImprovementFinder {
     *               parameters are discrete and not continuous.
     * @return the improvement which contains the improved parameter array and possibly a revised jumpSize.
     */
-  def findIncrementalImprovement(optimizee: Optimizee, improvement: Improvement,
+  def findIncrementalImprovement(optimizee: Optimizee, improvement: Option[Improvement],
                                  cache: mutable.Set[ParameterArray]): Improvement
 }

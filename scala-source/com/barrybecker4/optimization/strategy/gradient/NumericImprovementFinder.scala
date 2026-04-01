@@ -21,7 +21,10 @@ object NumericImprovementFinder {
   * @param startingParams parameters to improve
   * @author Barry Becker
   */
-class NumericImprovementFinder(val startingParams: ParameterArrayWithFitness) extends ImprovementFinder {
+class NumericImprovementFinder(val startingParams: ParameterArrayWithFitness,
+                               baselineParams: ParameterArray,
+                               useCache: Boolean = false,
+                               trace: String => Unit = _ => ()) extends ImprovementFinder {
 
 
   /** Try to find a parameterArray that is better than what we have now by evaluating using the optimizee passed in.
@@ -31,20 +34,11 @@ class NumericImprovementFinder(val startingParams: ParameterArrayWithFitness) ex
     *               parameters are discrete and not continuous.
     * @return the improvement which contains the improved parameter array and possibly a revised jumpSize.
     */
-  def findIncrementalImprovement(optimizee: Optimizee, lastImprovement: Improvement,
+  def findIncrementalImprovement(optimizee: Optimizee, lastImprovement: Option[Improvement],
                                  cache: mutable.Set[ParameterArray]): Improvement = {
-    var currentParams: ParameterArrayWithFitness = null
-    var oldGradient: Vector = null
-    var jumpSize: Double = 0
-    if (lastImprovement == null) {
-      currentParams = startingParams
-      jumpSize = INITIAL_JUMP_SIZE
-    }
-    if (lastImprovement != null) {
-      currentParams = lastImprovement.parameters
-      oldGradient = lastImprovement.gradient.get
-      jumpSize = lastImprovement.jumpSize
-    }
+    val currentParams: ParameterArrayWithFitness = lastImprovement.map(_.parameters).getOrElse(startingParams)
+    val oldGradient: Vector = lastImprovement.flatMap(_.gradient).orNull
+    val jumpSize: Double = lastImprovement.map(_.jumpSize).getOrElse(INITIAL_JUMP_SIZE)
     val oldFitness: Double = currentParams.fitness
     val iter = new ImprovementIteration(currentParams, oldGradient)
     var sumOfSqs: Double = 0
@@ -52,7 +46,8 @@ class NumericImprovementFinder(val startingParams: ParameterArrayWithFitness) ex
       sumOfSqs += iter.incSumOfSqs(i, optimizee)
     }
     val gradLength = Math.sqrt(sumOfSqs)
-    val step = new ImprovementStep(optimizee, iter, gradLength, cache, jumpSize, oldFitness)
+    val step = new ImprovementStep(optimizee, iter, gradLength, cache, jumpSize, oldFitness,
+      baselineParams, useCache, trace)
     val newParams = step.findNextParams(currentParams)
     var newJumpSize = step.jumpSize
     // the improvement may be zero or negative, meaning it did not improve.

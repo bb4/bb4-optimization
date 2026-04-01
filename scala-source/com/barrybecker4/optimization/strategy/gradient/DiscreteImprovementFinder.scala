@@ -20,7 +20,9 @@ object DiscreteImprovementFinder {
   * Finds incremental improvement in a discrete problem space.
   * @author Barry Becker
   */
-class DiscreteImprovementFinder(var startingParams: ParameterArrayWithFitness) extends ImprovementFinder {
+class DiscreteImprovementFinder(var startingParams: ParameterArrayWithFitness,
+                                baselineParams: ParameterArray,
+                                trace: String => Unit = _ => ()) extends ImprovementFinder {
 
   /** Try to find a parameterArray that is better than what we have now by evaluating using the optimizee passed in.
     * Try swapping parameters randomly until we find an improvement (if we can).
@@ -30,21 +32,12 @@ class DiscreteImprovementFinder(var startingParams: ParameterArrayWithFitness) e
     * @return the improvement which contains the improved parameter array and possibly a revised jumpSize.
     */
   def findIncrementalImprovement(optimizee: Optimizee,
-                                 lastImprovement: Improvement,
+                                 lastImprovement: Option[Improvement],
                                  cache: mutable.Set[ParameterArray]): Improvement = {
     var numTries = 0
     var fitnessDelta = 1.0
-    var jumpSize = .0
-    var currentParams: ParameterArrayWithFitness = null
-
-    if (lastImprovement == null) {
-      currentParams = startingParams
-      jumpSize = INITIAL_JUMP_SIZE
-    }
-    if (lastImprovement != null) {
-      currentParams = lastImprovement.parameters
-      jumpSize = lastImprovement.jumpSize * JUMP_SIZE_DECREASE
-    }
+    var jumpSize = lastImprovement.map(_.jumpSize * JUMP_SIZE_DECREASE).getOrElse(INITIAL_JUMP_SIZE)
+    val currentParams: ParameterArrayWithFitness = lastImprovement.map(_.parameters).getOrElse(startingParams)
 
     var improvement = Improvement(currentParams, 0, jumpSize)
 
@@ -58,7 +51,8 @@ class DiscreteImprovementFinder(var startingParams: ParameterArrayWithFitness) e
         val nbr: ParameterArrayWithFitness =
           if (optimizee.evaluateByComparison) {
             fitnessDelta = optimizee.compareFitness(nbrParam, currentParams.pa)
-            ParameterArrayWithFitness(nbrParam, currentParams.fitness + fitnessDelta)
+            val absoluteFitness = optimizee.compareFitness(nbrParam, baselineParams)
+            ParameterArrayWithFitness(nbrParam, absoluteFitness)
           } else {
             val fitness = optimizee.evaluateFitness(nbrParam)
             fitnessDelta = fitness - currentParams.fitness
@@ -67,12 +61,12 @@ class DiscreteImprovementFinder(var startingParams: ParameterArrayWithFitness) e
 
         if (fitnessDelta < 0)
           improvement = Improvement(nbr, fitnessDelta, jumpSize)
+        jumpSize *= JUMP_SIZE_INCREASE
       }
       numTries += 1
-      jumpSize *= JUMP_SIZE_INCREASE
     }
 
-    println("incremental improvement = " + improvement + " numTries=" + numTries)
+    trace("incremental improvement = " + improvement + " numTries=" + numTries)
     improvement
   }
 }

@@ -22,7 +22,9 @@ object ImprovementStep {
   * @author Barry Becker
   */
 class ImprovementStep(var optimizee: Optimizee, var iter: ImprovementIteration, var gradLength: Double,
-                      var cache: mutable.Set[ParameterArray], var jumpSize: Double, var oldFitness: Double) {
+                      var cache: mutable.Set[ParameterArray], var jumpSize: Double, var oldFitness: Double,
+                      baselineParams: ParameterArray, useCache: Boolean = true,
+                      trace: String => Unit = _ => ()) {
 
   private var improvement = .0
   private var improved = false
@@ -56,20 +58,23 @@ class ImprovementStep(var optimizee: Optimizee, var iter: ImprovementIteration, 
     currentParams = currentParams.add(iter.gradient)
     var gaussRadius = 0.01
     var sameParams = false
-    // for problems with integer params, we want to avoid testing the same candidate over again. */
-    while (cache.contains(currentParams)) {
-      sameParams = true
-      currentParams = currentParams.getRandomNeighbor(gaussRadius)
-      gaussRadius *= ImprovementStep.RADIUS_EXPANDER
+    if (useCache) {
+      // For problems with integer params, avoid retesting the same candidate repeatedly.
+      while (cache.contains(currentParams)) {
+        sameParams = true
+        currentParams = currentParams.getRandomNeighbor(gaussRadius)
+        gaussRadius *= ImprovementStep.RADIUS_EXPANDER
+      }
+      cache += currentParams
     }
-    cache += currentParams
 
     var newParams: ParameterArrayWithFitness = null
     if (optimizee.evaluateByComparison) {
-      val fitness = optimizee.compareFitness(currentParams, oldParams.pa)
+      val deltaFitness = optimizee.compareFitness(currentParams, oldParams.pa)
+      val fitness = optimizee.compareFitness(currentParams, baselineParams)
       newParams = ParameterArrayWithFitness(currentParams, fitness)
-      if (fitness > 0) improved = false
-      improvement = fitness
+      if (deltaFitness > 0) improved = false
+      improvement = deltaFitness
     }
     else {
       val fitness = optimizee.evaluateFitness(currentParams)
@@ -82,8 +87,8 @@ class ImprovementStep(var optimizee: Optimizee, var iter: ImprovementIteration, 
       newParams = oldParams
       if (!sameParams) { // we have not improved, try again with a reduced jump size.
         // This could happen, for example, if we overshot the goal.
-        println( "--Warning: the new params are worse, so reduce the step size and try again")
-        println(s"  jumpSize=$jumpSize")
+        trace("--Warning: the new params are worse, so reduce the step size and try again")
+        trace(s"  jumpSize=$jumpSize")
         jumpSize *= ImprovementStep.JUMP_SIZE_DEC_FACTOR
       }
     }
