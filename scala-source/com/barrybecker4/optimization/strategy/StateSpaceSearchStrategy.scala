@@ -12,7 +12,8 @@ object StateSpaceSearchStrategy {
 }
 
 /**
-  * Best-first search on a discrete graph defined by [[DiscreteStateSpace.successors]].
+  * Best-first search on a discrete graph: expands states using
+  * [[com.barrybecker4.optimization.optimizee.DiscreteStateSpace]] and its `successors` method.
   * Intended for small or structured state spaces; not a general-purpose A* implementation.
   */
 class StateSpaceSearchStrategy(optimizee: Optimizee)

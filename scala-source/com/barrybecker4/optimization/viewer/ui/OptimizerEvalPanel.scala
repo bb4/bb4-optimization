@@ -88,7 +88,7 @@ class OptimizerEvalPanel() extends JPanel
     repaint()
   }
 
-  /** Unused: progress is delivered via [[SwingWorker]] publish/process. */
+  /** Unused: progress is delivered via `javax.swing.SwingWorker` publish/process. */
   override def optimizerChanged(params: ParameterArrayWithFitness): Unit = ()
 
   override def showOptimization(strategy: OptimizationStrategyType, testProblem: OptimizeeProblem, logFile: String): Unit =

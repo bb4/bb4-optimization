@@ -47,7 +47,7 @@ object ParameterCrossover {
     val slice = (lo to hi).map(p1.get).toIndexedSeq
     val sliceVals = slice.map(_.getValue).toSet
     val restInOrder = p2.params.filter(p => !sliceVals.contains(p.getValue))
-    PermutedParameterArray(slice ++ restInOrder, rnd)
+    p1.rebuildAfterOrderCrossover(slice ++ restInOrder, rnd)
   }
 
   private def crossVariableLength(v1: VariableLengthIntSet, v2: VariableLengthIntSet, rnd: Random): VariableLengthIntSet = {

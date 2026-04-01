@@ -27,7 +27,7 @@ class GlobalSampleStrategy(optimizee: Optimizee) extends OptimizationStrategy(op
   /**
     * Requested sample budget for numeric spaces: [[com.barrybecker4.optimization.parameter.sampling.NumericGlobalSampler]]
     * chooses about `floor(requested^(1/numDims))` grid points per dimension (total samples ≈ that value raised to `numDims`).
-    * For other [[ParameterArray]] types, semantics follow their `findGlobalSamples` implementation.
+    * For other [[com.barrybecker4.optimization.parameter.ParameterArray]] types, semantics follow their `findGlobalSamples` implementation.
     */
   def setSamplingRate(samplingRate: Int): Unit = {
     assert(samplingRate > 0)

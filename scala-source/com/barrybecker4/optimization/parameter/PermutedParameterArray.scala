@@ -92,4 +92,12 @@ case class PermutedParameterArray(params: IndexedSeq[Parameter], rnd: Random)
   override def getRandomSample: ParameterArray = {
     PermutedParameterArray(rnd.shuffle(params), rnd)
   }
+
+  /**
+    * Wrap the result of order crossover (OX) in the same concrete type when subclasses carry domain state
+    * beyond the raw [[params]] sequence (for example puzzle-specific paths). The default rebuilds a plain
+    * [[PermutedParameterArray]].
+    */
+  def rebuildAfterOrderCrossover(childParams: IndexedSeq[Parameter], rnd: Random): PermutedParameterArray =
+    PermutedParameterArray(childParams, rnd)
 }
