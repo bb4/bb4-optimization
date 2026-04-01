@@ -16,6 +16,8 @@ import scala.compiletime.uninitialized
 abstract class OptimizationStrategy(var optimizee: Optimizee) {
 
   private var logger: Logger = uninitialized
+  /** True after [[setLogger]]; avoids touching `logger` when no file logging is configured. */
+  private var loggingToFile: Boolean = false
   protected var diagnostics: OptimizationDiagnostics = OptimizationDiagnostics.Silence
   /** listen for optimization changed events. useful for debugging.  */
   protected var listener: OptimizationListener = uninitialized
@@ -23,7 +25,11 @@ abstract class OptimizationStrategy(var optimizee: Optimizee) {
   /** @param logger the file that will record the results */
   def setLogger(logger: Logger): Unit = {
     this.logger = logger
+    loggingToFile = true
   }
+
+  /** Whether iteration logging to a file is active (set via [[setLogger]]). */
+  protected final def isLoggingToFile: Boolean = loggingToFile
 
   /** Console diagnostics when `verbose` is true; off by default. */
   def setVerbose(verbose: Boolean): Unit = {
@@ -39,7 +45,7 @@ abstract class OptimizationStrategy(var optimizee: Optimizee) {
   protected def log(iteration: Int, params: ParameterArrayWithFitness,
                     jumpSize: Double, deltaFitness: Double,
                     msg: String): Unit = {
-    if (logger != null) logger.write(iteration, params.fitness, jumpSize, deltaFitness, params.pa, msg)
+    if (loggingToFile) logger.write(iteration, params.fitness, jumpSize, deltaFitness, params.pa, msg)
   }
 
   /** @param initialParams the initial guess at the solution.

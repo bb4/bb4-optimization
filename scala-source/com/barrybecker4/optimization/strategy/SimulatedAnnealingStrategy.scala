@@ -1,47 +1,101 @@
-// Copyright by Barry G. Becker, 2000-2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
+// Copyright by Barry G. Becker, 2000-2026. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.strategy
 
 import com.barrybecker4.common.format.FormatUtil
 import com.barrybecker4.math.MathUtil
 import com.barrybecker4.optimization.optimizee.Optimizee
 import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
-import SimulatedAnnealingStrategy._
 
 import scala.compiletime.uninitialized
 import scala.util.Random
 
+/**
+  * How the neighbor proposal radius is scaled on top of the temperature-based base radius.
+  */
+sealed trait SimulatedAnnealingStepMode
+
+object SimulatedAnnealingStepMode {
+
+  /** Use only the built-in temperature- and iteration-dependent radius (legacy behavior). */
+  case object Fixed extends SimulatedAnnealingStepMode
+
+  /**
+    * Scale the base radius using observed Metropolis acceptance rate over sliding windows.
+    *
+    * @param targetRate        desired acceptance fraction (0–1); typical range ~0.3–0.5
+    * @param windowProposals   proposals between adjustments; if <= 0, adaptation is disabled
+    * @param scaleMin          lower clamp for the multiplicative scale
+    * @param scaleMax          upper clamp for the multiplicative scale
+    * @param growFactor        multiply scale when acceptance is above target (steps too small)
+    * @param shrinkFactor      multiply scale when acceptance is below target (steps too large)
+    * @param initialScale      scale at the start of each temperature outer iteration
+    */
+  final case class AdaptiveAcceptance(
+      targetRate: Double = 0.44,
+      windowProposals: Int = 50,
+      scaleMin: Double = 1e-3,
+      scaleMax: Double = 1e3,
+      growFactor: Double = 1.1,
+      shrinkFactor: Double = 0.9,
+      initialScale: Double = 1.0
+  ) extends SimulatedAnnealingStepMode
+}
+
+/**
+  * Tunables for [[SimulatedAnnealingStrategy]] (cooling schedule and base neighbor radius).
+  *
+  * @param innerIterationsPerDimension inner-loop length is this times parameter count per temperature level
+  * @param numTempIterations           used to derive final temperature: `tempMin = tempMax / 2^numTempIterations`
+  * @param tempDropFactor              geometric cooling multiplier each outer iteration
+  * @param defaultTempMax              initial `tempMax` until [[SimulatedAnnealingStrategy.setMaxTemperature]]
+  * @param radiusMultiplier            multiplier in `r_base = radiusMultiplier * temperature / ((N + ct) * tempMax)`
+  */
+case class SimulatedAnnealingConfig(
+    innerIterationsPerDimension: Int = 10,
+    numTempIterations: Int = 20,
+    tempDropFactor: Double = 0.6,
+    defaultTempMax: Double = 1000.0,
+    radiusMultiplier: Double = 8.0
+)
+
+object SimulatedAnnealingStrategy {
+  val DefaultConfig: SimulatedAnnealingConfig = SimulatedAnnealingConfig()
+}
 
 /**
   * Simulated annealing optimization strategy.
   * See http://en.wikipedia.org/wiki/Annealing for an explanation of the name.
   *
+  * '''Comparison mode (`evaluateByComparison == true`):''' this strategy matches
+  * [[com.barrybecker4.optimization.strategy.gradient.DiscreteImprovementFinder]]: a neighbor is an improvement when
+  * `compareFitness(newParams, currentParams) < 0`. That matches optimizees where the comparison is a score difference
+  * such as `score(new) - score(current)`. It does ''not'' match [[com.barrybecker4.optimization.optimizee.AbsoluteOptimizee.compareFitness]]
+  * (positive when the first argument is better); that implementation is intended for `evaluateByComparison == false` only.
+  *
+  * The [[rnd]] parameter is used for Metropolis coin flips; neighbor sampling uses the [[scala.util.Random]] embedded
+  * in the [[com.barrybecker4.optimization.parameter.ParameterArray]] (e.g. [[com.barrybecker4.optimization.parameter.NumericParameterArray]]).
+  *
+  * @param optimizee the thing to be optimized.
   * @author Barry Becker
   */
-object SimulatedAnnealingStrategy {
-  /** The number of iterations in the inner loop divided by the number of dimensions in the search space  */
-  private val N = 10
-  private val NUM_TEMP_ITERATIONS = 20
-
-  /** the amount to drop the temperature on each temperature iteration.   */
-  private val TEMP_DROP_FACTOR = 0.6
-
-  /** the client should really set the tempMax using setTemperatureMax before running. */
-  private val DEFAULT_TEMP_MAX = 1000.0
-}
-
-/**
-  * Constructor.
-  * use a hardcoded static data interface to initialize.
-  * so it can be easily run in an applet without using resources.
-  * @param optimizee the thing to be optimized.
-  */
 class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM)
-  extends OptimizationStrategy(optimizee) {
+    extends OptimizationStrategy(optimizee) {
 
-  private var tempMax = SimulatedAnnealingStrategy.DEFAULT_TEMP_MAX
+  private var config: SimulatedAnnealingConfig = SimulatedAnnealingStrategy.DefaultConfig
+  private var stepMode: SimulatedAnnealingStepMode = SimulatedAnnealingStepMode.Fixed
+  private var tempMax: Double = config.defaultTempMax
 
   /** Initial guess; used to store comparable fitness when `evaluateByComparison` is true. */
   private var initialParams: ParameterArray = uninitialized
+
+  def setConfig(config: SimulatedAnnealingConfig): Unit = {
+    this.config = config
+  }
+
+  /** @param mode fixed base radius only, or adaptive scaling from acceptance rate (see [[SimulatedAnnealingStepMode]]) */
+  def setStepMode(mode: SimulatedAnnealingStepMode): Unit = {
+    this.stepMode = mode
+  }
 
   /** @param tempMax the initial temperature at the start of the simulated annealing process (before cooling) */
   def setMaxTemperature(tempMax: Double): Unit = {
@@ -51,9 +105,9 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
   /** Finds a local minima.
     *
     * The concept is based on the manner in which liquids freeze or metals recrystallize in the process of annealing.
-    * In an annealing process, an initially at high temperature and disordered liquid, is slowly cooled so that the system
+    * In an annealing process, an initially high temperature and disordered liquid, is slowly cooled so that the system
     * is approximately in thermodynamic equilibrium at any point in the process. As cooling proceeds, the system becomes
-    * more ordered and approaches a "frozen" ground state at T=0. Hence the process can be thought of as an adiabatic
+    * more ordered and approaches a "frozen" ground state at T=0. Hence, the process can be thought of as an adiabatic
     * approach to the lowest energy state. If the initial temperature of the system is too low, or cooling is too fast,
     * the system may become quenched, forming defects or freezing out in metastable states
     * (ie. trapped in a local minimum energy state).
@@ -65,29 +119,64 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
     *  - You can actually make a move toward a solution that is worse. This allows the algorithm to
     * move out of local optima.
     *
+    * Each outer temperature iteration restarts the chain from the best solution so far ("reheat to best").
+    *
     * @param params  the initial value for the parameters to optimize.
-    * @param fitnessRange the approximate absolute value of the fitnessRange.
+    * @param fitnessRange the approximate scale of the objective; must be positive (used in Metropolis acceptance).
     * @return the optimized params.
     */
   override def doOptimization(params: ParameterArray, fitnessRange: Double): ParameterArrayWithFitness = {
+    require(
+      fitnessRange > 0.0 && fitnessRange.isFinite,
+      s"fitnessRange must be finite and > 0 for Metropolis scaling, got $fitnessRange"
+    )
     initialParams = params
+    val n = config.innerIterationsPerDimension
+    val numTempIterations = config.numTempIterations
+    val tempDrop = config.tempDropFactor
+    val radiusMul = config.radiusMultiplier
+
     var ct = 0
     var temperature = tempMax
-    val tempMin = tempMax / Math.pow(2.0, NUM_TEMP_ITERATIONS)
+    val tempMin = tempMax / math.pow(2.0, numTempIterations)
     var bestParams =
       if (!optimizee.evaluateByComparison)
         ParameterArrayWithFitness(params, optimizee.evaluateFitness(params))
       else ParameterArrayWithFitness(params, optimizee.compareFitness(params, initialParams))
 
-    // store the best solution we found at any given temperature iteration and use that as the initial
-    // start of the next temperature iteration.
-    var currentParams: ParameterArrayWithFitness = null
+    var currentParams: ParameterArrayWithFitness = bestParams
+    var firstTemperaturePass = true
 
-    while (currentParams == null || (temperature > tempMin && !isOptimalFitnessReached(currentParams))) {
-      // temperature iteration (temperature drops each time through)
+    while (firstTemperaturePass || (temperature > tempMin && !isOptimalFitnessReached(currentParams))) {
+      firstTemperaturePass = false
       currentParams = bestParams
-      while (ct < N * currentParams.pa.size && !isOptimalFitnessReached(currentParams)) {
-        currentParams = findNeighbor(currentParams, ct, temperature, fitnessRange)
+      var stepScale = initialStepScale()
+      var windowProposals = 0
+      var windowAccepts = 0
+
+      while (ct < n * currentParams.pa.size && !isOptimalFitnessReached(currentParams)) {
+        val rBase = radiusMul * temperature / ((n + ct) * tempMax)
+        val rEffective = stepScale * rBase
+        val (next, accepted) = neighborStep(currentParams, ct, temperature, fitnessRange, rEffective)
+        currentParams = next
+
+        stepMode match {
+          case SimulatedAnnealingStepMode.Fixed => ()
+          case a: SimulatedAnnealingStepMode.AdaptiveAcceptance if a.windowProposals > 0 =>
+            windowProposals += 1
+            if (accepted) windowAccepts += 1
+            if (windowProposals >= a.windowProposals) {
+              val rate = windowAccepts.toDouble / windowProposals
+              if (rate > a.targetRate + 1e-12)
+                stepScale = math.min(a.scaleMax, stepScale * a.growFactor)
+              else if (rate < a.targetRate - 1e-12)
+                stepScale = math.max(a.scaleMin, stepScale * a.shrinkFactor)
+              windowProposals = 0
+              windowAccepts = 0
+            }
+          case _: SimulatedAnnealingStepMode.AdaptiveAcceptance => ()
+        }
+
         if (currentParams.fitness < bestParams.fitness) {
           bestParams = currentParams
           notifyOfChange(bestParams)
@@ -95,35 +184,40 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
         ct += 1
       }
       ct = 0
-      // keep Reducing the temperature until it reaches tempMin
-      temperature *= TEMP_DROP_FACTOR
+      temperature *= tempDrop
       trace("temp = " + temperature + " tempMin = " + tempMin + "\n bestParams = " + bestParams)
     }
-    //println("T=" + temperature + "  currentFitness = " + bestParams.getFitness());
     log(ct, bestParams, 0, 0, FormatUtil.formatNumber(temperature))
     bestParams
   }
 
-  /** Select a new point in the neighborhood of our current location.
-    * The neighborhood we select from has a radius of r.
-    * @param params      current location in the parameter space.
-    * @param ct          iteration count.
-    * @param temperature current temperature. Gets cooler with every successive temperature iteration.
-    * @return neighboring point that is hopefully better than params.
-    */
-  private def findNeighbor(params: ParameterArrayWithFitness,
-                           ct: Int, temperature: Double, fitnessRange: Double): ParameterArrayWithFitness = {
+  private def initialStepScale(): Double =
+    stepMode match {
+      case SimulatedAnnealingStepMode.Fixed                         => 1.0
+      case a: SimulatedAnnealingStepMode.AdaptiveAcceptance => a.initialScale
+    }
+
+  /** @return (next state, whether the proposal was accepted for adaptive statistics) */
+  private def neighborStep(
+      params: ParameterArrayWithFitness,
+      ct: Int,
+      temperature: Double,
+      fitnessRange: Double,
+      rEffective: Double
+  ): (ParameterArrayWithFitness, Boolean) = {
     val curParams = params
-    val r = 8 * temperature / ((N + ct) * tempMax)
-    val newParams = params.pa.getRandomNeighbor(r)
-    val dist = curParams.pa.distance(newParams)
+    val newParams = params.pa.getRandomNeighbor(rEffective)
+    val dist =
+      if (isLoggingToFile) curParams.pa.distance(newParams)
+      else 0.0
     val (deltaFitness, newFitness) = deltaAndAbsoluteFitness(newParams, curParams)
     val useWorseSolution = metropolisAcceptWorse(deltaFitness, temperature, fitnessRange)
+    val accepted = deltaFitness < 0 || useWorseSolution
     val newParamsWithFitness =
-      if (deltaFitness < 0 || useWorseSolution) acceptedState(newParams, newFitness)
+      if (accepted) acceptedState(newParams, newFitness)
       else curParams
-    log(ct, newParamsWithFitness, r, dist, FormatUtil.formatNumber(temperature))
-    newParamsWithFitness
+    log(ct, newParamsWithFitness, rEffective, dist, FormatUtil.formatNumber(temperature))
+    (newParamsWithFitness, accepted)
   }
 
   /** @return (delta for Metropolis, absolute fitness of newParams when not comparison mode; 0.0 if comparison) */
@@ -137,7 +231,7 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
     }
 
   private def metropolisAcceptWorse(deltaFitness: Double, temperature: Double, fitnessRange: Double): Boolean = {
-    val probability = Math.pow(Math.E, tempMax * -deltaFitness / (fitnessRange * temperature))
+    val probability = math.exp(tempMax * -deltaFitness / (fitnessRange * temperature))
     rnd.nextDouble() < probability
   }
 
