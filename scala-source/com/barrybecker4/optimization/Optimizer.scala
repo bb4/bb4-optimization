@@ -1,8 +1,8 @@
-// Copyright by Barry G. Becker, 2000-2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
+// Copyright by Barry G. Becker, 2000-2026. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization
 
 import com.barrybecker4.math.MathUtil
-import com.barrybecker4.optimization.optimizee.Optimizee
+import com.barrybecker4.optimization.optimizee.{BudgetedOptimizee, Optimizee}
 import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType
 
@@ -35,21 +35,40 @@ class Optimizer(val optimizee: Optimizee, optimizationLogFile: Option[String] = 
     if (optimizationLogFile.isDefined) Some(new Logger(optimizationLogFile.get)) else None
 
   /** Constructs an optimization strategy object of the specified type and run it.
+    *
     * @param optimizationType the type of search to perform
-    * @param params           the initialGuess at the solution. Also defines the bounds of the search space.
-    * @param fitnessRange     the approximate range (max-min) of the fitness values
+    * @param params           the initial guess at the solution; also defines the bounds of the search space
+    * @param fitnessRange     approximate scale of the objective (e.g. max − min fitness over the domain of interest).
+    *                         Used by strategies that need a temperature or stopping threshold in the same units as
+    *                         fitness: e.g. [[com.barrybecker4.optimization.strategy.SimulatedAnnealingStrategy]]
+    *                         scales initial temperature from `fitnessRange / 10`, and
+    *                         [[com.barrybecker4.optimization.strategy.GeneticSearchStrategy]] derives improvement
+    *                         epsilon from `fitnessRange / 100_000_000`. It need not be exact; order-of-magnitude is enough.
+    * @param rnd              random source for stochastic strategies
+    * @param maxEvaluations   if set, wraps the optimizee so each call to `evaluateFitness` or `compareFitness`
+    *                         counts toward a budget; exceeding it throws
+    *                         [[com.barrybecker4.optimization.optimizee.EvaluationBudgetExceededException]]
+    * @param verbose          when true, strategies may print diagnostic traces to the console (off by default)
     * @return the solution to the optimization problem.
     */
   def doOptimization(optimizationType: OptimizationStrategyType,
                      params: ParameterArray, fitnessRange: Double,
-                     rnd: Random = MathUtil.RANDOM): ParameterArrayWithFitness = {
+                     rnd: Random = MathUtil.RANDOM,
+                     maxEvaluations: Option[Int] = None,
+                     verbose: Boolean = false): ParameterArrayWithFitness = {
 
-    val optStrategy = optimizationType.getStrategy(optimizee, fitnessRange, rnd)
+    val target: Optimizee = maxEvaluations match {
+      case Some(n) if n > 0 => new BudgetedOptimizee(optimizee, n)
+      case _ => optimizee
+    }
+
+    val optStrategy = optimizationType.getStrategy(target, fitnessRange, rnd)
     if (logger.isDefined) {
       logger.get.initialize(params)
       optStrategy.setLogger(logger.get)
     }
     optStrategy.setListener(listener)
+    if (verbose) optStrategy.setVerbose(true)
     optStrategy.doOptimization(params, fitnessRange)
   }
 

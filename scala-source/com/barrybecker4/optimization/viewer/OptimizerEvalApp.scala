@@ -1,17 +1,22 @@
 package com.barrybecker4.optimization.viewer
 
-import com.barrybecker4.optimization.optimizee.optimizees.DemoViewerProblem
+import com.barrybecker4.optimization.optimizee.optimizees.{DemoViewerProblem, DiscreteGrid2DDemoProblem, LineGraphDemoProblem}
 import com.barrybecker4.optimization.viewer.ui.OptimizerEvalFrame
 
 object OptimizerEvalApp {
 
   /**
-    * Default: two-parameter demo so the 2D viewer path fills the panel.
-    * For a one-parameter example, use [[com.barrybecker4.optimization.optimizee.optimizees.TrivialProblem]].
-    * For the full problem dropdown, run `GraphAnalyticFunctionSolution` from test sources.
+    * Three demos: continuous 2D distance, discrete 2D grid (with [[com.barrybecker4.optimization.optimizee.DiscreteStateSpace]]),
+    * and 1D line. For a single problem without the dropdown, use [[com.barrybecker4.optimization.optimizee.optimizees.TrivialProblem]].
+    * For more problems from test sources, run `GraphAnalyticFunctionSolution`.
     */
   def main(args: Array[String]): Unit = {
-    new OptimizerEvalFrame("test/temp.txt", new DemoViewerProblem)
+    new OptimizerEvalFrame(
+      "test/temp.txt",
+      IndexedSeq(
+        new DemoViewerProblem,
+        new DiscreteGrid2DDemoProblem,
+        new LineGraphDemoProblem))
   }
 
 }

@@ -1,11 +1,11 @@
-// Copyright by Barry G. Becker, 2000-2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
+// Copyright by Barry G. Becker, 2000-2026. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.strategy
 
 import com.barrybecker4.optimization.optimizee.Optimizee
 import GeneticSearchStrategy._
 import com.barrybecker4.common.format.FormatUtil
 import com.barrybecker4.math.MathUtil
-import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
+import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness, ParameterCrossover}
 import ParameterArrayWithFitness.given
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
@@ -20,6 +20,16 @@ object GeneticSearchStrategy {
   private val NBR_RADIUS_SOFTENER = 20.0
   private val INITIAL_RADIUS = 1.0
   private val MAX_NBRS_TO_EXPLORE = 8
+
+  /** Probability of using crossover vs neighbor mutation when filling the population after culling. */
+  private val CROSSOVER_PROBABILITY = 0.65
+
+  /** When false, skip crossover and use neighbor mutation only. */
+  private var crossoverEnabled: Boolean = true
+
+  def setCrossoverEnabled(enabled: Boolean): Unit = {
+    crossoverEnabled = enabled
+  }
 
   /** this prevents us from running forever.  */
   private val MAX_ITERATIONS = 100
@@ -128,9 +138,9 @@ class GeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM)
       pop = cullPopulation(pop)
       replaceCulledWithKeeperVariants(pop, pop.size)
       currentBest = pop.min
-      println("currBest = " + currentBest + " \nrecBest = " + recentBest + "        ct=" + ct)
+      trace("currBest = " + currentBest + " \nrecBest = " + recentBest + "        ct=" + ct)
       deltaFitness = computeFitnessDelta(recentBest, currentBest, ct)
-      println("delta fitness =" +
+      trace("delta fitness =" +
         deltaFitness + "      rbrRadius = " + nbrRadius + "  improvementEpsilon = " + improvementEpsilon)
       scaleNeighborRadius(deltaFitness, lowThresh, highThresh)
       recentBest = currentBest
@@ -143,7 +153,7 @@ class GeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM)
     }
 
     logEvolveTermination(currentBest, deltaFitness, numWithNoImprovement, ct)
-    println("----------------------- done -------------------")
+    trace("----------------------- done -------------------")
     log(ct, currentBest, 0, 0, FormatUtil.formatNumber(ct))
     currentBest
   }
@@ -165,13 +175,13 @@ class GeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM)
   private def logEvolveTermination(currentBest: ParameterArrayWithFitness, deltaFitness: Double,
                                    numWithNoImprovement: Int, ct: Int): Unit = {
     if (isOptimalFitnessReached(currentBest))
-      println("stopped because we found the optimal fitness.")
+      trace("stopped because we found the optimal fitness.")
     else if (deltaFitness >= -improvementEpsilon && numWithNoImprovement > MAX_ITER_NO_IMPRV) {
-      println("stopped because we made no IMPROVEMENT. The delta, " +
+      trace("stopped because we made no IMPROVEMENT. The delta, " +
         deltaFitness + " was >= " + -improvementEpsilon)
     }
     else if (ct > MAX_ITERATIONS)
-      println(s"Stopped because we exceeded the MAX ITERATIONS($MAX_ITERATIONS): num iterations = $ct")
+      trace(s"Stopped because we exceeded the MAX ITERATIONS($MAX_ITERATIONS): num iterations = $ct")
     else
       throw new IllegalStateException(s"stopped for unexpected cause. ct = $ct deltaFit=$deltaFitness " +
         s"currBest=$currentBest nbrRad=$nbrRadius")
@@ -197,8 +207,7 @@ class GeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM)
     // sort the population according to the fitness of members.
     val sortedPopulation = population.sorted
     // throw out the bottom CULL_FACTOR*desiredPopulationSize members - keeping the cream of the crop.
-    // then replace those culled with unary variations of those (now parents) that remain.
-    // @@ add option to do cross-over variations too.
+    // then replace those culled with crossover and/or neighbor mutation of the parents that remain.
     val keepSize = Math.max(1, (sortedPopulation.size * (1.0 - CULL_FACTOR)).toInt)
     val size = sortedPopulation.size
     val culledPop = sortedPopulation.dropRight(size - keepSize)
@@ -215,26 +224,45 @@ class GeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM)
   private def replaceCulledWithKeeperVariants(population: ArrayBuffer[ParameterArrayWithFitness],
                                               keepSize: Int): Unit = {
     var k = keepSize
-    //println("keepSize = " + keepSize + " grow current popSize of "
-    //    + population.size() + " to " + desiredPopulationSize);
     while (k < desiredPopulationSize) {
-      // loop over the keepers until all replacements found.
-      // Select randomly, but skewed toward the better ones
+      if (crossoverEnabled && rnd.nextDouble() < CROSSOVER_PROBABILITY && keepSize >= 2) {
+        var i1 = (rnd.nextDouble() * rnd.nextDouble() * keepSize).toInt
+        var i2 = (rnd.nextDouble() * rnd.nextDouble() * keepSize).toInt
+        if (keepSize > 1) {
+          while (i2 == i1) i2 = (i2 + 1) % keepSize
+        }
+        val p1 = population(i1).pa
+        val p2 = population(i2).pa
+        if (p1.getClass == p2.getClass) {
+          try {
+            val child = ParameterCrossover.cross(p1, p2, rnd)
+            if (!population.exists(_.pa == child)) {
+              population += evaluateParameterArray(child)
+              notifyOfChange(population(i1))
+            }
+          } catch {
+            case _: IllegalArgumentException => ()
+          }
+        }
+      }
       val r = rnd.nextDouble()
       val keeperIndex: Int = (r * r * keepSize).toInt
-      //k % keepSize;
       val p = population(keeperIndex)
-      // Add a permutation of one of the keepers.
-      // Multiply the radius by m because we want the worse ones to have higher variability.
       val r2 = (keeperIndex + NBR_RADIUS_SOFTENER) / NBR_RADIUS_SOFTENER * nbrRadius
       val nbr = getNeighbor(p.pa, r2)
-      if (!population.contains(nbr)) {
+      if (!population.exists(_.pa == nbr.pa)) {
         population += nbr
         notifyOfChange(p)
       }
       k += 1
     }
-    //printPopulation(population, 20);
+  }
+
+  private def evaluateParameterArray(pa: ParameterArray): ParameterArrayWithFitness = {
+    val fitness =
+      if (optimizee.evaluateByComparison) optimizee.compareFitness(pa, initialParams)
+      else optimizee.evaluateFitness(pa)
+    ParameterArrayWithFitness(pa, fitness)
   }
 
   /** @param p parameter array to get neighbor for

@@ -2,10 +2,11 @@ package com.barrybecker4.optimization.parameter
 
 import com.barrybecker4.math.MathUtil
 import com.barrybecker4.math.linear.Vector
-import org.scalatest.{BeforeAndAfter}
+import org.scalatest.BeforeAndAfter
 import NumericParameterArraySuite.createParamArray
 import org.scalatest.funsuite.AnyFunSuite
 
+import scala.compiletime.uninitialized
 import scala.util.Random
 
 
@@ -31,7 +32,7 @@ object NumericParameterArraySuite {
 
 class NumericParameterArraySuite extends AnyFunSuite with BeforeAndAfter {
 
-  private var params: NumericParameterArray = _
+  private var params: NumericParameterArray = uninitialized
 
   before {
     MathUtil.RANDOM.setSeed(0)

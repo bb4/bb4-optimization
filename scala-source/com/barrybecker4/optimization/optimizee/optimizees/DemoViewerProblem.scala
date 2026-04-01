@@ -7,7 +7,8 @@ import scala.util.Random
 
 /**
   * Minimal two-parameter optimizee for [[com.barrybecker4.optimization.viewer.OptimizerEvalApp]]:
-  * fitness is Euclidean distance to a fixed target so the 2D viewer shows a non-degenerate path.
+  * fitness is Euclidean distance to a fixed target in [0,1]² so the 2D viewer shows a non-degenerate path.
+  * Parameters are continuous doubles. For a discrete grid and state-space search, use [[DiscreteGrid2DDemoProblem]].
   */
 class DemoViewerProblem extends OptimizeeProblem {
 

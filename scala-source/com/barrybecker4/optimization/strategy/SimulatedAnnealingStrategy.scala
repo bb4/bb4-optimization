@@ -96,7 +96,7 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
       ct = 0
       // keep Reducing the temperature until it reaches tempMin
       temperature *= TEMP_DROP_FACTOR
-      println("temp = " + temperature + " tempMin = " + tempMin + "\n bestParams = " + bestParams)
+      trace("temp = " + temperature + " tempMin = " + tempMin + "\n bestParams = " + bestParams)
     }
     //println("T=" + temperature + "  currentFitness = " + bestParams.getFitness());
     log(ct, bestParams, 0, 0, FormatUtil.formatNumber(temperature))

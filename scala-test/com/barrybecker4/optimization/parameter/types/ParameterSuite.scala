@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.scalatest.BeforeAndAfter
 import org.scalatest.funsuite.AnyFunSuite
 
+import scala.compiletime.uninitialized
 import scala.util.Random
 
 /**
@@ -15,8 +16,8 @@ import scala.util.Random
   */
 abstract class ParameterSuite[T] extends AnyFunSuite with BeforeAndAfter {
   /** instance under test */
-  protected var parameter: Parameter = _
-  protected var rand: Random = _
+  protected var parameter: Parameter = uninitialized
+  protected var rand: Random = uninitialized
 
   before {
     rand = new Random(1)

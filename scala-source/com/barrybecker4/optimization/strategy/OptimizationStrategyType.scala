@@ -1,4 +1,4 @@
-// Copyright by Barry G. Becker, 2000-2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
+// Copyright by Barry G. Becker, 2000-2026. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.strategy
 
 import com.barrybecker4.optimization.optimizee.Optimizee
@@ -65,7 +65,7 @@ enum OptimizationStrategyType {
         strategy.setImprovementEpsilon(fitnessRange / 100000000.0)
         strategy
       case STATE_SPACE_SEARCH =>
-        throw new AbstractMethodError("State space search not yet implemented")
+        new StateSpaceSearchStrategy(optimizee)
       case BRUTE_FORCE =>
         new BruteForceStrategy(optimizee)
 }
@@ -80,6 +80,7 @@ object OptimizationStrategyType {
     SIMULATED_ANNEALING,
     GENETIC_SEARCH,
     CONCURRENT_GENETIC_SEARCH,
+    STATE_SPACE_SEARCH,
     BRUTE_FORCE
   )
 

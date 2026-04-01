@@ -5,13 +5,14 @@ import com.barrybecker4.optimization.parameter.types.{IntegerParameter, Paramete
 import org.scalatest.BeforeAndAfter
 import org.scalatest.funsuite.AnyFunSuite
 
+import scala.compiletime.uninitialized
 import scala.util.Random
 
 
 class PermutedDistanceCalculatorSuite extends AnyFunSuite with BeforeAndAfter {
 
   val calc = new PermutedDistanceCalculator()
-  var rnd: Random = _
+  var rnd: Random = uninitialized
 
   before {
     rnd = new Random(1)

@@ -9,6 +9,8 @@ import com.barrybecker4.optimization.viewer.projectors.SimpleProjector
 import com.barrybecker4.optimization.viewer.rendering.PointsListRenderer
 import com.barrybecker4.optimization.{OptimizationListener, Optimizer}
 
+import scala.compiletime.uninitialized
+
 import java.awt.*
 import java.awt.event.{MouseEvent, MouseListener, MouseMotionListener}
 import javax.swing.JPanel
@@ -32,8 +34,8 @@ class OptimizerEvalPanel() extends JPanel
 
   private val renderer = new PointsListRenderer
   private val projector = new SimpleProjector
-  private var pointsList: PointsList = _
-  private var dragStartPosition: Point = _
+  private var pointsList: PointsList = uninitialized
+  private var dragStartPosition: Point = uninitialized
 
   this.setPreferredSize(OptimizerEvalPanel.SIZE)
   this.addMouseListener(this)
@@ -49,12 +51,20 @@ class OptimizerEvalPanel() extends JPanel
       case e: AbstractMethodError =>
         // allow continuing if the strategy has simply not been implemented yet.
         e.printStackTrace()
+      case e: IllegalArgumentException =>
+        // e.g. STATE_SPACE_SEARCH without DiscreteStateSpace on the optimizee
+        e.printStackTrace()
     }
     this.repaint()
     println("\n************************************************************************")
-    println("The solution to the (" + optimizer.optimizee.getName + ") Polynomial Test Problem using " + optType + " is :\n" + solution)
-    println("Which evaluates to: " + solution.fitness)
-    println("We expected to get exactly p1 = " + solutionPosition.x + " and p2 = " + solutionPosition.y)
+    if (solution eq null) {
+      println("Optimization did not complete (see exception above). Strategy " + optType +
+        " may be incompatible with this problem type.")
+    } else {
+      println("The solution to the (" + optimizer.optimizee.getName + ") Polynomial Test Problem using " + optType + " is :\n" + solution)
+      println("Which evaluates to: " + solution.fitness)
+      println("We expected to get exactly p1 = " + solutionPosition.x + " and p2 = " + solutionPosition.y)
+    }
   }
 
   /** Called whenever the optimizer strategy moves incrementally toward the solution.

@@ -1,8 +1,7 @@
-// Copyright by Barry G. Becker, 2000-2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
+// Copyright by Barry G. Becker, 2000-2026. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.strategy
 
-import com.barrybecker4.optimization.Logger
-import com.barrybecker4.optimization.OptimizationListener
+import com.barrybecker4.optimization.{Logger, OptimizationDiagnostics, OptimizationListener}
 import com.barrybecker4.optimization.optimizee.Optimizee
 import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 
@@ -16,6 +15,7 @@ import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWi
 abstract class OptimizationStrategy(var optimizee: Optimizee) {
 
   private var logger: Logger = _
+  protected var diagnostics: OptimizationDiagnostics = OptimizationDiagnostics.Silence
   /** listen for optimization changed events. useful for debugging.  */
   protected var listener: OptimizationListener = _
 
@@ -23,6 +23,17 @@ abstract class OptimizationStrategy(var optimizee: Optimizee) {
   def setLogger(logger: Logger): Unit = {
     this.logger = logger
   }
+
+  /** Console diagnostics when `verbose` is true; off by default. */
+  def setVerbose(verbose: Boolean): Unit = {
+    diagnostics = if (verbose) new OptimizationDiagnostics.Console(true) else OptimizationDiagnostics.Silence
+  }
+
+  def setDiagnostics(d: OptimizationDiagnostics): Unit = {
+    diagnostics = d
+  }
+
+  protected def trace(msg: => String): Unit = diagnostics.trace(msg)
 
   protected def log(iteration: Int, params: ParameterArrayWithFitness,
                     jumpSize: Double, deltaFitness: Double,
