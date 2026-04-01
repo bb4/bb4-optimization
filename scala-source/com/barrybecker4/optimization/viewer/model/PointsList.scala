@@ -45,6 +45,9 @@ class PointsList(var rawSolutionPosition: Point2d, var edgeSize: Int, var projec
     new Point(getScaledXValue(pt.x), getScaledYValue(pt.y))
   }
 
+  def getScaledRawPoint(x: Double, y: Double): Point =
+    new Point(getScaledXValue(x), getScaledYValue(y))
+
   def size: Int = rawPoints.size
 
   /** Called whenever the optimizer strategy moves incrementally toward the solution.

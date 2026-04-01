@@ -39,6 +39,12 @@ class TopControls(val logFile: String, val testProblems: Seq[OptimizeeProblem], 
   private val gridCheck = new JCheckBox("Grid", true)
   gridCheck.addActionListener(_ => viewable.setShowGrid(gridCheck.isSelected))
 
+  private val contoursCheck = new JCheckBox("Contours", true)
+  contoursCheck.addActionListener(_ => viewable.setShowContours(contoursCheck.isSelected))
+
+  private val heatmapCheck = new JCheckBox("Heatmap", false)
+  heatmapCheck.addActionListener(_ => viewable.setShowHeatmap(heatmapCheck.isSelected))
+
   setLayout(new BorderLayout)
   private val navBar = new NavigationBar(viewable)
   private val comboPanel: JPanel = createStrategyCombo
@@ -46,6 +52,8 @@ class TopControls(val logFile: String, val testProblems: Seq[OptimizeeProblem], 
   comboPanel.add(new JLabel(" "))
   comboPanel.add(labelsCheck)
   comboPanel.add(gridCheck)
+  comboPanel.add(contoursCheck)
+  comboPanel.add(heatmapCheck)
   comboPanel.add(cancelButton)
   add(navBar, BorderLayout.CENTER)
   add(comboPanel, BorderLayout.EAST)

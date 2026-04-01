@@ -23,4 +23,8 @@ trait OptimizationViewable extends OptimizationListener with NavigationListener 
   def setShowPointLabels(enabled: Boolean): Unit = ()
 
   def setShowGrid(enabled: Boolean): Unit = ()
+
+  def setShowContours(enabled: Boolean): Unit = ()
+
+  def setShowHeatmap(enabled: Boolean): Unit = ()
 }

@@ -2,11 +2,11 @@
 package com.barrybecker4.optimization.viewer.ui
 
 import com.barrybecker4.optimization.optimizee.optimizees.OptimizeeProblem
-import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
+import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray, ParameterArrayWithFitness}
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType
 import com.barrybecker4.optimization.viewer.model.PointsList
 import com.barrybecker4.optimization.viewer.projectors.SimpleProjector
-import com.barrybecker4.optimization.viewer.rendering.PointsListRenderer
+import com.barrybecker4.optimization.viewer.rendering.{PointsListRenderer, ProjectedTopologyField, TopologyCacheKey}
 import com.barrybecker4.optimization.{OptimizationListener, Optimizer}
 
 import java.awt.{Color, Dimension, Graphics, Graphics2D, Point}
@@ -44,7 +44,11 @@ class OptimizerEvalPanel() extends JPanel
 
   private val renderer = new PointsListRenderer
   private val projector = new SimpleProjector
+  private val topologyXBins = 80
+  private val topologyYBins = 80
   private var pointsListOpt: Option[PointsList] = None
+  private var topologyFieldOpt: Option[ProjectedTopologyField] = None
+  private var topologyCache = Map.empty[TopologyCacheKey, ProjectedTopologyField]
   private var dragStart: Option[Point] = None
   private var currentWorker: Option[OptimizationSwingWorker] = None
   private var renderConfig = PointsListRenderer.Config()
@@ -74,6 +78,16 @@ class OptimizerEvalPanel() extends JPanel
     repaint()
   }
 
+  override def setShowContours(enabled: Boolean): Unit = {
+    renderConfig = renderConfig.copy(showContours = enabled)
+    repaint()
+  }
+
+  override def setShowHeatmap(enabled: Boolean): Unit = {
+    renderConfig = renderConfig.copy(showHeatmap = enabled)
+    repaint()
+  }
+
   /** Unused: progress is delivered via [[SwingWorker]] publish/process. */
   override def optimizerChanged(params: ParameterArrayWithFitness): Unit = ()
 
@@ -87,6 +101,7 @@ class OptimizerEvalPanel() extends JPanel
     currentWorker.foreach(_.cancel(true))
 
     val ctx = prepareRunContext(testProblem, logFile)
+    topologyFieldOpt = buildTopologyField(testProblem, ctx.initialGuess)
     val pointsList = new PointsList(ctx.solutionPosition, OptimizerEvalPanel.EDGE_SIZE, projector)
     pointsListOpt = Some(pointsList)
 
@@ -163,9 +178,24 @@ class OptimizerEvalPanel() extends JPanel
     g2.setColor(OptimizerEvalPanel.BG_COLOR)
     g2.fillRect(0, 0, dim.width, dim.height)
     pointsListOpt.foreach { pl =>
-      renderer.render(pl, g2, renderConfig, dim.width, dim.height)
+      renderer.render(pl, g2, renderConfig, dim.width, dim.height, topologyFieldOpt)
     }
   }
+
+  private def buildTopologyField(problem: OptimizeeProblem, params: ParameterArray): Option[ProjectedTopologyField] =
+    params match
+      case npa: NumericParameterArray =>
+        try
+          val key = ProjectedTopologyField.cacheKey(problem, npa, topologyXBins, topologyYBins)
+          topologyCache.get(key) match
+            case Some(field) => Some(field)
+            case None =>
+              val field = ProjectedTopologyField.sample(problem, projector, npa, topologyXBins, topologyYBins)
+              topologyCache += (key -> field)
+              Some(field)
+        catch
+          case _: Throwable => None
+      case _ => None
 
   override def pan(offset: Point2d): Unit =
     pointsListOpt.foreach { pl =>
