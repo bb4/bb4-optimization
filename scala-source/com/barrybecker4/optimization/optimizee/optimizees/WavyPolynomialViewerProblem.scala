@@ -14,11 +14,11 @@ import scala.util.Random
   */
 class WavyPolynomialViewerProblem(
     val cx: Double = 0.4,
-    val cy: Double = 0.6,
+    val cy: Double = 0.67,
     val rippleAmplitude: Double = 0.15,
-    val rippleFreq: Int = 10,
+    val rippleFreq: Int = 11,
     val coupledAmplitude: Double = 0.05,
-    val coupledFreq: Int = 8
+    val coupledFreq: Int = 3
 ) extends OptimizeeProblem {
 
   private val rnd = new Random(1)

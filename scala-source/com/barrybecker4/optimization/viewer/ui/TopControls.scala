@@ -42,7 +42,7 @@ class TopControls(val logFile: String, val testProblems: Seq[OptimizeeProblem], 
   private val contoursCheck = new JCheckBox("Contours", true)
   contoursCheck.addActionListener(_ => viewable.setShowContours(contoursCheck.isSelected))
 
-  private val heatmapCheck = new JCheckBox("Heatmap", false)
+  private val heatmapCheck = new JCheckBox("Heatmap", true)
   heatmapCheck.addActionListener(_ => viewable.setShowHeatmap(heatmapCheck.isSelected))
 
   setLayout(new BorderLayout)

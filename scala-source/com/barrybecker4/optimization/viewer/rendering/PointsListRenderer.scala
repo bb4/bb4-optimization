@@ -27,7 +27,7 @@ object PointsListRenderer {
       labelEveryN: Int = 5,
       showGrid: Boolean = true,
       showContours: Boolean = true,
-      showHeatmap: Boolean = false
+      showHeatmap: Boolean = true
   )
 }
 
