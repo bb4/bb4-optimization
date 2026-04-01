@@ -9,6 +9,7 @@ import java.awt._
 import java.awt.event.ItemEvent
 import java.awt.event.ItemListener
 
+import scala.compiletime.uninitialized
 
 /**
   * @author Barry Becker
@@ -16,13 +17,16 @@ import java.awt.event.ItemListener
 class BooleanParameterWidget(param: Parameter, val listener: ParameterChangeListener)
     extends ParameterWidget(param, listener) with ItemListener {
 
-  private var cb: JCheckBox = _
+  private val bparam: BooleanParameter = param match
+    case b: BooleanParameter => b
+    case _ => throw new IllegalArgumentException("Expected BooleanParameter, got " + param.getClass.getName)
+
+  private var cb: JCheckBox = uninitialized
 
   /** Create a ui widget appropriate for the parameter type. */
   override protected def addChildren(): Unit = {
     cb = new JCheckBox
     cb.setText(parameter.name)
-    val bparam = parameter.asInstanceOf[BooleanParameter]
     cb.setSelected(bparam.getNaturalValue.asInstanceOf[Boolean])
     cb.addItemListener(this)
     add(cb, BorderLayout.CENTER)

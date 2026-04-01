@@ -1,13 +1,15 @@
 // Copyright by Barry G. Becker, 2000-2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.viewer.ui
 
-import com.barrybecker4.optimization.viewer.ui.{NavigationBar, OptimizationViewable}
+import com.barrybecker4.optimization.viewer.ui.OptimizationViewable
 import com.barrybecker4.ui.components.{GradientButton, TexturedToolBar}
 import com.barrybecker4.ui.util.GUIUtil
 
 import java.awt.Dimension
 import java.awt.event.{ActionEvent, ActionListener}
 import javax.swing.{Box, Icon, ImageIcon}
+
+import scala.compiletime.uninitialized
 
 
 object NavigationBar {
@@ -28,8 +30,8 @@ class NavigationBar(var navListener: OptimizationViewable)
 
   setListener(new NavBarListener)
   init()
-  private var zoomInButton: GradientButton = _
-  private var zoomOutButton: GradientButton = _
+  private var zoomInButton: GradientButton = uninitialized
+  private var zoomOutButton: GradientButton = uninitialized
 
   private def init(): Unit = {
     zoomInButton = createToolBarButton("", "Zoom in", NavigationBar.zoomInImage)
@@ -48,10 +50,9 @@ class NavigationBar(var navListener: OptimizationViewable)
 
   /** handles the button clicks */
   private class NavBarListener extends ActionListener {
-    override def actionPerformed(e: ActionEvent): Unit = {
-      val src = e.getSource.asInstanceOf[GradientButton]
-      if (src eq zoomInButton) navListener.zoomIn()
-      else if (src eq zoomOutButton) navListener.zoomOut()
-    }
+    override def actionPerformed(e: ActionEvent): Unit =
+      val src = e.getSource
+      if src eq zoomInButton then navListener.zoomIn()
+      else if src eq zoomOutButton then navListener.zoomOut()
   }
 }

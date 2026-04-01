@@ -3,6 +3,8 @@ package com.barrybecker4.optimization.viewer
 import com.barrybecker4.optimization.optimizee.optimizees.{DemoViewerProblem, DiscreteGrid2DDemoProblem, LineGraphDemoProblem}
 import com.barrybecker4.optimization.viewer.ui.OptimizerEvalFrame
 
+import javax.swing.SwingUtilities
+
 object OptimizerEvalApp {
 
   /**
@@ -10,13 +12,16 @@ object OptimizerEvalApp {
     * and 1D line. For a single problem without the dropdown, use [[com.barrybecker4.optimization.optimizee.optimizees.TrivialProblem]].
     * For more problems from test sources, run `GraphAnalyticFunctionSolution`.
     */
-  def main(args: Array[String]): Unit = {
-    new OptimizerEvalFrame(
-      "test/temp.txt",
-      IndexedSeq(
-        new DemoViewerProblem,
-        new DiscreteGrid2DDemoProblem,
-        new LineGraphDemoProblem))
-  }
+  def main(args: Array[String]): Unit =
+    SwingUtilities.invokeLater(() =>
+      new OptimizerEvalFrame(
+        "test/temp.txt",
+        IndexedSeq(
+          new DemoViewerProblem,
+          new DiscreteGrid2DDemoProblem,
+          new LineGraphDemoProblem
+        )
+      )
+    )
 
 }

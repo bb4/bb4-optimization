@@ -9,6 +9,7 @@ import java.awt._
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 
+import scala.compiletime.uninitialized
 
 /**
   * Discrete set of dropdown values.
@@ -17,14 +18,16 @@ import java.awt.event.ActionListener
 class StringParameterWidget(val param: Parameter, val listener: ParameterChangeListener)
     extends ParameterWidget(param, listener) with ActionListener {
 
-  private var dropdown: JComboBox[_] = _
+  private var dropdown: JComboBox[AnyRef] = uninitialized
 
   /**
     * Create a ui widget appropriate for the parameter type.
     */
   override protected def addChildren(): Unit = { // create a dropdown
-    val sparam = parameter.asInstanceOf[StringParameter]
-    dropdown = new JComboBox(sparam.getStringValues.toArray)
+    val sparam = parameter match
+      case s: StringParameter => s
+      case _ => throw new IllegalArgumentException("Expected StringParameter, got " + parameter.getClass.getName)
+    dropdown = new JComboBox[AnyRef](sparam.getStringValues.toArray[AnyRef])
     dropdown.setName(parameter.name)
     dropdown.setMaximumSize(new Dimension(200, 20))
     dropdown.setToolTipText(parameter.name)

@@ -7,6 +7,7 @@ import com.barrybecker4.ui.sliders.LabeledSlider
 import com.barrybecker4.ui.sliders.SliderChangeListener
 import java.awt._
 
+import scala.compiletime.uninitialized
 
 /**
   * @author Barry Becker
@@ -14,7 +15,7 @@ import java.awt._
 class DoubleParameterWidget(param: Parameter, listener: ParameterChangeListener)
     extends ParameterWidget(param, listener) with SliderChangeListener {
 
-  private var slider: LabeledSlider = _
+  private var slider: LabeledSlider = uninitialized
 
   /** Create a ui widget appropriate for the parameter type. */
   override protected def addChildren(): Unit = {

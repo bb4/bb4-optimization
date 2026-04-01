@@ -9,125 +9,243 @@ import com.barrybecker4.optimization.viewer.projectors.SimpleProjector
 import com.barrybecker4.optimization.viewer.rendering.PointsListRenderer
 import com.barrybecker4.optimization.{OptimizationListener, Optimizer}
 
-import scala.compiletime.uninitialized
-
-import java.awt.*
+import java.awt.{Color, Dimension, Graphics, Graphics2D, Point}
 import java.awt.event.{MouseEvent, MouseListener, MouseMotionListener}
-import javax.swing.JPanel
+import java.util.concurrent.ExecutionException
+import javax.swing.{JComponent, JPanel, SwingUtilities, SwingWorker}
 import javax.vecmath.Point2d
 
+import scala.jdk.CollectionConverters.*
 
 object OptimizerEvalPanel {
   private val EDGE_SIZE = 1000
-  private[viewer] val SIZE = new Dimension(EDGE_SIZE, EDGE_SIZE)
+  private[viewer] val SIZE: Dimension = new Dimension(EDGE_SIZE, EDGE_SIZE)
   private val BG_COLOR = new Color(240, 245, 250)
 }
 
+private case class OptimizationRunContext(
+    optimizer: Optimizer,
+    solutionPosition: Point2d,
+    initialGuess: ParameterArray,
+    fitnessRange: Double
+)
+
 /**
   * Panel for showing the optimization visually.
-  * To zoom, click buttons at the top.
-  * To pan, simply click and drag.
+  * To zoom, use toolbar buttons. To pan, click and drag.
+  * Optimization runs on a background thread; UI updates and painting occur on the EDT.
   * @author Barry Becker
   */
 class OptimizerEvalPanel() extends JPanel
-    with OptimizationListener with OptimizationViewable with MouseListener with MouseMotionListener {
+    with OptimizationListener
+    with OptimizationViewable
+    with MouseListener
+    with MouseMotionListener {
 
   private val renderer = new PointsListRenderer
   private val projector = new SimpleProjector
-  private var pointsList: PointsList = uninitialized
-  private var dragStartPosition: Point = uninitialized
+  private var pointsListOpt: Option[PointsList] = None
+  private var dragStart: Option[Point] = None
+  private var currentWorker: Option[OptimizationSwingWorker] = None
+  private var renderConfig = PointsListRenderer.Config()
 
-  this.setPreferredSize(OptimizerEvalPanel.SIZE)
-  this.addMouseListener(this)
-  this.addMouseMotionListener(this)
+  private var statusSink: String => Unit = _ => ()
+  private var runStateListener: Boolean => Unit = _ => ()
 
-  def doTest(optType: OptimizationStrategyType, optimizer: Optimizer,
-             solutionPosition: Point2d, initialGuess: ParameterArray, fitnessRange: Double): Unit = {
-    pointsList = new PointsList(solutionPosition, OptimizerEvalPanel.EDGE_SIZE, projector)
-    var solution: ParameterArrayWithFitness = null
-    try
-      solution = optimizer.doOptimization(optType, initialGuess, fitnessRange)
-    catch {
-      case e: AbstractMethodError =>
-        // allow continuing if the strategy has simply not been implemented yet.
-        e.printStackTrace()
-      case e: IllegalArgumentException =>
-        // e.g. STATE_SPACE_SEARCH without DiscreteStateSpace on the optimizee
-        e.printStackTrace()
-    }
-    this.repaint()
-    println("\n************************************************************************")
-    if (solution eq null) {
-      println("Optimization did not complete (see exception above). Strategy " + optType +
-        " may be incompatible with this problem type.")
-    } else {
-      println("The solution to the (" + optimizer.optimizee.getName + ") Polynomial Test Problem using " + optType + " is :\n" + solution)
-      println("Which evaluates to: " + solution.fitness)
-      println("We expected to get exactly p1 = " + solutionPosition.x + " and p2 = " + solutionPosition.y)
-    }
+  setPreferredSize(OptimizerEvalPanel.SIZE)
+  addMouseListener(this)
+  addMouseMotionListener(this)
+
+  override def configureUiHooks(status: String => Unit, onRunStateChanged: Boolean => Unit): Unit = {
+    statusSink = status
+    runStateListener = onRunStateChanged
   }
 
-  /** Called whenever the optimizer strategy moves incrementally toward the solution.
-    * @param params we assume there is only two.
-    */
-  override def optimizerChanged(params: ParameterArrayWithFitness): Unit =
-    pointsList.addPoint(params)
+  override def cancelCurrentOptimization(): Unit =
+    currentWorker.foreach(_.cancel(true))
 
-  /** Show the optimization results in the ui. */
-  override def showOptimization(strategy: OptimizationStrategyType, testProblem: OptimizeeProblem, logFile: String): Unit = {
+  override def setShowPointLabels(enabled: Boolean): Unit = {
+    renderConfig = renderConfig.copy(showPointLabels = enabled)
+    repaint()
+  }
+
+  override def setShowGrid(enabled: Boolean): Unit = {
+    renderConfig = renderConfig.copy(showGrid = enabled)
+    repaint()
+  }
+
+  /** Unused: progress is delivered via [[SwingWorker]] publish/process. */
+  override def optimizerChanged(params: ParameterArrayWithFitness): Unit = ()
+
+  override def showOptimization(strategy: OptimizationStrategyType, testProblem: OptimizeeProblem, logFile: String): Unit =
+    if SwingUtilities.isEventDispatchThread then startOptimizationRun(strategy, testProblem, logFile)
+    else SwingUtilities.invokeLater(() => startOptimizationRun(strategy, testProblem, logFile))
+
+  private def startOptimizationRun(strategy: OptimizationStrategyType, testProblem: OptimizeeProblem, logFile: String): Unit = {
+    runStateListener(true)
+    updateStatus("Running…")
+    currentWorker.foreach(_.cancel(true))
+
+    val ctx = prepareRunContext(testProblem, logFile)
+    val pointsList = new PointsList(ctx.solutionPosition, OptimizerEvalPanel.EDGE_SIZE, projector)
+    pointsListOpt = Some(pointsList)
+
+    val worker = new OptimizationSwingWorker(
+      strategy = strategy,
+      ctx = ctx,
+      pointsList = pointsList,
+      paintTarget = this,
+      onComplete = outcome => {
+        applyOptimizationOutcome(testProblem, strategy, ctx.solutionPosition, outcome)
+        runStateListener(false)
+        currentWorker = None
+      }
+    )
+
+    currentWorker = Some(worker)
+    worker.execute()
+  }
+
+  private def prepareRunContext(testProblem: OptimizeeProblem, logFile: String): OptimizationRunContext = {
     val params = testProblem.getExactSolution
-    // have strategy for projecting n-dimensions down to two.
     val solutionPosition = projector.project(params.pa)
     val optimizer = new Optimizer(testProblem, Some(logFile))
-    optimizer.setListener(this)
-    doTest(strategy, optimizer, solutionPosition, testProblem.getInitialGuess, testProblem.getFitnessRange)
+    OptimizationRunContext(
+      optimizer = optimizer,
+      solutionPosition = solutionPosition,
+      initialGuess = testProblem.getInitialGuess,
+      fitnessRange = testProblem.getFitnessRange
+    )
   }
+
+  private def applyOptimizationOutcome(
+      testProblem: OptimizeeProblem,
+      strategy: OptimizationStrategyType,
+      solutionPosition: Point2d,
+      outcome: (Boolean, Option[ParameterArrayWithFitness], Option[Throwable])
+  ): Unit =
+    val (cancelled, solution, error) = outcome
+    if cancelled then updateStatus("Cancelled.")
+    else if error.isDefined then reportFailure(error.get, strategy)
+    else if solution.isEmpty then reportIncomplete(strategy)
+    else reportSuccess(testProblem, strategy, solutionPosition, solution.get)
+
+  private def reportFailure(t: Throwable, strategy: OptimizationStrategyType): Unit =
+    val msg = t.getMessage match
+      case null | "" => t.getClass.getSimpleName
+      case m         => m
+    updateStatus(s"Failed ($strategy): $msg")
+
+  private def reportIncomplete(strategy: OptimizationStrategyType): Unit =
+    updateStatus(
+      s"Optimization did not complete ($strategy). The strategy may be incompatible with this problem type."
+    )
+
+  private def reportSuccess(
+      testProblem: OptimizeeProblem,
+      strategy: OptimizationStrategyType,
+      solutionPosition: Point2d,
+      solution: ParameterArrayWithFitness
+  ): Unit =
+    updateStatus(
+      s"Completed ($strategy) on ${testProblem.getName}: fitness=${solution.fitness} — " +
+        s"target projection (${solutionPosition.x}, ${solutionPosition.y})"
+    )
+
+  private def updateStatus(msg: String): Unit =
+    if SwingUtilities.isEventDispatchThread then statusSink(msg)
+    else SwingUtilities.invokeLater(() => statusSink(msg))
 
   override def paintComponent(g: Graphics): Unit = {
     super.paintComponent(g)
     val g2 = g.asInstanceOf[Graphics2D]
-    val dim: Dimension = this.getSize
+    val dim = getSize
     g2.setColor(OptimizerEvalPanel.BG_COLOR)
-    g2.fillRect(0, 0, dim.getWidth.toInt, dim.getHeight.toInt)
-    renderer.render(pointsList, g2)
+    g2.fillRect(0, 0, dim.width, dim.height)
+    pointsListOpt.foreach { pl =>
+      renderer.render(pl, g2, renderConfig, dim.width, dim.height)
+    }
   }
 
-  override def pan(offset: Point2d): Unit = {
-    pointsList.pan(offset)
-    repaint()
-  }
+  override def pan(offset: Point2d): Unit =
+    pointsListOpt.foreach { pl =>
+      pl.pan(offset)
+      repaint()
+    }
 
-  override def zoomIn(): Unit = {
-    pointsList.zoomIn()
-    repaint()
-  }
+  override def zoomIn(): Unit =
+    pointsListOpt.foreach { pl =>
+      pl.zoomIn()
+      repaint()
+    }
 
-  override def zoomOut(): Unit = {
-    pointsList.zoomOut()
-    repaint()
-  }
+  override def zoomOut(): Unit =
+    pointsListOpt.foreach { pl =>
+      pl.zoomOut()
+      repaint()
+    }
 
   override def mouseDragged(e: MouseEvent): Unit = doPan(e.getPoint)
-  override def mouseMoved(e: MouseEvent): Unit = {}
-  override def mouseClicked(e: MouseEvent): Unit = {}
+  override def mouseMoved(e: MouseEvent): Unit = ()
+  override def mouseClicked(e: MouseEvent): Unit = ()
 
-  override def mousePressed(e: MouseEvent): Unit = {
-    dragStartPosition = e.getPoint
-    println("mouse pressed at " + dragStartPosition)
-  }
+  override def mousePressed(e: MouseEvent): Unit =
+    dragStart = Some(e.getPoint)
 
   override def mouseReleased(e: MouseEvent): Unit = doPan(e.getPoint)
-  override def mouseEntered(e: MouseEvent): Unit = {}
-  override def mouseExited(e: MouseEvent): Unit = {}
+  override def mouseEntered(e: MouseEvent): Unit = ()
+  override def mouseExited(e: MouseEvent): Unit = ()
 
-  private def doPan(currentPos: Point): Unit = {
-    if (!(dragStartPosition == currentPos)) {
-      val xOffset = (dragStartPosition.getX - currentPos.getX) / getWidth
-      val yOffset = (dragStartPosition.getY - currentPos.getY) / getHeight
-      val offset = new Point2d(xOffset, yOffset)
-      pointsList.pan(offset)
-      this.repaint()
+  private def doPan(currentPos: Point): Unit =
+    dragStart.foreach { start =>
+      if start != currentPos then
+        pointsListOpt.foreach { pl =>
+          val w = math.max(1, getWidth)
+          val h = math.max(1, getHeight)
+          val xOffset = (start.getX - currentPos.getX) / w
+          val yOffset = (start.getY - currentPos.getY) / h
+          pl.pan(new Point2d(xOffset, yOffset))
+          repaint()
+        }
+      dragStart = Some(currentPos)
     }
-    dragStartPosition = currentPos
+}
+
+/** Runs [[Optimizer.doOptimization]] off the EDT and streams intermediate points via `publish`/`process`. */
+private class OptimizationSwingWorker(
+    strategy: OptimizationStrategyType,
+    ctx: OptimizationRunContext,
+    pointsList: PointsList,
+    paintTarget: JComponent,
+    onComplete: ((Boolean, Option[ParameterArrayWithFitness], Option[Throwable])) => Unit
+) extends SwingWorker[Option[ParameterArrayWithFitness], ParameterArrayWithFitness] {
+
+  override def doInBackground(): Option[ParameterArrayWithFitness] = {
+    ctx.optimizer.setListener(p => publish(p))
+    try Some(ctx.optimizer.doOptimization(strategy, ctx.initialGuess, ctx.fitnessRange))
+    catch
+      case e: AbstractMethodError       => logFailure(e); None
+      case e: IllegalArgumentException => logFailure(e); None
   }
+
+  private def logFailure(e: Throwable): Unit =
+    e.printStackTrace()
+
+  override def process(chunks: java.util.List[ParameterArrayWithFitness]): Unit = {
+    chunks.asScala.foreach(pointsList.addPoint)
+    paintTarget.repaint()
+  }
+
+  override def done(): Unit =
+    val outcome =
+      if isCancelled then (true, None, None)
+      else
+        try (false, get(), None)
+        catch
+          case e: ExecutionException =>
+            (false, None, Option(e.getCause))
+          case e: InterruptedException =>
+            Thread.currentThread().interrupt()
+            (false, None, Some(e))
+    SwingUtilities.invokeLater(() => onComplete(outcome))
 }
