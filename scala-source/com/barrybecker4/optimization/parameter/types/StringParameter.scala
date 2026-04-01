@@ -15,7 +15,7 @@ case class StringParameter(index: Int, values: IndexedSeq[String], name: String,
                            redistFunc: Option[RedistributionFunction] = None)
     extends AbstractIntParameter(index, 0, values.length - 1, name, redistFunc) {
 
-  def this(theVal: Enum[_], enumValues: IndexedSeq[Enum[_]], paramName: String) = {
+  def this(theVal: Enum[?], enumValues: IndexedSeq[Enum[?]], paramName: String) = {
     this(theVal.ordinal(), enumValues.map(_.toString), paramName, None)
   }
 
@@ -45,6 +45,6 @@ case class StringParameter(index: Int, values: IndexedSeq[String], name: String,
 
   def getStringValues: IndexedSeq[String] = values
   override protected def isOrdered = false
-  override def getType: Class[_] = classOf[String]
+  override def getType: Class[?] = classOf[String]
   override def createWidget(listener: ParameterChangeListener) = new StringParameterWidget(this, listener)
 }

@@ -62,7 +62,7 @@ case class IntegerParameter(theVal: Double, minValue: Double, maxValue: Double, 
   }
 
   override def getNaturalValue: Any = this.getValue.round
-  override def getType: Class[_] = classOf[Int]
+  override def getType: Class[?] = classOf[Int]
   override def createWidget(listener: ParameterChangeListener): ParameterWidget =
     new DoubleParameterWidget(this, listener)
 }

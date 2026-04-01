@@ -8,6 +8,7 @@ import com.barrybecker4.math.MathUtil
 import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness, ParameterCrossover}
 import ParameterArrayWithFitness.given
 import scala.collection.mutable.ArrayBuffer
+import scala.compiletime.uninitialized
 import scala.util.Random
 
 
@@ -54,7 +55,7 @@ class GeneticSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM)
   extends OptimizationStrategy(optimizee) {
 
   /** Initial guess; baseline for `compareFitness` when `evaluateByComparison` is true. */
-  private var initialParams: ParameterArray = _
+  private var initialParams: ParameterArray = uninitialized
 
   /** radius to look for neighbors in  */
   private var nbrRadius = NBR_RADIUS

@@ -48,7 +48,7 @@ case class BooleanParameter(bValue: Boolean, name: String, redistFunc: Option[Bo
 
   override protected def isOrdered = false
 
-  override def getType: Class[_] = classOf[Boolean]
+  override def getType: Class[?] = classOf[Boolean]
 
   override def createWidget(listener: ParameterChangeListener): ParameterWidget =
     new BooleanParameterWidget(this, listener)

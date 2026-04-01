@@ -5,6 +5,8 @@ import com.barrybecker4.math.Range
 import com.barrybecker4.math.function.{Function, InvertibleFunction}
 import RedistributionFunction.verifyInRange
 
+import scala.compiletime.uninitialized
+
 
 object RedistributionFunction {
 
@@ -20,7 +22,7 @@ object RedistributionFunction {
 trait RedistributionFunction extends Object with Function {
 
   /** the discretized redistribution function */
-  protected var redistributionFunction: InvertibleFunction = _
+  protected var redistributionFunction: InvertibleFunction = uninitialized
 
   /** Given an x value, returns f(x)  (i.e. y)
     * Remaps values in the range [0, 1] -> [0, 1]

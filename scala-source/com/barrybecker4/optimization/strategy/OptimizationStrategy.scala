@@ -5,6 +5,7 @@ import com.barrybecker4.optimization.{Logger, OptimizationDiagnostics, Optimizat
 import com.barrybecker4.optimization.optimizee.Optimizee
 import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 
+import scala.compiletime.uninitialized
 
 /**
   * Abstract base class for Optimization strategy.
@@ -14,10 +15,10 @@ import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWi
   */
 abstract class OptimizationStrategy(var optimizee: Optimizee) {
 
-  private var logger: Logger = _
+  private var logger: Logger = uninitialized
   protected var diagnostics: OptimizationDiagnostics = OptimizationDiagnostics.Silence
   /** listen for optimization changed events. useful for debugging.  */
-  protected var listener: OptimizationListener = _
+  protected var listener: OptimizationListener = uninitialized
 
   /** @param logger the file that will record the results */
   def setLogger(logger: Logger): Unit = {

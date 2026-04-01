@@ -5,6 +5,8 @@ import com.barrybecker4.math.MathUtil
 import com.barrybecker4.math.function.PiecewiseFunction
 import RedistributionFunction.verifyInRange
 
+import scala.compiletime.uninitialized
+
 
 /**
   * The default is a completely uniform distribution (all values having equal probability).
@@ -15,8 +17,8 @@ import RedistributionFunction.verifyInRange
   */
 class UniformRedistribution() extends RedistributionFunction {
 
-  protected var specialValues: Array[Double] = _
-  protected var specialValueProbabilities: Array[Double] = _
+  protected var specialValues: Array[Double] = uninitialized
+  protected var specialValueProbabilities: Array[Double] = uninitialized
 
   /**
     * If you have just a purely uniform distribution you do not need to add any redistribution

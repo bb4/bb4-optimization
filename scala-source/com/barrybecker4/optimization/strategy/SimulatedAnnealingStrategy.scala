@@ -7,6 +7,7 @@ import com.barrybecker4.optimization.optimizee.Optimizee
 import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 import SimulatedAnnealingStrategy._
 
+import scala.compiletime.uninitialized
 import scala.util.Random
 
 
@@ -40,7 +41,7 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
   private var tempMax = SimulatedAnnealingStrategy.DEFAULT_TEMP_MAX
 
   /** Initial guess; used to store comparable fitness when `evaluateByComparison` is true. */
-  private var initialParams: ParameterArray = _
+  private var initialParams: ParameterArray = uninitialized
 
   /** @param tempMax the initial temperature at the start of the simulated annealing process (before cooling) */
   def setMaxTemperature(tempMax: Double): Unit = {

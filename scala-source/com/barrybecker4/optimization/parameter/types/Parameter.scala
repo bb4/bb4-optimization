@@ -70,7 +70,7 @@ trait Parameter {
   def isIntegerOnly: Boolean
 
   /** @return class type of the underlying parameter value (e.g. float.class or int.class)*/
-  def getType: Class[_]
+  def getType: Class[?]
 
   /** All parameters can produce copies of themselves.
     * @return new copy of the parameter

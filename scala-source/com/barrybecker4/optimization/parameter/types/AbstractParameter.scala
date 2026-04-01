@@ -71,7 +71,7 @@ abstract class AbstractParameter(value: Double,
     sa.toString
   }
 
-  override def getType: Class[_] =
+  override def getType: Class[?] =
     if (isIntegerOnly) classOf[Int]
     else classOf[Float]
 

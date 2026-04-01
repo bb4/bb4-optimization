@@ -71,6 +71,6 @@ case class DoubleParameter(value: Double, minValue: Double, maxValue: Double, na
   }
 
   override def getNaturalValue: Any = this.getValue
-  override def getType: Class[_] = classOf[Float]
+  override def getType: Class[?] = classOf[Float]
   override def createWidget(listener: ParameterChangeListener) = new DoubleParameterWidget(this, listener)
 }

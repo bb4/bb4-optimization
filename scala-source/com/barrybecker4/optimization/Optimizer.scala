@@ -6,6 +6,7 @@ import com.barrybecker4.optimization.optimizee.{BudgetedOptimizee, Optimizee}
 import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType
 
+import scala.compiletime.uninitialized
 import scala.util.Random
 
 
@@ -30,7 +31,7 @@ import scala.util.Random
   */
 class Optimizer(val optimizee: Optimizee, optimizationLogFile: Option[String] = None) {
 
-  protected var listener: OptimizationListener = _
+  protected var listener: OptimizationListener = uninitialized
   private val logger: Option[Logger] =
     if (optimizationLogFile.isDefined) Some(new Logger(optimizationLogFile.get)) else None
 
