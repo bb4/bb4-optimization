@@ -56,6 +56,14 @@ class NumericParameterArraySuite extends AnyFunSuite with BeforeAndAfter {
     assertResult(0.3) { result.get(1).getValue }
   }
 
+  test("add clamps second coordinate to max when vector pushes above range") {
+    params = createParamArray(0.2, 0.3)
+    val delta = Vector(IndexedSeq(0.0, 100.0))
+    val result = params.add(delta)
+    assertResult(0.2) { result.get(0).getValue }
+    assertResult(NumericParameterArraySuite.MAX_VALUE) { result.get(1).getValue }
+  }
+
   test("Find0GlobalSamples") {
     // expect[[IllegalArgumentException]
     params = createParamArray(.2, .3)

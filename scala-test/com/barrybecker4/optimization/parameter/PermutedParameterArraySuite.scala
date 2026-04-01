@@ -27,6 +27,15 @@ class PermutedParameterArraySuite extends AnyFunSuite {
     assertResult(expNbr) { nbrParams }
   }
 
+  /** radius 5.0 yields two transpositions; second swap applies to the permutation after the first. */
+  test("PermutedNeighbor multiple transpositions compose on current state") {
+    val rnd = new Random(1)
+    val params = createPermParameterArray(Array[Int](0, 1, 2, 3, 4), rnd)
+    val nbrParams = params.getRandomNeighbor(5.0)
+    val expNbr = createPermParameterArray(Array[Int](3, 1, 0, 2, 4), rnd)
+    assertResult(expNbr) { nbrParams }
+  }
+
   /** The two param arrays are not the same, but they are equidistant if they differ only
     * in the cyclic offset.
     */

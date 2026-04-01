@@ -83,20 +83,27 @@ case class NumericParameterArray(params: IndexedSeq[Parameter],
 
     val newParams = for (i <- 0 until size) yield {
       val param = get(i)
-      var newParam = param.setValue(param.getValue + vec(i))
-      if (newParam.getValue > newParam.maxValue) {
-        println("Warning param " +
-          newParam.name + " is exceeding is maximum value. It is being pegged to that maximum of " + newParam.maxValue)
-        newParam = newParam.setValue(newParam.maxValue)
-      }
-      if (newParam.getValue < newParam.minValue) {
-        println("Warning param " +
-          newParam.name + " is exceeding is minimum value. It is being pegged to that minimum of " + newParam.minValue)
-        newParam = newParam.setValue(newParam.minValue)
-      }
-      newParam
+      clampToParameterRange(param.setValue(param.getValue + vec(i)))
     }
     NumericParameterArray(newParams, numSteps, rnd)
+  }
+
+  /** If [[value]] lies outside the parameter's min/max, peg it and emit a warning on stderr. */
+  private def clampToParameterRange(param: Parameter): Parameter = {
+    var p = param
+    if (p.getValue > p.maxValue) {
+      Console.err.println(
+        "Warning param " + p.name + " exceeds its maximum value; pegging to " + p.maxValue
+      )
+      p = p.setValue(p.maxValue)
+    }
+    if (p.getValue < p.minValue) {
+      Console.err.println(
+        "Warning param " + p.name + " exceeds its minimum value; pegging to " + p.minValue
+      )
+      p = p.setValue(p.minValue)
+    }
+    p
   }
 
   def incrementByEps(idx: Int, dir: Direction): NumericParameterArray = {

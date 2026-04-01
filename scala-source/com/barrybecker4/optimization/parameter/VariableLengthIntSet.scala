@@ -102,7 +102,7 @@ class VariableLengthIntSet(params: IndexedSeq[Parameter], val fullSeq: IndexedSe
   /** @return an instance with specified indices from fullSet */
   def getCombination(indices: Seq[Int]): VariableLengthIntSet = {
     assert(indices.size <= getMaxLength,
-      "The number of indices (" + indices.size + ") was greater than the max size (" + size + ")")
+      "The number of indices (" + indices.size + ") was greater than the max size (" + getMaxLength + ")")
     val newParams = for (i <- indices) yield VariableLengthIntSet.createParam(fullSeq(i))
     new VariableLengthIntSet(newParams.toIndexedSeq, fullSeq, distCalc, rnd)
   }
@@ -151,17 +151,17 @@ class VariableLengthIntSet(params: IndexedSeq[Parameter], val fullSeq: IndexedSe
   }
 
   private def swapMarkedWithFreeNodes(numSelect: Int, freeNodes: Seq[Int]): VariableLengthIntSet = {
-    val randomIndices = rnd.shuffle(params.indices).take(numSelect).sorted
+    val randomIndicesSorted = rnd.shuffle(params.indices).take(numSelect).sorted
     val randomFreeIndices = rnd.shuffle(freeNodes.indices).take(numSelect)
-    var ct = 0
-    val newParams = for (i <- params.indices) yield {
-      if (ct < numSelect && i == randomIndices(ct)) {
-        val v = freeNodes(randomFreeIndices(ct))
-        ct += 1
-        VariableLengthIntSet.createParam(v)
-      } else params(i)
+    val replacementByIndex: Map[Int, Int] =
+      randomIndicesSorted.zip(randomFreeIndices.map(freeNodes)).toMap
+    val newParams = params.indices.map { i =>
+      replacementByIndex.get(i) match {
+        case Some(v) => VariableLengthIntSet.createParam(v)
+        case None => params(i)
+      }
     }
-    new VariableLengthIntSet(newParams, fullSeq, distCalc, rnd)
+    new VariableLengthIntSet(newParams.toIndexedSeq, fullSeq, distCalc, rnd)
   }
 
   /** @return all the ints in fullSet that are not currently used */

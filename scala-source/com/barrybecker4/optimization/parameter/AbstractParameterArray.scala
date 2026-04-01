@@ -16,12 +16,11 @@ object AbstractParameterArray {
   * @param params the list of parameters
   * @author Barry Becker
   */
-abstract class AbstractParameterArray(params: IndexedSeq[Parameter] = IndexedSeq[Parameter](), rnd: Random)
+abstract class AbstractParameterArray(params: IndexedSeq[Parameter] = IndexedSeq.empty[Parameter], rnd: Random)
     extends ParameterArray {
 
   override def getSamplePopulationSize: Int = {
     var pop = 1
-    assert(params != null)
     for (param <- params) {
       pop *= (if (param.isIntegerOnly) 4 else 12)
     }
@@ -40,7 +39,6 @@ abstract class AbstractParameterArray(params: IndexedSeq[Parameter] = IndexedSeq
       sb.append("parameter[").append(i).append("] = ").append(get(i).toString)
       sb.append('\n')
     }
-    //sb.append("rnd="+rnd.toString)
     sb.toString
   }
 

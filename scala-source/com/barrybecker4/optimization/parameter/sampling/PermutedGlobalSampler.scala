@@ -8,7 +8,9 @@ import com.barrybecker4.math.combinatorics.Permuter
 import com.barrybecker4.optimization.parameter.ParameterArray
 import com.barrybecker4.optimization.parameter.PermutedParameterArray
 import PermutedGlobalSampler.CLOSE_FACTOR
+import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
+import scala.compiletime.uninitialized
 
 
 object PermutedGlobalSampler {
@@ -46,13 +48,16 @@ class PermutedGlobalSampler(var params: PermutedParameterArray, val requestedNum
   }
 
   /** Used to enumerate all possible permutations when doing exhaustive search */
-  private var permuter: Permuter = _
+  private var permuter: Permuter = uninitialized
 
   if (useExhaustiveSearch)
     permuter = new Permuter(params.size)
 
   /** used to cache the samples already tried so we do not repeat them if the requestedNumSamples is small */
   private val globalSamples = new ArrayBuffer[ParameterArray]()
+
+  /** membership mirror of [[globalSamples]] for O(1) duplicate checks */
+  private val seenSamples: mutable.HashSet[PermutedParameterArray] = mutable.HashSet.empty
 
 
   override def next(): PermutedParameterArray = {
@@ -66,14 +71,13 @@ class PermutedGlobalSampler(var params: PermutedParameterArray, val requestedNum
   /** Randomly sample the parameter space until a sample that was not seen before is found.
     * @return the next random sample.
     */
-  private def getNextRandomSample = {
-    var nextSample: PermutedParameterArray = null
+  private def getNextRandomSample: PermutedParameterArray = {
     while (globalSamples.size < counter) {
-      nextSample = params.getRandomSample.asInstanceOf[PermutedParameterArray]
-      if (!globalSamples.contains(nextSample))
-        globalSamples.append(nextSample)
+      val candidate = params.getRandomSample.asInstanceOf[PermutedParameterArray]
+      if (seenSamples.add(candidate))
+        globalSamples.append(candidate)
     }
-    nextSample
+    globalSamples.last.asInstanceOf[PermutedParameterArray]
   }
 
   /** Globally sample the parameter space searching all possibilities.

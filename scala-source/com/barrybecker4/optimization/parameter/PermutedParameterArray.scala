@@ -19,7 +19,7 @@ case class PermutedParameterArray(params: IndexedSeq[Parameter], rnd: Random)
 
   private val distanceCalculator: PermutedDistanceCalculator = new PermutedDistanceCalculator()
 
-  def this(rnd: Random = MathUtil.RANDOM) = { this(IndexedSeq[Parameter](), rnd)}
+  def this(rnd: Random = MathUtil.RANDOM) = { this(IndexedSeq.empty[Parameter], rnd)}
 
   /** Permute the parameters according to the specified permutation
     * of 0 based indices.
@@ -44,9 +44,15 @@ case class PermutedParameterArray(params: IndexedSeq[Parameter], rnd: Random)
     distanceCalculator.findDistance(this, pa.asInstanceOf[PermutedParameterArray])
 
   /** Create a new permutation that is not too distant from what we have now.
+    *
     * @param radius an indication of the amount of variation to use. 0 is none, 3 is a lot.
-    *        Change Math.min(1, 10 * radius * N/100) of the entries, where N is the number of params
-    * @return the random nbr.
+    *               Applies this many random transpositions (pairwise value swaps), in sequence:
+    *               `max(1, (10 * radius * N / 100).toInt)` where `N` is [[size]].
+    * @return a new [[PermutedParameterArray]].
+    * @note Each transposition exchanges the values at two random indices in the permutation as updated
+    *       so far. Successive swaps compose like ordinary transpositions on the current state (standard for
+    *       local search on permutations), rather than always reading endpoint values from the initial
+    *       [[params]] snapshot.
     */
   override def getRandomNeighbor(radius: Double): PermutedParameterArray = {
     if (size <= 1) return this
@@ -59,11 +65,19 @@ case class PermutedParameterArray(params: IndexedSeq[Parameter], rnd: Random)
       var index2 = rnd.nextInt(size)
       while (index2 == index1)
         index2 = rnd.nextInt(size)
-      // swap
-      revisedParams(index1) = params(index1).setValue(params(index2).getValue)
-      revisedParams(index2) = params(index2).setValue(params(index1).getValue)
+      swapValuesAt(revisedParams, index1, index2)
     }
     PermutedParameterArray(revisedParams.toIndexedSeq, rnd)
+  }
+
+  /** Swap parameter values at `i` and `j` in the working array (mutates `buf`). */
+  private def swapValuesAt(buf: Array[Parameter], i: Int, j: Int): Unit = {
+    val pi = buf(i)
+    val pj = buf(j)
+    val vi = pi.getValue
+    val vj = pj.getValue
+    buf(i) = pi.setValue(vj)
+    buf(j) = pj.setValue(vi)
   }
 
   /** Globally sample the parameter space.

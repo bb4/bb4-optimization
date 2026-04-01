@@ -46,11 +46,19 @@ class PermutedDistanceCalculator {
     * @return the computed runlength
     */
   private def determineRunLength(pa1: ParameterArray, pa2: ParameterArray, len: Int, idx: Int,
-                                 runLengths: ArrayBuffer[Int]) = {
-    var k = 0
-    var i: Int = idx
-    k = 1
-    var j = findCorrespondingEntryIndex(pa2, len, pa1.get(idx))
+                                 runLengths: ArrayBuffer[Int]): Int = {
+    val j0 = findCorrespondingEntryIndex(pa2, len, pa1.get(idx))
+    val (runLength, matchFound) = extendMatchingRun(pa1, pa2, len, idx, j0)
+    if (matchFound) runLengths.append(runLength)
+    runLength
+  }
+
+  /** Walk forward in both permutations in parallel until the first mismatch (cyclic). */
+  private def extendMatchingRun(pa1: ParameterArray, pa2: ParameterArray, len: Int, startI: Int, startJ: Int)
+      : (Int, Boolean) = {
+    var i = startI
+    var j = startJ
+    var k = 1
     var matchFound = false
     var matched = true
     while (matched && k <= len) {
@@ -60,9 +68,7 @@ class PermutedDistanceCalculator {
       matched = pa1.get(i).getValue == pa2.get(j).getValue
       matchFound |= matched
     }
-    val runLength = k - 1
-    if (matchFound) runLengths.append(runLength)
-    runLength
+    (k - 1, matchFound)
   }
 
   /** throws AssertionError if not there. It must be there.

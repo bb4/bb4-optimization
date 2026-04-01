@@ -6,6 +6,7 @@ import com.barrybecker4.optimization.parameter.ParameterArray
 import com.barrybecker4.optimization.parameter.VariableLengthIntSet
 import java.util.NoSuchElementException
 import scala.collection.mutable.ArrayBuffer
+import scala.compiletime.uninitialized
 
 
 object VariableLengthGlobalSampler {
@@ -41,14 +42,16 @@ class VariableLengthGlobalSampler(var params: VariableLengthIntSet, val requeste
   useExhaustiveSearch = requestedNumSamples > VariableLengthGlobalSampler.CLOSE_FACTOR * totalConfigurations
 
   /** Used to enumerate all possible combination when doing exhaustive search */
-  private var combinator: Combinater = _
+  private var combinator: Combinater = uninitialized
   if (useExhaustiveSearch)
     combinator = new Combinater(params.getMaxLength)
 
 
   override def next(): VariableLengthIntSet = {
-    if (counter >= totalConfigurations)
-      throw new NoSuchElementException("ran out of samples. There are only " + totalConfigurations)
+    if (counter >= numSamples)
+      throw new NoSuchElementException(
+        "ran out of samples. Iterator is limited to " + numSamples + " of " + totalConfigurations + " configurations."
+      )
     if (counter == numSamples - 1)
       hasNext = false
     counter += 1
@@ -59,14 +62,13 @@ class VariableLengthGlobalSampler(var params: VariableLengthIntSet, val requeste
   /** Randomly sample the parameter space until a sample that was not seen before is found.
     * @return the next random sample.
     */
-  private def getNextRandomSample = {
-    var nextSample: VariableLengthIntSet = null
+  private def getNextRandomSample: VariableLengthIntSet = {
     while (globalSamples.size < counter) {
-      nextSample = params.getRandomSample.asInstanceOf[VariableLengthIntSet]
-      if (!globalSamples.contains(nextSample))
-        globalSamples.append(nextSample)
+      val candidate = params.getRandomSample.asInstanceOf[VariableLengthIntSet]
+      if (!globalSamples.contains(candidate))
+        globalSamples.append(candidate)
     }
-    nextSample
+    globalSamples.last.asInstanceOf[VariableLengthIntSet]
   }
 
   /** Globally sample the parameter space searching all possibilities.

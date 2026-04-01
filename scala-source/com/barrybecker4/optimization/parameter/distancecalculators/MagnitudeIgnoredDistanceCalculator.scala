@@ -20,20 +20,14 @@ class MagnitudeIgnoredDistanceCalculator extends DistanceCalculator {
   override def calculateDistance(pa1: ParameterArray, pa2: ParameterArray): Double = {
     val thisLength = pa1.size
     val thatLength = pa2.size
-    var theseValues = Array.ofDim[Int](thisLength)
-    var thoseValues = Array.ofDim[Int](thatLength)
-    for (i <- 0 until thisLength) {
-      theseValues :+= pa1.get(i).getValue.toInt
-    }
-    for (i <- 0 until thatLength) {
-      thoseValues :+= pa2.get(i).getValue.toInt
-    }
-    theseValues = theseValues.sorted
-    thoseValues = thoseValues.sorted
-
+    val theseValues = sortedIntValues(pa1, thisLength)
+    val thoseValues = sortedIntValues(pa2, thatLength)
     val valueDifferences = calcValueDifferences(theseValues, thoseValues)
     Math.abs(thisLength - thatLength) + valueDifferences
   }
+
+  private def sortedIntValues(pa: ParameterArray, len: Int): Array[Int] =
+    (0 until len).map(i => pa.get(i).getValue.toInt).toArray.sorted
 
   /** Perform a sort of merge sort on the two sorted lists of values to find matches.
     * The more matches there are between the two lists, the more similar they are.
