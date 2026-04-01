@@ -10,8 +10,8 @@ import scala.util.Random
 
 
 object GlobalHillClimbingStrategy {
-  /** Passed to [[GlobalSampleStrategy.setSamplingRate]] as the global numeric sample budget (see NumericGlobalSampler). */
-  private val NUM_SAMPLES = 1000
+  /** Default passed to [[GlobalSampleStrategy.setSamplingRate]] as the global sample budget. */
+  val DEFAULT_GLOBAL_SAMPLE_BUDGET: Int = 1000
 
   /** Number of best global samples from which to run local hill climbing. */
   val DEFAULT_MULTISTART_COUNT: Int = 5
@@ -27,11 +27,18 @@ object GlobalHillClimbingStrategy {
 class GlobalHillClimbingStrategy(optimizee: Optimizee) extends OptimizationStrategy(optimizee) {
 
   private var multistartCount: Int = GlobalHillClimbingStrategy.DEFAULT_MULTISTART_COUNT
+  private var globalSampleBudget: Int = GlobalHillClimbingStrategy.DEFAULT_GLOBAL_SAMPLE_BUDGET
 
   /** How many top global samples seed local hill climbing (clamped to at least 1 at runtime). */
   def setMultistartCount(k: Int): Unit = {
     assert(k >= 1, "multistart count must be positive")
     multistartCount = k
+  }
+
+  /** Budget for [[GlobalSampleStrategy]] before local hill climbs (larger = more exploration in high-D spaces). */
+  def setGlobalSampleBudget(samples: Int): Unit = {
+    assert(samples > 0, "global sample budget must be positive")
+    globalSampleBudget = samples
   }
 
   /**
@@ -44,7 +51,7 @@ class GlobalHillClimbingStrategy(optimizee: Optimizee) extends OptimizationStrat
                               fitnessRange: Double): ParameterArrayWithFitness = {
     val gsStrategy = new GlobalSampleStrategy(optimizee)
     gsStrategy.setListener(listener)
-    gsStrategy.setSamplingRate(GlobalHillClimbingStrategy.NUM_SAMPLES)
+    gsStrategy.setSamplingRate(globalSampleBudget)
     val seeds = gsStrategy.doOptimizationTopK(params, fitnessRange, multistartCount)
     if (seeds.isEmpty) {
       val initial =
