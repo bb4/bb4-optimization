@@ -12,7 +12,7 @@ import com.barrybecker4.optimization.parameter.{Direction, NumericParameterArray
   * over a numerical parameter space.
   * @param params the params to improve.
   * @param numericPa same as `params.pa` as numeric array (caller guarantees type).
-  * @param priorGradient direction from the previous step, if any; otherwise a default unit direction is used.
+  * @param priorGradient direction from the previous step, if any; otherwise a default unit direction is used for dot-product step sizing.
   * @author Barry Becker
   */
 class ImprovementIteration(
@@ -25,7 +25,8 @@ class ImprovementIteration(
   private var fitnessDelta: Vector = numericPa.asVector
   var gradient: Vector = numericPa.asVector
 
-  var oldGradient: Vector = priorGradient match {
+  /** Prior step's gradient for comparing turning angle; `None` uses a normalized all-ones direction. */
+  val previousGradientForDot: Vector = priorGradient match {
     case Some(g) => g
     case None =>
       var og = numericPa.asVector

@@ -49,7 +49,7 @@ class ImprovementStep(var optimizee: Optimizee, var iter: ImprovementIteration, 
     * @return nearby location with better fitness if there is one.
     */
   private def findNextCandidateParams(params: ParameterArrayWithFitness): ParameterArrayWithFitness = {
-    var currentParams: NumericParameterArray = params.pa.asInstanceOf[NumericParameterArray]
+    var currentParams: NumericParameterArray = requireNumericParameterArray(params.pa)
     val oldParams = params
     iter.updateGradient(jumpSize, gradLength)
     currentParams = currentParams.add(iter.gradient)

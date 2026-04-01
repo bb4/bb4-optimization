@@ -2,7 +2,7 @@ package com.barrybecker4.optimization.strategy.gradient
 
 import com.barrybecker4.math.linear.Vector
 import com.barrybecker4.optimization.optimizee.Optimizee
-import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray, ParameterArrayWithFitness}
+import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 
 import scala.collection.mutable
 import ImprovementFinder.INITIAL_JUMP_SIZE
@@ -30,7 +30,7 @@ class NumericImprovementFinder(val startingParams: ParameterArrayWithFitness,
     val priorGradient: Option[Vector] = lastImprovement.flatMap(_.gradient)
     val jumpSize: Double = lastImprovement.map(_.jumpSize).getOrElse(INITIAL_JUMP_SIZE)
     val oldFitness: Double = currentParams.fitness
-    val numericPa = currentParams.pa.asInstanceOf[NumericParameterArray]
+    val numericPa = requireNumericParameterArray(currentParams.pa)
     val iter = new ImprovementIteration(currentParams, numericPa, priorGradient)
     var sumOfSqs: Double = 0
     for (i <- 0 until currentParams.pa.size) {
@@ -43,9 +43,8 @@ class NumericImprovementFinder(val startingParams: ParameterArrayWithFitness,
     var newJumpSize = step.jumpSize
     // the improvement may be zero or negative, meaning it did not improve.
     val improvement = step.getImprovement
-    val dotProduct = iter.gradient.normalizedDot(iter.oldGradient)
+    val dotProduct = iter.gradient.normalizedDot(iter.previousGradientForDot)
     newJumpSize = findNewJumpSize(newJumpSize, dotProduct)
-    iter.oldGradient = iter.gradient
     Improvement(newParams, improvement, newJumpSize, Some(iter.gradient))
   }
 
