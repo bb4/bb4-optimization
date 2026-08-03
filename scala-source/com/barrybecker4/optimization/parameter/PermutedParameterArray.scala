@@ -31,7 +31,7 @@ case class PermutedParameterArray(params: IndexedSeq[Parameter], rnd: Random)
   }
 
   /**
-    * Same permutation and parameter values with a new [[Random]] (e.g. multistart hill climbing).
+    * Same permutation and parameter values with a new [[scala.util.Random]] (e.g. multistart hill climbing).
     * Subclasses that carry domain state beyond [[params]] should override to preserve their concrete type.
     */
   def forkWithRnd(newRnd: Random): PermutedParameterArray =
@@ -103,7 +103,7 @@ case class PermutedParameterArray(params: IndexedSeq[Parameter], rnd: Random)
   /**
     * Wrap the result of order crossover (OX) in the same concrete type when subclasses carry domain state
     * beyond the raw [[params]] sequence (for example puzzle-specific paths). The default rebuilds a plain
-    * [[PermutedParameterArray]].
+    * [[com.barrybecker4.optimization.parameter.PermutedParameterArray]].
     */
   def rebuildAfterOrderCrossover(childParams: IndexedSeq[Parameter], rnd: Random): PermutedParameterArray =
     PermutedParameterArray(childParams, rnd)
