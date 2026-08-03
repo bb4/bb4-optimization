@@ -8,7 +8,7 @@ plugins {
 
 description = 'A Scala library project containing a collection of heuristic optimization algorithms.'
 group = 'com.barrybecker4'
-version = '2.0.0'
+version = '2.1-SNAPSHOT'
 
 bb4 {
     archivesBaseName.set('bb4-optimization')
