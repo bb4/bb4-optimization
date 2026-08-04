@@ -6,7 +6,6 @@ import com.barrybecker4.math.MathUtil
 import com.barrybecker4.optimization.optimizee.Optimizee
 import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 
-import scala.compiletime.uninitialized
 import scala.util.Random
 
 /**
@@ -85,9 +84,6 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
   private var stepMode: SimulatedAnnealingStepMode = SimulatedAnnealingStepMode.Fixed
   private var tempMax: Double = config.defaultTempMax
 
-  /** Initial guess; used to store comparable fitness when `evaluateByComparison` is true. */
-  private var initialParams: ParameterArray = uninitialized
-
   def setConfig(config: SimulatedAnnealingConfig): Unit = {
     this.config = config
   }
@@ -130,7 +126,7 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
       fitnessRange > 0.0 && fitnessRange.isFinite,
       s"fitnessRange must be finite and > 0 for Metropolis scaling, got $fitnessRange"
     )
-    initialParams = params
+    val initialParams = params
     val n = config.innerIterationsPerDimension
     val numTempIterations = config.numTempIterations
     val tempDrop = config.tempDropFactor
@@ -157,7 +153,7 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
       while (ct < n * currentParams.pa.size && !isOptimalFitnessReached(currentParams)) {
         val rBase = radiusMul * temperature / ((n + ct) * tempMax)
         val rEffective = stepScale * rBase
-        val (next, accepted) = neighborStep(currentParams, ct, temperature, fitnessRange, rEffective)
+        val (next, accepted) = neighborStep(currentParams, ct, temperature, fitnessRange, rEffective, initialParams)
         currentParams = next
 
         stepMode match {
@@ -203,7 +199,8 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
       ct: Int,
       temperature: Double,
       fitnessRange: Double,
-      rEffective: Double
+      rEffective: Double,
+      baseline: ParameterArray
   ): (ParameterArrayWithFitness, Boolean) = {
     val curParams = params
     val newParams = params.pa.getRandomNeighbor(rEffective)
@@ -214,7 +211,7 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
     val useWorseSolution = metropolisAcceptWorse(deltaFitness, temperature, fitnessRange)
     val accepted = deltaFitness < 0 || useWorseSolution
     val newParamsWithFitness =
-      if (accepted) acceptedState(newParams, newFitness)
+      if (accepted) acceptedState(newParams, newFitness, baseline)
       else curParams
     log(ct, newParamsWithFitness, rEffective, dist, FormatUtil.formatNumber(temperature))
     (newParamsWithFitness, accepted)
@@ -235,9 +232,13 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
     rnd.nextDouble() < probability
   }
 
-  private def acceptedState(newParams: ParameterArray, newFitness: Double): ParameterArrayWithFitness = {
+  private def acceptedState(
+      newParams: ParameterArray,
+      newFitness: Double,
+      baseline: ParameterArray
+  ): ParameterArrayWithFitness = {
     val storedFitness =
-      if (optimizee.evaluateByComparison) optimizee.compareFitness(newParams, initialParams)
+      if (optimizee.evaluateByComparison) optimizee.compareFitness(newParams, baseline)
       else newFitness
     ParameterArrayWithFitness(newParams, storedFitness)
   }

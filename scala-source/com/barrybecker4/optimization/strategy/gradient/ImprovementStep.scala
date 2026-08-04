@@ -65,28 +65,26 @@ class ImprovementStep(var optimizee: Optimizee, var iter: ImprovementIteration, 
       cache += currentParams
     }
 
-    var newParams: ParameterArrayWithFitness = null
-    if (optimizee.evaluateByComparison) {
-      val deltaFitness = optimizee.compareFitness(currentParams, oldParams.pa)
-      val fitness = optimizee.compareFitness(currentParams, baselineParams)
-      newParams = ParameterArrayWithFitness(currentParams, fitness)
-      improvement = deltaFitness
-    }
-    else {
-      val fitness = optimizee.evaluateFitness(currentParams)
-      newParams = ParameterArrayWithFitness(currentParams, fitness)
-      improvement = fitness - oldFitness
-    }
+    val newParams =
+      if (optimizee.evaluateByComparison) {
+        val deltaFitness = optimizee.compareFitness(currentParams, oldParams.pa)
+        val fitness = optimizee.compareFitness(currentParams, baselineParams)
+        improvement = deltaFitness
+        ParameterArrayWithFitness(currentParams, fitness)
+      } else {
+        val fitness = optimizee.evaluateFitness(currentParams)
+        improvement = fitness - oldFitness
+        ParameterArrayWithFitness(currentParams, fitness)
+      }
     improved = improvement < 0
     if (!improved) {
-      newParams = oldParams
       if (!sameParams) { // we have not improved, try again with a reduced jump size.
         // This could happen, for example, if we overshot the goal.
         trace("--Warning: the new params are worse, so reduce the step size and try again")
         trace(s"  jumpSize=$jumpSize")
         jumpSize *= ImprovementStep.JUMP_SIZE_DEC_FACTOR
       }
-    }
-    newParams
+      oldParams
+    } else newParams
   }
 }

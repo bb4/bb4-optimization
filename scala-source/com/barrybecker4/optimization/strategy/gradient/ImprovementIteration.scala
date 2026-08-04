@@ -29,11 +29,7 @@ class ImprovementIteration(
   val previousGradientForDot: Vector = priorGradient match {
     case Some(g) => g
     case None =>
-      var og = numericPa.asVector
-      for (i <- 0 until numericPa.size) {
-        og = og.set(i, 1.0)
-      }
-      og.normalize
+      (0 until numericPa.size).foldLeft(numericPa.asVector)((og, i) => og.set(i, 1.0)).normalize
   }
 
   /** Compute the squares in one of the iteration directions and add it to the running sum.

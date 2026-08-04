@@ -71,14 +71,11 @@ class GeneticSearchStrategy(
     * @return the optimized params.
     */
   override def doOptimization(params: ParameterArray, fitnessRange: Double): ParameterArrayWithFitness = {
-    var lastBest: ParameterArrayWithFitness = null
     desiredPopulationSize = params.getSamplePopulationSize
 
     val population = findInitialPopulation(params)
-    //println("The population of this generation is " + population.size()
-    //    + " (desired was " + desiredPopulationSize + ")");
     // EVALUATE POPULATION
-    lastBest = population.min //evaluatePopulation(population, params)
+    val lastBest = population.min //evaluatePopulation(population, params)
     evolve(lastBest, population, fitnessRange)
   }
 
