@@ -5,8 +5,6 @@ import com.barrybecker4.math.Range
 import com.barrybecker4.math.function.{Function, InvertibleFunction}
 import RedistributionFunction.verifyInRange
 
-import scala.compiletime.uninitialized
-
 
 object RedistributionFunction {
 
@@ -19,10 +17,10 @@ object RedistributionFunction {
   * Responsible for defining the probability distribution for selecting random parameter values.
   * Derived classes will define the different sorts of redistribution functions.
   */
-trait RedistributionFunction extends Object with Function {
+trait RedistributionFunction extends Function {
 
   /** the discretized redistribution function */
-  protected var redistributionFunction: InvertibleFunction = uninitialized
+  protected def redistributionFunction: InvertibleFunction
 
   /** Given an x value, returns f(x)  (i.e. y)
     * Remaps values in the range [0, 1] -> [0, 1]
@@ -49,6 +47,4 @@ trait RedistributionFunction extends Object with Function {
   }
 
   override def getDomain: Range = Range(0, 1.0)
-
-  protected def initializeFunction(): Unit
 }

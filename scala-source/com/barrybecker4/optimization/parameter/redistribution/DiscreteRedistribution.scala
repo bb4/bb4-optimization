@@ -2,6 +2,20 @@
 package com.barrybecker4.optimization.parameter.redistribution
 
 
+object DiscreteRedistribution {
+
+  private def normalizeSpecialValues(numValues: Int, discreteSpecialValues: Array[Int]): Array[Double] = {
+    val len = discreteSpecialValues.length
+    val specialValues = new Array[Double](len)
+    for (i <- 0 until len) {
+      assert(discreteSpecialValues(i) < numValues,
+        " A discrete special value (" + discreteSpecialValues(i) + ") was >= " + numValues)
+      specialValues(i) = discreteSpecialValues(i).toDouble / (numValues - 1).toDouble
+    }
+    specialValues
+  }
+}
+
 /**
   * If you have just a purely uniform distribution you do not need to add any redistribution function
   * as that is the default. Use this function though, if you have uniform except for a few special values.
@@ -13,17 +27,8 @@ package com.barrybecker4.optimization.parameter.redistribution
   * @author Barry Becker
   */
 class DiscreteRedistribution(numValues: Int, discreteSpecialValues: Array[Int],
-                             discreteSpecialValueProbabilities: Array[Double]) extends UniformRedistribution {
-
-  val len: Int = discreteSpecialValues.length
-  specialValues = new Array[Double](len)
-  specialValueProbabilities = new Array[Double](len)
-
-  for (i <- 0 until len) {
-    assert(discreteSpecialValues(i) < numValues,
-      " A discrete special value (" + discreteSpecialValues(i) + ") was >= " + numValues)
-    specialValues(i) = discreteSpecialValues(i).toDouble / (numValues - 1).toDouble
-    specialValueProbabilities(i) = discreteSpecialValueProbabilities(i)
-  }
-  initializeFunction()
-}
+                             discreteSpecialValueProbabilities: Array[Double])
+  extends UniformRedistribution(
+    DiscreteRedistribution.normalizeSpecialValues(numValues, discreteSpecialValues),
+    discreteSpecialValueProbabilities
+  )

@@ -6,6 +6,7 @@ import com.barrybecker4.math.Range
 import com.barrybecker4.math.function.ArrayFunction
 import com.barrybecker4.math.function.FunctionInverter
 import com.barrybecker4.math.function.ErrorFunction
+import com.barrybecker4.math.function.InvertibleFunction
 import RedistributionFunction.verifyInRange
 
 
@@ -18,13 +19,13 @@ object GaussianRedistribution {
   * Convert the uniform distribution to a normal (gaussian) one.
   * @author Barry Becker
   */
-case class GaussianRedistribution(var mean: Double, var stdDeviation: Double) extends RedistributionFunction {
+case class GaussianRedistribution(mean: Double, stdDeviation: Double) extends RedistributionFunction {
 
   verifyInRange(mean)
   private val errorFunction = new ErrorFunction
-  initializeFunction()
+  protected val redistributionFunction: InvertibleFunction = buildRedistributionFunction()
 
-  override protected def initializeFunction(): Unit = {
+  private def buildRedistributionFunction(): InvertibleFunction = {
     val cdfFunction = buildInitialCdfSamples()
     val lowMissing = cdf(0)
     val highMissing = 1.0 - cdfFunction(GaussianRedistribution.NUM_MAP_VALUES - 1)
@@ -35,7 +36,7 @@ case class GaussianRedistribution(var mean: Double, var stdDeviation: Double) ex
     val xRange = Range(0.0, 1.0)
     val inverter = new FunctionInverter(cdfFunction)
     val functionMap = inverter.createInverseFunction(xRange)
-    redistributionFunction = new ArrayFunction(functionMap, cdfFunction)
+    new ArrayFunction(functionMap, cdfFunction)
   }
 
   /** Discrete samples of the CDF at uniform x in (0, 1], index 0 fixed at 0. */
