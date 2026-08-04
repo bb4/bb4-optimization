@@ -6,7 +6,6 @@ import com.barrybecker4.optimization.optimizee.{BudgetedOptimizee, Optimizee}
 import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType
 
-import scala.compiletime.uninitialized
 import scala.util.Random
 
 
@@ -31,9 +30,8 @@ import scala.util.Random
   */
 class Optimizer(val optimizee: Optimizee, optimizationLogFile: Option[String] = None) {
 
-  protected var listener: OptimizationListener = uninitialized
-  private val logger: Option[Logger] =
-    if (optimizationLogFile.isDefined) Some(new Logger(optimizationLogFile.get)) else None
+  protected var listener: Option[OptimizationListener] = None
+  private val logger: Option[Logger] = optimizationLogFile.map(new Logger(_))
 
   /** Constructs an optimization strategy object of the specified type and run it.
     *
@@ -64,16 +62,16 @@ class Optimizer(val optimizee: Optimizee, optimizationLogFile: Option[String] = 
     }
 
     val optStrategy = optimizationType.getStrategy(target, fitnessRange, rnd)
-    if (logger.isDefined) {
-      logger.get.initialize(params)
-      optStrategy.setLogger(logger.get)
+    logger.foreach { log =>
+      log.initialize(params)
+      optStrategy.setLogger(log)
     }
-    optStrategy.setListener(listener)
+    listener.foreach(optStrategy.setListener)
     if (verbose) optStrategy.setVerbose(true)
     optStrategy.doOptimization(params, fitnessRange)
   }
 
   def setListener(lnr: OptimizationListener): Unit = {
-    listener = lnr
+    listener = Option(lnr)
   }
 }

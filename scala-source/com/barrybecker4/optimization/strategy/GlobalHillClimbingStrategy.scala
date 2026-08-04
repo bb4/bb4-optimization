@@ -50,7 +50,7 @@ class GlobalHillClimbingStrategy(optimizee: Optimizee) extends OptimizationStrat
   override def doOptimization(params: ParameterArray,
                               fitnessRange: Double): ParameterArrayWithFitness = {
     val gsStrategy = new GlobalSampleStrategy(optimizee)
-    gsStrategy.setListener(listener)
+    listener.foreach(gsStrategy.setListener)
     gsStrategy.setSamplingRate(globalSampleBudget)
     val seeds = gsStrategy.doOptimizationTopK(params, fitnessRange, multistartCount)
     if (seeds.isEmpty) {
@@ -90,7 +90,7 @@ class GlobalHillClimbingStrategy(optimizee: Optimizee) extends OptimizationStrat
 
   private def runHillClimbingFrom(seed: ParameterArrayWithFitness, fitnessRange: Double): ParameterArrayWithFitness = {
     val strategy = new HillClimbingStrategy(optimizee)
-    strategy.setListener(listener)
+    listener.foreach(strategy.setListener)
     strategy.doOptimization(seed.pa, fitnessRange)
   }
 }
