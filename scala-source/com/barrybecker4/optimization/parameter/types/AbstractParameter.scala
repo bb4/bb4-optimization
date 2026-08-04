@@ -36,10 +36,7 @@ abstract class AbstractParameter(value: Double,
     assert(Math.abs(r) <= 1.5)
     if (r == 0) return v // no change in the param.
     val change = rand.nextGaussian() * r * range
-    var newValue = v + change
-    if (newValue > maxValue) newValue = maxValue
-    else if (newValue < minValue) newValue = minValue
-    newValue
+    Math.min(maxValue, Math.max(minValue, v + change))
   }
 
   override def getIncrementForDirection(direction: Direction): Double = direction.multiplier
@@ -78,8 +75,7 @@ abstract class AbstractParameter(value: Double,
   override def getValue: Double = {
     val retValue =
       if (redistributionFunction.isDefined) {
-        var v = (this.value - minValue) / range
-        v = redistributionFunction.get.getValue(v)
+        val v = redistributionFunction.get.getValue((this.value - minValue) / range)
         v * range + minValue
       } else this.value
     validateRange(retValue)

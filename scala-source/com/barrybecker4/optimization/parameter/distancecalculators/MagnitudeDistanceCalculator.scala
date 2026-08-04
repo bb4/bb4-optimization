@@ -22,14 +22,8 @@ class MagnitudeDistanceCalculator extends DistanceCalculator {
   override def calculateDistance(pa1: ParameterArray, pa2: ParameterArray): Double = {
     val thisLength = pa1.size
     val thatLength = pa2.size
-    var sum1: Double = 0
-    var sum2: Double = 0
-    for (i <- 0 until thisLength) {
-      sum1 += pa1.get(i).getValue
-    }
-    for (i <- 0 until thatLength) {
-      sum2 += pa2.get(i).getValue
-    }
+    val sum1 = (0 until thisLength).map(i => pa1.get(i).getValue).sum
+    val sum2 = (0 until thatLength).map(i => pa2.get(i).getValue).sum
     Math.abs(sum1 - sum2)
   }
 }

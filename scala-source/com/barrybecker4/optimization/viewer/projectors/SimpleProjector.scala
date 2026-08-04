@@ -17,15 +17,12 @@ import javax.vecmath.Point2d
   */
 class SimpleProjector extends Projector {
   override def project(params: ParameterArray): Point2d = {
-    var xVal: Double = 0
-    var yVal: Double = 0
-    for (i <- 0 until params.size) {
+    val (xSum, ySum) = (0 until params.size).foldLeft((0.0, 0.0)) { case ((xAcc, yAcc), i) =>
       val v = params.get(i).getValue
-      if (i % 2 == 0) xVal += v
-      else yVal += v
+      if (i % 2 == 0) (xAcc + v, yAcc) else (xAcc, yAcc + v)
     }
-    if (!hasEvenIndexedParams(params)) xVal = yVal
-    else if (!hasOddIndexedParams(params)) yVal = xVal
+    val xVal = if (!hasEvenIndexedParams(params)) ySum else xSum
+    val yVal = if (!hasOddIndexedParams(params)) xSum else ySum
     new Point2d(xVal, yVal)
   }
 
@@ -48,13 +45,10 @@ class SimpleProjector extends Projector {
   private def rangeHasPositiveExtent(r: Range): Boolean = r.getExtent > 0
 
   private def findRange(params: ParameterArray, modulus: Int) = {
-    var min: Double = 0
-    var max: Double = 0
-    for (i <- 0 until params.size) {
-      if (i % 2 == modulus) {
-        min += params.get(i).minValue
-        max += params.get(i).maxValue
-      }
+    val (min, max) = (0 until params.size).foldLeft((0.0, 0.0)) { case ((minAcc, maxAcc), i) =>
+      if (i % 2 == modulus)
+        (minAcc + params.get(i).minValue, maxAcc + params.get(i).maxValue)
+      else (minAcc, maxAcc)
     }
     Range(min, max)
   }

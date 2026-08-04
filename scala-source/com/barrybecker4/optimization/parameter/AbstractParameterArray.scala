@@ -20,9 +20,8 @@ abstract class AbstractParameterArray(params: IndexedSeq[Parameter] = IndexedSeq
     extends ParameterArray {
 
   override def getSamplePopulationSize: Int = {
-    var pop = 1
-    for (param <- params) {
-      pop *= (if (param.isIntegerOnly) 4 else 12)
+    val pop = params.foldLeft(1) { (acc, param) =>
+      acc * (if (param.isIntegerOnly) 4 else 12)
     }
     Math.min(AbstractParameterArray.POPULATION_MAX, pop)
   }
