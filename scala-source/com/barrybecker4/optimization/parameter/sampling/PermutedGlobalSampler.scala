@@ -10,7 +10,6 @@ import com.barrybecker4.optimization.parameter.PermutedParameterArray
 import PermutedGlobalSampler.CLOSE_FACTOR
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
-import scala.compiletime.uninitialized
 
 
 object PermutedGlobalSampler {
@@ -48,10 +47,8 @@ class PermutedGlobalSampler(var params: PermutedParameterArray, val requestedNum
   }
 
   /** Used to enumerate all possible permutations when doing exhaustive search */
-  private var permuter: Permuter = uninitialized
-
-  if (useExhaustiveSearch)
-    permuter = new Permuter(params.size)
+  private val permuter: Option[Permuter] =
+    if (useExhaustiveSearch) Some(new Permuter(params.size)) else None
 
   /** used to cache the samples already tried so we do not repeat them if the requestedNumSamples is small */
   private val globalSamples = new ArrayBuffer[ParameterArray]()
@@ -84,8 +81,6 @@ class PermutedGlobalSampler(var params: PermutedParameterArray, val requestedNum
     * @return the next exhaustive sample.
     */
   private def getNextExhaustiveSample = {
-    val pParams = params.setPermutation(permuter.next())
-    //hasNext = permuter.hasNext()
-    pParams
+    params.setPermutation(permuter.get.next())
   }
 }
