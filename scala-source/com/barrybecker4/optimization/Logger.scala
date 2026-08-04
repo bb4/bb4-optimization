@@ -15,8 +15,8 @@ object Logger {
   * Logger for use with optimizer algorithms.
   * @author Barry Becker
   */
-class Logger(var sLogFile: String) {
-  assert(sLogFile != null)
+class Logger(val sLogFile: String) {
+  require(sLogFile != null, "log file path must not be null")
 
   /** Create and init the log file.
     * @param params used to determine param names.
@@ -73,10 +73,6 @@ class Logger(var sLogFile: String) {
       $sep${FormatUtil.formatNumber(jumpSize)}
       $sep${FormatUtil.formatNumber(distance)}
       $sep${params.toCSVString}$sep$comment"""
-    if (sLogFile == null) {
-      println("<no logfile>: " + rowText)
-      return
-    }
     try { // append to existing log file.
       val logFile = new FileWriter(sLogFile, true)
       logFile.write(rowText + '\n')
