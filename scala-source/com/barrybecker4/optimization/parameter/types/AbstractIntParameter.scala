@@ -4,7 +4,7 @@ package com.barrybecker4.optimization.parameter.types
 import com.barrybecker4.math.MathUtil
 import com.barrybecker4.optimization.parameter.Direction
 import com.barrybecker4.optimization.parameter.ParameterChangeListener
-import com.barrybecker4.optimization.parameter.redistribution.{DiscreteRedistribution, RedistributionFunction}
+import com.barrybecker4.optimization.parameter.redistribution.RedistributionFunction
 import com.barrybecker4.optimization.parameter.ui.{DoubleParameterWidget, ParameterWidget}
 import scala.util.Random
 
