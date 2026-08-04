@@ -2,7 +2,6 @@
 package com.barrybecker4.optimization.parameter.ui
 
 import com.barrybecker4.optimization.parameter.ParameterChangeListener
-import com.barrybecker4.optimization.parameter.types.BooleanParameter
 import com.barrybecker4.optimization.parameter.types.Parameter
 import javax.swing._
 import java.awt._
@@ -17,17 +16,14 @@ import scala.compiletime.uninitialized
 class BooleanParameterWidget(param: Parameter, val listener: ParameterChangeListener)
     extends ParameterWidget(param, listener) with ItemListener {
 
-  private val bparam: BooleanParameter = param match
-    case b: BooleanParameter => b
-    case _ => throw new IllegalArgumentException("Expected BooleanParameter, got " + param.getClass.getName)
-
+  // Not a val used by addChildren: parent ctor calls addChildren before subclass fields init.
   private var cb: JCheckBox = uninitialized
 
   /** Create a ui widget appropriate for the parameter type. */
   override protected def addChildren(): Unit = {
     cb = new JCheckBox
     cb.setText(parameter.name)
-    cb.setSelected(bparam.getNaturalValue.asInstanceOf[Boolean])
+    cb.setSelected(parameter.getNaturalValue.asInstanceOf[Boolean])
     cb.addItemListener(this)
     add(cb, BorderLayout.CENTER)
   }

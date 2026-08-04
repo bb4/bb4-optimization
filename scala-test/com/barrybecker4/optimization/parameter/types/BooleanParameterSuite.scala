@@ -30,4 +30,11 @@ class BooleanParameterSuite extends ParameterSuite[Boolean] {
 
   override protected def expectedRandomValues: Array[Boolean] =
     Array[Boolean](true, false, false, false, true, false, true, true, true, true)
+
+  /** Regression: parent ParameterWidget ctor calls addChildren before subclass fields init. */
+  test("createWidget does not NPE") {
+    val param = createParameter
+    val widget = param.createWidget(_ => ())
+    assert(widget != null)
+  }
 }
