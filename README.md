@@ -1,22 +1,31 @@
 # bb4-optimization
 
-A collection of heuristic optimization algorithms.
-The algorithms are implemented mostly as described by Michalewicz and Fogel in ["How to Solve It: Modern Heuristics"](http://www.amazon.com/How-Solve-It-Modern-Heuristics/dp/3540224947)
+[![CI](https://github.com/bb4/bb4-optimization/actions/workflows/ci.yml/badge.svg)](https://github.com/bb4/bb4-optimization/actions/workflows/ci.yml)
 
-An Optimizer uses a specified optimization strategy (see OptimizationStrategyType) to optimize an Optimizee.
-Optimization is nearly the same thing as search. In [bb4-puzzles](https://github.com/bb4/bb4-puzzles), [bb4-games](https://github.com/bb4/bb4-games), and [bb4-simulations](https://github.com/bb4/bb4-simulations) implementations, various types of optimization strategies from this library are used to search for solutions.
+Heuristic search and optimization algorithms for continuous and discrete parameter spaces. Implement an `Optimizee`, pick a strategy (hill climbing, simulated annealing, genetic search, and others), and let `Optimizer` find a good solution — used by [bb4-puzzles](https://github.com/bb4/bb4-puzzles), [bb4-games](https://github.com/bb4/bb4-games), and [bb4-simulations](https://github.com/bb4/bb4-simulations). Algorithms largely follow Michalewicz and Fogel's [*How to Solve It: Modern Heuristics*](https://www.amazon.com/How-Solve-It-Modern-Heuristics/dp/3540224947).
 
-### How to Build
-Type 'gradlew build' at the root (or ./gradlew if running in Cygwin). This is mainly a library project, but there are several interesting test cases that can be viewed visually.
-If you want to open the source in Intellij, then first run 'gradlew idea'.
-There is a simple visualization of a trivial optimization problem that can be viewed by running 'gradlew run'.
+## Using it
 
-When there is a new release, versioned artifacts will be published by Barry Becker to [Sonatype](https://oss.sonatype.org).
+```groovy
+implementation 'com.barrybecker4:bb4-optimization:2.0.0'
+```
 
-### License
-All source (unless otherwise specified in individual file) is provided under the [MIT License](http://www.opensource.org/licenses/MIT)
+See the [releases page](https://github.com/bb4/bb4-optimization/releases) or [Maven Central](https://central.sonatype.com/artifact/com.barrybecker4/bb4-optimization) for newer versions.
 
+## What's inside
 
+- **`Optimizer`** — facade that runs a chosen strategy against an `Optimizee` (optional logging, listeners, evaluation budget)
+- **`Optimizee` / `AbsoluteOptimizee`** — interface (and absolute-fitness adapter) for the thing being optimized; fitness is minimized (0 is best)
+- **`BudgetedOptimizee`** — wraps an optimizee with a hard evaluation limit
+- **`DiscreteStateSpace`** — marker for discrete problems used with state-space search
+- **`OptimizationStrategyType`** — hill climbing, global sampling / global hill climbing, simulated annealing, genetic search (including concurrent), state-space search, and brute force
+- **`parameter`** — typed parameters (`DoubleParameter`, `IntegerParameter`, `BooleanParameter`, …), arrays (`NumericParameterArray`, `PermutedParameterArray`, `VariableLengthIntSet`), sampling, distance metrics, and optional redistribution functions
+- **`viewer` / `OptimizerEvalApp`** — Swing UI that visualizes strategies on demo problems (`./gradlew run`)
 
+## Building from source
 
+See the [Building bb4 Projects wiki](https://github.com/bb4/bb4-common/wiki/Building-bb4-Projects).
 
+## License
+
+MIT — see [LICENSE](LICENSE).
