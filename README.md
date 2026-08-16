@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/bb4/bb4-optimization/actions/workflows/ci.yml/badge.svg)](https://github.com/bb4/bb4-optimization/actions/workflows/ci.yml)
 
-📊 [Build status for all bb4 projects](https://github.com/bb4)
+📊 [Build status for all bb4 projects](https://github.com/bb4/.github)
 
 Heuristic search and optimization algorithms for continuous and discrete parameter spaces. Implement an `Optimizee`, pick a strategy (hill climbing, simulated annealing, genetic search, and others), and let `Optimizer` find a good solution — used by [bb4-puzzles](https://github.com/bb4/bb4-puzzles), [bb4-games](https://github.com/bb4/bb4-games), and [bb4-simulations](https://github.com/bb4/bb4-simulations). Algorithms largely follow Michalewicz and Fogel's [*How to Solve It: Modern Heuristics*](https://www.amazon.com/How-Solve-It-Modern-Heuristics/dp/3540224947).
 
