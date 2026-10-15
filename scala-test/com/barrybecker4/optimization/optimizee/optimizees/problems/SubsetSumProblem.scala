@@ -19,7 +19,7 @@ object SubsetSumProblem {
     val initialGuess = problem.getInitialGuess
     //System.out.println("initial guess=" + initialGuess + " all=" + initialGuess.asInstanceOf[VariableLengthIntSet].getMaxLength)
     val solution = optimizer.doOptimization(GLOBAL_HILL_CLIMBING,
-      initialGuess, problem.getFitnessRange, new Random(1))
+      initialGuess, problem.getFitnessRange, new Random(1)).best
     OptimizeeProblem.showSolution(problem, solution)
   }
 }

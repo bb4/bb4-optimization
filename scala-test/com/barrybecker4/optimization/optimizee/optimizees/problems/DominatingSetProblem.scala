@@ -27,7 +27,7 @@ object DominatingSetProblem {
     val optimizer = new Optimizer(problem, Some(LOG_FILE_HOME + "domSet_optimization.txt"))
     val initialGuess = problem.getInitialGuess
     val solution = optimizer.doOptimization(SIMULATED_ANNEALING,
-      initialGuess, v.getFitnessRange, new Random(1))
+      initialGuess, v.getFitnessRange, new Random(1)).best
     showSolution(problem, solution)
   }
 }

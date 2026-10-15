@@ -30,6 +30,41 @@ class GlobalHillClimbingStrategySuite extends AnyFunSuite {
       s"multistart should not regress vs single-seed; got r1=${r1.fitness} r2=${r2.fitness}")
     assert(r2.fitness < 1.0e-4)
   }
+
+  test("diverse multistart reaches lower fitness than fitness-only seeds on double well") {
+    val rnd = new Random(17)
+    val optimizee = new DoubleWellOptimizee()
+    val initial = NumericParameterArray(
+      IndexedSeq(DoubleParameter(value = 8.0, minValue = -10.0, maxValue = 10.0, name = "x")),
+      rnd = rnd
+    )
+    val fitnessRange = 100.0
+
+    val topOnly = new GlobalHillClimbingStrategy(optimizee)
+    topOnly.setConfig(
+      GlobalHillClimbingConfig(
+        multistartCount = 2,
+        globalSampleBudget = 100,
+        seedSelection = SeedSelection.TopFitness
+      )
+    )
+
+    val diverse = new GlobalHillClimbingStrategy(optimizee)
+    diverse.setConfig(
+      GlobalHillClimbingConfig(
+        multistartCount = 2,
+        globalSampleBudget = 100,
+        seedSelection = SeedSelection.DiverseFromTopM(topM = 50, minSeparation = 0.15)
+      )
+    )
+
+    val rTop = topOnly.doOptimization(initial, fitnessRange)
+    val rDiv = diverse.doOptimization(initial, fitnessRange)
+
+    assert(rDiv.fitness <= rTop.fitness + 1.0e-9,
+      s"diverse should not lose to top-fitness; top=${rTop.fitness} diverse=${rDiv.fitness}")
+    assert(rDiv.fitness < 1.0, s"expected near-global minimum, got ${rDiv.fitness}")
+  }
 }
 
 private final class UnimodalQuadraticOptimizee(target: Double) extends Optimizee {

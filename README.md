@@ -16,11 +16,12 @@ See the [releases page](https://github.com/bb4/bb4-optimization/releases) or [Ma
 
 ## What's inside
 
-- **`Optimizer`** — facade that runs a chosen strategy against an `Optimizee` (optional logging, listeners, evaluation budget)
+- **`Optimizer`** — facade that runs a chosen strategy against an `Optimizee`; returns **`OptimizationResult`** (`best`, `status`, optional `evaluationsUsed`) with optional logging, listeners, and evaluation budget
+- **`OptimizationResult` / `OptimizationStatus`** — when `maxEvaluations` is set, exceeding the budget yields `BudgetExhausted` and **`best` is best-so-far** (no exception to the caller)
 - **`Optimizee` / `AbsoluteOptimizee`** — interface (and absolute-fitness adapter) for the thing being optimized; fitness is minimized (0 is best)
 - **`BudgetedOptimizee`** — wraps an optimizee with a hard evaluation limit
 - **`DiscreteStateSpace`** — marker for discrete problems used with state-space search
-- **`OptimizationStrategyType`** — hill climbing, global sampling / global hill climbing, simulated annealing, genetic search (including concurrent), state-space search, and brute force
+- **`OptimizationStrategyType`** — hill climbing, global sampling / **global hill climbing** (diverse multistart seeds via `GlobalHillClimbingConfig`), simulated annealing, genetic search (including concurrent), state-space search, and brute force
 - **`parameter`** — typed parameters (`DoubleParameter`, `IntegerParameter`, `BooleanParameter`, …), arrays (`NumericParameterArray`, `PermutedParameterArray`, `VariableLengthIntSet`), sampling, distance metrics, and optional redistribution functions
 - **`viewer` / `OptimizerEvalApp`** — Swing UI that visualizes strategies on demo problems (`./gradlew run`)
 

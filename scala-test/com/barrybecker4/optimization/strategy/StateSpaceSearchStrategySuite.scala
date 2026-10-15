@@ -18,7 +18,7 @@ class StateSpaceSearchStrategySuite extends AnyFunSuite {
     val problem = new LineGraphTestProblem(target = 7, lo = 0, hi = 20, rnd = rnd)
     val opt = new Optimizer(problem)
     val guess = new NumericParameterArray(IndexedSeq(new IntegerParameter(0, 0, 20, "x")), rnd = rnd)
-    val sol = opt.doOptimization(STATE_SPACE_SEARCH, guess, 100.0, rnd)
+    val sol = opt.doOptimization(STATE_SPACE_SEARCH, guess, 100.0, rnd).best
     assert(sol.fitness == 0.0)
     assert(sol.pa.get(0).getValue.toInt == 7)
   }
@@ -29,7 +29,7 @@ class StateSpaceSearchStrategySuite extends AnyFunSuite {
     val problem = new DiscreteGrid2DDemoProblem()
     val opt = new Optimizer(problem)
     val guess = problem.getInitialGuess
-    val sol = opt.doOptimization(STATE_SPACE_SEARCH, guess, problem.getFitnessRange, rnd)
+    val sol = opt.doOptimization(STATE_SPACE_SEARCH, guess, problem.getFitnessRange, rnd).best
     assert(sol.fitness == 0.0)
     assert(sol.pa.get(0).getValue.toInt == 8)
     assert(sol.pa.get(1).getValue.toInt == 8)

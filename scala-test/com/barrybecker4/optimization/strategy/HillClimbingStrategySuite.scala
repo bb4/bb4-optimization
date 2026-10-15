@@ -19,7 +19,7 @@ class HillClimbingStrategySuite extends AnyFunSuite {
       rnd = rnd
     )
 
-    val solution = optimizer.doOptimization(HILL_CLIMBING, initial, fitnessRange = 100.0, rnd = rnd)
+    val solution = optimizer.doOptimization(HILL_CLIMBING, initial, fitnessRange = 100.0, rnd = rnd).best
     assert(solution.fitness < 1.0e-5)
     assert(math.abs(solution.pa.get(0).getValue - 2.0) < 0.02)
   }
@@ -33,7 +33,7 @@ class HillClimbingStrategySuite extends AnyFunSuite {
       rnd = rnd
     )
 
-    val solution = optimizer.doOptimization(HILL_CLIMBING, initial, fitnessRange = 100.0, rnd = rnd)
+    val solution = optimizer.doOptimization(HILL_CLIMBING, initial, fitnessRange = 100.0, rnd = rnd).best
     val expectedFitness = optimizee.compareFitness(solution.pa, initial)
     assert(math.abs(solution.fitness - expectedFitness) < 1.0e-9)
     assert(solution.fitness < 0.0)
@@ -53,7 +53,7 @@ class HillClimbingStrategySuite extends AnyFunSuite {
       rnd
     )
 
-    val solution = optimizer.doOptimization(HILL_CLIMBING, initial, fitnessRange = 10.0, rnd = rnd)
+    val solution = optimizer.doOptimization(HILL_CLIMBING, initial, fitnessRange = 10.0, rnd = rnd).best
     val expectedFitness = optimizee.compareFitness(solution.pa, initial)
     assert(math.abs(solution.fitness - expectedFitness) < 1.0e-9)
   }

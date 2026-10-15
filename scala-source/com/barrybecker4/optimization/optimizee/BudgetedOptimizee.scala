@@ -16,9 +16,13 @@ class EvaluationBudgetExceededException(val maxEvaluations: Int)
 class BudgetedOptimizee(delegate: Optimizee, val maxEvaluations: Int) extends Optimizee {
 
   private var count = 0
+  private var budgetExhausted = false
 
   /** Number of objective evaluations consumed so far. */
   def evaluationsUsed: Int = count
+
+  /** True after a call was rejected because the evaluation limit was reached. */
+  def wasBudgetExhausted: Boolean = budgetExhausted
 
   override def getName: String = delegate.getName
 
@@ -37,7 +41,10 @@ class BudgetedOptimizee(delegate: Optimizee, val maxEvaluations: Int) extends Op
   override def getOptimalFitness: Double = delegate.getOptimalFitness
 
   private def bump(): Unit = {
-    if (count >= maxEvaluations) throw new EvaluationBudgetExceededException(maxEvaluations)
+    if (count >= maxEvaluations) {
+      budgetExhausted = true
+      throw new EvaluationBudgetExceededException(maxEvaluations)
+    }
     count += 1
   }
 }

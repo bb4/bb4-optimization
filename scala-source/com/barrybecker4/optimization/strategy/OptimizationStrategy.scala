@@ -17,6 +17,8 @@ abstract class OptimizationStrategy(var optimizee: Optimizee) {
   protected var diagnostics: OptimizationDiagnostics = OptimizationDiagnostics.Silence
   /** listen for optimization changed events. useful for debugging.  */
   protected var listener: Option[OptimizationListener] = None
+  /** Best parameters observed during this run (via [[notifyOfChange]]). */
+  private var runBest: Option[ParameterArrayWithFitness] = None
 
   /** @param logger the file that will record the results */
   def setLogger(logger: Logger): Unit = {
@@ -43,6 +45,19 @@ abstract class OptimizationStrategy(var optimizee: Optimizee) {
     fileLogger.foreach(_.write(iteration, params.fitness, jumpSize, deltaFitness, params.pa, msg))
   }
 
+  /** Best point seen so far this run, if any. */
+  def bestSoFar: Option[ParameterArrayWithFitness] = runBest
+
+  /**
+    * Copy logger, listener, and diagnostics onto a nested strategy so composite runs
+    * (e.g. global hill climbing) share one configuration.
+    */
+  protected def copyRunConfigurationTo(child: OptimizationStrategy): Unit = {
+    fileLogger.foreach(child.setLogger)
+    listener.foreach(child.setListener)
+    child.setDiagnostics(diagnostics)
+  }
+
   /** @param initialParams the initial guess at the solution.
     * @param fitnessRange  the approximate absolute value of the fitnessRange.
     * @return optimized parameters.
@@ -64,6 +79,12 @@ abstract class OptimizationStrategy(var optimizee: Optimizee) {
     }
 
   private[strategy] def notifyOfChange(params: ParameterArrayWithFitness): Unit = {
+    updateRunBest(params)
     listener.foreach(_.optimizerChanged(params))
+  }
+
+  /** Record `params` as the run champion when it improves on [[runBest]]. */
+  protected final def updateRunBest(params: ParameterArrayWithFitness): Unit = {
+    if (runBest.forall(_.fitness > params.fitness)) runBest = Some(params)
   }
 }

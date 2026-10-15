@@ -2,7 +2,7 @@
 package com.barrybecker4.optimization
 
 import com.barrybecker4.math.MathUtil
-import com.barrybecker4.optimization.optimizee.{BudgetedOptimizee, Optimizee}
+import com.barrybecker4.optimization.optimizee.{BudgetedOptimizee, EvaluationBudgetExceededException, Optimizee}
 import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType
 
@@ -45,21 +45,22 @@ class Optimizer(val optimizee: Optimizee, optimizationLogFile: Option[String] = 
     *                         epsilon from `fitnessRange / 100_000_000`. It need not be exact; order-of-magnitude is enough.
     * @param rnd              random source for stochastic strategies
     * @param maxEvaluations   if set, wraps the optimizee so each call to `evaluateFitness` or `compareFitness`
-    *                         counts toward a budget; exceeding it throws
-    *                         [[com.barrybecker4.optimization.optimizee.EvaluationBudgetExceededException]]
+    *                         counts toward a budget; when exceeded, returns best-so-far with
+    *                         [[OptimizationStatus.BudgetExhausted]] instead of throwing
     * @param verbose          when true, strategies may print diagnostic traces to the console (off by default)
-    * @return the solution to the optimization problem.
+    * @return [[OptimizationResult]] with the best parameters found and run status
     */
   def doOptimization(optimizationType: OptimizationStrategyType,
                      params: ParameterArray, fitnessRange: Double,
                      rnd: Random = MathUtil.RANDOM,
                      maxEvaluations: Option[Int] = None,
-                     verbose: Boolean = false): ParameterArrayWithFitness = {
+                     verbose: Boolean = false): OptimizationResult = {
 
-    val target: Optimizee = maxEvaluations match {
-      case Some(n) if n > 0 => new BudgetedOptimizee(optimizee, n)
-      case _ => optimizee
+    val budgeted: Option[BudgetedOptimizee] = maxEvaluations match {
+      case Some(n) if n > 0 => Some(new BudgetedOptimizee(optimizee, n))
+      case _ => None
     }
+    val target: Optimizee = budgeted.getOrElse(optimizee)
 
     val optStrategy = optimizationType.getStrategy(target, fitnessRange, rnd)
     logger.foreach { log =>
@@ -68,7 +69,29 @@ class Optimizer(val optimizee: Optimizee, optimizationLogFile: Option[String] = 
     }
     listener.foreach(optStrategy.setListener)
     if (verbose) optStrategy.setVerbose(true)
-    optStrategy.doOptimization(params, fitnessRange)
+
+    try {
+      val best = optStrategy.doOptimization(params, fitnessRange)
+      val champion = optStrategy.bestSoFar.filter(_.fitness < best.fitness).getOrElse(best)
+      if (budgeted.exists(_.wasBudgetExhausted)) {
+        OptimizationResult(
+          champion,
+          OptimizationStatus.BudgetExhausted,
+          budgeted.map(_.maxEvaluations)
+        )
+      } else {
+        val status =
+          if (!optimizee.evaluateByComparison && champion.fitness <= optimizee.getOptimalFitness)
+            OptimizationStatus.OptimalReached
+          else OptimizationStatus.Completed
+        OptimizationResult(champion, status, budgeted.map(_.evaluationsUsed))
+      }
+    } catch {
+      case e: EvaluationBudgetExceededException =>
+        val fallback = ParameterArrayWithFitness(params, Double.MaxValue)
+        val best = optStrategy.bestSoFar.getOrElse(fallback)
+        OptimizationResult(best, OptimizationStatus.BudgetExhausted, Some(e.maxEvaluations))
+    }
   }
 
   def setListener(lnr: OptimizationListener): Unit = {

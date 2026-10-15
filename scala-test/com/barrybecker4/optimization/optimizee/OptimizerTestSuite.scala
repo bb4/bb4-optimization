@@ -31,7 +31,8 @@ object OptimizerTestSuite {
                            errorThresh: Double, title: String): Unit = {
     System.out.println(title + "\nabout to apply " + optType + " to " + problem.getName +
       " with initial guess = " + initialGuess + ".")
-    val solution = optimizer.doOptimization(optType, initialGuess, fitnessRange, new Random(1))
+    val result = optimizer.doOptimization(optType, initialGuess, fitnessRange, new Random(1))
+    val solution = result.best
     val error = problem.getError(solution)
     assert(error <= errorThresh,
       s"*** $title ***\nAllowable error ($errorThresh) was exceeded using $optType" +

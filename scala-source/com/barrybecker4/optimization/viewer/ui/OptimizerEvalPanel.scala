@@ -252,7 +252,7 @@ private class OptimizationSwingWorker(
 
   override def doInBackground(): Option[ParameterArrayWithFitness] = {
     ctx.optimizer.setListener(p => publish(p))
-    try Some(ctx.optimizer.doOptimization(strategy, ctx.initialGuess, ctx.fitnessRange))
+    try Some(ctx.optimizer.doOptimization(strategy, ctx.initialGuess, ctx.fitnessRange).best)
     catch
       case e: AbstractMethodError       => logFailure(e); None
       case e: IllegalArgumentException => logFailure(e); None

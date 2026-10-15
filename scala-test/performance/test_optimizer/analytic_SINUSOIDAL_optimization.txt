@@ -1,1 +1,21 @@
 iteration,	fitness,	jumpSize,	dotprod,	p1,	p2,	comment 
+0,	0.08836
+      ,	0
+      ,	0
+      ,	1.29, 1.935,	initial test
+0,	250.1
+      ,	0
+      ,	0
+      ,	-9.677, -9.677,	initial test
+0,	172.9
+      ,	0
+      ,	0
+      ,	-9.677, 9.677,	initial test
+0,	104.3
+      ,	0
+      ,	0
+      ,	-9.032, 0,	initial test
+0,	156.4
+      ,	0
+      ,	0
+      ,	-9.677, -4.516,	initial test
