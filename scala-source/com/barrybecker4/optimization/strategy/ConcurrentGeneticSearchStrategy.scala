@@ -10,17 +10,25 @@ import scala.util.Random
 import scala.collection.parallel.CollectionConverters._
 
 /**
-  * Concurrent (i.e. parallelized) Genetic Algorithm (evolutionary) optimization strategy.
-  * Many different strategies are possible to alter the population for each successive iteration.
-  * The 2 primary ones that I use here are unary mutation and cross-over.
-  * See Chapter 6 in "How to Solve it: Modern Heuristics" for more info.
+  * Concurrent (parallelized) Genetic Algorithm optimization strategy.
+  *
+  * Parallelizes:
+  *  - compare-mode population re-evaluation vs a generation baseline
+  *  - batch offspring fitness evaluation ([[evaluateOffspring]]) for initial seeding and refill
+  *
+  * Parent selection, crossover, and neighbor proposal stay on the calling thread.
+  *
+  * '''Thread safety:''' the [[Optimizee]] must be safe for concurrent `evaluateFitness` /
+  * `compareFitness` calls (typical for immutable puzzle/sim objectives). If the optimizee
+  * mutates shared state, use [[GeneticSearchStrategy]] instead or synchronize externally.
+  *
   * @param optimizee the thing to be optimized.
   * @author Barry Becker
   */
 class ConcurrentGeneticSearchStrategy(
     optimizee: Optimizee,
     rnd: Random = MathUtil.RANDOM,
-    config: GeneticConfig = GeneticConfig()
+    config: GeneticSearchConfig = GeneticSearchConfig.default
 ) extends GeneticSearchStrategy(optimizee, rnd, config) {
 
   /**
@@ -38,5 +46,19 @@ class ConcurrentGeneticSearchStrategy(
       population(i) = updated(i)
       i += 1
     }
+  }
+
+  /**
+    * Parallel fitness evaluation of offspring; results are returned in the same order as `candidates`
+    * so merge order stays deterministic for a fixed proposal sequence.
+    */
+  override protected def evaluateOffspring(
+      candidates: Seq[ParameterArray],
+      generationBaseline: ParameterArray
+  ): Seq[ParameterArrayWithFitness] = {
+    if (candidates.isEmpty) return IndexedSeq.empty
+    candidates.indices.par.map { i =>
+      i -> evaluateParameterArray(candidates(i), generationBaseline)
+    }.toIndexedSeq.sortBy(_._1).map(_._2)
   }
 }

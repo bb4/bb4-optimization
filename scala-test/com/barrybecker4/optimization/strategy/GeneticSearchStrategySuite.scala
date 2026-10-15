@@ -89,13 +89,77 @@ class GeneticSearchStrategySuite extends AnyFunSuite {
     assert(optimizee.compareFitness(result.pa, result.pa).abs < 1e-9)
   }
 
-  test("GeneticConfig disables crossover without throwing") {
+  test("GeneticSearchConfig disables crossover without throwing") {
     val rnd = new Random(17)
     val optimizee = new RecordingOptimizee
-    val strategy = new GeneticSearchStrategy(optimizee, rnd, GeneticConfig(crossoverEnabled = false))
+    val strategy = new GeneticSearchStrategy(optimizee, rnd, GeneticSearchConfig(crossoverEnabled = false))
     val seed = NumericParameterArraySuiteLike.twoDoubleParams(0.3, -0.4)
     val result = strategy.doOptimization(seed, fitnessRange = 50.0)
     assert(result.pa != null)
+  }
+
+  test("sameSolution treats equal-valued distinct arrays as duplicates") {
+    val a = NumericParameterArraySuiteLike.twoDoubleParams(1.0, 2.0)
+    val b = NumericParameterArraySuiteLike.twoDoubleParams(1.0, 2.0)
+    assert(a ne b)
+    assert(GeneticSearchStrategy.sameSolution(a, b))
+    assert(!GeneticSearchStrategy.sameSolution(a, NumericParameterArraySuiteLike.twoDoubleParams(1.0, 3.0)))
+  }
+
+  test("elitism reinjects champion after cull when missing from keepers") {
+    val rnd = new Random(19)
+    val optimizee = new RecordingOptimizee
+    val strategy = new GeneticSearchStrategy(optimizee, rnd, GeneticSearchConfig(elitismEnabled = true))
+    val best = NumericParameterArraySuiteLike.twoDoubleParams(0.0, 0.0)
+    val worse = NumericParameterArraySuiteLike.twoDoubleParams(5.0, 5.0)
+    val champ = ParameterArrayWithFitness(best, 0.0)
+    strategy.setGlobalChampionForTesting(champ)
+    val pop = ArrayBuffer(
+      ParameterArrayWithFitness(worse, 10.0),
+      ParameterArrayWithFitness(NumericParameterArraySuiteLike.twoDoubleParams(4.0, 4.0), 8.0)
+    )
+    strategy.ensureEliteForTesting(pop)
+    assert(pop.exists(m => GeneticSearchStrategy.sameSolution(m.pa, best)))
+  }
+
+  test("SingleSample neighbor mode uses fewer evals than GreedyImproveAbsolute") {
+    def mkPopulation(optimizee: RecordingOptimizee): ArrayBuffer[ParameterArrayWithFitness] = {
+      val a = NumericParameterArraySuiteLike.twoDoubleParams(1.0, 2.0)
+      val b = NumericParameterArraySuiteLike.twoDoubleParams(-1.0, 3.0)
+      val c = NumericParameterArraySuiteLike.twoDoubleParams(0.5, -2.0)
+      ArrayBuffer(
+        ParameterArrayWithFitness(a, optimizee.evaluateFitness(a)),
+        ParameterArrayWithFitness(b, optimizee.evaluateFitness(b)),
+        ParameterArrayWithFitness(c, optimizee.evaluateFitness(c))
+      )
+    }
+
+    val greedyOpt = new RecordingOptimizee
+    val greedy = new GeneticSearchStrategy(
+      greedyOpt, new Random(23), GeneticSearchConfig(
+        crossoverEnabled = false,
+        neighborSelection = NeighborSelection.GreedyImproveAbsolute
+      )
+    )
+    val greedyPop = mkPopulation(greedyOpt)
+    greedyOpt.evaluateFitnessCalls.clear()
+    greedy.refillAfterCullForTesting(greedyPop, keepSize = 3, greedyPop.head.pa, desiredPopSize = 12)
+    val greedyEvals = greedyOpt.evaluateFitnessCalls.size
+
+    val singleOpt = new RecordingOptimizee
+    val single = new GeneticSearchStrategy(
+      singleOpt, new Random(23), GeneticSearchConfig(
+        crossoverEnabled = false,
+        neighborSelection = NeighborSelection.SingleSample
+      )
+    )
+    val singlePop = mkPopulation(singleOpt)
+    singleOpt.evaluateFitnessCalls.clear()
+    single.refillAfterCullForTesting(singlePop, keepSize = 3, singlePop.head.pa, desiredPopSize = 12)
+    val singleEvals = singleOpt.evaluateFitnessCalls.size
+
+    assert(singleEvals < greedyEvals,
+      s"expected SingleSample fewer evals; single=$singleEvals greedy=$greedyEvals")
   }
 }
 

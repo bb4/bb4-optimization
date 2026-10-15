@@ -21,7 +21,8 @@ See the [releases page](https://github.com/bb4/bb4-optimization/releases) or [Ma
 - **`Optimizee` / `AbsoluteOptimizee`** — interface (and absolute-fitness adapter) for the thing being optimized; fitness is minimized (0 is best)
 - **`BudgetedOptimizee`** — wraps an optimizee with a hard evaluation limit
 - **`DiscreteStateSpace`** — marker for discrete problems used with state-space search
-- **`OptimizationStrategyType`** — hill climbing, global sampling / **global hill climbing** (diverse multistart seeds via `GlobalHillClimbingConfig`), simulated annealing, genetic search (including concurrent), state-space search, and brute force
+- **`OptimizationStrategyType`** — hill climbing, global sampling / **global hill climbing** (diverse multistart seeds via `GlobalHillClimbingConfig`), simulated annealing, **genetic / concurrent genetic** (`GeneticSearchConfig`: elitism, cull/crossover, neighbor modes, budget-safe evolve), state-space search, and brute force
+- **`GeneticSearchConfig` / `NeighborSelection`** — tunables for genetic search; concurrent genetic parallelizes offspring evaluation (optimizee must be thread-safe for `evaluateFitness` / `compareFitness`)
 - **`parameter`** — typed parameters (`DoubleParameter`, `IntegerParameter`, `BooleanParameter`, …), arrays (`NumericParameterArray`, `PermutedParameterArray`, `VariableLengthIntSet`), sampling, distance metrics, and optional redistribution functions
 - **`viewer` / `OptimizerEvalApp`** — Swing UI that visualizes strategies on demo problems (`./gradlew run`)
 

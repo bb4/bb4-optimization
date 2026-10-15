@@ -3,7 +3,7 @@ package com.barrybecker4.optimization.optimizee
 import com.barrybecker4.optimization.{OptimizationStatus, Optimizer}
 import com.barrybecker4.optimization.parameter.NumericParameterArray
 import com.barrybecker4.optimization.parameter.types.{DoubleParameter, IntegerParameter}
-import com.barrybecker4.optimization.strategy.{DoubleWellOptimizee, GLOBAL_HILL_CLIMBING, HILL_CLIMBING}
+import com.barrybecker4.optimization.strategy.{DoubleWellOptimizee, GENETIC_SEARCH, GLOBAL_HILL_CLIMBING, HILL_CLIMBING}
 import org.scalatest.funsuite.AnyFunSuite
 
 import scala.util.Random
@@ -35,5 +35,20 @@ class BudgetedOptimizeeSuite extends AnyFunSuite {
     assert(result.status == OptimizationStatus.BudgetExhausted)
     assert(result.best.fitness < initialFitness,
       s"expected best-so-far to improve on initial guess; got ${result.best.fitness} vs initial $initialFitness")
+  }
+
+  test("genetic search returns best-so-far when budget exhausted") {
+    val rnd = new Random(5)
+    val optimizee = new DoubleWellOptimizee()
+    val guess = NumericParameterArray(
+      IndexedSeq(DoubleParameter(value = 8.0, minValue = -10.0, maxValue = 10.0, name = "x")),
+      rnd = rnd
+    )
+    val initialFitness = optimizee.evaluateFitness(guess)
+    val opt = new Optimizer(optimizee)
+    val result = opt.doOptimization(GENETIC_SEARCH, guess, 100.0, rnd, maxEvaluations = Some(80))
+    assert(result.status == OptimizationStatus.BudgetExhausted)
+    assert(result.best.fitness <= initialFitness,
+      s"expected best-so-far not worse than initial; got ${result.best.fitness} vs initial $initialFitness")
   }
 }
