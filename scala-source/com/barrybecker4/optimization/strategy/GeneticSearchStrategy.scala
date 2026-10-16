@@ -33,8 +33,6 @@ object GeneticSearchStrategy {
   * See Chapter 6 in "How to Solve it: Modern Heuristics" for more info.
   *
   * @param optimizee the thing to be optimized.
-  * @param config    per-instance genetic options (defaults preserve prior behavior).
-  * @author Barry Becker
   */
 class GeneticSearchStrategy(
     optimizee: Optimizee,

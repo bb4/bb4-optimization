@@ -12,6 +12,7 @@ class GlobalSampleStrategySuite extends AnyFunSuite {
   test("diverse topK selects well-separated seeds on a flat landscape") {
     val rnd = new Random(42)
     val optimizee = new FlatLandscapeOptimizee()
+    
     val initial = NumericParameterArray(
       IndexedSeq(
         DoubleParameter(value = 0.0, minValue = -10.0, maxValue = 10.0, name = "x"),
@@ -20,6 +21,7 @@ class GlobalSampleStrategySuite extends AnyFunSuite {
       rnd = rnd
     )
     val gs = new GlobalSampleStrategy(optimizee)
+    
     gs.setSamplingRate(100)
 
     val diverse = gs.doOptimizationTopK(

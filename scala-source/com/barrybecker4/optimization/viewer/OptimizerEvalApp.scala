@@ -7,7 +7,8 @@ import com.barrybecker4.optimization.optimizee.optimizees.{
   WavyPolynomialViewerProblem,
   AckleyProblem,
   RastriginProblem,
-  RosenbrockProblem
+  RosenbrockProblem,
+  SphereProblem
 }
 import com.barrybecker4.optimization.viewer.ui.OptimizerEvalFrame
 
@@ -36,7 +37,8 @@ object OptimizerEvalApp {
           new LineGraphDemoProblem,
           AckleyProblem(dimensions = 2),
           RastriginProblem(dimensions = 2),
-          RosenbrockProblem(dimensions = 2)
+          RosenbrockProblem(dimensions = 2),
+          new SphereProblem
         )
       )
     )
