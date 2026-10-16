@@ -34,4 +34,7 @@ class LineGraphTestProblem(val target: Int, val lo: Int, val hi: Int, rnd: Rando
     val v = state.get(0).getValue.toInt
     List(v - 1, v + 1).filter(x => x >= lo && x <= hi).map(npa)
   }
+
+  override def heuristic(state: ParameterArray): Double =
+    math.abs(state.get(0).getValue.toInt - target).toDouble
 }

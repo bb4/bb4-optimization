@@ -52,4 +52,7 @@ class DiscreteGrid2DDemoProblem extends OptimizeeProblem with DiscreteStateSpace
     val moves = List((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1))
     moves.filter { case (a, b) => a >= 0 && a <= gridN && b >= 0 && b <= gridN }.map { case (a, b) => npa(a, b) }
   }
+
+  /** Same Euclidean distance as fitness (preserves best-first order when used as A* h with g = fitness). */
+  override def heuristic(state: ParameterArray): Double = evaluateFitness(state)
 }

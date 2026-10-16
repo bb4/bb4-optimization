@@ -4,7 +4,8 @@ import com.barrybecker4.optimization.{OptimizationStatus, Optimizer}
 import com.barrybecker4.optimization.parameter.NumericParameterArray
 import com.barrybecker4.optimization.parameter.types.{DoubleParameter, IntegerParameter}
 import com.barrybecker4.optimization.strategy.{
-  DoubleWellOptimizee, GENETIC_SEARCH, GLOBAL_HILL_CLIMBING, GLOBAL_SIMULATED_ANNEALING, HILL_CLIMBING, SIMULATED_ANNEALING
+  DoubleWellOptimizee, GENETIC_SEARCH, GLOBAL_HILL_CLIMBING, GLOBAL_SIMULATED_ANNEALING, HILL_CLIMBING,
+  SIMULATED_ANNEALING, STATE_SPACE_SEARCH
 }
 import org.scalatest.funsuite.AnyFunSuite
 
@@ -82,5 +83,19 @@ class BudgetedOptimizeeSuite extends AnyFunSuite {
     assert(result.status == OptimizationStatus.BudgetExhausted)
     assert(result.best.fitness <= initialFitness,
       s"expected best-so-far not worse than initial; got ${result.best.fitness} vs initial $initialFitness")
+  }
+
+  test("state space search returns best-so-far when budget exhausted") {
+    val rnd = new Random(11)
+    val problem = new LineGraphTestProblem(target = 15, lo = 0, hi = 40, rnd = rnd)
+    val guess = new NumericParameterArray(IndexedSeq(new IntegerParameter(0, 0, 40, "x")), rnd = rnd)
+    val initialFitness = problem.evaluateFitness(guess)
+    val opt = new Optimizer(problem)
+    val result = opt.doOptimization(STATE_SPACE_SEARCH, guess, 40.0, rnd, maxEvaluations = Some(8))
+    assert(result.status == OptimizationStatus.BudgetExhausted)
+    assert(result.best.fitness <= initialFitness,
+      s"expected best-so-far not worse than initial; got ${result.best.fitness} vs initial $initialFitness")
+    assert(result.best.fitness < initialFitness,
+      s"expected some improvement with 8 evals; got ${result.best.fitness} vs initial $initialFitness")
   }
 }

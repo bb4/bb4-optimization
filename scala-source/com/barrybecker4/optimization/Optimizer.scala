@@ -57,7 +57,7 @@ class Optimizer(val optimizee: Optimizee, optimizationLogFile: Option[String] = 
                      verbose: Boolean = false): OptimizationResult = {
 
     val budgeted: Option[BudgetedOptimizee] = maxEvaluations match {
-      case Some(n) if n > 0 => Some(new BudgetedOptimizee(optimizee, n))
+      case Some(n) if n > 0 => Some(BudgetedOptimizee.wrap(optimizee, n))
       case _ => None
     }
     val target: Optimizee = budgeted.getOrElse(optimizee)

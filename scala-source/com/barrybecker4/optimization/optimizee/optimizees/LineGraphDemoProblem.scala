@@ -45,4 +45,8 @@ class LineGraphDemoProblem(
     val v = state.get(0).getValue.toInt
     List(v - 1, v + 1).filter(x => x >= lo && x <= hi).map(npa)
   }
+
+  /** Admissible heuristic: remaining distance on the line equals absolute fitness. */
+  override def heuristic(state: ParameterArray): Double =
+    math.abs(state.get(0).getValue.toInt - target).toDouble
 }

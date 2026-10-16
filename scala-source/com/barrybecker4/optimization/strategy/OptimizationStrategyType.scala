@@ -71,7 +71,9 @@ enum OptimizationStrategyType {
         strategy.setImprovementEpsilon(fitnessRange / 100000000.0)
         strategy
       case STATE_SPACE_SEARCH =>
-        new StateSpaceSearchStrategy(optimizee)
+        val strategy = new StateSpaceSearchStrategy(optimizee)
+        strategy.setConfig(StateSpaceSearchConfig.default)
+        strategy
       case BRUTE_FORCE =>
         new BruteForceStrategy(optimizee)
 }

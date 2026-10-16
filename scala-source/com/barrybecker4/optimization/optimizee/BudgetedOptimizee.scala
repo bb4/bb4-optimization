@@ -48,3 +48,31 @@ class BudgetedOptimizee(delegate: Optimizee, val maxEvaluations: Int) extends Op
     count += 1
   }
 }
+
+object BudgetedOptimizee {
+
+  /**
+    * Wrap `delegate` with an evaluation budget. When `delegate` mixes in [[DiscreteStateSpace]],
+    * the wrapper also does so (needed for [[com.barrybecker4.optimization.strategy.StateSpaceSearchStrategy]]).
+    */
+  def wrap(delegate: Optimizee, maxEvaluations: Int): BudgetedOptimizee =
+    delegate match {
+      case d: DiscreteStateSpace => new BudgetedDiscreteOptimizee(d, maxEvaluations)
+      case _ => new BudgetedOptimizee(delegate, maxEvaluations)
+    }
+}
+
+/**
+  * [[BudgetedOptimizee]] that preserves [[DiscreteStateSpace]] for strategies that require it.
+  */
+private[optimizee] final class BudgetedDiscreteOptimizee(
+    discreteDelegate: Optimizee & DiscreteStateSpace,
+    maxEvaluations: Int
+) extends BudgetedOptimizee(discreteDelegate, maxEvaluations) with DiscreteStateSpace {
+
+  override def successors(state: ParameterArray): Seq[ParameterArray] =
+    discreteDelegate.successors(state)
+
+  override def heuristic(state: ParameterArray): Double =
+    discreteDelegate.heuristic(state)
+}
