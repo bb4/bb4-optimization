@@ -18,11 +18,13 @@ object ErrorTolerances {
   */
 case class ErrorTolerances(globalSampling: Double, globalHillClimbing: Double, hillClimbing: Double,
              simAnnealing: Double, geneticSearch: Double, concurrentGeneticSearch: Double,
-             stateSpace: Double = 0, bruteForce: Double = 0) {
+             stateSpace: Double = 0, bruteForce: Double = 0,
+             globalSimulatedAnnealing: Double = 0) {
 
   private val percentValues = Map[OptimizationStrategyType, Double](
     GLOBAL_SAMPLING -> globalSampling,
     GLOBAL_HILL_CLIMBING -> globalHillClimbing,
+    GLOBAL_SIMULATED_ANNEALING -> globalSimulatedAnnealing,
     HILL_CLIMBING -> hillClimbing,
     SIMULATED_ANNEALING -> simAnnealing,
     GENETIC_SEARCH -> geneticSearch,

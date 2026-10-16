@@ -3,8 +3,10 @@ package com.barrybecker4.optimization.strategy
 
 import com.barrybecker4.common.format.FormatUtil
 import com.barrybecker4.math.MathUtil
-import com.barrybecker4.optimization.optimizee.Optimizee
-import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
+import com.barrybecker4.optimization.optimizee.{EvaluationBudgetExceededException, Optimizee}
+import com.barrybecker4.optimization.parameter.{
+  NumericParameterArray, ParameterArray, ParameterArrayWithFitness, PermutedParameterArray, VariableLengthIntSet
+}
 
 import scala.util.Random
 
@@ -48,17 +50,22 @@ object SimulatedAnnealingStepMode {
   * @param tempDropFactor              geometric cooling multiplier each outer iteration
   * @param defaultTempMax              initial `tempMax` until [[SimulatedAnnealingStrategy.setMaxTemperature]]
   * @param radiusMultiplier            multiplier in `r_base = radiusMultiplier * temperature / ((N + ct) * tempMax)`
+  * @param stepMode                    fixed base radius or adaptive acceptance scaling
   */
 case class SimulatedAnnealingConfig(
     innerIterationsPerDimension: Int = 10,
     numTempIterations: Int = 20,
     tempDropFactor: Double = 0.6,
     defaultTempMax: Double = 1000.0,
-    radiusMultiplier: Double = 8.0
+    radiusMultiplier: Double = 8.0,
+    stepMode: SimulatedAnnealingStepMode = SimulatedAnnealingStepMode.AdaptiveAcceptance()
 )
 
 object SimulatedAnnealingStrategy {
   val DefaultConfig: SimulatedAnnealingConfig = SimulatedAnnealingConfig()
+
+  /** [[com.barrybecker4.optimization.parameter.types.AbstractParameter.tweakNumericValue]] requires |r| <= 1.5. */
+  private[strategy] val MAX_PROPOSAL_RADIUS: Double = 1.5
 }
 
 /**
@@ -74,6 +81,9 @@ object SimulatedAnnealingStrategy {
   * The [[rnd]] parameter is used for Metropolis coin flips; neighbor sampling uses the [[scala.util.Random]] embedded
   * in the [[com.barrybecker4.optimization.parameter.ParameterArray]] (e.g. [[com.barrybecker4.optimization.parameter.NumericParameterArray]]).
   *
+  * Budget: when the optimizee is wrapped with an evaluation budget, this strategy catches
+  * [[EvaluationBudgetExceededException]] and returns best-so-far (seeded via [[notifyOfChange]] after the initial eval).
+  *
   * @param optimizee the thing to be optimized.
   * @author Barry Becker
   */
@@ -81,8 +91,9 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
     extends OptimizationStrategy(optimizee) {
 
   private var config: SimulatedAnnealingConfig = SimulatedAnnealingStrategy.DefaultConfig
-  private var stepMode: SimulatedAnnealingStepMode = SimulatedAnnealingStepMode.Fixed
   private var tempMax: Double = config.defaultTempMax
+
+  def getConfig: SimulatedAnnealingConfig = config
 
   def setConfig(config: SimulatedAnnealingConfig): Unit = {
     this.config = config
@@ -90,7 +101,7 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
 
   /** @param mode fixed base radius only, or adaptive scaling from acceptance rate (see [[SimulatedAnnealingStepMode]]) */
   def setStepMode(mode: SimulatedAnnealingStepMode): Unit = {
-    this.stepMode = mode
+    this.config = config.copy(stepMode = mode)
   }
 
   /** @param tempMax the initial temperature at the start of the simulated annealing process (before cooling) */
@@ -131,67 +142,96 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
     val numTempIterations = config.numTempIterations
     val tempDrop = config.tempDropFactor
     val radiusMul = config.radiusMultiplier
+    // Adaptive radius scaling helps continuous landscapes; on discrete spaces it tends to
+    // overshoot — prefer Fixed there when the config still says AdaptiveAcceptance.
+    val stepMode =
+      if (isDiscreteProblem(params) &&
+          config.stepMode.isInstanceOf[SimulatedAnnealingStepMode.AdaptiveAcceptance])
+        SimulatedAnnealingStepMode.Fixed
+      else config.stepMode
 
     var ct = 0
     var temperature = tempMax
     val tempMin = tempMax / math.pow(2.0, numTempIterations)
     var bestParams =
-      if (!optimizee.evaluateByComparison)
-        ParameterArrayWithFitness(params, optimizee.evaluateFitness(params))
-      else ParameterArrayWithFitness(params, optimizee.compareFitness(params, initialParams))
+      try {
+        if (!optimizee.evaluateByComparison)
+          ParameterArrayWithFitness(params, optimizee.evaluateFitness(params))
+        else ParameterArrayWithFitness(params, optimizee.compareFitness(params, initialParams))
+      } catch {
+        case _: EvaluationBudgetExceededException =>
+          return ParameterArrayWithFitness(params, Double.MaxValue)
+      }
+
+    notifyOfChange(bestParams)
 
     var currentParams: ParameterArrayWithFitness = bestParams
     var firstTemperaturePass = true
 
-    while (firstTemperaturePass || (temperature > tempMin && !isOptimalFitnessReached(currentParams))) {
-      firstTemperaturePass = false
-      currentParams = bestParams
-      var stepScale = initialStepScale()
-      var windowProposals = 0
-      var windowAccepts = 0
+    try {
+      while (firstTemperaturePass || (temperature > tempMin && !isOptimalFitnessReached(currentParams))) {
+        firstTemperaturePass = false
+        currentParams = bestParams
+        var stepScale = initialStepScale(stepMode)
+        var windowProposals = 0
+        var windowAccepts = 0
 
-      while (ct < n * currentParams.pa.size && !isOptimalFitnessReached(currentParams)) {
-        val rBase = radiusMul * temperature / ((n + ct) * tempMax)
-        val rEffective = stepScale * rBase
-        val (next, accepted) = neighborStep(currentParams, ct, temperature, fitnessRange, rEffective, initialParams)
-        currentParams = next
+        while (ct < n * currentParams.pa.size && !isOptimalFitnessReached(currentParams)) {
+          val rBase = radiusMul * temperature / ((n + ct) * tempMax)
+          val rEffective = clampProposalRadius(stepScale * rBase)
+          val (next, accepted) =
+            neighborStep(currentParams, ct, temperature, fitnessRange, rEffective, initialParams)
+          currentParams = next
 
-        stepMode match {
-          case SimulatedAnnealingStepMode.Fixed => ()
-          case a: SimulatedAnnealingStepMode.AdaptiveAcceptance if a.windowProposals > 0 =>
-            windowProposals += 1
-            if (accepted) windowAccepts += 1
-            if (windowProposals >= a.windowProposals) {
-              val rate = windowAccepts.toDouble / windowProposals
-              if (rate > a.targetRate + 1e-12)
-                stepScale = math.min(a.scaleMax, stepScale * a.growFactor)
-              else if (rate < a.targetRate - 1e-12)
-                stepScale = math.max(a.scaleMin, stepScale * a.shrinkFactor)
-              windowProposals = 0
-              windowAccepts = 0
-            }
-          case _: SimulatedAnnealingStepMode.AdaptiveAcceptance => ()
+          stepMode match {
+            case SimulatedAnnealingStepMode.Fixed => ()
+            case a: SimulatedAnnealingStepMode.AdaptiveAcceptance if a.windowProposals > 0 =>
+              windowProposals += 1
+              if (accepted) windowAccepts += 1
+              if (windowProposals >= a.windowProposals) {
+                val rate = windowAccepts.toDouble / windowProposals
+                if (rate > a.targetRate + 1e-12)
+                  stepScale = math.min(a.scaleMax, stepScale * a.growFactor)
+                else if (rate < a.targetRate - 1e-12)
+                  stepScale = math.max(a.scaleMin, stepScale * a.shrinkFactor)
+                windowProposals = 0
+                windowAccepts = 0
+              }
+            case _: SimulatedAnnealingStepMode.AdaptiveAcceptance => ()
+          }
+
+          if (currentParams.fitness < bestParams.fitness) {
+            bestParams = currentParams
+            notifyOfChange(bestParams)
+          }
+          ct += 1
         }
-
-        if (currentParams.fitness < bestParams.fitness) {
-          bestParams = currentParams
-          notifyOfChange(bestParams)
-        }
-        ct += 1
+        ct = 0
+        temperature *= tempDrop
+        trace("temp = " + temperature + " tempMin = " + tempMin + "\n bestParams = " + bestParams)
       }
-      ct = 0
-      temperature *= tempDrop
-      trace("temp = " + temperature + " tempMin = " + tempMin + "\n bestParams = " + bestParams)
+    } catch {
+      case _: EvaluationBudgetExceededException =>
+        () // return bestParams below
     }
     log(ct, bestParams, 0, 0, FormatUtil.formatNumber(temperature))
     bestParams
   }
 
-  private def initialStepScale(): Double =
+  private def initialStepScale(stepMode: SimulatedAnnealingStepMode): Double =
     stepMode match {
       case SimulatedAnnealingStepMode.Fixed                         => 1.0
       case a: SimulatedAnnealingStepMode.AdaptiveAcceptance => a.initialScale
     }
+
+  private def clampProposalRadius(rEffective: Double): Double =
+    math.min(SimulatedAnnealingStrategy.MAX_PROPOSAL_RADIUS, rEffective)
+
+  private def isDiscreteProblem(params: ParameterArray): Boolean = params match {
+    case _: PermutedParameterArray | _: VariableLengthIntSet => true
+    case n: NumericParameterArray => (0 until n.size).exists(i => n.get(i).isIntegerOnly)
+    case _ => false
+  }
 
   /** @return (next state, whether the proposal was accepted for adaptive statistics) */
   private def neighborStep(

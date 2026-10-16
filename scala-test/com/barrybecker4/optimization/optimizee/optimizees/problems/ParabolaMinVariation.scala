@@ -39,7 +39,8 @@ sealed trait ParabolaMinVariation extends ProblemVariation {
 
 case object PARABOLA extends ParabolaMinVariation {
   val errorTolerances = ErrorTolerances(
-    0.009, RELAXED_TOL, BASE_TOLERANCE, GLOB_SAMP_TOL, BASE_TOLERANCE, BASE_TOLERANCE, BASE_TOLERANCE)
+    0.009, RELAXED_TOL, BASE_TOLERANCE, GLOB_SAMP_TOL, BASE_TOLERANCE, BASE_TOLERANCE, BASE_TOLERANCE,
+    globalSimulatedAnnealing = RELAXED_TOL)
 
   /** Smooth parabola with min of 0.0 at P1, P2 */
   override def evaluateFitness(a: ParameterArray): Double =
@@ -49,7 +50,8 @@ case object PARABOLA extends ParabolaMinVariation {
 
 case object SINUSOIDAL extends ParabolaMinVariation {
   val errorTolerances = ErrorTolerances(
-    0.009, RELAXED_TOL, 0.01, GLOB_SAMP_TOL, BASE_TOLERANCE, BASE_TOLERANCE, BASE_TOLERANCE)
+    0.009, RELAXED_TOL, 0.01, GLOB_SAMP_TOL, BASE_TOLERANCE, BASE_TOLERANCE, BASE_TOLERANCE,
+    globalSimulatedAnnealing = RELAXED_TOL)
 
   /** This version introduces a bit of sinusoidal noise.
     * @param a the position on the parabolic surface given the specified values of p1 and p2
@@ -63,7 +65,8 @@ case object SINUSOIDAL extends ParabolaMinVariation {
 case object ABS_SINUSOIDAL extends ParabolaMinVariation {
   val errorTolerances =
     ErrorTolerances(0.009, 0.0128, 0.01,
-      GLOB_SAMP_TOL, RELAXED_TOL, RELAXED_TOL, BASE_TOLERANCE, BASE_TOLERANCE)
+      GLOB_SAMP_TOL, RELAXED_TOL, RELAXED_TOL, BASE_TOLERANCE, BASE_TOLERANCE,
+      globalSimulatedAnnealing = 0.0128)
 
   /** This version introduces a bit of absolute value sinusoidal noise.
     * This means it will not be second order differentiable, making this type of search harder.
@@ -77,7 +80,7 @@ case object ABS_SINUSOIDAL extends ParabolaMinVariation {
 
 case object STEPPED extends ParabolaMinVariation {
   val errorTolerances = ErrorTolerances(0.009, RELAXED_TOL, BASE_TOLERANCE, GLOB_SAMP_TOL,
-    RELAXED_TOL, RELAXED_TOL, BASE_TOLERANCE)
+    RELAXED_TOL, RELAXED_TOL, BASE_TOLERANCE, globalSimulatedAnnealing = RELAXED_TOL)
 
   /** This version introduces a bit of step function noise. */
   override def evaluateFitness(a: ParameterArray): Double =

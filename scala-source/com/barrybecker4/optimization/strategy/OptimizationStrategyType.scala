@@ -16,6 +16,7 @@ enum OptimizationStrategyType {
 
   case GLOBAL_SAMPLING,
        GLOBAL_HILL_CLIMBING,
+       GLOBAL_SIMULATED_ANNEALING,
        HILL_CLIMBING,
        SIMULATED_ANNEALING,
        GENETIC_SEARCH,
@@ -28,6 +29,8 @@ enum OptimizationStrategyType {
       "Sparsely sample the space and return the best sample."
     case GLOBAL_HILL_CLIMBING =>
       "Global sampling, then hill climb from each of the best few samples; return the best local optimum."
+    case GLOBAL_SIMULATED_ANNEALING =>
+      "Global sampling, then simulated annealing from each of the best few samples; return the best result."
     case HILL_CLIMBING =>
       "Search method which always marches toward the direction of greatest improvement."
     case SIMULATED_ANNEALING =>
@@ -50,10 +53,13 @@ enum OptimizationStrategyType {
         gsStrategy
       case GLOBAL_HILL_CLIMBING =>
         new GlobalHillClimbingStrategy(optimizee)
+      case GLOBAL_SIMULATED_ANNEALING =>
+        new GlobalSimulatedAnnealingStrategy(optimizee, rnd)
       case HILL_CLIMBING =>
         new HillClimbingStrategy(optimizee)
       case SIMULATED_ANNEALING =>
         val strategy = new SimulatedAnnealingStrategy(optimizee, rnd)
+        strategy.setConfig(SimulatedAnnealingConfig())
         strategy.setMaxTemperature(fitnessRange / 10.0)
         strategy
       case GENETIC_SEARCH =>
@@ -76,6 +82,7 @@ object OptimizationStrategyType {
   val valuesForUi: Array[OptimizationStrategyType] = Array(
     GLOBAL_SAMPLING,
     GLOBAL_HILL_CLIMBING,
+    GLOBAL_SIMULATED_ANNEALING,
     HILL_CLIMBING,
     SIMULATED_ANNEALING,
     GENETIC_SEARCH,

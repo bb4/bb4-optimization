@@ -76,6 +76,9 @@ abstract class OptimizerTestSuite extends AnyFunSuite with BeforeAndAfter {
   test("GlobalHillClimbing") {
     doTest(GLOBAL_HILL_CLIMBING)
   }
+  test("GlobalSimulatedAnnealing") {
+    doTest(GLOBAL_SIMULATED_ANNEALING)
+  }
 
   /** Run test for given optimization type
     * @param optType the optimization type to use.

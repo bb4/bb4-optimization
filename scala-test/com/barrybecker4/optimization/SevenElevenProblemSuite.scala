@@ -11,7 +11,8 @@ object SevenElevenProblemSuite {
   /** default error tolerance. */
   private val TOL = 0.006
   /** the tolerances for each for the search strategies. */
-  val ERROR_TOLERANCES = ErrorTolerances(0.1, TOL / 10.0, TOL / 3.0, TOL / 10.0, TOL, TOL / 3.0, TOL / 3.0, TOL)
+  val ERROR_TOLERANCES = ErrorTolerances(0.1, TOL / 10.0, TOL / 3.0, TOL / 10.0, TOL, TOL / 3.0, TOL / 3.0, TOL,
+    globalSimulatedAnnealing = TOL / 10.0)
 }
 
 class SevenElevenProblemSuite extends OptimizerTestSuite {

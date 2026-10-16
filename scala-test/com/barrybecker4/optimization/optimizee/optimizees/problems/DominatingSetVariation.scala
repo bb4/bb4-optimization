@@ -103,7 +103,7 @@ sealed trait DominatingSetVariation extends ProblemVariation {
 case object SIMPLE_DS extends DominatingSetVariation {
 
   val adjacencies = new Graph(Seq(List(1, 2), List(0, 2), List(0, 1)))
-  val errorTolerances = ErrorTolerances(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+  val errorTolerances = ErrorTolerances(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, globalSimulatedAnnealing = 0.0)
 
   override def getExactSolution: ParameterArrayWithFitness = createSolution(0)
   override def getFitnessRange = 7.0
@@ -120,7 +120,7 @@ case object PENTAGRAM_DS extends DominatingSetVariation {
     List(0, 6, 9), List(1, 5, 7), List(2, 6, 8), List(3, 7, 9), List(4, 5, 8)
   ))
 
-  val errorTolerances = ErrorTolerances(4.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+  val errorTolerances = ErrorTolerances(4.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, globalSimulatedAnnealing = 0.0)
 
   /** This is one of several possible solutions that gives an optimal fitness of 0 */
   override def getExactSolution: ParameterArrayWithFitness = createSolution(0, 1, 8)
@@ -140,7 +140,7 @@ case object TYPICAL_DS extends DominatingSetVariation {
   ))
 
   /** Headroom for stochastic discrete hill climbing / global HC on TYPICAL_DS (see OptimizerTestSuite slack note). */
-  val errorTolerances = ErrorTolerances(3.6, 2.5, 4.5, 1.6, 1.2, 1.2)
+  val errorTolerances = ErrorTolerances(3.6, 2.5, 4.5, 1.6, 1.2, 1.2, globalSimulatedAnnealing = 2.5)
 
   /** This is one of several possible solutions that gives an optimal fitness of 0 */
   override def getExactSolution: ParameterArrayWithFitness = createSolution(6, 7, 8, 19, 21, 24)
