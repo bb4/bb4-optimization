@@ -1,5 +1,1 @@
 iteration,	fitness,	jumpSize,	dotprod,	p0,	comment 
-0,	0
-      ,	0
-      ,	0
-      ,	0,	0
