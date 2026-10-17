@@ -24,7 +24,9 @@ enum OptimizationStrategyType {
        STATE_SPACE_SEARCH,
        BRUTE_FORCE,
        DIFFERENTIAL_EVOLUTION,
-       PARTICLE_SWARM
+       PARTICLE_SWARM,
+       ITERATED_LOCAL_SEARCH,
+       VARIABLE_NEIGHBORHOOD_SEARCH
 
   def getDescription: String = this match
     case GLOBAL_SAMPLING =>
@@ -51,6 +53,10 @@ enum OptimizationStrategyType {
         "Employs population vector differences for mutation, followed by binomial crossover and one-to-one selection."
     case PARTICLE_SWARM =>
       "A swarm of particles flies through the bounded parameter space. Works for continuous and discrete problems."
+    case ITERATED_LOCAL_SEARCH => 
+      "Iterated local search (ILS) for discrete problems such as permutations."
+    case VARIABLE_NEIGHBORHOOD_SEARCH =>
+      "Variable neighborhood search (VNS) for discrete problems such as permutations."
 
   def getStrategy(optimizee: Optimizee, fitnessRange: Double, rnd: Random): OptimizationStrategy =
     this match
@@ -86,8 +92,11 @@ enum OptimizationStrategyType {
       case DIFFERENTIAL_EVOLUTION =>
         new DifferentialEvolutionStrategy(optimizee)
       case PARTICLE_SWARM =>
-        new ParticleSwarmStrategy((optimizee))
-
+        new ParticleSwarmStrategy(optimizee)
+      case ITERATED_LOCAL_SEARCH =>
+        IteratedLocalSearchStrategy.strategyFor(optimizee, IteratedLocalSearchConfig.IteratedLocalSearch)
+      case VARIABLE_NEIGHBORHOOD_SEARCH =>
+        IteratedLocalSearchStrategy.strategyFor(optimizee, IteratedLocalSearchConfig.VariableNeighborhoodSearch)  
 }
 
 object OptimizationStrategyType {
@@ -104,7 +113,9 @@ object OptimizationStrategyType {
     STATE_SPACE_SEARCH,
     BRUTE_FORCE,
     DIFFERENTIAL_EVOLUTION,
-    PARTICLE_SWARM
+    PARTICLE_SWARM,
+    ITERATED_LOCAL_SEARCH, 
+    VARIABLE_NEIGHBORHOOD_SEARCH
   )
 
   /** @deprecated use [[valuesForUi]] */
