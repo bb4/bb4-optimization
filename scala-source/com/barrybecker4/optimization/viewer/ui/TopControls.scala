@@ -8,6 +8,13 @@ import java.awt.{BorderLayout, FlowLayout}
 import java.awt.event.{ActionEvent, ActionListener}
 import javax.swing.{JButton, JCheckBox, JComboBox, JLabel, JPanel}
 
+object TopControls {
+
+  /** Strategies the dropdown should offer for this problem, via [[OptimizationStrategyType.appliesTo]]. */
+  private[viewer] def strategiesFor(problem: OptimizeeProblem): Array[OptimizationStrategyType] =
+    OptimizationStrategyType.valuesForUi.filter(_.appliesTo(problem, problem.getInitialGuess))
+}
+
 /**
   * Controls at the top of the OptimizerEvalFrame that allow setting the strategy and optimizee problem.
   *
@@ -20,8 +27,9 @@ class TopControls(val logFile: String, val testProblems: Seq[OptimizeeProblem], 
     with ActionListener {
 
   private var testProblem: OptimizeeProblem = testProblems.head
+  private var suppressStrategyEvents = false
 
-  private val strategyDropDown = new JComboBox[OptimizationStrategyType](OptimizationStrategyType.valuesForUi)
+  private val strategyDropDown = new JComboBox[OptimizationStrategyType]()
   private val testProblemDropDown: Option[JComboBox[OptimizeeProblem]] =
     if testProblems.length > 1 then
       val box = new JComboBox[OptimizeeProblem](testProblems.toArray)
@@ -66,19 +74,37 @@ class TopControls(val logFile: String, val testProblems: Seq[OptimizeeProblem], 
 
   private def createStrategyCombo: JPanel = {
     val strategyPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 4))
+    refreshStrategyChoices(testProblem)
     strategyPanel.add(strategyDropDown)
     strategyDropDown.addActionListener(this)
     strategyPanel
   }
 
   override def actionPerformed(e: ActionEvent): Unit =
-    val src = e.getSource
-    if src eq strategyDropDown then showOptimization()
-    else if testProblemDropDown.exists(_ eq src) then
-      selectedTestProblem.foreach { p =>
-        testProblem = p
-        showOptimization()
-      }
+    if suppressStrategyEvents then ()
+    else
+      val src = e.getSource
+      if src eq strategyDropDown then showOptimization()
+      else if testProblemDropDown.exists(_ eq src) then
+        selectedTestProblem.foreach { p =>
+          testProblem = p
+          refreshStrategyChoices(p)
+          showOptimization()
+        }
+
+  /** Replace the strategy list for `problem`, keeping the current choice when it still applies. */
+  private def refreshStrategyChoices(problem: OptimizeeProblem): Unit = {
+    val previous = Option(strategyDropDown.getSelectedItem).collect { case s: OptimizationStrategyType => s }
+    val applicable = TopControls.strategiesFor(problem)
+    suppressStrategyEvents = true
+    try
+      strategyDropDown.removeAllItems()
+      applicable.foreach(strategyDropDown.addItem)
+      val next = previous.filter(s => applicable.contains(s)).orElse(applicable.headOption)
+      next.foreach(strategyDropDown.setSelectedItem)
+    finally
+      suppressStrategyEvents = false
+  }
 
   private def selectedTestProblem: Option[OptimizeeProblem] =
     testProblemDropDown.flatMap(cb => Option(cb.getSelectedItem).collect { case p: OptimizeeProblem => p })

@@ -21,6 +21,25 @@ object OptimizerEvalPanel {
   private val EDGE_SIZE = 1000
   private[viewer] val SIZE: Dimension = new Dimension(EDGE_SIZE, EDGE_SIZE)
   private val BG_COLOR = new Color(240, 245, 250)
+
+  /** Status line for a strategy that threw. A blank message uses the exception class name. */
+  private[viewer] def failureStatus(strategy: OptimizationStrategyType, error: Throwable): String =
+    val msg = error.getMessage match
+      case null | "" => error.getClass.getSimpleName
+      case m         => m
+    s"Failed ($strategy): $msg"
+
+  /**
+    * One optimization body off the EDT.
+    * `IllegalArgumentException` propagates so the status bar can show its message.
+    * `AbstractMethodError` is an unimplemented hook and still becomes an empty result.
+    */
+  private[viewer] def backgroundResult(run: => ParameterArrayWithFitness): Option[ParameterArrayWithFitness] =
+    try Some(run)
+    catch
+      case e: AbstractMethodError =>
+        e.printStackTrace()
+        None
 }
 
 private case class OptimizationRunContext(
@@ -151,10 +170,7 @@ class OptimizerEvalPanel() extends JPanel
     else reportSuccess(testProblem, strategy, solutionPosition, solution.get)
 
   private def reportFailure(t: Throwable, strategy: OptimizationStrategyType): Unit =
-    val msg = t.getMessage match
-      case null | "" => t.getClass.getSimpleName
-      case m         => m
-    updateStatus(s"Failed ($strategy): $msg")
+    updateStatus(OptimizerEvalPanel.failureStatus(strategy, t))
 
   private def reportIncomplete(strategy: OptimizationStrategyType): Unit =
     updateStatus(
@@ -257,14 +273,10 @@ private class OptimizationSwingWorker(
 
   override def doInBackground(): Option[ParameterArrayWithFitness] = {
     ctx.optimizer.setListener(p => publish(p))
-    try Some(ctx.optimizer.doOptimization(strategy, ctx.initialGuess, ctx.fitnessRange).best)
-    catch
-      case e: AbstractMethodError       => logFailure(e); None
-      case e: IllegalArgumentException => logFailure(e); None
+    OptimizerEvalPanel.backgroundResult(
+      ctx.optimizer.doOptimization(strategy, ctx.initialGuess, ctx.fitnessRange).best
+    )
   }
-
-  private def logFailure(e: Throwable): Unit =
-    e.printStackTrace()
 
   override def process(chunks: java.util.List[ParameterArrayWithFitness]): Unit = {
     chunks.asScala.foreach(pointsList.addPoint)

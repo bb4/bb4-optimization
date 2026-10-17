@@ -11,6 +11,7 @@ Headless runs went through `Optimizer.doOptimization`. The same problems were al
 | `./gradlew test` on the tree **before** these fixes | Did not finish. `DominatingSetProblemSuite` stayed inside genetic-search duplicate checks (`toCSVString` → `FormatUtil.formatNumber`, a global lock) for more than 90s and was killed. Filtered suites under `strategy`, `parameter`, `optimizee`, and `viewer` were 242 tests, 0 failures. `ParabolaMinFunctionProblemSuite`, `SevenElevenProblemSuite`, `SubsetSumProblemSuite`, and `TravelingSalesmanProblemSuite` passed when run on their own. |
 | `./gradlew test --tests SlowIntegrationSuite` | Fails immediately with "No tests found". `build.gradle` excludes `*SlowIntegrationSuite*` from the `test` task. The suite is `./gradlew slowTest` (one brute-force pass over a standard TSP, two subset-sum variants, and `TYPICAL_DS`). That task was still running when a 90s cap expired, so it is not part of the 288. |
 | `./gradlew test` **after** the fixes on this branch | **288 tests, 0 failures, 0 errors**, about 6s. `DominatingSetProblemSuite` finished in 3.9s (genetic search 1.3s, concurrent genetic search 2.1s). |
+| `./gradlew test` after the scoreboard and the viewer applicability change | **299 tests, 0 failures, 0 errors**, about 8s. That includes `StrategyScoreboardSuite`, `OptimizationStrategyTypeSuite` (6), and `OptimizerEvalStatusSuite` (4). |
 
 ## Results before fixes
 
@@ -121,7 +122,7 @@ That is why **global hill climbing** and **global simulated annealing** throw on
 
 `OptimizerEvalPanel.startOptimizationRun` (lines 108–117) always applies `onComplete`. Changing the combo box cancels the in-flight worker; that worker's `done()` runs later and sets the status to "Cancelled." even when the replacement run succeeded. `screenshots/sphere__genetic_search.png` shows a finished population and the status "Cancelled."
 
-`OptimizationSwingWorker.doInBackground` (lines 257–258) catches `IllegalArgumentException`, prints it, and returns `None` with no error attached. The panel then says "Optimization did not complete" and hides the message. State-space search on a continuous problem takes this path. So does brute force on a continuous space after the fix below.
+`OptimizationSwingWorker.doInBackground` (lines 257–258) catches `IllegalArgumentException`, prints it, and returns `None` with no error attached. The panel then says "Optimization did not complete" and hides the message. State-space search on a continuous problem takes this path. So does brute force on a continuous space after the fix below. This follow-up stops catching `IllegalArgumentException`. The status line is `Failed (STRATEGY):` plus `getMessage`. `AbstractMethodError` still becomes an empty result.
 
 ### 7. `Optimizer` drops the caller's `Random` for several strategies
 
@@ -134,9 +135,8 @@ That is why **global hill climbing** and **global simulated annealing** throw on
 ### Other defects that are real and smaller
 
 - `Optimizee.getOptimalFitness` is documented as "the best (largest) expected fitness" (`Optimizee.scala` line 39). Every strategy minimizes, and 0 is best.
-- `OptimizationStrategyType.valuesForUi` is commented "excludes unimplemented state-space search" (line 104) and the array includes `STATE_SPACE_SEARCH` (line 113). The README strategy list stops at brute force and does not mention differential evolution, particle swarm, iterated local search, or variable neighborhood search.
+- The README strategy list stops at brute force and does not mention differential evolution, particle swarm, iterated local search, or variable neighborhood search. The `valuesForUi` comment that said the catalog excluded state-space search now says the dropdown filters that catalog with `appliesTo`.
 - `IntegerParameter.setValue` still does not clamp. Only the epsilon step was corrected. A caller can still store an integer outside `[min, max]`.
-- The UI offers state-space search and brute force for every problem, including continuous ones.
 
 ## Fixes on this branch, with before / after
 
@@ -182,7 +182,7 @@ What the patch does:
 ## Suggestions, in order
 
 1. **Headless scoreboard in CI.** Done in `StrategyScoreboardSuite`. `./gradlew build` (the CI workflow) runs every strategy on sphere, Ackley, Rastrigin, Rosenbrock, the integer line, and the integer grid, for seeds 1, 42, and 99. Each run must finish at least as good as its start. Differential evolution and particle swarm must reach 1e-2 everywhere in that set. Brute force and state-space search must reach 0 on the lattices and refuse a continuous space. A 300,000-evaluation budget and a 90-second test limit stop a non-terminating search.
-2. **Make illegal strategy/problem pairs visible.** Stop offering `STATE_SPACE_SEARCH` and `BRUTE_FORCE` for continuous problems, or let `IllegalArgumentException` reach the status bar instead of "did not complete". The comment on `valuesForUi` should match the array.
+2. **Make illegal strategy/problem pairs visible.** Done. `OptimizationStrategyType.appliesTo(optimizee, params)` is what the viewer dropdown uses. State-space search applies when the optimizee is a `DiscreteStateSpace`. Brute force applies to integer lattices and non-numeric arrays, and refuses a `NumericParameterArray` that has a continuous parameter. Differential evolution and particle swarm apply to absolute-fitness numeric arrays. Hill climbing and global hill climbing apply to numeric, permuted, and variable-length parameters. Everything else in `valuesForUi` stays offered. Changing the problem rebuilds the combo and keeps the current strategy when it still applies. A thrown `IllegalArgumentException` reaches the status bar as `Failed (STRATEGY): <message>`. Screenshots: `/opt/cursor/artifacts/screenshots-applicability/before/` (sphere list still contains `STATE_SPACE_SEARCH` and `BRUTE_FORCE`; status "Optimization did not complete") and `.../after/` (those two are gone on the sphere, present on the 1D line, and a state-space run on the sphere shows `Failed (STATE_SPACE_SEARCH): STATE_SPACE_SEARCH requires an Optimizee that mixes in DiscreteStateSpace`).
 3. **Document the strategies that already exist.** The README stops at brute force. Differential evolution, particle swarm, iterated local search, and variable neighborhood search need a sentence each on the problem shape they fit. Correct `getOptimalFitness` to say the fitness is minimized.
 4. **Give genetic search a cheaper identity and a smaller default population.** `getSamplePopulationSize` is `min(4000, 4^n)` for integer parameters. Duplicate checks were linear scans through a formatter. A hash of the parameter values, and a population that grows with dimension instead of jumping to the cap, is what made the dominating-set case usable after the equality change; the cap itself is still blunt.
 5. **Clamp in `IntegerParameter.setValue`**, the same way `incrementByEps` now clamps. Redistribution functions need a test so the clamp does not change their inverse.
