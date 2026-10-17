@@ -90,13 +90,13 @@ enum OptimizationStrategyType {
       case BRUTE_FORCE =>
         new BruteForceStrategy(optimizee)
       case DIFFERENTIAL_EVOLUTION =>
-        new DifferentialEvolutionStrategy(optimizee)
+        new DifferentialEvolutionStrategy(optimizee, rnd = rnd)
       case PARTICLE_SWARM =>
-        new ParticleSwarmStrategy(optimizee)
+        new ParticleSwarmStrategy(optimizee, rnd)
       case ITERATED_LOCAL_SEARCH =>
-        IteratedLocalSearchStrategy.strategyFor(optimizee, IteratedLocalSearchConfig.IteratedLocalSearch)
+        IteratedLocalSearchStrategy.strategyFor(optimizee, IteratedLocalSearchConfig.IteratedLocalSearch, rnd)
       case VARIABLE_NEIGHBORHOOD_SEARCH =>
-        IteratedLocalSearchStrategy.strategyFor(optimizee, IteratedLocalSearchConfig.VariableNeighborhoodSearch)  
+        IteratedLocalSearchStrategy.strategyFor(optimizee, IteratedLocalSearchConfig.VariableNeighborhoodSearch, rnd)  
 }
 
 object OptimizationStrategyType {

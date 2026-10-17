@@ -9,8 +9,12 @@ import scala.collection.mutable
 import scala.util.Random
 
 object IteratedLocalSearchStrategy {
-  def strategyFor(optimizee: Optimizee, config: IteratedLocalSearchConfig): IteratedLocalSearchStrategy = {
-    val strategy = new IteratedLocalSearchStrategy(optimizee, new Random(1))
+  def strategyFor(
+      optimizee: Optimizee,
+      config: IteratedLocalSearchConfig,
+      rnd: Random = new Random(1)
+  ): IteratedLocalSearchStrategy = {
+    val strategy = new IteratedLocalSearchStrategy(optimizee, rnd)
     strategy.setConfig(config)
     strategy
   }

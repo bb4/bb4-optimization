@@ -2,6 +2,7 @@ package com.barrybecker4.optimization.parameter
 
 import com.barrybecker4.math.MathUtil
 import com.barrybecker4.math.linear.Vector
+import com.barrybecker4.optimization.parameter.types.IntegerParameter
 import org.scalatest.BeforeAndAfter
 import NumericParameterArraySuite.createParamArray
 import org.scalatest.funsuite.AnyFunSuite
@@ -125,4 +126,24 @@ class NumericParameterArraySuite extends AnyFunSuite with BeforeAndAfter {
 
   private def getListFromIterator(iter: Iterator[NumericParameterArray]): Array[NumericParameterArray] =
     iter.toArray
+
+  test("integer random samples stay inside the inclusive range and can hit both ends") {
+    val ints = NumericParameterArray(IndexedSeq(new IntegerParameter(0, 0, 5, "i")), rnd = new Random(0))
+    val seen = scala.collection.mutable.Set.empty[Int]
+    var i = 0
+    while (i < 400) {
+      val v = ints.getRandomSample.get(0).getValue.toInt
+      assert(v >= 0 && v <= 5, s"sample $v left [0, 5]")
+      seen += v
+      i += 1
+    }
+    assert(seen.contains(0) && seen.contains(5), s"missed an endpoint, saw $seen")
+  }
+
+  test("an enormous numeric grid is rejected instead of wrapping the sample count") {
+    val params = createParamArray(0.0, 0.0)
+    assertThrows[IllegalArgumentException] {
+      params.findGlobalSamples(Long.MaxValue)
+    }
+  }
 }

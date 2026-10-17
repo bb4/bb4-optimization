@@ -57,10 +57,14 @@ class ImprovementStep(var optimizee: Optimizee, var iter: ImprovementIteration, 
     var sameParams = false
     if (useCache) {
       // For problems with integer params, avoid retesting the same candidate repeatedly.
-      while (cache.contains(currentParams)) {
+      // Cap the radius: tweakNumericValue rejects |r| > 1.5, and a tiny discrete neighborhood
+      // can otherwise spin this loop until that assertion fires.
+      var attempts = 0
+      while (cache.contains(currentParams) && attempts < 24) {
         sameParams = true
-        currentParams = currentParams.getRandomNeighbor(gaussRadius)
-        gaussRadius *= ImprovementStep.RADIUS_EXPANDER
+        currentParams = currentParams.getRandomNeighbor(math.min(1.5, gaussRadius))
+        if (gaussRadius < 1.5) gaussRadius = math.min(1.5, gaussRadius * ImprovementStep.RADIUS_EXPANDER)
+        attempts += 1
       }
       cache += currentParams
     }

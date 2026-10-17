@@ -35,7 +35,8 @@ abstract class AbstractIntParameter(theVal: Int, minVal: Int, maxVal: Int, param
     * @return the size of the increment taken
     */
   override def incrementByEps(direction: Direction): IntegerParameter = {
-    new IntegerParameter((getValue + direction.multiplier).toInt, minVal, maxVal, paramName, redisFunc)
+    val raw = (getValue + direction.multiplier).round.toInt
+    new IntegerParameter(math.max(minVal, math.min(maxVal, raw)), minVal, maxVal, paramName, redisFunc)
   }
 
   override def getValue: Double = {

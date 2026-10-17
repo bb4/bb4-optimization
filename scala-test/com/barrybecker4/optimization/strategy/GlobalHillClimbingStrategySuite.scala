@@ -1,6 +1,7 @@
 package com.barrybecker4.optimization.strategy
 
 import com.barrybecker4.optimization.optimizee.Optimizee
+import com.barrybecker4.optimization.optimizee.optimizees.{DiscreteGrid2DDemoProblem, LineGraphDemoProblem}
 import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray}
 import com.barrybecker4.optimization.parameter.types.DoubleParameter
 import org.scalatest.funsuite.AnyFunSuite
@@ -64,6 +65,16 @@ class GlobalHillClimbingStrategySuite extends AnyFunSuite {
     assert(rDiv.fitness <= rTop.fitness + 1.0e-9,
       s"diverse should not lose to top-fitness; top=${rTop.fitness} diverse=${rDiv.fitness}")
     assert(rDiv.fitness < 1.0, s"expected near-global minimum, got ${rDiv.fitness}")
+  }
+
+  test("integer line and grid searches finish at the optimum") {
+    val line = new LineGraphDemoProblem
+    val lineResult = new GlobalHillClimbingStrategy(line).doOptimization(line.getInitialGuess, line.getFitnessRange)
+    assert(lineResult.fitness == 0.0, s"line fitness ${lineResult.fitness}")
+
+    val grid = new DiscreteGrid2DDemoProblem
+    val gridResult = new GlobalHillClimbingStrategy(grid).doOptimization(grid.getInitialGuess, grid.getFitnessRange)
+    assert(gridResult.fitness == 0.0, s"grid fitness ${gridResult.fitness}")
   }
 }
 

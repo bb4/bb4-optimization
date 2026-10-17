@@ -55,8 +55,11 @@ case class DoubleParameter(value: Double, minValue: Double, maxValue: Double, na
 
   override def getIncrementForDirection(direction: Direction): Double = {
     val increment = direction.multiplier * (maxValue - minValue) / DoubleParameter.NUM_STEPS
-    if (value + increment > maxValue) maxValue
-    else if (value + increment < minValue) 0
+    val proposed = value + increment
+    // Return a delta that lands on the bound. Returning the bound itself (or 0) either
+    // jumps outside the range or refuses to move when the full step would cross it.
+    if (proposed > maxValue) maxValue - value
+    else if (proposed < minValue) minValue - value
     else increment
   }
 

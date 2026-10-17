@@ -17,7 +17,8 @@ object GeneticSearchStrategy {
 
   /** True when two parameter arrays represent the same candidate (not merely the same reference). */
   private[strategy] def sameSolution(a: ParameterArray, b: ParameterArray): Boolean =
-    (a eq b) || (a.getClass == b.getClass && a.toCSVString == b.toCSVString)
+    (a eq b) || (a.getClass == b.getClass && a.size == b.size &&
+      (0 until a.size).forall(i => a.get(i).getValue == b.get(i).getValue))
 
   private[strategy] def containsSolution(
       population: Iterable[ParameterArrayWithFitness],
@@ -361,7 +362,7 @@ class GeneticSearchStrategy(
           if (!GeneticSearchStrategy.containsSolution(population, nbr.pa)) {
             population += nbr
             considerChampion(nbr)
-            notifyOfChange(p)
+            notifyOfChange(nbr)
           }
         } else {
           val nbrPa = p.pa.getRandomNeighbor(r2)

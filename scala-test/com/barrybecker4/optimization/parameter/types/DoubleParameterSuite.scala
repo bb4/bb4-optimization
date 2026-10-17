@@ -1,6 +1,8 @@
 // Copyright by Barry G. Becker, 2013-2014. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.parameter.types
 
+import com.barrybecker4.optimization.parameter.Direction
+
 /**
   * @author Barry Becker
   */
@@ -35,4 +37,16 @@ class DoubleParameterSuite extends ParameterSuite[Double] {
       4.838779547120604, 0.030585911328806503, 4.818523985116038, 4.699326943909549,
       4.735974588315969, 4.6854107444798485
     )
+
+  test("a step that would cross a bound lands on the bound") {
+    val nearMax = DoubleParameter(5.119, -5.12, 5.12, "x")
+    val forward = nearMax.incrementByEps(Direction.FORWARD)
+    assert(forward.getValue <= nearMax.maxValue)
+    assert(forward.getValue == nearMax.maxValue)
+
+    val nearMin = DoubleParameter(-5.119, -5.12, 5.12, "x")
+    val backward = nearMin.incrementByEps(Direction.BACKWARD)
+    assert(backward.getValue >= nearMin.minValue)
+    assert(backward.getValue == nearMin.minValue)
+  }
 }
