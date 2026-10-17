@@ -36,6 +36,10 @@ See the [releases page](https://github.com/bb4/bb4-optimization/releases) or [Ma
   prefer `GLOBAL_HILL_CLIMBING` when local optima are shallow)
 - **`GeneticSearchConfig` / `NeighborSelection`** — tunables for genetic search; 
   concurrent genetic parallelizes offspring evaluation (optimizee must be thread-safe for `evaluateFitness` / `compareFitness`)
+- **`ParticleSwarmStrategy` / `ParticleSwarmConfig`** — particle swarm optimization (`PARTICLE_SWARM`) for bounded numeric parameters:
+  a swarm is pulled toward each particle's own best and its neighborhood's best (`ParticleSwarmTopology.Global` converges fast,
+  `Ring` is more robust on multimodal problems); reproducible for a given seed, integer parameters are rounded, and it returns best-so-far when an evaluation budget runs out.
+  Needs absolute fitness (not `evaluateByComparison`) and a `NumericParameterArray`
 - **`parameter`** — typed parameters (`DoubleParameter`, `IntegerParameter`, `BooleanParameter`, …), 
   arrays (`NumericParameterArray`, `PermutedParameterArray`, `VariableLengthIntSet`), 
   sampling, distance metrics, and optional redistribution functions

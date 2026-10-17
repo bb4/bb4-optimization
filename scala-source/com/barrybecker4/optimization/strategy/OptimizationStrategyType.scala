@@ -23,7 +23,8 @@ enum OptimizationStrategyType {
        CONCURRENT_GENETIC_SEARCH,
        STATE_SPACE_SEARCH,
        BRUTE_FORCE,
-       DIFFERENTIAL_EVOLUTION
+       DIFFERENTIAL_EVOLUTION,
+       PARTICLE_SWARM
 
   def getDescription: String = this match
     case GLOBAL_SAMPLING =>
@@ -48,6 +49,10 @@ enum OptimizationStrategyType {
     case DIFFERENTIAL_EVOLUTION =>
       "Excellent default for continuous, bounded, non-linear parameter optimization. " +
         "Employs population vector differences for mutation, followed by binomial crossover and one-to-one selection."
+    case PARTICLE_SWARM =>
+      "A swarm of particles flies through the bounded parameter space, pulled toward the best positions " +
+        "found by each particle and by its neighbors. Good for continuous, multimodal problems; " +
+        "needs absolute fitness and numeric parameters."
 
   def getStrategy(optimizee: Optimizee, fitnessRange: Double, rnd: Random): OptimizationStrategy =
     this match
@@ -82,6 +87,8 @@ enum OptimizationStrategyType {
         new BruteForceStrategy(optimizee)
       case DIFFERENTIAL_EVOLUTION =>
         new DifferentialEvolutionStrategy(optimizee)
+      case PARTICLE_SWARM =>
+        new ParticleSwarmStrategy(optimizee, rnd)
 
 }
 
@@ -98,7 +105,8 @@ object OptimizationStrategyType {
     CONCURRENT_GENETIC_SEARCH,
     STATE_SPACE_SEARCH,
     BRUTE_FORCE,
-    DIFFERENTIAL_EVOLUTION
+    DIFFERENTIAL_EVOLUTION,
+    PARTICLE_SWARM
   )
 
   /** @deprecated use [[valuesForUi]] */
