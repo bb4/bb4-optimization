@@ -1,7 +1,10 @@
 // Copyright by Barry G. Becker, 2000-2026. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.strategy
 
-import com.barrybecker4.optimization.optimizee.Optimizee
+import com.barrybecker4.optimization.optimizee.{DiscreteStateSpace, Optimizee}
+import com.barrybecker4.optimization.parameter.{
+  NumericParameterArray, ParameterArray, PermutedParameterArray, VariableLengthIntSet
+}
 
 import scala.util.Random
 
@@ -58,6 +61,25 @@ enum OptimizationStrategyType {
     case VARIABLE_NEIGHBORHOOD_SEARCH =>
       "Variable neighborhood search (VNS) for discrete problems such as permutations."
 
+  /**
+    * True when this strategy can run on `optimizee` with `params`.
+    * False only for combinations that the strategy rejects up front (wrong parameter
+    * shape, continuous enumeration, or comparison fitness). A poor fit that still runs,
+    * such as hill climbing on a multimodal surface, stays true.
+    */
+  def appliesTo(optimizee: Optimizee, params: ParameterArray): Boolean =
+    this match
+      case STATE_SPACE_SEARCH =>
+        optimizee.isInstanceOf[DiscreteStateSpace]
+      case BRUTE_FORCE =>
+        !hasContinuousParameter(params)
+      case DIFFERENTIAL_EVOLUTION | PARTICLE_SWARM =>
+        !optimizee.evaluateByComparison && params.isInstanceOf[NumericParameterArray]
+      case HILL_CLIMBING | GLOBAL_HILL_CLIMBING =>
+        locallySearchable(params)
+      case _ =>
+        true
+
   def getStrategy(optimizee: Optimizee, fitnessRange: Double, rnd: Random): OptimizationStrategy =
     this match
       case GLOBAL_SAMPLING =>
@@ -96,12 +118,24 @@ enum OptimizationStrategyType {
       case ITERATED_LOCAL_SEARCH =>
         IteratedLocalSearchStrategy.strategyFor(optimizee, IteratedLocalSearchConfig.IteratedLocalSearch, rnd)
       case VARIABLE_NEIGHBORHOOD_SEARCH =>
-        IteratedLocalSearchStrategy.strategyFor(optimizee, IteratedLocalSearchConfig.VariableNeighborhoodSearch, rnd)  
+        IteratedLocalSearchStrategy.strategyFor(optimizee, IteratedLocalSearchConfig.VariableNeighborhoodSearch, rnd)
+
+  private def hasContinuousParameter(params: ParameterArray): Boolean =
+    params match
+      case numeric: NumericParameterArray =>
+        (0 until numeric.size).exists(i => !numeric.get(i).isIntegerOnly)
+      case _ =>
+        false
+
+  private def locallySearchable(params: ParameterArray): Boolean =
+    params match
+      case _: NumericParameterArray | _: PermutedParameterArray | _: VariableLengthIntSet => true
+      case _ => false
 }
 
 object OptimizationStrategyType {
 
-  /** Strategies shown in UI dropdowns (excludes unimplemented state-space search). */
+  /** Catalog offered by UI dropdowns. Each problem keeps the entries for which [[OptimizationStrategyType.appliesTo]] is true. */
   val valuesForUi: Array[OptimizationStrategyType] = Array(
     GLOBAL_SAMPLING,
     GLOBAL_HILL_CLIMBING,
