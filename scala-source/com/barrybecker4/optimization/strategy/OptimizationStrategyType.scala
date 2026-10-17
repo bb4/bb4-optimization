@@ -24,7 +24,9 @@ enum OptimizationStrategyType {
        STATE_SPACE_SEARCH,
        BRUTE_FORCE,
        DIFFERENTIAL_EVOLUTION,
-       PARTICLE_SWARM
+       PARTICLE_SWARM,
+       ITERATED_LOCAL_SEARCH,
+       VARIABLE_NEIGHBORHOOD_SEARCH
 
   def getDescription: String = this match
     case GLOBAL_SAMPLING =>
@@ -53,6 +55,13 @@ enum OptimizationStrategyType {
       "A swarm of particles flies through the bounded parameter space, pulled toward the best positions " +
         "found by each particle and by its neighbors. Good for continuous, multimodal problems; " +
         "needs absolute fitness and numeric parameters."
+    case ITERATED_LOCAL_SEARCH =>
+      "Repeatedly shakes the current solution with a fixed strength, runs a local search, and moves to the result " +
+        "if it is at least as good. Good for discrete problems like permutations and subsets; " +
+        "keeps exploring around good solutions instead of stopping at the first local optimum."
+    case VARIABLE_NEIGHBORHOOD_SEARCH =>
+      "Like iterated local search, but shakes harder after each failed attempt and resets after an improvement, " +
+        "so it moves to a better solution only when one is found. Good for discrete problems like permutations and subsets."
 
   def getStrategy(optimizee: Optimizee, fitnessRange: Double, rnd: Random): OptimizationStrategy =
     this match
@@ -89,6 +98,14 @@ enum OptimizationStrategyType {
         new DifferentialEvolutionStrategy(optimizee)
       case PARTICLE_SWARM =>
         new ParticleSwarmStrategy(optimizee, rnd)
+      case ITERATED_LOCAL_SEARCH =>
+        val strategy = new IteratedLocalSearchStrategy(optimizee, rnd)
+        strategy.setConfig(IteratedLocalSearchConfig.IteratedLocalSearch)
+        strategy
+      case VARIABLE_NEIGHBORHOOD_SEARCH =>
+        val strategy = new IteratedLocalSearchStrategy(optimizee, rnd)
+        strategy.setConfig(IteratedLocalSearchConfig.VariableNeighborhoodSearch)
+        strategy
 
 }
 
@@ -106,7 +123,9 @@ object OptimizationStrategyType {
     STATE_SPACE_SEARCH,
     BRUTE_FORCE,
     DIFFERENTIAL_EVOLUTION,
-    PARTICLE_SWARM
+    PARTICLE_SWARM,
+    ITERATED_LOCAL_SEARCH,
+    VARIABLE_NEIGHBORHOOD_SEARCH
   )
 
   /** @deprecated use [[valuesForUi]] */

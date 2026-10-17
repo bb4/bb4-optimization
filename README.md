@@ -40,6 +40,10 @@ See the [releases page](https://github.com/bb4/bb4-optimization/releases) or [Ma
   a swarm is pulled toward each particle's own best and its neighborhood's best (`ParticleSwarmTopology.Global` converges fast,
   `Ring` is more robust on multimodal problems); reproducible for a given seed, integer parameters are rounded, and it returns best-so-far when an evaluation budget runs out.
   Needs absolute fitness (not `evaluateByComparison`) and a `NumericParameterArray`
+- **`IteratedLocalSearchStrategy` / `IteratedLocalSearchConfig`** — iterated local search (`ITERATED_LOCAL_SEARCH`) and variable neighborhood search (`VARIABLE_NEIGHBORHOOD_SEARCH`) for discrete problems (permutations, variable length integer sets):
+  shake the current solution, run a first-improvement local search over random neighbors, and move on if the result is better (`LocalSearchAcceptance` can also accept equal or, Metropolis-style, worse optima);
+  the shake level is fixed for ILS and escalates after each failed round for VNS, it restarts from a random solution when stuck, never evaluates a solution twice, supports comparison mode, and returns best-so-far when an evaluation budget runs out.
+  Prefer over `HILL_CLIMBING` when it gets stuck in local optima, and over `GLOBAL_HILL_CLIMBING` when good solutions are clustered
 - **`parameter`** — typed parameters (`DoubleParameter`, `IntegerParameter`, `BooleanParameter`, …), 
   arrays (`NumericParameterArray`, `PermutedParameterArray`, `VariableLengthIntSet`), 
   sampling, distance metrics, and optional redistribution functions
