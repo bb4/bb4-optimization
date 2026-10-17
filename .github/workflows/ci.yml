@@ -18,6 +18,7 @@ jobs:
           distribution: temurin
           java-version: '21'
 
+      # ./gradlew build runs StrategyScoreboardSuite (strategy × problem fitness bars).
       - name: Build and test
         run: |
           if [ "${{ github.event_name }}" = "repository_dispatch" ]; then
