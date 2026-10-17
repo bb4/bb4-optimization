@@ -21,7 +21,8 @@ class BooleanParameterSuite extends ParameterSuite[Boolean] {
 
   override protected def expectedNaturalValue: Boolean = true
 
-  override protected def expectedForwardEpsChange = 2.0
+  // true is already the upper bound (1). A forward step must stay inside [0, 1].
+  override protected def expectedForwardEpsChange = 1.0
 
   override protected def expectedBackwardEpsChange = 0.0
 

@@ -41,8 +41,12 @@ case class IntegerParameter(theVal: Double, minValue: Double, maxValue: Double, 
     * @param direction forward or backward.
     * @return the size of the increment taken
     */
-  override def incrementByEps(direction: Direction): IntegerParameter =
-    new IntegerParameter((getValue + direction.multiplier).toInt, minValue, maxValue, name, redisFunc)
+  override def incrementByEps(direction: Direction): IntegerParameter = {
+    val raw = (getValue + direction.multiplier).round.toInt
+    val lo = minValue.round.toInt
+    val hi = maxValue.round.toInt
+    new IntegerParameter(math.max(lo, math.min(hi, raw)), minValue, maxValue, name, redisFunc)
+  }
 
   override def setValue(value: Double): IntegerParameter = {
     val retValue =

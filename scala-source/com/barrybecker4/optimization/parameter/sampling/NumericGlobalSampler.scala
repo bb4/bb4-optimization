@@ -40,7 +40,19 @@ class NumericGlobalSampler(var params: NumericParameterArray, val requestedNumSa
   }
 
   private def determineSamplingRate(requestedNumSamples: Long) = {
-    val numDims = params.size
-    Math.pow(requestedNumSamples.toDouble, 1.0 / numDims).toInt
+    if (requestedNumSamples < 1)
+      throw new IllegalArgumentException(
+        s"requestedNumSamples must be positive, got $requestedNumSamples")
+    val numDims = math.max(1, params.size)
+    val raw = math.pow(requestedNumSamples.toDouble, 1.0 / numDims)
+    // MultiDimensionalIndexer multiplies the per-dimension counts in a 32-bit int.
+    // A request such as Long.MaxValue overflows that product (2D wraps to 1 sample;
+    // 1D asks for two billion). Fail instead of searching a corrupted grid.
+    val maxSafePerDim = math.max(1, math.floor(math.pow(Int.MaxValue.toDouble, 1.0 / numDims)).toInt)
+    if (raw.isNaN || raw > maxSafePerDim)
+      throw new IllegalArgumentException(
+        s"Requested global sample grid is too large: about ${raw} points per dimension across $numDims dimensions " +
+          s"(limit $maxSafePerDim so the grid count fits in a 32-bit int)")
+    math.max(1, raw.toInt)
   }
 }

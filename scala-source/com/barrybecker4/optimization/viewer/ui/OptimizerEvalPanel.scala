@@ -105,15 +105,20 @@ class OptimizerEvalPanel() extends JPanel
     val pointsList = new PointsList(ctx.solutionPosition, OptimizerEvalPanel.EDGE_SIZE, projector)
     pointsListOpt = Some(pointsList)
 
-    val worker = new OptimizationSwingWorker(
+    // A cancelled run finishes on the EDT after the next run has started. Only the worker
+    // that is still current may publish status; otherwise "Cancelled." overwrites a finished run.
+    var worker: OptimizationSwingWorker = null
+    worker = new OptimizationSwingWorker(
       strategy = strategy,
       ctx = ctx,
       pointsList = pointsList,
       paintTarget = this,
       onComplete = outcome => {
-        applyOptimizationOutcome(testProblem, strategy, ctx.solutionPosition, outcome)
-        runStateListener(false)
-        currentWorker = None
+        if (currentWorker.contains(worker)) {
+          applyOptimizationOutcome(testProblem, strategy, ctx.solutionPosition, outcome)
+          runStateListener(false)
+          currentWorker = None
+        }
       }
     )
 

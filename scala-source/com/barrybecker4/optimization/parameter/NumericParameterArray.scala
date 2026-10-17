@@ -125,9 +125,16 @@ case class NumericParameterArray(params: IndexedSeq[Parameter],
     val newParams =
       for (k <- 0 until size) yield {
         val par = get(k)
-        val newPar = par.setValue(par.minValue + rnd.nextDouble() * par.range)
-        assert(newPar.getValue < newPar.maxValue && newPar.getValue > newPar.minValue, "newPar "
-          + newPar.getValue + " not between " + newPar.minValue + " and  " + newPar.maxValue)
+        val proposed =
+          if (par.isIntegerOnly) {
+            val lo = par.minValue.round.toInt
+            val hi = par.maxValue.round.toInt
+            val span = math.max(1, hi - lo + 1)
+            (lo + rnd.nextInt(span)).toDouble
+          } else par.minValue + rnd.nextDouble() * par.range
+        val newPar = par.setValue(proposed)
+        assert(newPar.getValue <= newPar.maxValue && newPar.getValue >= newPar.minValue,
+          "newPar " + newPar.getValue + " not in [" + newPar.minValue + ", " + newPar.maxValue + "]")
         newPar
       }
     NumericParameterArray(newParams, numSteps, rnd)

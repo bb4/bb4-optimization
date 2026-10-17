@@ -1,6 +1,8 @@
 // Copyright by Barry G. Becker, 2013-2014. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.parameter.types
 
+import com.barrybecker4.optimization.parameter.Direction
+
 /**
   * @author Barry Becker
   */
@@ -30,4 +32,10 @@ class IntegerParameterSuite extends ParameterSuite[Int] {
 
   override protected def expectedRandomValues: Array[Int] =
     Array[Int](9, 6, 5, 6, 11, 3, 11, 11, 11, 10)
+
+  test("a step at the upper bound stays on the bound") {
+    val atMax = new IntegerParameter(5, 0, 5, "i")
+    val next = atMax.incrementByEps(Direction.FORWARD)
+    assert(next.getValue == 5.0)
+  }
 }
