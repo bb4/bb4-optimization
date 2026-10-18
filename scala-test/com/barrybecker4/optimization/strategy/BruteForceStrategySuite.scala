@@ -4,6 +4,7 @@ import com.barrybecker4.math.MathUtil
 import com.barrybecker4.optimization.optimizee.optimizees.{LineGraphDemoProblem, SphereProblem}
 import com.barrybecker4.optimization.parameter.PermutedParameterArray
 import com.barrybecker4.optimization.parameter.types.IntegerParameter
+import com.barrybecker4.optimization.strategy.optimizees.CompareModeTestOptimizee
 import org.scalatest.funsuite.AnyFunSuite
 
 import scala.util.Random

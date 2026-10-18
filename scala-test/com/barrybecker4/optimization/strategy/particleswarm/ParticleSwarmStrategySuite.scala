@@ -4,8 +4,10 @@ import com.barrybecker4.optimization.optimizee.optimizees.{AckleyProblem, Rastri
 import com.barrybecker4.optimization.optimizee.{BudgetedOptimizee, Optimizee}
 import com.barrybecker4.optimization.parameter.types.{DoubleParameter, IntegerParameter}
 import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray, ParameterArrayWithFitness, PermutedParameterArray}
+import com.barrybecker4.optimization.strategy.particleswarm.optimizees.PsoFunctionOptimizee
 import com.barrybecker4.optimization.strategy.particleswarm.{ParticleSwarmConfig, ParticleSwarmStrategy, ParticleSwarmTopology}
-import com.barrybecker4.optimization.strategy.{OptimizationStrategyType, CompareModeTestOptimizee}
+import com.barrybecker4.optimization.strategy.OptimizationStrategyType
+import com.barrybecker4.optimization.strategy.optimizees.CompareModeTestOptimizee
 import com.barrybecker4.optimization.{OptimizationListener, OptimizationStatus, Optimizer}
 import org.scalatest.funsuite.AnyFunSuite
 
@@ -295,25 +297,4 @@ class ParticleSwarmStrategySuite extends AnyFunSuite {
     NumericParameterArray(
       specs.zipWithIndex.map { case ((value, min, max), i) => DoubleParameter(value, min, max, "x_" + i) }.toIndexedSeq,
       rnd = rnd)
-}
-
-/** Wraps a fitness function, counting evaluations and recording every position that was evaluated. */
-private final class PsoFunctionOptimizee(fitness: ParameterArray => Double, optimal: Double = 0.0) extends Optimizee {
-
-  var evaluations = 0
-  val seen: ArrayBuffer[Array[Double]] = ArrayBuffer.empty
-
-  override def getName: String = "pso-test-function"
-  override def evaluateByComparison: Boolean = false
-
-  override def evaluateFitness(params: ParameterArray): Double = {
-    evaluations += 1
-    seen += Array.tabulate(params.size)(i => params.get(i).getValue)
-    fitness(params)
-  }
-
-  override def compareFitness(params1: ParameterArray, params2: ParameterArray): Double =
-    throw new UnsupportedOperationException
-
-  override def getOptimalFitness: Double = optimal
 }

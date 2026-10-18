@@ -8,6 +8,7 @@ import com.barrybecker4.optimization.strategy.iteratedlocal.IteratedLocalSearchS
 import com.barrybecker4.optimization.strategy.iteratedlocal.{IteratedLocalSearchConfig, IteratedLocalSearchStrategy, LocalSearchAcceptance}
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType
 import com.barrybecker4.optimization.{OptimizationListener, OptimizationStatus, Optimizer}
+import com.barrybecker4.optimization.strategy.iteratedlocal.optimizees.{IlsRecordingOptimizee, IlsSortednessCompareOptimizee}
 import org.scalatest.funsuite.AnyFunSuite
 
 import scala.collection.mutable.ArrayBuffer
@@ -255,48 +256,4 @@ private final class IlsCircleTourOptimizee(slots: IndexedSeq[Int]) extends Optim
     throw new UnsupportedOperationException
 
   override def getOptimalFitness: Double = 1.0e-9
-}
-
-/** Compare mode: the score is how far each value is from its index, and the result is a score difference. */
-private final class IlsSortednessCompareOptimizee extends Optimizee {
-
-  override def getName: String = "sortedness-compare"
-  override def evaluateByComparison: Boolean = true
-
-  override def evaluateFitness(params: ParameterArray): Double =
-    throw new UnsupportedOperationException
-
-  override def compareFitness(sample: ParameterArray, baseline: ParameterArray): Double =
-    score(sample) - score(baseline)
-
-  override def getOptimalFitness: Double = 0.0
-
-  private def score(params: ParameterArray): Double = {
-    var sum = 0.0
-    for (i <- 0 until params.size) {
-      sum += math.abs(params.get(i).getValue - i)
-    }
-    sum
-  }
-}
-
-/** Wraps a fitness function and records the values of every solution that was evaluated, in order. */
-private final class IlsRecordingOptimizee(fitness: ParameterArray => Double, optimal: Double = 0.0) extends Optimizee {
-
-  val evaluated: ArrayBuffer[Vector[Double]] = ArrayBuffer.empty
-
-  def evaluations: Int = evaluated.size
-
-  override def getName: String = "recording"
-  override def evaluateByComparison: Boolean = false
-
-  override def evaluateFitness(params: ParameterArray): Double = {
-    evaluated += Vector.tabulate(params.size)(i => params.get(i).getValue)
-    fitness(params)
-  }
-
-  override def compareFitness(params1: ParameterArray, params2: ParameterArray): Double =
-    throw new UnsupportedOperationException
-
-  override def getOptimalFitness: Double = optimal
 }

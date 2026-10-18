@@ -2,11 +2,11 @@ package com.barrybecker4.optimization.strategy.annealing
 
 import com.barrybecker4.optimization.optimizee.BudgetedOptimizee
 import com.barrybecker4.optimization.parameter.types.DoubleParameter
-import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray}
+import com.barrybecker4.optimization.parameter.NumericParameterArray
 import com.barrybecker4.optimization.strategy.annealing.{GlobalSimulatedAnnealingConfig, GlobalSimulatedAnnealingStrategy}
 import com.barrybecker4.optimization.strategy.hillclimbing.SeedSelection
-import com.barrybecker4.optimization.strategy.DoubleWellOptimizee
-import com.barrybecker4.optimization.strategy.annealing.SaGlobalUnimodalOptimizee
+import com.barrybecker4.optimization.strategy.annealing.optimizees.SaGlobalUnimodalOptimizee
+import com.barrybecker4.optimization.strategy.optimizees.DoubleWellOptimizee
 import org.scalatest.funsuite.AnyFunSuite
 
 import scala.util.Random
@@ -91,17 +91,4 @@ class GlobalSimulatedAnnealingStrategySuite extends AnyFunSuite {
       s"diverse should not lose to top-fitness; top=${rTop.fitness} diverse=${rDiv.fitness}")
     assert(rDiv.fitness < 1.0, s"expected near-global minimum, got ${rDiv.fitness}")
   }
-}
-
-private final class SaGlobalUnimodalOptimizee(target: Double) extends com.barrybecker4.optimization.optimizee.Optimizee {
-  override def getName: String = "unimodal-quadratic-gsa"
-  override def evaluateByComparison: Boolean = false
-  override def evaluateFitness(params: ParameterArray): Double = {
-    val x = params.get(0).getValue
-    val d = x - target
-    d * d
-  }
-  override def compareFitness(params1: ParameterArray, params2: ParameterArray): Double =
-    throw new UnsupportedOperationException
-  override def getOptimalFitness: Double = 0.0
 }

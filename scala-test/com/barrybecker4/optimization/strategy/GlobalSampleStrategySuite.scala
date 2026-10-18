@@ -4,6 +4,7 @@ import com.barrybecker4.optimization.optimizee.Optimizee
 import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray, ParameterArrayWithFitness}
 import com.barrybecker4.optimization.parameter.types.DoubleParameter
 import com.barrybecker4.optimization.strategy.hillclimbing.SeedSelection
+import com.barrybecker4.optimization.strategy.optimizees.FlatLandscapeOptimizee
 import org.scalatest.funsuite.AnyFunSuite
 
 import scala.util.Random
@@ -38,13 +39,4 @@ class GlobalSampleStrategySuite extends AnyFunSuite {
     val spread = diverse.head.pa.distance(diverse(1).pa)
     assert(spread > 8.0, s"expected well-separated seeds, distance=$spread xs=$xs ys=$ys")
   }
-}
-
-private final class FlatLandscapeOptimizee extends Optimizee {
-  override def getName: String = "flat"
-  override def evaluateByComparison: Boolean = false
-  override def evaluateFitness(params: ParameterArray): Double = 1.0
-  override def compareFitness(params1: ParameterArray, params2: ParameterArray): Double =
-    throw new UnsupportedOperationException
-  override def getOptimalFitness: Double = 0.0
 }

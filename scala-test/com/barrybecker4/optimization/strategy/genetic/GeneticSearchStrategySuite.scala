@@ -1,13 +1,12 @@
 package com.barrybecker4.optimization.strategy.genetic
 
 import com.barrybecker4.math.MathUtil
-import com.barrybecker4.optimization.optimizee.Optimizee
 import com.barrybecker4.optimization.parameter.types.DoubleParameter
 import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray, ParameterArrayWithFitness}
+import com.barrybecker4.optimization.strategy.genetic.optimizees.{BaselineRelativeQuadraticGeneticTestOptimizee, RecordingCompareBaselineOptimizee, RecordingOptimizee}
 import com.barrybecker4.optimization.strategy.genetic.{GeneticSearchConfig, GeneticSearchStrategy, NeighborSelection}
 import org.scalatest.funsuite.AnyFunSuite
 
-import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
 
@@ -174,65 +173,5 @@ private[strategy] object NumericParameterArraySuiteLike {
       max,
       Array[String]("A", "B"),
       MathUtil.RANDOM)
-  }
-}
-
-private[strategy] final class RecordingOptimizee extends Optimizee {
-  val evaluateFitnessCalls: mutable.Buffer[ParameterArray] = mutable.Buffer.empty
-
-  override def getName: String = "recording"
-
-  override def evaluateByComparison: Boolean = false
-
-  override def evaluateFitness(params: ParameterArray): Double = {
-    evaluateFitnessCalls += params
-    params.get(0).getValue + params.get(1).getValue
-  }
-
-  override def compareFitness(params1: ParameterArray, params2: ParameterArray): Double =
-    throw new UnsupportedOperationException
-
-  override def getOptimalFitness: Double = 0.0
-}
-
-/** Records the baseline (second) argument of every `compareFitness` call. */
-private[strategy] final class RecordingCompareBaselineOptimizee extends Optimizee {
-  val compareBaselines: mutable.Buffer[ParameterArray] = mutable.Buffer.empty
-
-  override def getName: String = "recording-compare-baseline"
-
-  override def evaluateByComparison: Boolean = true
-
-  override def evaluateFitness(params: ParameterArray): Double =
-    throw new UnsupportedOperationException
-
-  override def compareFitness(sample: ParameterArray, baseline: ParameterArray): Double = {
-    compareBaselines += baseline
-    val s = sample.get(0).getValue + sample.get(1).getValue
-    val b = baseline.get(0).getValue + baseline.get(1).getValue
-    s - b
-  }
-
-  override def getOptimalFitness: Double = 0.0
-}
-
-/** `compareFitness(sample, baseline) = score(sample) - score(baseline)` (lower is better when sample is better). */
-private[strategy] final class BaselineRelativeQuadraticGeneticTestOptimizee(target: Double) extends Optimizee {
-  override def getName: String = "quadratic-compare-genetic"
-
-  override def evaluateByComparison: Boolean = true
-
-  override def evaluateFitness(params: ParameterArray): Double =
-    throw new UnsupportedOperationException
-
-  override def compareFitness(sample: ParameterArray, baseline: ParameterArray): Double =
-    score(sample) - score(baseline)
-
-  override def getOptimalFitness: Double = 0.0
-
-  private def score(params: ParameterArray): Double = {
-    val x = params.get(0).getValue
-    val d = x - target
-    d * d
   }
 }

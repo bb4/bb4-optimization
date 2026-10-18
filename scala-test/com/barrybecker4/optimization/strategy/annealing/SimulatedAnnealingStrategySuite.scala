@@ -1,11 +1,10 @@
 package com.barrybecker4.optimization.strategy.annealing
 
-import com.barrybecker4.optimization.optimizee.Optimizee
 import com.barrybecker4.optimization.parameter.types.DoubleParameter
 import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray}
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType.SIMULATED_ANNEALING
+import com.barrybecker4.optimization.strategy.annealing.optimizees.{FlatAbsoluteOptimizee, SaBaselineRelativeQuadratic, SaQuadraticOptimizee}
 import com.barrybecker4.optimization.strategy.annealing.{SimulatedAnnealingStepMode, SimulatedAnnealingStrategy}
-//import com.barrybecker4.optimization.strategy.annealing.{FlatAbsoluteOptimizee, SaTestBaselineRelativeQuadratic, SaTestQuadraticOptimizee}
 import org.scalatest.funsuite.AnyFunSuite
 
 import scala.util.Random
@@ -14,7 +13,7 @@ class SimulatedAnnealingStrategySuite extends AnyFunSuite {
 
   test("doOptimization requires positive finite fitnessRange") {
     val rnd = new Random(0)
-    val optimizee = new SaTestQuadraticOptimizee(target = 0.0)
+    val optimizee = new SaQuadraticOptimizee(target = 0.0)
     val sa = new SimulatedAnnealingStrategy(optimizee, rnd)
     val initial = NumericParameterArray(
       IndexedSeq(DoubleParameter(value = 2.0, minValue = -10.0, maxValue = 10.0, name = "x")),
@@ -26,7 +25,7 @@ class SimulatedAnnealingStrategySuite extends AnyFunSuite {
 
   test("fixed step mode improves on simple quadratic") {
     val rnd = new Random(5)
-    val optimizee = new SaTestQuadraticOptimizee(target = 1.0)
+    val optimizee = new SaQuadraticOptimizee(target = 1.0)
     val sa = new SimulatedAnnealingStrategy(optimizee, rnd)
     sa.setStepMode(SimulatedAnnealingStepMode.Fixed)
     sa.setMaxTemperature(50.0)
@@ -40,13 +39,13 @@ class SimulatedAnnealingStrategySuite extends AnyFunSuite {
   }
 
   test("default config uses AdaptiveAcceptance") {
-    val sa = new SimulatedAnnealingStrategy(new SaTestQuadraticOptimizee(0.0), new Random(1))
+    val sa = new SimulatedAnnealingStrategy(new SaQuadraticOptimizee(0.0), new Random(1))
     assert(sa.getConfig.stepMode.isInstanceOf[SimulatedAnnealingStepMode.AdaptiveAcceptance])
   }
 
   test("factory default uses AdaptiveAcceptance") {
     val rnd = new Random(3)
-    val optimizee = new SaTestQuadraticOptimizee(target = 0.0)
+    val optimizee = new SaQuadraticOptimizee(target = 0.0)
     val strategy = SIMULATED_ANNEALING.getStrategy(optimizee, fitnessRange = 100.0, rnd)
     val sa = strategy.asInstanceOf[SimulatedAnnealingStrategy]
     assert(sa.getConfig.stepMode.isInstanceOf[SimulatedAnnealingStepMode.AdaptiveAcceptance])
@@ -54,7 +53,7 @@ class SimulatedAnnealingStrategySuite extends AnyFunSuite {
 
   test("aggressive adaptive scale does not exceed proposal radius clamp") {
     val rnd = new Random(19)
-    val optimizee = new SaTestQuadraticOptimizee(target = 0.0)
+    val optimizee = new SaQuadraticOptimizee(target = 0.0)
     val sa = new SimulatedAnnealingStrategy(optimizee, rnd)
     sa.setStepMode(
       SimulatedAnnealingStepMode.AdaptiveAcceptance(
@@ -100,7 +99,7 @@ class SimulatedAnnealingStrategySuite extends AnyFunSuite {
     assert(out.fitness == 1.0)
 
     val rnd2 = new Random(13)
-    val compareOpt = new SaTestBaselineRelativeQuadratic(target = 0.0)
+    val compareOpt = new SaBaselineRelativeQuadratic(target = 0.0)
     val sa2 = new SimulatedAnnealingStrategy(compareOpt, rnd2)
     sa2.setStepMode(SimulatedAnnealingStepMode.AdaptiveAcceptance(windowProposals = 10))
     sa2.setMaxTemperature(30.0)
@@ -115,7 +114,7 @@ class SimulatedAnnealingStrategySuite extends AnyFunSuite {
 
   test("budget interrupt mid-run keeps compare-fitness consistent with baseline") {
     val rnd = new Random(29)
-    val compareOpt = new SaTestBaselineRelativeQuadratic(target = 0.0)
+    val compareOpt = new SaBaselineRelativeQuadratic(target = 0.0)
     val budgeted = new com.barrybecker4.optimization.optimizee.BudgetedOptimizee(compareOpt, maxEvaluations = 25)
     val sa = new SimulatedAnnealingStrategy(budgeted, rnd)
     sa.setStepMode(SimulatedAnnealingStepMode.Fixed)
@@ -129,43 +128,4 @@ class SimulatedAnnealingStrategySuite extends AnyFunSuite {
     assert(math.abs(out.fitness - expected) < 1.0e-9,
       s"stored fitness ${out.fitness} should match compare vs baseline $expected")
   }
-}
-
-private final class SaTestQuadraticOptimizee(target: Double) extends Optimizee {
-  override def getName: String = "quadratic-sa-test"
-  override def evaluateByComparison: Boolean = false
-  override def evaluateFitness(params: ParameterArray): Double = {
-    val x = params.get(0).getValue
-    val d = x - target
-    d * d
-  }
-  override def compareFitness(params1: ParameterArray, params2: ParameterArray): Double =
-    throw new UnsupportedOperationException
-  override def getOptimalFitness: Double = 0.0
-}
-
-private final class SaTestBaselineRelativeQuadratic(target: Double) extends Optimizee {
-  override def getName: String = "quadratic-compare-sa-test"
-  override def evaluateByComparison: Boolean = true
-  override def evaluateFitness(params: ParameterArray): Double =
-    throw new UnsupportedOperationException
-  override def compareFitness(sample: ParameterArray, baseline: ParameterArray): Double =
-    score(sample) - score(baseline)
-  override def getOptimalFitness: Double = 0.0
-
-  private def score(params: ParameterArray): Double = {
-    val x = params.get(0).getValue
-    val d = x - target
-    d * d
-  }
-}
-
-/** Constant positive fitness; Metropolis always accepts equal-fitness moves (exp(0)=1). */
-private final class FlatAbsoluteOptimizee extends Optimizee {
-  override def getName: String = "flat-sa-test"
-  override def evaluateByComparison: Boolean = false
-  override def evaluateFitness(params: ParameterArray): Double = 1.0
-  override def compareFitness(params1: ParameterArray, params2: ParameterArray): Double =
-    throw new UnsupportedOperationException
-  override def getOptimalFitness: Double = 0.0
 }

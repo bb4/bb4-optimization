@@ -5,7 +5,7 @@ import com.barrybecker4.optimization.optimizee.optimizees.{DiscreteGrid2DDemoPro
 import com.barrybecker4.optimization.parameter.types.DoubleParameter
 import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray}
 import com.barrybecker4.optimization.strategy.hillclimbing.{GlobalHillClimbingConfig, GlobalHillClimbingStrategy, SeedSelection, UnimodalQuadraticOptimizee}
-import com.barrybecker4.optimization.strategy.DoubleWellOptimizee
+import com.barrybecker4.optimization.strategy.optimizees.DoubleWellOptimizee
 import org.scalatest.funsuite.AnyFunSuite
 
 import scala.util.Random

@@ -1,7 +1,7 @@
 package com.barrybecker4.optimization.strategy.iteratedlocal
 
-import com.barrybecker4.optimization.strategy.DoubleWellOptimizee
 import com.barrybecker4.optimization.strategy.iteratedlocal.{IteratedLocalSearchConfig, IteratedLocalSearchStrategy, LocalSearchAcceptance}
+import com.barrybecker4.optimization.strategy.optimizees.DoubleWellOptimizee
 import org.scalatest.funsuite.AnyFunSuite
 
 import scala.util.Random

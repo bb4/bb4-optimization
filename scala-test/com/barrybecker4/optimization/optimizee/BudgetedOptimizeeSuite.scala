@@ -3,8 +3,9 @@ package com.barrybecker4.optimization.optimizee
 import com.barrybecker4.optimization.{OptimizationStatus, Optimizer}
 import com.barrybecker4.optimization.parameter.NumericParameterArray
 import com.barrybecker4.optimization.parameter.types.{DoubleParameter, IntegerParameter}
+import com.barrybecker4.optimization.strategy.optimizees.DoubleWellOptimizee
 import com.barrybecker4.optimization.strategy.{
-  DoubleWellOptimizee, GENETIC_SEARCH, GLOBAL_HILL_CLIMBING, GLOBAL_SIMULATED_ANNEALING, HILL_CLIMBING,
+  GENETIC_SEARCH, GLOBAL_HILL_CLIMBING, GLOBAL_SIMULATED_ANNEALING, HILL_CLIMBING,
   SIMULATED_ANNEALING, STATE_SPACE_SEARCH
 }
 import org.scalatest.funsuite.AnyFunSuite

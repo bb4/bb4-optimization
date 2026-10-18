@@ -1,15 +1,15 @@
-package com.barrybecker4.optimization.strategy
+package com.barrybecker4.optimization.strategy.statespace
 
 import com.barrybecker4.math.MathUtil
 import com.barrybecker4.optimization.Optimizer
-import com.barrybecker4.optimization.optimizee.{DiscreteStateSpace, LineGraphTestProblem, Optimizee}
 import com.barrybecker4.optimization.optimizee.optimizees.DiscreteGrid2DDemoProblem
-import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray}
+import com.barrybecker4.optimization.optimizee.LineGraphTestProblem
 import com.barrybecker4.optimization.parameter.types.IntegerParameter
+import com.barrybecker4.optimization.parameter.NumericParameterArray
+import com.barrybecker4.optimization.strategy.OptimizationStrategyType.STATE_SPACE_SEARCH
+import com.barrybecker4.optimization.strategy.statespace.optimizees.{CompareModeLineOptimizee, CountingDiscreteOptimizee}
 import com.barrybecker4.optimization.strategy.statespace.{StateSpaceSearchConfig, StateSpaceSearchMode, StateSpaceSearchStrategy}
 import org.scalatest.funsuite.AnyFunSuite
-
-import scala.collection.mutable
 import scala.util.Random
 
 class StateSpaceSearchStrategySuite extends AnyFunSuite {
@@ -116,57 +116,4 @@ class StateSpaceSearchStrategySuite extends AnyFunSuite {
     assert(strategy.getConfig.maxExpansions == StateSpaceSearchConfig.DEFAULT_MAX_EXPANSIONS)
     assert(strategy.getConfig.searchMode == StateSpaceSearchMode.BestFirstFitness)
   }
-}
-
-/** Wraps a discrete optimizee and records evaluateFitness keys / counts. */
-private final class CountingDiscreteOptimizee(delegate: Optimizee & DiscreteStateSpace)
-    extends Optimizee with DiscreteStateSpace {
-
-  val evaluatedKeys: mutable.Set[String] = mutable.LinkedHashSet.empty
-  var evaluateCount: Int = 0
-
-  override def getName: String = "counting-" + delegate.getName
-  override def evaluateByComparison: Boolean = delegate.evaluateByComparison
-  override def getOptimalFitness: Double = delegate.getOptimalFitness
-
-  override def evaluateFitness(params: ParameterArray): Double = {
-    evaluateCount += 1
-    evaluatedKeys += params.toCSVString
-    delegate.evaluateFitness(params)
-  }
-
-  override def compareFitness(params1: ParameterArray, params2: ParameterArray): Double =
-    delegate.compareFitness(params1, params2)
-
-  override def successors(state: ParameterArray): Seq[ParameterArray] = delegate.successors(state)
-
-  override def heuristic(state: ParameterArray): Double = delegate.heuristic(state)
-}
-
-/** compareFitness(sample, baseline) = score(sample) - score(baseline); score = |x - target|. */
-private final class CompareModeLineOptimizee(target: Int, lo: Int, hi: Int, rnd: Random)
-    extends Optimizee with DiscreteStateSpace {
-
-  override def getName: String = "compare-line"
-  override def evaluateByComparison: Boolean = true
-  override def getOptimalFitness: Double = 0.0
-
-  override def evaluateFitness(params: ParameterArray): Double =
-    throw new UnsupportedOperationException
-
-  override def compareFitness(sample: ParameterArray, baseline: ParameterArray): Double =
-    score(sample) - score(baseline)
-
-  override def successors(state: ParameterArray): Seq[ParameterArray] = {
-    val v = state.get(0).getValue.toInt
-    List(v - 1, v + 1).filter(x => x >= lo && x <= hi).map(npa)
-  }
-
-  override def heuristic(state: ParameterArray): Double = 0.0
-
-  private def score(params: ParameterArray): Double =
-    math.abs(params.get(0).getValue.toInt - target).toDouble
-
-  private def npa(value: Int): NumericParameterArray =
-    new NumericParameterArray(IndexedSeq(new IntegerParameter(value, lo, hi, "x")), rnd = rnd)
 }

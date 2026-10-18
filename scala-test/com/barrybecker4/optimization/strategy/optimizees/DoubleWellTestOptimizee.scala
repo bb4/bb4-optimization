@@ -1,4 +1,4 @@
-package com.barrybecker4.optimization.strategy
+package com.barrybecker4.optimization.strategy.optimizees
 
 import com.barrybecker4.optimization.optimizee.Optimizee
 import com.barrybecker4.optimization.parameter.ParameterArray

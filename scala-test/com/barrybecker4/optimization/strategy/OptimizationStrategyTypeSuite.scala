@@ -5,6 +5,7 @@ import com.barrybecker4.optimization.optimizee.Optimizee
 import com.barrybecker4.optimization.optimizee.optimizees.{DiscreteGrid2DDemoProblem, LineGraphDemoProblem, SphereProblem}
 import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray, PermutedParameterArray, VariableLengthIntSet}
 import com.barrybecker4.optimization.parameter.types.{DoubleParameter, IntegerParameter}
+import com.barrybecker4.optimization.strategy.statespace.optimizees.CompareOnlyOptimizee
 import org.scalatest.funsuite.AnyFunSuite
 
 import scala.util.Random
@@ -53,7 +54,7 @@ class OptimizationStrategyTypeSuite extends AnyFunSuite {
     val compare = new CompareOnlyOptimizee
     assert(!DIFFERENTIAL_EVOLUTION.appliesTo(compare, sphere.getInitialGuess))
     assert(!PARTICLE_SWARM.appliesTo(compare, sphere.getInitialGuess))
-    assert(STATE_SPACE_SEARCH.appliesTo(compare, sphere.getInitialGuess) == false)
+    assert(!STATE_SPACE_SEARCH.appliesTo(compare, sphere.getInitialGuess))
     assert(HILL_CLIMBING.appliesTo(compare, sphere.getInitialGuess))
   }
 
@@ -94,11 +95,3 @@ class OptimizationStrategyTypeSuite extends AnyFunSuite {
   }
 }
 
-/** Absolute-fitness strategies must refuse this even when the parameters are numeric. */
-private class CompareOnlyOptimizee extends Optimizee {
-  override def getName: String = "compare-only"
-  override def evaluateByComparison: Boolean = true
-  override def evaluateFitness(params: ParameterArray): Double = 0.0
-  override def compareFitness(params1: ParameterArray, params2: ParameterArray): Double = 0.0
-  override def getOptimalFitness: Double = 0.0
-}

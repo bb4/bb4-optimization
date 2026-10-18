@@ -1,6 +1,6 @@
 package com.barrybecker4.optimization.strategy.particleswarm
 
-import com.barrybecker4.optimization.strategy.DoubleWellOptimizee
+import com.barrybecker4.optimization.strategy.optimizees.DoubleWellOptimizee
 import com.barrybecker4.optimization.strategy.particleswarm.{ParticleSwarmConfig, ParticleSwarmStrategy, ParticleSwarmTopology}
 import org.scalatest.funsuite.AnyFunSuite
 
