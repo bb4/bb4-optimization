@@ -1,7 +1,6 @@
 package com.barrybecker4.optimization.strategy
 
-import com.barrybecker4.optimization.optimizee.Optimizee
-import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray, ParameterArrayWithFitness}
+import com.barrybecker4.optimization.parameter.NumericParameterArray
 import com.barrybecker4.optimization.parameter.types.DoubleParameter
 import com.barrybecker4.optimization.strategy.hillclimbing.SeedSelection
 import com.barrybecker4.optimization.strategy.optimizees.FlatLandscapeOptimizee

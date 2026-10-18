@@ -175,9 +175,7 @@ class IteratedLocalSearchStrategySuite extends AnyFunSuite {
     val tour = new IlsCircleTourOptimizee(CircleSlots)
     val reported = ArrayBuffer.empty[Double]
     val strategy = strategyFor(tour, IteratedLocalSearchConfig.Default)
-    strategy.setListener(new OptimizationListener {
-      override def optimizerChanged(params: ParameterArrayWithFitness): Unit = reported += params.fitness
-    })
+    strategy.setListener((params: ParameterArrayWithFitness) => reported += params.fitness)
 
     val solution = strategy.doOptimization(identityTour(14, new Random(2)), CircleFitnessRange)
 
