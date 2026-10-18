@@ -1,5 +1,5 @@
 // Copyright by Barry G. Becker, 2000-2026. Licensed under MIT License: http://www.opensource.org/licenses/MIT
-package com.barrybecker4.optimization.strategy
+package com.barrybecker4.optimization.strategy.iteratedlocal
 
 /**
  * Decides whether the local optimum reached after a shake replaces the current solution in

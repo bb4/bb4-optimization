@@ -1,5 +1,5 @@
 // Copyright by Barry G. Becker, 2000-2026. Licensed under MIT License: http://www.opensource.org/licenses/MIT
-package com.barrybecker4.optimization.strategy
+package com.barrybecker4.optimization.strategy.statespace
 
 /** How the frontier priority queue is ordered. */
 enum StateSpaceSearchMode {

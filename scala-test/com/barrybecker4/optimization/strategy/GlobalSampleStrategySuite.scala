@@ -3,6 +3,7 @@ package com.barrybecker4.optimization.strategy
 import com.barrybecker4.optimization.optimizee.Optimizee
 import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray, ParameterArrayWithFitness}
 import com.barrybecker4.optimization.parameter.types.DoubleParameter
+import com.barrybecker4.optimization.strategy.hillclimbing.SeedSelection
 import org.scalatest.funsuite.AnyFunSuite
 
 import scala.util.Random

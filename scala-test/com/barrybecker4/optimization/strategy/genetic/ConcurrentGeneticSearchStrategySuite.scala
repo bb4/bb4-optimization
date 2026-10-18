@@ -1,9 +1,11 @@
-package com.barrybecker4.optimization.strategy
+package com.barrybecker4.optimization.strategy.genetic
 
 import com.barrybecker4.math.MathUtil
 import com.barrybecker4.optimization.optimizee.Optimizee
-import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray, PermutedParameterArray}
 import com.barrybecker4.optimization.parameter.types.{DoubleParameter, IntegerParameter}
+import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray, PermutedParameterArray}
+import com.barrybecker4.optimization.strategy.genetic.{ConcurrentGeneticSearchStrategy, GeneticSearchConfig, GeneticSearchStrategy, NeighborSelection}
+import com.barrybecker4.optimization.strategy.CompareModeTestOptimizee
 import org.scalatest.funsuite.AnyFunSuite
 
 import java.util.concurrent.atomic.AtomicInteger
@@ -14,7 +16,7 @@ class ConcurrentGeneticSearchStrategySuite extends AnyFunSuite {
   test("concurrent genetic completes in compare mode on tiny permutation space") {
     MathUtil.RANDOM.setSeed(42)
     val rnd = new Random(42)
-    val optimizee = new PermutationIdentityCompareOptimizee
+    val optimizee = new CompareModeTestOptimizee
     val seed = PermutedParameterArray(IndexedSeq(
       new IntegerParameter(2, 0, 2, "a"),
       new IntegerParameter(1, 0, 2, "b"),

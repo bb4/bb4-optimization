@@ -5,6 +5,8 @@ import com.barrybecker4.math.MathUtil
 import com.barrybecker4.optimization.optimizee.{BudgetedOptimizee, EvaluationBudgetExceededException, Optimizee}
 import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType
+import com.barrybecker4.optimization.strategy.annealing.SimulatedAnnealingStrategy
+import com.barrybecker4.optimization.strategy.genetic.GeneticSearchStrategy
 
 import scala.util.Random
 
@@ -37,13 +39,13 @@ class Optimizer(val optimizee: Optimizee, optimizationLogFile: Option[String] = 
     *
     * @param optimizationType the type of search to perform
     * @param params           the initial guess at the solution; also defines the bounds of the search space
-    * @param fitnessRange     approximate scale of the objective (e.g. max − min fitness over the domain of interest).
-    *                         Used by strategies that need a temperature or stopping threshold in the same units as
-    *                         fitness: e.g. [[com.barrybecker4.optimization.strategy.SimulatedAnnealingStrategy]]
-    *                         scales initial temperature from `fitnessRange / 10`, and
-    *                         [[com.barrybecker4.optimization.strategy.GeneticSearchStrategy]] derives improvement
-    *                         epsilon from `fitnessRange / 100_000_000`. It need not be exact; order-of-magnitude is enough.
-    * @param rnd              random source for stochastic strategies
+    * @param fitnessRange approximate scale of the objective (e.g. max − min fitness over the domain of interest).
+    *                     Used by strategies that need a temperature or stopping threshold in the same units as
+    *                     fitness: e.g. [[SimulatedAnnealingStrategy]]
+    *                     scales initial temperature from `fitnessRange / 10`, and
+    *                     [[GeneticSearchStrategy]] derives improvement
+    *                     epsilon from `fitnessRange / 100_000_000`. It need not be exact; order-of-magnitude is enough.
+    * @param rnd          random source for stochastic strategies
     * @param maxEvaluations   if set, wraps the optimizee so each call to `evaluateFitness` or `compareFitness`
     *                         counts toward a budget; when exceeded, returns best-so-far with
     *                         [[OptimizationStatus.BudgetExhausted]] instead of throwing

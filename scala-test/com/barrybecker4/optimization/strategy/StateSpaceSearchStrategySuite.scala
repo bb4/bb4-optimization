@@ -6,6 +6,7 @@ import com.barrybecker4.optimization.optimizee.{DiscreteStateSpace, LineGraphTes
 import com.barrybecker4.optimization.optimizee.optimizees.DiscreteGrid2DDemoProblem
 import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray}
 import com.barrybecker4.optimization.parameter.types.IntegerParameter
+import com.barrybecker4.optimization.strategy.statespace.{StateSpaceSearchConfig, StateSpaceSearchMode, StateSpaceSearchStrategy}
 import org.scalatest.funsuite.AnyFunSuite
 
 import scala.collection.mutable

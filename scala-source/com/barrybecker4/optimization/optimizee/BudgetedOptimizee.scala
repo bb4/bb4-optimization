@@ -2,6 +2,7 @@
 package com.barrybecker4.optimization.optimizee
 
 import com.barrybecker4.optimization.parameter.ParameterArray
+import com.barrybecker4.optimization.strategy.statespace.StateSpaceSearchStrategy
 
 /**
   * Thrown when [[BudgetedOptimizee]] has reached its evaluation limit.
@@ -53,7 +54,7 @@ object BudgetedOptimizee {
 
   /**
     * Wrap `delegate` with an evaluation budget. When `delegate` mixes in [[DiscreteStateSpace]],
-    * the wrapper also does so (needed for [[com.barrybecker4.optimization.strategy.StateSpaceSearchStrategy]]).
+    * the wrapper also does so (needed for [[StateSpaceSearchStrategy]]).
     */
   def wrap(delegate: Optimizee, maxEvaluations: Int): BudgetedOptimizee =
     delegate match {

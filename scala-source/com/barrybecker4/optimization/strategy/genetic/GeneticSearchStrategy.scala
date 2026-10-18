@@ -1,11 +1,12 @@
 // Copyright by Barry G. Becker, 2000-2026. Licensed under MIT License: http://www.opensource.org/licenses/MIT
-package com.barrybecker4.optimization.strategy
+package com.barrybecker4.optimization.strategy.genetic
 
-import com.barrybecker4.optimization.optimizee.{EvaluationBudgetExceededException, Optimizee}
 import com.barrybecker4.common.format.FormatUtil
 import com.barrybecker4.math.MathUtil
+import com.barrybecker4.optimization.optimizee.{EvaluationBudgetExceededException, Optimizee}
+import com.barrybecker4.optimization.parameter.ParameterArrayWithFitness.given
 import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness, ParameterCrossover}
-import ParameterArrayWithFitness.given
+import com.barrybecker4.optimization.strategy.OptimizationStrategy
 
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random

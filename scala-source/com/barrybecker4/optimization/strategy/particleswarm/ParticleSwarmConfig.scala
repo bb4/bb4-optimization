@@ -1,5 +1,6 @@
 // Copyright by Barry G. Becker, 2000-2026. Licensed under MIT License: http://www.opensource.org/licenses/MIT
-package com.barrybecker4.optimization.strategy
+package com.barrybecker4.optimization.strategy.particleswarm
+
 
 /**
  * Which particles each particle learns from (its "social" attractor) in [[ParticleSwarmStrategy]].

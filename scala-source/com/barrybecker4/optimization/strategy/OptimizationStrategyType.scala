@@ -2,9 +2,13 @@
 package com.barrybecker4.optimization.strategy
 
 import com.barrybecker4.optimization.optimizee.{DiscreteStateSpace, Optimizee}
-import com.barrybecker4.optimization.parameter.{
-  NumericParameterArray, ParameterArray, PermutedParameterArray, VariableLengthIntSet
-}
+import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray, PermutedParameterArray, VariableLengthIntSet}
+import com.barrybecker4.optimization.strategy.annealing.{GlobalSimulatedAnnealingStrategy, SimulatedAnnealingConfig, SimulatedAnnealingStrategy}
+import com.barrybecker4.optimization.strategy.genetic.{ConcurrentGeneticSearchStrategy, GeneticSearchStrategy}
+import com.barrybecker4.optimization.strategy.hillclimbing.{GlobalHillClimbingStrategy, HillClimbingStrategy}
+import com.barrybecker4.optimization.strategy.iteratedlocal.{IteratedLocalSearchConfig, IteratedLocalSearchStrategy}
+import com.barrybecker4.optimization.strategy.particleswarm.ParticleSwarmStrategy
+import com.barrybecker4.optimization.strategy.statespace.{StateSpaceSearchConfig, StateSpaceSearchStrategy}
 
 import scala.util.Random
 

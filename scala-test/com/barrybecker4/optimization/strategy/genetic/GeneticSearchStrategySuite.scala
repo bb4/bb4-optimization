@@ -1,9 +1,10 @@
-package com.barrybecker4.optimization.strategy
+package com.barrybecker4.optimization.strategy.genetic
 
 import com.barrybecker4.math.MathUtil
 import com.barrybecker4.optimization.optimizee.Optimizee
 import com.barrybecker4.optimization.parameter.types.DoubleParameter
 import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray, ParameterArrayWithFitness}
+import com.barrybecker4.optimization.strategy.genetic.{GeneticSearchConfig, GeneticSearchStrategy, NeighborSelection}
 import org.scalatest.funsuite.AnyFunSuite
 
 import scala.collection.mutable

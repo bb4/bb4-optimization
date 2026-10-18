@@ -1,12 +1,14 @@
-package com.barrybecker4.optimization.strategy
+package com.barrybecker4.optimization.strategy.iteratedlocal
 
-import com.barrybecker4.optimization.{OptimizationListener, OptimizationStatus, Optimizer}
-import com.barrybecker4.optimization.optimizee.{BudgetedOptimizee, Optimizee}
 import com.barrybecker4.optimization.optimizee.optimizees.problems.{SubsetSumProblem, TYPICAL_SS}
-import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness, PermutedParameterArray}
+import com.barrybecker4.optimization.optimizee.{BudgetedOptimizee, Optimizee}
 import com.barrybecker4.optimization.parameter.types.IntegerParameter
+import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness, PermutedParameterArray}
+import com.barrybecker4.optimization.strategy.iteratedlocal.IteratedLocalSearchStrategy.strategyFor
+import com.barrybecker4.optimization.strategy.iteratedlocal.{IteratedLocalSearchConfig, IteratedLocalSearchStrategy, LocalSearchAcceptance}
+import com.barrybecker4.optimization.strategy.OptimizationStrategyType
+import com.barrybecker4.optimization.{OptimizationListener, OptimizationStatus, Optimizer}
 import org.scalatest.funsuite.AnyFunSuite
-import IteratedLocalSearchStrategy.strategyFor
 
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random

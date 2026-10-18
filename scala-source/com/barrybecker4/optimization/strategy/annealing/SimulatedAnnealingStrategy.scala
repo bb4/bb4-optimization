@@ -1,12 +1,11 @@
 // Copyright by Barry G. Becker, 2000-2026. Licensed under MIT License: http://www.opensource.org/licenses/MIT
-package com.barrybecker4.optimization.strategy
+package com.barrybecker4.optimization.strategy.annealing
 
 import com.barrybecker4.common.format.FormatUtil
 import com.barrybecker4.math.MathUtil
 import com.barrybecker4.optimization.optimizee.{EvaluationBudgetExceededException, Optimizee}
-import com.barrybecker4.optimization.parameter.{
-  NumericParameterArray, ParameterArray, ParameterArrayWithFitness, PermutedParameterArray, VariableLengthIntSet
-}
+import com.barrybecker4.optimization.parameter.*
+import com.barrybecker4.optimization.strategy.OptimizationStrategy
 
 import scala.util.Random
 

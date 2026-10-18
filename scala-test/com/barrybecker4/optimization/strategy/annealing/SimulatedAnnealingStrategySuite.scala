@@ -1,8 +1,11 @@
-package com.barrybecker4.optimization.strategy
+package com.barrybecker4.optimization.strategy.annealing
 
 import com.barrybecker4.optimization.optimizee.Optimizee
-import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray}
 import com.barrybecker4.optimization.parameter.types.DoubleParameter
+import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray}
+import com.barrybecker4.optimization.strategy.OptimizationStrategyType.SIMULATED_ANNEALING
+import com.barrybecker4.optimization.strategy.annealing.{SimulatedAnnealingStepMode, SimulatedAnnealingStrategy}
+//import com.barrybecker4.optimization.strategy.annealing.{FlatAbsoluteOptimizee, SaTestBaselineRelativeQuadratic, SaTestQuadraticOptimizee}
 import org.scalatest.funsuite.AnyFunSuite
 
 import scala.util.Random

@@ -1,8 +1,12 @@
-package com.barrybecker4.optimization.strategy
+package com.barrybecker4.optimization.strategy.annealing
 
 import com.barrybecker4.optimization.optimizee.BudgetedOptimizee
-import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray}
 import com.barrybecker4.optimization.parameter.types.DoubleParameter
+import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray}
+import com.barrybecker4.optimization.strategy.annealing.{GlobalSimulatedAnnealingConfig, GlobalSimulatedAnnealingStrategy}
+import com.barrybecker4.optimization.strategy.hillclimbing.SeedSelection
+import com.barrybecker4.optimization.strategy.DoubleWellOptimizee
+import com.barrybecker4.optimization.strategy.annealing.SaGlobalUnimodalOptimizee
 import org.scalatest.funsuite.AnyFunSuite
 
 import scala.util.Random

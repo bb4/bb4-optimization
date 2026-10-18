@@ -1,9 +1,10 @@
 // Copyright by Barry G. Becker, 2000-2026. Licensed under MIT License: http://www.opensource.org/licenses/MIT
-package com.barrybecker4.optimization.strategy
+package com.barrybecker4.optimization.strategy.particleswarm
 
 import com.barrybecker4.math.MathUtil
 import com.barrybecker4.optimization.optimizee.{EvaluationBudgetExceededException, Optimizee}
 import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray, ParameterArrayWithFitness}
+import com.barrybecker4.optimization.strategy.OptimizationStrategy
 
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random

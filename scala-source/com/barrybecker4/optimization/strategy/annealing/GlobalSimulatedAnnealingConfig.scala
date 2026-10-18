@@ -1,5 +1,8 @@
 // Copyright by Barry G. Becker, 2000-2026. Licensed under MIT License: http://www.opensource.org/licenses/MIT
-package com.barrybecker4.optimization.strategy
+package com.barrybecker4.optimization.strategy.annealing
+
+import com.barrybecker4.optimization.strategy.hillclimbing.SeedSelection
+import com.barrybecker4.optimization.strategy.annealing.{GlobalSimulatedAnnealingStrategy, SimulatedAnnealingConfig, SimulatedAnnealingStrategy}
 
 /**
   * Tunables for [[GlobalSimulatedAnnealingStrategy]].

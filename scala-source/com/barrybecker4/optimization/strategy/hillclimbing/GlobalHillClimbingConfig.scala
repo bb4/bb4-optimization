@@ -1,5 +1,7 @@
 // Copyright by Barry G. Becker, 2000-2026. Licensed under MIT License: http://www.opensource.org/licenses/MIT
-package com.barrybecker4.optimization.strategy
+package com.barrybecker4.optimization.strategy.hillclimbing
+
+import com.barrybecker4.optimization.strategy.hillclimbing.{GlobalHillClimbingConfig, GlobalHillClimbingStrategy, SeedSelection}
 
 /** How multistart seeds are chosen from global samples. */
 enum SeedSelection {

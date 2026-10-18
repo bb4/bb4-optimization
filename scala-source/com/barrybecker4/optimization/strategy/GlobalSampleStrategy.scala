@@ -5,7 +5,8 @@ import com.barrybecker4.optimization.optimizee.Optimizee
 import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 
 import scala.collection.mutable
-import GlobalSampleStrategy._
+import GlobalSampleStrategy.*
+import com.barrybecker4.optimization.strategy.hillclimbing.SeedSelection
 
 
 object GlobalSampleStrategy {

@@ -13,7 +13,7 @@ class BruteForceStrategySuite extends AnyFunSuite {
   test("brute force finds identity permutation under compareFitness") {
     MathUtil.RANDOM.setSeed(7)
     val rnd = new Random(7)
-    val optimizee = new PermutationIdentityCompareOptimizee
+    val optimizee = new CompareModeTestOptimizee
     val seed = PermutedParameterArray(IndexedSeq(
       new IntegerParameter(0, 0, 2, "a"),
       new IntegerParameter(1, 0, 2, "b"),

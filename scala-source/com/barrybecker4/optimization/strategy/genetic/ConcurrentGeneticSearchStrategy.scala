@@ -1,13 +1,13 @@
 // Copyright by Barry G. Becker, 2001-2026. Licensed under MIT License: http://www.opensource.org/licenses/MIT
-package com.barrybecker4.optimization.strategy
+package com.barrybecker4.optimization.strategy.genetic
 
 import com.barrybecker4.math.MathUtil
 import com.barrybecker4.optimization.optimizee.Optimizee
 import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 
 import scala.collection.mutable.ArrayBuffer
+import scala.collection.parallel.CollectionConverters.*
 import scala.util.Random
-import scala.collection.parallel.CollectionConverters._
 
 /**
   * Concurrent (parallelized) Genetic Algorithm optimization strategy.

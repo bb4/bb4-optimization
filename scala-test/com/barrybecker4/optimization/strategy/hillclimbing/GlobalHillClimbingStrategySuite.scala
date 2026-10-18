@@ -1,9 +1,11 @@
-package com.barrybecker4.optimization.strategy
+package com.barrybecker4.optimization.strategy.hillclimbing
 
 import com.barrybecker4.optimization.optimizee.Optimizee
 import com.barrybecker4.optimization.optimizee.optimizees.{DiscreteGrid2DDemoProblem, LineGraphDemoProblem}
-import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray}
 import com.barrybecker4.optimization.parameter.types.DoubleParameter
+import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray}
+import com.barrybecker4.optimization.strategy.hillclimbing.{GlobalHillClimbingConfig, GlobalHillClimbingStrategy, SeedSelection, UnimodalQuadraticOptimizee}
+import com.barrybecker4.optimization.strategy.DoubleWellOptimizee
 import org.scalatest.funsuite.AnyFunSuite
 
 import scala.util.Random

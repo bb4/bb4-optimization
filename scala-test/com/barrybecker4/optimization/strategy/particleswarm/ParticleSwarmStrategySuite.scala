@@ -1,12 +1,12 @@
-package com.barrybecker4.optimization.strategy
+package com.barrybecker4.optimization.strategy.particleswarm
 
-import com.barrybecker4.optimization.{OptimizationListener, OptimizationStatus, Optimizer}
-import com.barrybecker4.optimization.optimizee.{BudgetedOptimizee, Optimizee}
 import com.barrybecker4.optimization.optimizee.optimizees.{AckleyProblem, RastriginProblem, RosenbrockProblem, SphereProblem}
-import com.barrybecker4.optimization.parameter.{
-  NumericParameterArray, ParameterArray, ParameterArrayWithFitness, PermutedParameterArray
-}
+import com.barrybecker4.optimization.optimizee.{BudgetedOptimizee, Optimizee}
 import com.barrybecker4.optimization.parameter.types.{DoubleParameter, IntegerParameter}
+import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray, ParameterArrayWithFitness, PermutedParameterArray}
+import com.barrybecker4.optimization.strategy.particleswarm.{ParticleSwarmConfig, ParticleSwarmStrategy, ParticleSwarmTopology}
+import com.barrybecker4.optimization.strategy.{OptimizationStrategyType, CompareModeTestOptimizee}
+import com.barrybecker4.optimization.{OptimizationListener, OptimizationStatus, Optimizer}
 import org.scalatest.funsuite.AnyFunSuite
 
 import scala.collection.mutable.ArrayBuffer
@@ -248,7 +248,7 @@ class ParticleSwarmStrategySuite extends AnyFunSuite {
   }
 
   test("rejects an optimizee that evaluates by comparison") {
-    val strategy = new ParticleSwarmStrategy(new PermutationIdentityCompareOptimizee, new Random(17))
+    val strategy = new ParticleSwarmStrategy(new CompareModeTestOptimizee, new Random(17))
 
     intercept[IllegalArgumentException] {
       strategy.doOptimization(doubleArray(new Random(1), (0.0, -1.0, 1.0)), 1.0)
