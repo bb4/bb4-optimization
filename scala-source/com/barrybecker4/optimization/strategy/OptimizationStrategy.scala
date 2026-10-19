@@ -83,6 +83,17 @@ abstract class OptimizationStrategy(var optimizee: Optimizee) {
     listener.foreach(_.optimizerChanged(params))
   }
 
+  /**
+    * The fitness of `candidate`: absolute, or relative to `baseline` when the optimizee evaluates by comparison.
+    * NaN is mapped to positive infinity so that it can never look like an improvement or poison a comparison.
+    */
+  protected final def scoreAgainst(candidate: ParameterArray, baseline: ParameterArray): Double = {
+    val fitness =
+      if (optimizee.evaluateByComparison) optimizee.compareFitness(candidate, baseline)
+      else optimizee.evaluateFitness(candidate)
+    if (fitness.isNaN) Double.PositiveInfinity else fitness
+  }
+
   /** Record `params` as the run champion when it improves on [[runBest]]. */
   protected final def updateRunBest(params: ParameterArrayWithFitness): Unit = {
     if (runBest.forall(_.fitness > params.fitness)) runBest = Some(params)
