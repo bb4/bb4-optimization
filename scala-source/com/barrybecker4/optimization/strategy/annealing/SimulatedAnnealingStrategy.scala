@@ -135,11 +135,11 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
     * more ordered and approaches a "frozen" ground state at T=0. Hence, the process can be thought of as an adiabatic
     * approach to the lowest energy state. If the initial temperature of the system is too low, or cooling is too fast,
     * the system may become quenched, forming defects or freezing out in metastable states
-    * (ie. trapped in a local minimum energy state).
+    * (i.e. trapped in a local minimum energy state).
     *
     * In many ways the algorithm is similar to hill-climbing.
     * The main differences are:
-    *  - The next candidate solution is selected randomly within a gaussian neighborhood that shrinks
+    *  - The next candidate solution is selected randomly within a Gaussian neighborhood that shrinks
     * with the temperature and within the current iteration.
     *  - You can actually make a move toward a solution that is worse. This allows the algorithm to
     * move out of local optima.
