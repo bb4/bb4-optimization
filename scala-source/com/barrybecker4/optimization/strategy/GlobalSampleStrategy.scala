@@ -5,6 +5,7 @@ import com.barrybecker4.optimization.optimizee.Optimizee
 import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 
 import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 import GlobalSampleStrategy.*
 import com.barrybecker4.optimization.strategy.hillclimbing.SeedSelection
 
@@ -14,6 +15,9 @@ object GlobalSampleStrategy {
   private val DEFAULT_NUM_SAMPLES = 10000
 
   private val DISTANCE_SCALE_SAMPLES = 5
+
+  /** Distances closer than this are treated as equal when choosing between seed candidates. */
+  private val TIE_EPS = 1.0e-12
 }
 
 /**
@@ -33,7 +37,7 @@ class GlobalSampleStrategy(optimizee: Optimizee) extends OptimizationStrategy(op
     * For other [[com.barrybecker4.optimization.parameter.ParameterArray]] types, semantics follow their `findGlobalSamples` implementation.
     */
   def setSamplingRate(samplingRate: Int): Unit = {
-    assert(samplingRate > 0)
+    require(samplingRate > 0, s"samplingRate must be positive, got $samplingRate")
     numSample = samplingRate
   }
 
@@ -62,6 +66,7 @@ class GlobalSampleStrategy(optimizee: Optimizee) extends OptimizationStrategy(op
   /**
     * Same sampling and evaluation as [[doOptimization]], but retains multistart seeds.
     * Used for multistart local search.
+    * A sample whose fitness is NaN is never a seed.
     */
   private[strategy] def doOptimizationTopK(
       params: ParameterArray,
@@ -70,62 +75,78 @@ class GlobalSampleStrategy(optimizee: Optimizee) extends OptimizationStrategy(op
       seedSelection: SeedSelection = SeedSelection.TopFitness
   ): Seq[ParameterArrayWithFitness] = {
     val kClamped = math.max(1, k)
-    val samples = params.findGlobalSamples(numSample)
-    var globalBest = ParameterArrayWithFitness(params, Double.MaxValue)
-    var done = false
-    val worstIsHead: Ordering[ParameterArrayWithFitness] =
-      Ordering.by[ParameterArrayWithFitness, Double](_.fitness).reverse
-
-    val reservoirSize = seedSelection match {
-      case SeedSelection.TopFitness =>
-        kClamped
-      case SeedSelection.DiverseFromTopM(topM, _) =>
-        math.max(topM, kClamped)
-    }
-    val pq = mutable.PriorityQueue.empty[ParameterArrayWithFitness](using worstIsHead)
-
-    while (samples.hasNext && !done) {
-      val sample = samples.next()
-      val fitness =
-        if (optimizee.evaluateByComparison) optimizee.compareFitness(sample, params)
-        else optimizee.evaluateFitness(sample)
-      val candidate = ParameterArrayWithFitness(sample, fitness)
-      if (fitness < globalBest.fitness) {
-        globalBest = candidate
-        notifyOfChange(globalBest)
-      }
-      if (pq.size < reservoirSize) pq.enqueue(candidate)
-      else if (fitness < pq.head.fitness) {
-        pq.dequeue()
-        pq.enqueue(candidate)
-      }
-      if (isOptimalFitnessReached(globalBest))
-        done = true
-    }
+    val reservoir = new SeedReservoir(reservoirSize(seedSelection, kClamped))
+    val globalBest = sampleInto(reservoir, params)
     if (globalBest.fitness == Double.MaxValue) IndexedSeq.empty
     else {
       seedSelection match {
         case SeedSelection.TopFitness =>
-          topFitnessSeeds(globalBest, pq, kClamped)
+          topFitnessSeeds(globalBest, reservoir, kClamped)
         case diverse: SeedSelection.DiverseFromTopM =>
-          diverseSeeds(globalBest, pq.toArray.sortBy(_.fitness), kClamped, params, diverse.minSeparation)
+          diverseSeeds(globalBest, reservoir.bestFirst, kClamped, params, diverse.minSeparation)
       }
     }
   }
 
+  private def reservoirSize(seedSelection: SeedSelection, k: Int): Int =
+    seedSelection match {
+      case SeedSelection.TopFitness => k
+      case SeedSelection.DiverseFromTopM(topM, _) => math.max(topM, k)
+    }
+
+  /** Evaluates the samples in turn, stopping early at the optimal fitness. @return the best one, in order seen. */
+  private def sampleInto(reservoir: SeedReservoir, params: ParameterArray): ParameterArrayWithFitness = {
+    val samples = params.findGlobalSamples(numSample)
+    var globalBest = ParameterArrayWithFitness(params, Double.MaxValue)
+    while (samples.hasNext && !isOptimalFitnessReached(globalBest)) {
+      val sample = samples.next()
+      val candidate = ParameterArrayWithFitness(sample, scoreAgainst(sample, params))
+      if (candidate.fitness < globalBest.fitness) {
+        globalBest = candidate
+        notifyOfChange(globalBest)
+      }
+      reservoir.offer(candidate)
+    }
+    globalBest
+  }
+
+  /** Keeps the `capacity` lowest-fitness candidates offered so far. */
+  private final class SeedReservoir(capacity: Int) {
+
+    // the head of the queue is the largest fitness, i.e. the first one to be pushed out
+    private val worstOnTop = mutable.PriorityQueue.empty[ParameterArrayWithFitness](
+      using Ordering.by[ParameterArrayWithFitness, Double](_.fitness))
+
+    def offer(candidate: ParameterArrayWithFitness): Unit =
+      if (worstOnTop.size < capacity) worstOnTop.enqueue(candidate)
+      else if (candidate.fitness < worstOnTop.head.fitness) {
+        worstOnTop.dequeue()
+        worstOnTop.enqueue(candidate)
+      }
+
+    def bestFirst: Array[ParameterArrayWithFitness] = worstOnTop.toArray.sortBy(_.fitness)
+  }
+
   private def topFitnessSeeds(
       globalBest: ParameterArrayWithFitness,
-      pq: mutable.PriorityQueue[ParameterArrayWithFitness],
+      reservoir: SeedReservoir,
       k: Int
   ): Seq[ParameterArrayWithFitness] = {
-    val sorted = pq.toArray.sortBy(_.fitness).toIndexedSeq
     // Prepend first-seen global best so tie-breaking matches [[doOptimization]]; multistart's first local run matches legacy.
     // Do not dedupe by set equality: distinct ParameterArray instances share one Random; deduping would drop repeats but
     // leave later seeds in the list, consuming the RNG before the primary hill climb and changing its trajectory.
-    val merged = globalBest +: sorted.filterNot(_.pa eq globalBest.pa)
+    val merged = globalBest +: reservoir.bestFirst.toIndexedSeq.filterNot(_.pa eq globalBest.pa)
     merged.take(k)
   }
 
+  /** A seed candidate and its distance (in units of the typical distance) to the nearest seed chosen so far. */
+  private final class PoolEntry(val candidate: ParameterArrayWithFitness, var nearestSeedDistance: Double)
+
+  /**
+    * Greedy max-min selection: the global best first, then repeatedly the pool member that is farthest from all seeds
+    * chosen so far (preferring ones that are at least `minSeparation` away, and then ones on the other side of the
+    * origin from the first seed).
+    */
   private def diverseSeeds(
       globalBest: ParameterArrayWithFitness,
       reservoir: Array[ParameterArrayWithFitness],
@@ -134,25 +155,30 @@ class GlobalSampleStrategy(optimizee: Optimizee) extends OptimizationStrategy(op
       minSeparation: Double
   ): Seq[ParameterArrayWithFitness] = {
     val scale = typicalDistanceScale(reference)
-    val selected = mutable.ArrayBuffer[ParameterArrayWithFitness](globalBest)
-    var pool = reservoir.filterNot(_.pa eq globalBest.pa).to(mutable.ArrayBuffer)
+    def distance(a: ParameterArrayWithFitness, b: ParameterArrayWithFitness): Double = a.pa.distance(b.pa) / scale
+
+    val selected = ArrayBuffer[ParameterArrayWithFitness](globalBest)
+    val pool = reservoir.filterNot(_.pa eq globalBest.pa)
+      .map(c => new PoolEntry(c, distance(c, globalBest))).to(ArrayBuffer)
 
     while (selected.size < k && pool.nonEmpty) {
-      def minNormDist(c: ParameterArrayWithFitness): Double =
-        selected.map(s => c.pa.distance(s.pa) / scale).min
-
-      val separated = pool.filter(c => minNormDist(c) >= minSeparation - 1.0e-12)
-      val candidates = if (separated.nonEmpty) separated else pool
-      val anchor = selected.head
-      val maxDist = candidates.map(minNormDist).max
-      val tier = candidates.filter(c => minNormDist(c) >= maxDist - 1.0e-12)
-      val opposite = tier.filter(c => oppositeBasinBonus(anchor, c) > 0)
-      val pickFrom = if (opposite.nonEmpty) opposite else tier
-      val next = pickFrom.maxBy(c => (minNormDist(c), oppositeBasinBonus(anchor, c)))
-      selected += next
-      pool = pool.filterNot(_ eq next)
+      val next = pickNext(globalBest, pool, minSeparation)
+      selected += next.candidate
+      pool.filterInPlace(_ ne next)
+      // keeping the nearest-seed distance up to date costs one distance per pool member per pick
+      pool.foreach(e => e.nearestSeedDistance = math.min(e.nearestSeedDistance, distance(e.candidate, next.candidate)))
     }
     selected.toIndexedSeq
+  }
+
+  private def pickNext(anchor: ParameterArrayWithFitness, pool: ArrayBuffer[PoolEntry], minSeparation: Double): PoolEntry = {
+    val separated = pool.filter(_.nearestSeedDistance >= minSeparation - TIE_EPS)
+    val candidates = if (separated.nonEmpty) separated else pool
+    val maxDist = candidates.map(_.nearestSeedDistance).max
+    val farthest = candidates.filter(_.nearestSeedDistance >= maxDist - TIE_EPS)
+    val opposite = farthest.filter(e => oppositeBasinBonus(anchor, e.candidate) > 0)
+    val pickFrom = if (opposite.nonEmpty) opposite else farthest
+    pickFrom.maxBy(e => (e.nearestSeedDistance, oppositeBasinBonus(anchor, e.candidate)))
   }
 
   /** Prefer seeds on the opposite side of the origin on the first parameter when min-distance ties. */

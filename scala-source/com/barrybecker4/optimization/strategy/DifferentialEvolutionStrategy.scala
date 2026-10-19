@@ -4,6 +4,7 @@ import com.barrybecker4.optimization.optimizee.{EvaluationBudgetExceededExceptio
 import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray, ParameterArrayWithFitness}
 import com.barrybecker4.optimization.parameter.types.Parameter
 
+import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
 
 /**
@@ -32,14 +33,12 @@ class DifferentialEvolutionStrategy(
   require(populationSize >= 4,
     s"DifferentialEvolutionStrategy needs at least 4 individuals to pick three distinct donors, got $populationSize")
   require(maxIterations >= 0, s"maxIterations must not be negative, got $maxIterations")
-
-  private var population: IndexedSeq[ParameterArray] = IndexedSeq.empty
-  private var fitnesses: Array[Double] = Array.empty
-  private var bestSolution: ParameterArray = null
-  private var bestFitness: Double = Double.MaxValue
+  require(fWeight.isFinite, s"fWeight must be finite, got $fWeight")
+  require(crossoverRate >= 0.0 && crossoverRate <= 1.0, s"crossoverRate must be in [0, 1], got $crossoverRate")
 
   /**
    * Runs the Differential Evolution search until convergence or iteration limits.
+   * If the evaluation budget runs out, the best individual evaluated so far is returned.
    */
   override def doOptimization(params: ParameterArray, fitnessRange: Double): ParameterArrayWithFitness = {
     require(!optimizee.evaluateByComparison,
@@ -49,150 +48,116 @@ class DifferentialEvolutionStrategy(
       case other => throw new IllegalArgumentException(
         "DifferentialEvolutionStrategy only supports NumericParameterArray, but got " + other.getClass.getSimpleName)
     }
+    require(template.size > 0, "DifferentialEvolutionStrategy needs at least one parameter to optimize")
+    new Evolution(template).execute().getOrElse(ParameterArrayWithFitness(params, Double.MaxValue))
+  }
 
-    try {
-      initializePopulation(template)
+  /** One run. All the state lives here, so a strategy can be run again without anything left over from before. */
+  private final class Evolution(template: NumericParameterArray) {
 
-      var iteration = 0
-      var currentParams = ParameterArrayWithFitness(bestSolution, bestFitness)
-      notifyOfChange(currentParams)
+    private var population = IndexedSeq.empty[NumericParameterArray]
+    private var fitnesses = Array.empty[Double]
+    private var best: Option[ParameterArrayWithFitness] = None
 
-      while (iteration < maxIterations && !isOptimalFitnessReached(currentParams)) {
-        val nextPopulation = new Array[ParameterArray](populationSize)
-        val nextFitnesses = new Array[Double](populationSize)
-
-        var i = 0
-        while (i < populationSize) {
-          val target = population(i)
-          val trial = createTrialVector(i, target)
-          val trialFitness = optimizee.evaluateFitness(trial)
-
-          if (trialFitness <= fitnesses(i)) {
-            nextPopulation(i) = trial
-            nextFitnesses(i) = trialFitness
-            if (trialFitness < bestFitness) {
-              bestFitness = trialFitness
-              bestSolution = trial
-            }
-          } else {
-            nextPopulation(i) = target
-            nextFitnesses(i) = fitnesses(i)
-          }
-          i += 1
+    /** @return the best individual evaluated, or None if not even one could be evaluated */
+    def execute(): Option[ParameterArrayWithFitness] = {
+      try {
+        seedPopulation()
+        notifyOfChange(best.get)
+        var iteration = 0
+        while (iteration < maxIterations && !isOptimalFitnessReached(best.get)) {
+          runGeneration()
+          iteration += 1
+          notifyOfChange(best.get)
         }
-
-        population = nextPopulation.toIndexedSeq
-        fitnesses = nextFitnesses
-        iteration += 1
-        currentParams = ParameterArrayWithFitness(bestSolution, bestFitness)
-        notifyOfChange(currentParams)
+      } catch {
+        case _: EvaluationBudgetExceededException => () // fall through and return the best found so far
       }
-      currentParams
-    } catch {
-      case _: EvaluationBudgetExceededException =>
-        if (bestSolution == null) ParameterArrayWithFitness(params, Double.MaxValue)
-        else ParameterArrayWithFitness(bestSolution, bestFitness)
+      best
     }
-  }
 
-  /**
-   * Seeds the population: individual 0 receives initialGuess, while the remaining
-   * individuals are sampled uniformly across the parameter bounds.
-   */
-  private def initializePopulation(initialGuess: NumericParameterArray): Unit = {
-    val pop = new Array[ParameterArray](populationSize)
-    fitnesses = new Array[Double](populationSize)
-
-    pop(0) = initialGuess
-    fitnesses(0) = optimizee.evaluateFitness(pop(0))
-    bestSolution = pop(0)
-    bestFitness = fitnesses(0)
-
-    var i = 1
-    while (i < populationSize) {
-      val individual = uniformSample(initialGuess)
-      pop(i) = individual
-      fitnesses(i) = optimizee.evaluateFitness(individual)
-      if (fitnesses(i) < bestFitness) {
-        bestFitness = fitnesses(i)
-        bestSolution = individual
+    /** Individual 0 is the initial guess; the others are sampled uniformly across the parameter bounds. */
+    private def seedPopulation(): Unit = {
+      val individuals = ArrayBuffer[NumericParameterArray](template)
+      val scores = ArrayBuffer[Double]()
+      scores += evaluate(template)
+      while (individuals.size < populationSize) {
+        val individual = uniformSample(template)
+        individuals += individual
+        scores += evaluate(individual)
       }
-      i += 1
-    }
-    population = pop.toIndexedSeq
-  }
-
-  /** Uniform point inside each parameter's inclusive bounds. Uses this strategy's [[rnd]]. */
-  private def uniformSample(template: NumericParameterArray): NumericParameterArray = {
-    val sampled = (0 until template.size).map { j =>
-      val p = template.get(j)
-      val proposed =
-        if (p.isIntegerOnly) {
-          val lo = p.minValue.round.toInt
-          val hi = p.maxValue.round.toInt
-          val span = math.max(1, hi - lo + 1)
-          (lo + rnd.nextInt(span)).toDouble
-        } else p.minValue + rnd.nextDouble() * (p.maxValue - p.minValue)
-      p.setValue(proposed)
-    }
-    NumericParameterArray(sampled, template.numSteps, template.rnd)
-  }
-
-  /**
-   * Generates a mutant vector using DE/rand/1 strategy:
-   * v = r1 + F * (r2 - r3), followed by binomial crossover with target vector.
-   * Parameters are immutable (`setValue` returns a new instance); the trial is a new array.
-   */
-  private def createTrialVector(targetIndex: Int, target: ParameterArray): ParameterArray = {
-    val indices = selectThreeDistinct(targetIndex)
-    val r1 = population(indices(0))
-    val r2 = population(indices(1))
-    val r3 = population(indices(2))
-
-    val numDimensions = target.size
-    val forcedIndex = if (numDimensions == 0) 0 else rnd.nextInt(numDimensions)
-    val trialParams = (0 until numDimensions).map { j =>
-      val targetParam = target.get(j)
-      if (rnd.nextDouble() < crossoverRate || j == forcedIndex) mutatedParameter(r1, r2, r3, targetParam, j)
-      else targetParam
-    }
-    rebuild(target, trialParams)
-  }
-
-  private def mutatedParameter(r1: ParameterArray, r2: ParameterArray, r3: ParameterArray,
-                               targetParam: Parameter, j: Int): Parameter = {
-    val mutatedVal = r1.get(j).getValue + fWeight * (r2.get(j).getValue - r3.get(j).getValue)
-    val clampedVal = math.max(targetParam.minValue, math.min(targetParam.maxValue, mutatedVal))
-    targetParam.setValue(clampedVal)
-  }
-
-  private def rebuild(template: ParameterArray, params: IndexedSeq[Parameter]): ParameterArray =
-    template match {
-      case n: NumericParameterArray => NumericParameterArray(params, n.numSteps, n.rnd)
-      case other =>
-        throw new IllegalArgumentException(
-          "DifferentialEvolutionStrategy only supports NumericParameterArray, but got " + other.getClass.getSimpleName)
+      population = individuals.toIndexedSeq
+      fitnesses = scores.toArray
     }
 
-  /**
-   * Selects three distinct indices from [0, populationSize) that are not equal to excludedIndex.
-   */
-  private def selectThreeDistinct(excludedIndex: Int): Array[Int] = {
-    val selected = new Array[Int](3)
-    var count = 0
-    var guard = 0
-    val guardLimit = populationSize * 20
-    while (count < 3) {
-      guard += 1
-      if (guard > guardLimit)
-        throw new IllegalStateException(
-          s"Could not pick 3 donors distinct from $excludedIndex in a population of $populationSize")
-      val candidate = rnd.nextInt(populationSize)
-      if (candidate != excludedIndex && !selected.take(count).contains(candidate)) {
-        selected(count) = candidate
-        count += 1
+    /** Builds one trial per individual from the old generation; each replaces its target if it is no worse. */
+    private def runGeneration(): Unit = {
+      val nextPopulation = new Array[NumericParameterArray](populationSize)
+      val nextFitnesses = new Array[Double](populationSize)
+      for (i <- 0 until populationSize) {
+        val trial = createTrialVector(i, population(i))
+        val trialFitness = evaluate(trial)
+        val trialWins = trialFitness <= fitnesses(i)
+        nextPopulation(i) = if (trialWins) trial else population(i)
+        nextFitnesses(i) = if (trialWins) trialFitness else fitnesses(i)
       }
+      population = nextPopulation.toIndexedSeq
+      fitnesses = nextFitnesses
     }
-    selected
+
+    /** Scores an individual, and remembers it if it is the best seen so far. NaN counts as the worst possible. */
+    private def evaluate(individual: NumericParameterArray): Double = {
+      val fitness = optimizee.evaluateFitness(individual)
+      val score = if (fitness.isNaN) Double.PositiveInfinity else fitness
+      if (best.forall(score < _.fitness)) best = Some(ParameterArrayWithFitness(individual, score))
+      score
+    }
+
+    /** Uniform point inside each parameter's inclusive bounds. Uses this strategy's [[rnd]]. */
+    private def uniformSample(template: NumericParameterArray): NumericParameterArray = {
+      val sampled = (0 until template.size).map { j =>
+        val p = template.get(j)
+        p.setValue(if (p.isIntegerOnly) randomInteger(p) else p.minValue + rnd.nextDouble() * (p.maxValue - p.minValue))
+      }
+      NumericParameterArray(sampled, template.numSteps, template.rnd)
+    }
+
+    private def randomInteger(p: Parameter): Double = {
+      val lo = p.minValue.round.toInt
+      val hi = p.maxValue.round.toInt
+      (lo + rnd.nextInt(math.max(1, hi - lo + 1))).toDouble
+    }
+
+    /**
+     * Generates a mutant vector using DE/rand/1 strategy:
+     * v = r1 + F * (r2 - r3), followed by binomial crossover with target vector.
+     * Parameters are immutable (`setValue` returns a new instance); the trial is a new array.
+     */
+    private def createTrialVector(targetIndex: Int, target: NumericParameterArray): NumericParameterArray = {
+      val donor1 = drawDonor(targetIndex)
+      val donor2 = drawDonor(targetIndex, donor1)
+      val donor3 = drawDonor(targetIndex, donor1, donor2)
+      val (r1, r2, r3) = (population(donor1), population(donor2), population(donor3))
+
+      val forcedIndex = rnd.nextInt(target.size) // at least one parameter always comes from the mutant
+      val trialParams = (0 until target.size).map { j =>
+        val targetParam = target.get(j)
+        if (rnd.nextDouble() < crossoverRate || j == forcedIndex) mutatedParameter(r1, r2, r3, targetParam, j)
+        else targetParam
+      }
+      NumericParameterArray(trialParams, target.numSteps, target.rnd)
+    }
+
+    /** A population index that is none of `taken`. (Fewer than 4 individuals are rejected by the constructor.) */
+    private def drawDonor(taken: Int*): Int =
+      Iterator.continually(rnd.nextInt(populationSize)).find(candidate => !taken.contains(candidate)).get
+
+    /** The mutant value, kept inside the bounds and rounded for integer parameters (`setValue` would truncate). */
+    private def mutatedParameter(r1: ParameterArray, r2: ParameterArray, r3: ParameterArray,
+                                 targetParam: Parameter, j: Int): Parameter = {
+      val mutatedVal = r1.get(j).getValue + fWeight * (r2.get(j).getValue - r3.get(j).getValue)
+      val clampedVal = math.max(targetParam.minValue, math.min(targetParam.maxValue, mutatedVal))
+      targetParam.setValue(if (targetParam.isIntegerOnly) math.rint(clampedVal) else clampedVal)
+    }
   }
 }

@@ -1,4 +1,4 @@
-// Copyright by Barry G. Becker, 2000-2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
+// Copyright by Barry G. Becker, 2000-2026. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.strategy
 
 import com.barrybecker4.optimization.optimizee.Optimizee
@@ -28,7 +28,7 @@ class BruteForceStrategy(optimizee: Optimizee) extends OptimizationStrategy(opti
           "BRUTE_FORCE cannot enumerate a continuous parameter space. " +
             "Use GLOBAL_SAMPLING or another strategy for real-valued parameters.")
       case numeric: NumericParameterArray =>
-        enumerateIntegerLattice(numeric, params)
+        enumerateIntegerLattice(numeric)
       case _ =>
         searchSamples(params)
     }
@@ -37,73 +37,80 @@ class BruteForceStrategy(optimizee: Optimizee) extends OptimizationStrategy(opti
     (0 until params.size).exists(i => !params.get(i).isIntegerOnly)
 
   /** Every inclusive integer combination. Stops early when the known optimum is reached. */
-  private def enumerateIntegerLattice(template: NumericParameterArray,
-                                      baseline: ParameterArray): ParameterArrayWithFitness = {
-    val bounds = (0 until template.size).map { i =>
+  private def enumerateIntegerLattice(template: NumericParameterArray): ParameterArrayWithFitness = {
+    val bounds = integerBounds(template)
+    requireEnumerable(template, bounds)
+    new LatticeSearch(template, bounds).run()
+  }
+
+  private def integerBounds(template: NumericParameterArray): IndexedSeq[(Int, Int)] =
+    (0 until template.size).map { i =>
       val p = template.get(i)
       (p.minValue.round.toInt, p.maxValue.round.toInt)
     }
+
+  /** Fails fast, before any evaluation, if a range is empty or the lattice is too big to finish. */
+  private def requireEnumerable(template: NumericParameterArray, bounds: IndexedSeq[(Int, Int)]): Unit = {
     var product = 1L
-    bounds.foreach { case (lo, hi) =>
-      val span = (hi - lo + 1).toLong
-      if (span <= 0 || product > MaxIntegerCandidates / span)
-        throw new IllegalArgumentException(
-          s"BRUTE_FORCE integer space has more than $MaxIntegerCandidates candidates")
+    bounds.zipWithIndex.foreach { case ((lo, hi), i) =>
+      val span = hi.toLong - lo + 1
+      require(span > 0, s"BRUTE_FORCE parameter ${template.get(i).name} has an empty integer range [$lo, $hi]")
+      require(product <= MaxIntegerCandidates / span,
+        s"BRUTE_FORCE integer space has more than $MaxIntegerCandidates candidates")
       product *= span
     }
+  }
 
-    var best = ParameterArrayWithFitness(template, Double.MaxValue)
+  /** Depth first enumeration of the lattice, one dimension per level of recursion. */
+  private final class LatticeSearch(template: NumericParameterArray, bounds: IndexedSeq[(Int, Int)]) {
 
-    def consider(values: IndexedSeq[Double]): Unit = {
+    private val coords = Array.fill(bounds.size)(0.0)
+    private var best = ParameterArrayWithFitness(template, Double.MaxValue)
+
+    def run(): ParameterArrayWithFitness = {
+      enumerate(0)
+      best
+    }
+
+    private def done: Boolean = isOptimalFitnessReached(best)
+
+    private def enumerate(dim: Int): Unit =
+      if (dim == bounds.size) consider()
+      else {
+        val (lo, hi) = bounds(dim)
+        var v = lo
+        while (v <= hi && !done) {
+          coords(dim) = v.toDouble
+          enumerate(dim + 1)
+          v += 1
+        }
+      }
+
+    private def consider(): Unit = {
       val candidate = NumericParameterArray(
-        values.indices.map(i => template.get(i).setValue(values(i))),
+        coords.indices.map(i => template.get(i).setValue(coords(i))),
         template.numSteps,
         template.rnd
       )
-      val fitness =
-        if (optimizee.evaluateByComparison) optimizee.compareFitness(candidate, baseline)
-        else optimizee.evaluateFitness(candidate)
+      val fitness = scoreAgainst(candidate, template)
       if (fitness < best.fitness) {
         best = ParameterArrayWithFitness(candidate, fitness)
         notifyOfChange(best)
       }
     }
-
-    val coords = Array.fill(bounds.size)(0.0)
-    def rec(dim: Int): Unit = {
-      if (isOptimalFitnessReached(best)) return
-      if (dim == bounds.size) consider(coords.toIndexedSeq)
-      else {
-        val (lo, hi) = bounds(dim)
-        var v = lo
-        while (v <= hi && !isOptimalFitnessReached(best)) {
-          coords(dim) = v.toDouble
-          rec(dim + 1)
-          v += 1
-        }
-      }
-    }
-    if (bounds.isEmpty) consider(IndexedSeq.empty)
-    else rec(0)
-    best
   }
 
   private def searchSamples(params: ParameterArray): ParameterArrayWithFitness = {
     val samples = params.findGlobalSamples(Long.MaxValue)
-    var bestParams: ParameterArrayWithFitness = ParameterArrayWithFitness(params, Double.MaxValue)
-    var done = false
-    while (samples.hasNext && !done) {
+    var best = ParameterArrayWithFitness(params, Double.MaxValue)
+    while (samples.hasNext && !isOptimalFitnessReached(best)) {
       val sample = samples.next()
-      val fitness =
-        if (optimizee.evaluateByComparison) optimizee.compareFitness(sample, params)
-        else optimizee.evaluateFitness(sample)
-      if (fitness < bestParams.fitness) {
-        bestParams = ParameterArrayWithFitness(sample, fitness)
-        notifyOfChange(bestParams)
+      val fitness = scoreAgainst(sample, params)
+      if (fitness < best.fitness) {
+        best = ParameterArrayWithFitness(sample, fitness)
+        notifyOfChange(best)
       }
-      if (isOptimalFitnessReached(bestParams))
-        done = true
     }
-    bestParams
+    best
   }
 }
