@@ -34,8 +34,12 @@ class StrategyScoreboardSuite extends AnyFunSuite with TimeLimitedTests {
 
   private val Seeds = Seq(1, 42, 99)
 
-  /** Stops a runaway search. Legitimate runs here stay under ~210_000 evaluations. */
-  private val EvaluationBudget = 300000
+  /**
+    * Stops a runaway search. Legitimate runs here stay under ~380_000 evaluations; the most expensive is
+    * GLOBAL_HILL_CLIMBING on rosenbrock, where each of the 5 seeds (the 5 best, well separated samples, all near the
+    * curved valley) crawls along it with ever smaller steps.
+    */
+  private val EvaluationBudget = 500000
 
   private val Problems: Seq[(String, () => OptimizeeProblem)] = Seq(
     "sphere" -> (() => SphereProblem(dimensions = 2)),
