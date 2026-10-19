@@ -158,7 +158,7 @@ class GeneticSearchBehaviorSuite extends AnyFunSuite {
     val parents = Seq((1.0, 2.0), (-1.0, 3.0), (0.5, -2.0)).map { case (a, b) => NumericParameterArraySuiteLike.twoDoubleParams(a, b) }
     val pop = ArrayBuffer(parents.map(p => ParameterArrayWithFitness(p, optimizee.evaluateFitness(p)))*)
     strategy.refillAfterCullForTesting(pop, keepSize = 3, parents.head, desiredPopSize = 40)
-    val keys = pop.map(m => GeneticSearchStrategy.solutionKey(m.pa))
+    val keys = pop.map(m => Solutions.key(m.pa))
     assert(keys.distinct.size == pop.size)
   }
 
@@ -173,7 +173,7 @@ class GeneticSearchBehaviorSuite extends AnyFunSuite {
     val champion = ParameterArrayWithFitness(NumericParameterArraySuiteLike.twoDoubleParams(0.0, 0.0), 0.0)
     strategy.setGlobalChampionForTesting(champion)
     strategy.ensureEliteForTesting(pop) // no run has set a desired size, so the population counts as full
-    assert(pop.exists(m => GeneticSearchStrategy.sameSolution(m.pa, champion.pa)))
+    assert(pop.exists(m => Solutions.same(m.pa, champion.pa)))
     assert(pop.size == 3 && !pop.exists(_.fitness == 10.0), "the worst member should have been replaced")
   }
 
@@ -189,12 +189,12 @@ class GeneticSearchBehaviorSuite extends AnyFunSuite {
     val a = NumericParameterArraySuiteLike.twoDoubleParams(1.0, 2.0)
     val b = NumericParameterArraySuiteLike.twoDoubleParams(1.0, 2.0)
     val c = NumericParameterArraySuiteLike.twoDoubleParams(1.0, 3.0)
-    assert(GeneticSearchStrategy.solutionKey(a) == GeneticSearchStrategy.solutionKey(b))
-    assert(GeneticSearchStrategy.solutionKey(a) != GeneticSearchStrategy.solutionKey(c))
+    assert(Solutions.key(a) == Solutions.key(b))
+    assert(Solutions.key(a) != Solutions.key(c))
     val pos = NumericParameterArraySuiteLike.twoDoubleParams(0.0, 1.0)
     val neg = NumericParameterArraySuiteLike.twoDoubleParams(-0.0, 1.0)
-    assert(GeneticSearchStrategy.sameSolution(pos, neg))
-    assert(GeneticSearchStrategy.solutionKey(pos) == GeneticSearchStrategy.solutionKey(neg))
+    assert(Solutions.same(pos, neg))
+    assert(Solutions.key(pos) == Solutions.key(neg))
   }
 
   // ---- same seed ------------------------------------------------------------------------------------------

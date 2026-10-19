@@ -102,8 +102,8 @@ class GeneticSearchStrategySuite extends AnyFunSuite {
     val a = NumericParameterArraySuiteLike.twoDoubleParams(1.0, 2.0)
     val b = NumericParameterArraySuiteLike.twoDoubleParams(1.0, 2.0)
     assert(a ne b)
-    assert(GeneticSearchStrategy.sameSolution(a, b))
-    assert(!GeneticSearchStrategy.sameSolution(a, NumericParameterArraySuiteLike.twoDoubleParams(1.0, 3.0)))
+    assert(Solutions.same(a, b))
+    assert(!Solutions.same(a, NumericParameterArraySuiteLike.twoDoubleParams(1.0, 3.0)))
   }
 
   test("elitism reinjects champion after cull when missing from keepers") {
@@ -119,7 +119,7 @@ class GeneticSearchStrategySuite extends AnyFunSuite {
       ParameterArrayWithFitness(NumericParameterArraySuiteLike.twoDoubleParams(4.0, 4.0), 8.0)
     )
     strategy.ensureEliteForTesting(pop)
-    assert(pop.exists(m => GeneticSearchStrategy.sameSolution(m.pa, best)))
+    assert(pop.exists(m => Solutions.same(m.pa, best)))
   }
 
   test("SingleSample neighbor mode uses fewer evals than GreedyImproveAbsolute") {
