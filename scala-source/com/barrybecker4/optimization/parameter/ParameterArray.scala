@@ -45,6 +45,19 @@ trait ParameterArray {
   /** @return get a completely random solution in the parameter space.*/
   def getRandomSample: ParameterArray
 
+  /**
+    * What makes two arrays of the same class the same candidate solution. Strategies that avoid evaluating or keeping
+    * duplicates (such as genetic search) compare this, so equal identities must mean equal candidates.
+    *
+    * The default is the sequence of parameter values, which is right whenever the values fully describe the candidate.
+    * Override it when they do not. For example, when the parameters are only an encoding that is relative to the
+    * array itself (ids ranked within one particular path), different candidates can have the same values.
+    * The result needs value equality and a consistent `hashCode` (a case class, a collection, a string).
+    */
+  def candidateIdentity: Any =
+    // `+ 0.0` turns -0.0 into 0.0, which compare equal as numbers but not once boxed.
+    (0 until size).map(i => get(i).getValue + 0.0)
+
   override def toString: String
 
   /** @return the parameters in a string of Comma Separated Values.*/

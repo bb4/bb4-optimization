@@ -6,18 +6,15 @@ import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWi
 /** Tells whether two parameter arrays are the same candidate, as opposed to merely the same reference. */
 private[strategy] object Solutions {
 
-  /** True when two parameter arrays represent the same candidate (same type and parameter values). */
+  /** True when two parameter arrays represent the same candidate (same type and [[ParameterArray.candidateIdentity]]). */
   def same(a: ParameterArray, b: ParameterArray): Boolean =
-    (a eq b) || (a.getClass == b.getClass && a.size == b.size &&
-      (0 until a.size).forall(i => a.get(i).getValue == b.get(i).getValue))
+    (a eq b) || (a.getClass == b.getClass && a.candidateIdentity == b.candidateIdentity)
 
   def contains(population: Iterable[ParameterArrayWithFitness], pa: ParameterArray): Boolean =
     population.exists(m => same(m.pa, pa))
 
   /** Hashable identity of a candidate; two arrays have equal keys exactly when [[same]] holds. */
-  final case class Key(kind: Class[?], values: IndexedSeq[Double])
+  final case class Key(kind: Class[?], identity: Any)
 
-  def key(pa: ParameterArray): Key =
-    // `+ 0.0` turns -0.0 into 0.0, which are the same value for `same` but differ when boxed.
-    Key(pa.getClass, (0 until pa.size).map(i => pa.get(i).getValue + 0.0))
+  def key(pa: ParameterArray): Key = Key(pa.getClass, pa.candidateIdentity)
 }
