@@ -6,7 +6,7 @@ import com.barrybecker4.optimization.parameter.ParameterArray
 import scala.collection.mutable
 
 
-private[strategy] final class RecordingOptimizee extends Optimizee {
+final class RecordingOptimizee extends Optimizee {
   
   val evaluateFitnessCalls: mutable.Buffer[ParameterArray] = mutable.Buffer.empty
 

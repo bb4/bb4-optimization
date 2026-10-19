@@ -7,7 +7,7 @@ import com.barrybecker4.optimization.parameter.ParameterArray
   * Compare-fitness landscape with optimum at the identity permutation (value i at index i).
   * Used to exercise `evaluateByComparison` paths in strategies.
   */
-private[strategy] final class CompareModeTestOptimizee extends Optimizee {
+final class CompareModeTestOptimizee extends Optimizee {
 
   override def getName: String = "perm-compare"
 

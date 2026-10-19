@@ -13,7 +13,7 @@ object GlobalSimulatedAnnealingStrategy {
   /** Default passed to [[GlobalSampleStrategy.setSamplingRate]] as the global sample budget. */
   val DEFAULT_GLOBAL_SAMPLE_BUDGET: Int = 1000
 
-  /** Number of best global samples from which to run local simulated annealing. */
+  /** Number of the best global samples from which to run local simulated annealing. */
   val DEFAULT_MULTISTART_COUNT: Int = 5
 }
 

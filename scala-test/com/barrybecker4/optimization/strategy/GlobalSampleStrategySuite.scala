@@ -12,7 +12,7 @@ class GlobalSampleStrategySuite extends AnyFunSuite {
 
   test("diverse topK selects well-separated seeds on a flat landscape") {
     val rnd = new Random(42)
-    val optimizee = new FlatLandscapeOptimizee()
+    val optimizee = new FlatLandscapeOptimizee
     
     val initial = NumericParameterArray(
       IndexedSeq(

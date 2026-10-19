@@ -5,7 +5,7 @@ import com.barrybecker4.optimization.parameter.ParameterArray
 import com.barrybecker4.optimization.strategy.statespace.{StateSpaceSearchMode, StateSpaceSearchStrategy}
 
 /**
-  * Mix in with an [[Optimizee]] when the search space is a discrete graph and you can enumerate
+  * Mix in with an [[Optimizee]] when the search space is a discrete graph, and you can enumerate
   * one-step transitions. Used by [[StateSpaceSearchStrategy]].
   * Successor lists should stay small; this API is for structured, low-branching problems—not huge graphs.
   */

@@ -14,7 +14,7 @@ class MagnitudeIgnoredDistanceCalculator extends DistanceCalculator {
     * There are two ways in which instance can differ, and the weighting assigned to each may depend on the problem.
     *  - the length of the parameter array
     *  - the set of values in the parameter array.
-    * Generally, the distance is greater the greater the number of parameters that are different.
+    * Generally, the distance is greater the number of parameters that are different.
     * @return the distance between this parameter array and another.
     */
   override def calculateDistance(pa1: ParameterArray, pa2: ParameterArray): Double = {

@@ -42,7 +42,7 @@ object SimulatedAnnealingStepMode {
 }
 
 /**
-  * Tunables for [[SimulatedAnnealingStrategy]] (cooling schedule and base neighbor radius).
+  * Tunable parameters for [[SimulatedAnnealingStrategy]] (cooling schedule and base neighbor radius).
   *
   * @param innerIterationsPerDimension inner-loop length is this times parameter count per temperature level
   * @param numTempIterations           used to derive final temperature: `tempMin = tempMax / 2^numTempIterations`

@@ -5,7 +5,7 @@ import com.barrybecker4.optimization.strategy.hillclimbing.SeedSelection
 import com.barrybecker4.optimization.strategy.annealing.{GlobalSimulatedAnnealingStrategy, SimulatedAnnealingConfig, SimulatedAnnealingStrategy}
 
 /**
-  * Tunables for [[GlobalSimulatedAnnealingStrategy]].
+  * Tunable parameters for [[GlobalSimulatedAnnealingStrategy]].
   *
   * @param multistartCount       number of local SA runs from global seeds
   * @param globalSampleBudget    passed to [[GlobalSampleStrategy.setSamplingRate]]
