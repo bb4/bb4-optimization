@@ -32,8 +32,7 @@ class HillClimbingStrategy(optimizee: Optimizee) extends OptimizationStrategy(op
   override def doOptimization(params: ParameterArray, fitnessRange: Double): ParameterArrayWithFitness =
     climb(startingPoint(params), params)
 
-  /**
-    * Climb downhill from a start whose fitness is already known.
+  /** Climb downhill from a start whose fitness is already known.
     * Used by multistart strategies, which have scored their seeds already.
     *
     * @param start    where to start, with its fitness
