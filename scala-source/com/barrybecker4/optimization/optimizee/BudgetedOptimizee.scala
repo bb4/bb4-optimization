@@ -16,14 +16,15 @@ class EvaluationBudgetExceededException(val maxEvaluations: Int)
   */
 class BudgetedOptimizee(delegate: Optimizee, val maxEvaluations: Int) extends Optimizee {
 
+  // Guarded by `this`: concurrent strategies call the optimizee from several threads.
   private var count = 0
   private var budgetExhausted = false
 
   /** Number of objective evaluations consumed so far. */
-  def evaluationsUsed: Int = count
+  def evaluationsUsed: Int = synchronized(count)
 
   /** True after a call was rejected because the evaluation limit was reached. */
-  def wasBudgetExhausted: Boolean = budgetExhausted
+  def wasBudgetExhausted: Boolean = synchronized(budgetExhausted)
 
   override def getName: String = delegate.getName
 
@@ -41,7 +42,7 @@ class BudgetedOptimizee(delegate: Optimizee, val maxEvaluations: Int) extends Op
 
   override def getOptimalFitness: Double = delegate.getOptimalFitness
 
-  private def bump(): Unit = {
+  private def bump(): Unit = synchronized {
     if (count >= maxEvaluations) {
       budgetExhausted = true
       throw new EvaluationBudgetExceededException(maxEvaluations)
