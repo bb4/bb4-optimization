@@ -1,8 +1,6 @@
 // Copyright by Barry G. Becker, 2000-2026. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.strategy.genetic
 
-import com.barrybecker4.optimization.strategy.genetic.{GeneticSearchConfig, GeneticSearchStrategy, NeighborSelection}
-
 /**
   * How absolute-fitness neighbor mutation picks a candidate.
   * Compare-mode always takes a single sample vs the generation baseline.
@@ -28,7 +26,7 @@ enum NeighborSelection {
   * @param crossoverEnabled       when false, refill uses neighbor mutation only
   * @param cullFactor             fraction of population discarded each generation (0–1)
   * @param crossoverProbability   chance of crossover vs mutation when filling after cull
-  * @param maxIterations          hard cap on generations
+  * @param maxIterations          hard cap on the number of generations
   * @param maxStagnantGenerations stop after this many generations with negligible improvement
   * @param initialNeighborRadius  radius for seeding the initial population
   * @param nbrRadius              starting mutation neighborhood radius during evolve
@@ -55,7 +53,21 @@ case class GeneticSearchConfig(
     neighborSelection: NeighborSelection = NeighborSelection.GreedyImproveAbsolute,
     improvementEpsilon: Double = GeneticSearchConfig.DEFAULT_IMPROVEMENT_EPS,
     elitismEnabled: Boolean = true
-)
+) {
+  require(cullFactor >= 0.0 && cullFactor <= 1.0, s"cullFactor must be in [0, 1], got $cullFactor")
+  require(crossoverProbability >= 0.0 && crossoverProbability <= 1.0,
+    s"crossoverProbability must be in [0, 1], got $crossoverProbability")
+  require(maxIterations >= 0, s"maxIterations must not be negative, got $maxIterations")
+  require(maxStagnantGenerations >= 0, s"maxStagnantGenerations must not be negative, got $maxStagnantGenerations")
+  require(initialNeighborRadius > 0.0, s"initialNeighborRadius must be positive, got $initialNeighborRadius")
+  require(nbrRadius > 0.0, s"nbrRadius must be positive, got $nbrRadius")
+  require(nbrRadiusShrinkFactor > 0.0 && nbrRadiusExpandFactor > 0.0,
+    s"radius shrink/expand factors must be positive, got $nbrRadiusShrinkFactor, $nbrRadiusExpandFactor")
+  // the softener is a divisor in the per-rank mutation radius
+  require(nbrRadiusSoftener > 0.0, s"nbrRadiusSoftener must be positive, got $nbrRadiusSoftener")
+  require(maxNeighborRetries >= 0, s"maxNeighborRetries must not be negative, got $maxNeighborRetries")
+  require(improvementEpsilon >= 0.0, s"improvementEpsilon must not be negative, got $improvementEpsilon")
+}
 
 object GeneticSearchConfig {
   /** Default stagnation epsilon (factory may override from fitnessRange). */

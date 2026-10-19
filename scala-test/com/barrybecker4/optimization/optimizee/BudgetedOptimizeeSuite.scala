@@ -99,4 +99,24 @@ class BudgetedOptimizeeSuite extends AnyFunSuite {
     assert(result.best.fitness < initialFitness,
       s"expected some improvement with 8 evals; got ${result.best.fitness} vs initial $initialFitness")
   }
+
+  test("the evaluation budget is exact when the optimizee is called from many threads") {
+    val budgeted = new BudgetedOptimizee(new DoubleWellOptimizee(), maxEvaluations = 500)
+    val guess = NumericParameterArray(
+      IndexedSeq(DoubleParameter(value = 1.0, minValue = -10.0, maxValue = 10.0, name = "x")), rnd = new Random(1))
+    val succeeded = new java.util.concurrent.atomic.AtomicInteger(0)
+    val threads = (1 to 8).map { _ =>
+      new Thread(() => {
+        for (_ <- 1 to 200) {
+          try { budgeted.evaluateFitness(guess); succeeded.incrementAndGet() }
+          catch { case _: EvaluationBudgetExceededException => () }
+        }
+      })
+    }
+    threads.foreach(_.start())
+    threads.foreach(_.join())
+    assert(succeeded.get() == 500)
+    assert(budgeted.evaluationsUsed == 500)
+    assert(budgeted.wasBudgetExhausted)
+  }
 }
