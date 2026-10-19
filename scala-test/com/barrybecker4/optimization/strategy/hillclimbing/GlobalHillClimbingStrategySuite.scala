@@ -12,6 +12,30 @@ import scala.util.Random
 
 class GlobalHillClimbingStrategySuite extends AnyFunSuite {
 
+  private def twoDim(rnd: Random) = NumericParameterArray(
+    IndexedSeq(
+      DoubleParameter(value = 7.0, minValue = -10.0, maxValue = 10.0, name = "x"),
+      DoubleParameter(value = -6.0, minValue = -10.0, maxValue = 10.0, name = "y")),
+    rnd = rnd)
+
+  test("multistart is reproducible: the same seed gives the same result every time") {
+    def run() = {
+      val rnd = new Random(5)
+      val strategy = new GlobalHillClimbingStrategy(new com.barrybecker4.optimization.strategy.optimizees.TwoMinima2DOptimizee)
+      strategy.setConfig(GlobalHillClimbingConfig(multistartCount = 3, globalSampleBudget = 200))
+      strategy.doOptimization(twoDim(rnd), fitnessRange = 100.0).fitness
+    }
+    val results = (1 to 4).map(_ => run())
+    assert(results.distinct.size == 1, s"expected identical results, got $results")
+  }
+
+  test("an evaluation budget of zero returns the start with worst fitness instead of throwing") {
+    val rnd = new Random(3)
+    val budgeted = new com.barrybecker4.optimization.optimizee.BudgetedOptimizee(new DoubleWellOptimizee(), maxEvaluations = 0)
+    val out = new GlobalHillClimbingStrategy(budgeted).doOptimization(twoDim(rnd), fitnessRange = 100.0)
+    assert(out.fitness == Double.MaxValue)
+  }
+
   test("multistart with K>1 is not worse than K=1 on a unimodal quadratic") {
     val rnd = new Random(11)
     val optimizee = new UnimodalQuadraticOptimizee(target = 0.35)

@@ -221,4 +221,29 @@ class SimulatedAnnealingStrategySuite extends AnyFunSuite {
       assert(lines.size > 2, s"expected header + step rows + summary, got ${lines.size} lines")
     } finally file.delete()
   }
+
+  test("adaptive mode changes the search in one dimension (the window used to be longer than a level)") {
+    val adaptive = (1 to 10).map(seed => annealed(seed, SimulatedAnnealingStepMode.AdaptiveAcceptance()).fitness)
+    val fixed = (1 to 10).map(seed => annealed(seed, SimulatedAnnealingStepMode.Fixed).fitness)
+    assert(adaptive != fixed)
+  }
+
+  test("adaptive mode still converges on a 1-D quadratic") {
+    val results = (1 to 10).map(seed => annealed(seed, SimulatedAnnealingStepMode.AdaptiveAcceptance()).fitness)
+    assert(results.count(_ < 0.05) >= 8, s"results: $results")
+  }
+
+  test("the Metropolis random draw is only made for moves that do not improve") {
+    var draws = 0
+    val metro = new Random(5) {
+      override def nextDouble(): Double = { draws += 1; super.nextDouble() }
+    }
+    val budgeted = new BudgetedOptimizee(new SaQuadraticOptimizee(1.0), maxEvaluations = 100000)
+    val sa = new SimulatedAnnealingStrategy(budgeted, metro)
+    sa.setStepMode(SimulatedAnnealingStepMode.Fixed)
+    sa.setMaxTemperature(50.0)
+    sa.doOptimization(start(-5.0, new Random(77)), fitnessRange = 100.0)
+    val proposals = budgeted.evaluationsUsed - 1 // minus the initial evaluation
+    assert(draws > 0 && draws < proposals, s"draws=$draws proposals=$proposals")
+  }
 }

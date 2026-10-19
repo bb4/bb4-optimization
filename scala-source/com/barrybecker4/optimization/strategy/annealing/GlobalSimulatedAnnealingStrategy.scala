@@ -4,7 +4,7 @@ package com.barrybecker4.optimization.strategy.annealing
 import com.barrybecker4.math.MathUtil
 import com.barrybecker4.optimization.optimizee.{EvaluationBudgetExceededException, Optimizee}
 import com.barrybecker4.optimization.parameter.*
-import com.barrybecker4.optimization.strategy.{GlobalSampleStrategy, OptimizationStrategy}
+import com.barrybecker4.optimization.strategy.{GlobalSampleStrategy, OptimizationStrategy, SeedForking}
 
 import scala.util.Random
 
@@ -110,36 +110,12 @@ class GlobalSimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathU
 
   /** The first seed shares the caller's RNG (single-start behavior); later seeds get their own. */
   private def startPoint(seed: ParameterArrayWithFitness, idx: Int): ParameterArrayWithFitness =
-    if (idx == 0) seed else parameterArrayWithForkedRnd(seed, idx)
+    if (idx == 0) seed else SeedForking.fork(seed, idx)
 
   private def annealFrom(start: ParameterArrayWithFitness,
                          fitnessRange: Double,
                          champion: Champion): Unit =
     withinBudget(runSimulatedAnnealingFrom(start, fitnessRange)).foreach(champion.offer)
-
-  /**
-    * Seed for a forked RNG. Derived from the parameter values (not `hashCode`, which for case-class arrays
-    * includes the identity hash of the embedded [[Random]]) so that runs with the same seed are reproducible.
-    */
-  private[annealing] def forkSalt(pa: ParameterArray, forkIdx: Int): Long = {
-    val values = (0 until pa.size).map(i => pa.get(i).getValue)
-    values.hashCode.toLong * 31L + forkIdx.toLong * 1103515245L
-  }
-
-  private def parameterArrayWithForkedRnd(s: ParameterArrayWithFitness, forkIdx: Int): ParameterArrayWithFitness = {
-    val forked = new Random(forkSalt(s.pa, forkIdx))
-    val newPa = s.pa match {
-      case v: VariableLengthIntSet =>
-        val paramsSeq = (0 until v.size).map(v.get)
-        VariableLengthIntSet.createInstance(paramsSeq, v.fullSeq, forked)
-      case n: NumericParameterArray =>
-        NumericParameterArray(n.params, n.numSteps, forked)
-      case p: PermutedParameterArray =>
-        p.forkWithRnd(forked)
-      case other => other
-    }
-    ParameterArrayWithFitness(newPa, s.fitness)
-  }
 
   private def runSimulatedAnnealingFrom(seed: ParameterArrayWithFitness,
                                         fitnessRange: Double): ParameterArrayWithFitness = {

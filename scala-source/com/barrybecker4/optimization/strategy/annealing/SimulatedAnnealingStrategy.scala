@@ -239,8 +239,9 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
 
     private def runTemperatureLevel(): Unit = {
       current = best
-      val scaler = new StepScaler(stepMode)
-      while (step < innerIterationsPerDimension * current.pa.size && !isOptimalFitnessReached(current)) {
+      val levelLength = innerIterationsPerDimension * current.pa.size
+      val scaler = new StepScaler(stepMode, levelLength)
+      while (step < levelLength && !isOptimalFitnessReached(current)) {
         val (next, accepted) = proposeAndMaybeAccept(scaler)
         current = next
         scaler.record(accepted)
@@ -268,9 +269,8 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
       val candidate = current.pa.getRandomNeighbor(radius)
       val dist = if (isLoggingToFile) current.pa.distance(candidate) else 0.0
       val (delta, candidateFitness) = deltaAndAbsoluteFitness(candidate, current)
-      // The Metropolis draw is made even for improving moves to keep the random stream stable.
-      val metropolisAccepts = metropolisAcceptWorse(delta, temperature, fitnessRange)
-      val accepted = delta < 0 || metropolisAccepts
+      // Improving moves are always taken; only worse ones need the Metropolis test (and its random draw).
+      val accepted = delta < 0 || metropolisAcceptWorse(delta, temperature, fitnessRange)
       val next = if (accepted) acceptedState(candidate, candidateFitness) else current
       logStep(next, radius, dist)
       (next, accepted)

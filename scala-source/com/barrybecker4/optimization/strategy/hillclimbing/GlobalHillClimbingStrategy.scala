@@ -3,10 +3,7 @@ package com.barrybecker4.optimization.strategy.hillclimbing
 
 import com.barrybecker4.optimization.optimizee.{EvaluationBudgetExceededException, Optimizee}
 import com.barrybecker4.optimization.parameter.*
-import com.barrybecker4.optimization.strategy.{GlobalSampleStrategy, OptimizationStrategy}
-import com.barrybecker4.optimization.strategy.hillclimbing.HillClimbingStrategy
-
-import scala.util.Random
+import com.barrybecker4.optimization.strategy.{GlobalSampleStrategy, OptimizationStrategy, SeedForking}
 
 
 object GlobalHillClimbingStrategy {
@@ -67,9 +64,13 @@ class GlobalHillClimbingStrategy(optimizee: Optimizee) extends OptimizationStrat
         case _: EvaluationBudgetExceededException => None
       }
 
-    def initialGuess: ParameterArrayWithFitness =
-      if (optimizee.evaluateByComparison) ParameterArrayWithFitness(params, Double.MaxValue)
-      else ParameterArrayWithFitness(params, optimizee.evaluateFitness(params))
+    // Evaluated at most once; if even that exceeds the budget the result is the worst possible fitness.
+    lazy val initialGuess: ParameterArrayWithFitness = {
+      val fitness =
+        if (optimizee.evaluateByComparison) Double.MaxValue
+        else runPhase(optimizee.evaluateFitness(params)).getOrElse(Double.MaxValue)
+      ParameterArrayWithFitness(params, fitness)
+    }
 
     val gsStrategy = new GlobalSampleStrategy(optimizee)
     copyRunConfigurationTo(gsStrategy)
@@ -94,33 +95,12 @@ class GlobalHillClimbingStrategy(optimizee: Optimizee) extends OptimizationStrat
       runPhase(runHillClimbingFrom(initialGuess, fitnessRange)).foreach(consider)
     } else {
       seeds.zipWithIndex.foreach { case (seed, idx) =>
-        val start = if (idx == 0) seed else parameterArrayWithForkedRnd(seed, idx)
+        val start = if (idx == 0) seed else SeedForking.fork(seed, idx)
         runPhase(runHillClimbingFrom(start, fitnessRange)).foreach(consider)
       }
     }
 
     overallBest.getOrElse(initialGuess)
-  }
-
-  /**
-    * Extra multistart seeds often share the same [[Random]] as the initial guess; hill climbing mutates that RNG.
-    * Fork per seed (after the primary) so the first local run matches legacy single-start behavior and later starts
-    * do not depend on how many draws earlier seeds consumed.
-    */
-  private def parameterArrayWithForkedRnd(s: ParameterArrayWithFitness, forkIdx: Int): ParameterArrayWithFitness = {
-    val salt = s.pa.## * 31L + forkIdx.toLong * 1103515245L
-    val rnd = new Random(salt)
-    val newPa = s.pa match {
-      case v: VariableLengthIntSet =>
-        val paramsSeq = (0 until v.size).map(v.get)
-        VariableLengthIntSet.createInstance(paramsSeq, v.fullSeq, rnd)
-      case n: NumericParameterArray =>
-        NumericParameterArray(n.params, n.numSteps, rnd)
-      case p: PermutedParameterArray =>
-        p.forkWithRnd(rnd)
-      case other => other
-    }
-    ParameterArrayWithFitness(newPa, s.fitness)
   }
 
   private def runHillClimbingFrom(seed: ParameterArrayWithFitness, fitnessRange: Double): ParameterArrayWithFitness = {

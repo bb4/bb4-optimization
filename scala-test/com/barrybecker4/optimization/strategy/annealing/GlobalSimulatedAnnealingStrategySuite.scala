@@ -133,20 +133,6 @@ class GlobalSimulatedAnnealingStrategySuite extends AnyFunSuite {
     assert(out.fitness.isFinite && out.fitness < Double.MaxValue)
   }
 
-  test("fork salt depends on the parameter values and fork index, not on the Random instance") {
-    val strategy = new GlobalSimulatedAnnealingStrategy(new TwoMinima2DOptimizee, new Random(1))
-    val a = twoDim(new Random(1))
-    val b = twoDim(new Random(999))
-    assert(strategy.forkSalt(a, 1) == strategy.forkSalt(b, 1))
-    assert(strategy.forkSalt(a, 1) != strategy.forkSalt(a, 2))
-    val moved = NumericParameterArray(
-      IndexedSeq(
-        DoubleParameter(value = 7.5, minValue = -10.0, maxValue = 10.0, name = "x"),
-        DoubleParameter(value = -6.0, minValue = -10.0, maxValue = 10.0, name = "y")),
-      rnd = new Random(1))
-    assert(strategy.forkSalt(a, 1) != strategy.forkSalt(moved, 1))
-  }
-
   test("setters keep config valid and reject bad values") {
     val strategy = new GlobalSimulatedAnnealingStrategy(new DoubleWellOptimizee(), new Random(1))
     strategy.setMultistartCount(7)
