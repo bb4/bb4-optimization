@@ -2,13 +2,12 @@
 package com.barrybecker4.optimization.strategy.annealing
 
 import com.barrybecker4.optimization.strategy.hillclimbing.SeedSelection
-import com.barrybecker4.optimization.strategy.annealing.{GlobalSimulatedAnnealingStrategy, SimulatedAnnealingConfig, SimulatedAnnealingStrategy}
 
 /**
   * Tunable parameters for [[GlobalSimulatedAnnealingStrategy]].
   *
-  * @param multistartCount       number of local SA runs from global seeds
-  * @param globalSampleBudget    passed to [[GlobalSampleStrategy.setSamplingRate]]
+  * @param multistartCount       number of local SA runs from global seeds (at least 1)
+  * @param globalSampleBudget    passed to [[com.barrybecker4.optimization.strategy.GlobalSampleStrategy.setSamplingRate]] (positive)
   * @param seedSelection         how to pick multistart seeds from global samples
   * @param annealingConfig       config applied to each local [[SimulatedAnnealingStrategy]]
   */
@@ -20,6 +19,8 @@ case class GlobalSimulatedAnnealingConfig(
     ),
     annealingConfig: SimulatedAnnealingConfig = SimulatedAnnealingConfig()
 ) {
+  require(multistartCount >= 1, s"multistartCount must be at least 1, got $multistartCount")
+  require(globalSampleBudget > 0, s"globalSampleBudget must be positive, got $globalSampleBudget")
 
   /** [[SeedSelection.DiverseFromTopM.topM]] uses `max(10 * multistartCount, 50)` when `topM <= 0`. */
   def effectiveSeedSelection: SeedSelection =
