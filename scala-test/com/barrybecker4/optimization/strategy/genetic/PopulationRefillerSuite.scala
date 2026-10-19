@@ -28,7 +28,7 @@ class PopulationRefillerSuite extends AnyFunSuite {
         cands.map(pa => ParameterArrayWithFitness(pa, optimizee.evaluateFitness(pa)))
       },
       added += _)
-    val population = keepers(optimizee)
+    val population: ArrayBuffer[ParameterArrayWithFitness] = keepers(optimizee)
     def refill(desired: Int): Unit = refiller.refill(population, 3, desired, population.head.pa, 0.1)
   }
 

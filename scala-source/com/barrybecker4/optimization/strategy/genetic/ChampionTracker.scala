@@ -16,7 +16,7 @@ import scala.collection.mutable.ArrayBuffer
   * with it, and back with [[toPopulationFrame]] when the champion is put back into a population.
   *
   * @param compareMode  whether the optimizee scores candidates by comparison
-  * @param onCandidate  told about every candidate considered, whether or not it becomes the champion
+  * @param onCandidate  told about every candidate considered, whether it becomes the champion
   */
 private[genetic] final class ChampionTracker(compareMode: Boolean,
                                              onCandidate: ParameterArrayWithFitness => Unit) {
