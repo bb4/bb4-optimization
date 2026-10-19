@@ -62,4 +62,27 @@ class StepScalerSuite extends AnyFunSuite {
     record(s, Seq.fill(200)(true)*)
     assert(s.scale == 1.5)
   }
+
+  test("the window is capped at half the proposals per level so short levels still adapt") {
+    // default window is 50, but a level of 10 proposals (1 dimension) allows only 5
+    val s = new StepScaler(AdaptiveAcceptance(growFactor = 2.0), proposalsPerLevel = 10)
+    record(s, true, true, true, true)
+    assert(s.scale == 1.0)
+    record(s, true)
+    assert(s.scale == 2.0)
+  }
+
+  test("the window cap never drops below one proposal") {
+    val s = new StepScaler(AdaptiveAcceptance(growFactor = 2.0), proposalsPerLevel = 1)
+    record(s, true)
+    assert(s.scale == 2.0)
+  }
+
+  test("a long level leaves the configured window alone") {
+    val s = new StepScaler(AdaptiveAcceptance(windowProposals = 8, growFactor = 2.0), proposalsPerLevel = 1000)
+    record(s, Seq.fill(7)(true)*)
+    assert(s.scale == 1.0)
+    record(s, true)
+    assert(s.scale == 2.0)
+  }
 }

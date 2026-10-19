@@ -10,8 +10,14 @@ import com.barrybecker4.optimization.strategy.annealing.SimulatedAnnealingStepMo
   * With [[Fixed]] (or an [[AdaptiveAcceptance]] whose `windowProposals <= 0`) the scale never changes.
   * Otherwise, after every `windowProposals` proposals the observed acceptance rate is compared with the target:
   * above target grows the scale (steps too small), below target shrinks it (steps too large).
+  *
+  * The window is capped at half of `proposalsPerLevel`, so the scale gets at least two adjustments per temperature
+  * level. Without the cap the default window (50) is longer than a whole level when there are fewer than 5
+  * dimensions (10 proposals per dimension), and the adaptation would never fire.
+  *
+  * @param proposalsPerLevel number of proposals made at one temperature level
   */
-private[annealing] final class StepScaler(mode: SimulatedAnnealingStepMode) {
+private[annealing] final class StepScaler(mode: SimulatedAnnealingStepMode, proposalsPerLevel: Int = Int.MaxValue) {
 
   /** Differences smaller than this between the observed and target rate are treated as "on target". */
   private val RateTolerance = 1e-12
@@ -30,9 +36,12 @@ private[annealing] final class StepScaler(mode: SimulatedAnnealingStepMode) {
     case a: AdaptiveAcceptance if a.windowProposals > 0 =>
       proposals += 1
       if (accepted) accepts += 1
-      if (proposals >= a.windowProposals) completeWindow(a)
+      if (proposals >= effectiveWindow(a)) completeWindow(a)
     case _ => ()
   }
+
+  private def effectiveWindow(a: AdaptiveAcceptance): Int =
+    math.min(a.windowProposals, math.max(1, proposalsPerLevel / 2))
 
   private def completeWindow(a: AdaptiveAcceptance): Unit = {
     val rate = accepts.toDouble / proposals
