@@ -1,6 +1,7 @@
 package com.barrybecker4.optimization.strategy.hillclimbing
 
-import com.barrybecker4.optimization.optimizee.Optimizee
+import com.barrybecker4.optimization.optimizee.{BudgetedOptimizee, Optimizee}
+import com.barrybecker4.optimization.strategy.hillclimbing.optimizees.BaselineRelativeQuadraticCompareOptimizee
 import com.barrybecker4.optimization.optimizee.optimizees.{DiscreteGrid2DDemoProblem, LineGraphDemoProblem}
 import com.barrybecker4.optimization.parameter.types.DoubleParameter
 import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray}
@@ -91,6 +92,57 @@ class GlobalHillClimbingStrategySuite extends AnyFunSuite {
     assert(rDiv.fitness <= rTop.fitness + 1.0e-9,
       s"diverse should not lose to top-fitness; top=${rTop.fitness} diverse=${rDiv.fitness}")
     assert(rDiv.fitness < 1.0, s"expected near-global minimum, got ${rDiv.fitness}")
+  }
+
+  private def oneDim(x: Double, rnd: Random) = NumericParameterArray(
+    IndexedSeq(DoubleParameter(value = x, minValue = -10.0, maxValue = 10.0, name = "x")), rnd = rnd)
+
+  test("comparison mode: the result is scored against the initial guess, whichever seed it came from") {
+    for (seed <- 1 to 4) {
+      val rnd = new Random(seed)
+      val optimizee = new BaselineRelativeQuadraticCompareOptimizee(target = 1.5)
+      val initial = oneDim(-4.0, rnd)
+      val strategy = new GlobalHillClimbingStrategy(optimizee)
+      strategy.setConfig(GlobalHillClimbingConfig(multistartCount = 3, globalSampleBudget = 50))
+      val result = strategy.doOptimization(initial, fitnessRange = 100.0)
+      val expected = optimizee.compareFitness(result.pa, initial)
+      assert(math.abs(result.fitness - expected) < 1.0e-9, s"seed $seed: fitness ${result.fitness} but vs initial it is $expected")
+      assert(result.fitness < -1.0, s"seed $seed: expected a big improvement over x=-4, got ${result.fitness}")
+    }
+  }
+
+  test("comparison mode: the best of several seeds wins using one common baseline") {
+    val rnd = new Random(21)
+    val optimizee = new BaselineRelativeQuadraticCompareOptimizee(target = 1.5)
+    val initial = oneDim(-4.0, rnd)
+    val strategy = new GlobalHillClimbingStrategy(optimizee)
+    strategy.setConfig(GlobalHillClimbingConfig(multistartCount = 4, globalSampleBudget = 40,
+      seedSelection = SeedSelection.TopFitness))
+    val result = strategy.doOptimization(initial, fitnessRange = 100.0)
+    // The global optimum scores (-4-1.5)^2 = 30.25 better than the start.
+    assert(result.fitness < -30.0, s"expected near -30.25, got ${result.fitness}")
+  }
+
+  test("comparison mode with a zero budget returns the initial guess scored zero against itself") {
+    val rnd = new Random(3)
+    val budgeted = new BudgetedOptimizee(new BaselineRelativeQuadraticCompareOptimizee(1.5), maxEvaluations = 0)
+    val out = new GlobalHillClimbingStrategy(budgeted).doOptimization(oneDim(-4.0, rnd), fitnessRange = 100.0)
+    assert(out.fitness == 0.0, s"expected 0.0, got ${out.fitness}")
+  }
+
+  test("a budget that runs out part way through the local climbs still returns the best point evaluated") {
+    for (budget <- Seq(30, 60, 90)) {
+      val rnd = new Random(budget)
+      val inner = new UnimodalQuadraticOptimizee(target = 0.35)
+      val budgeted = new BudgetedOptimizee(inner, maxEvaluations = budget)
+      val strategy = new GlobalHillClimbingStrategy(budgeted)
+      strategy.setConfig(GlobalHillClimbingConfig(multistartCount = 3, globalSampleBudget = 20))
+      val result = strategy.doOptimization(oneDim(-4.0, rnd), fitnessRange = 100.0)
+      assert(budgeted.wasBudgetExhausted, s"budget $budget should have been exhausted")
+      assert(result.fitness < 16.0, s"budget $budget: expected better than the global samples' worst, got ${result.fitness}")
+      val check = (result.pa.get(0).getValue - 0.35) * (result.pa.get(0).getValue - 0.35)
+      assert(math.abs(result.fitness - check) < 1.0e-9, "returned fitness must belong to the returned point")
+    }
   }
 
   test("integer line and grid searches finish at the optimum") {
