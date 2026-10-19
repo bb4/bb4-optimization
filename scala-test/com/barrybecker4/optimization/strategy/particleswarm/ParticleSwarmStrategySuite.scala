@@ -178,6 +178,23 @@ class ParticleSwarmStrategySuite extends AnyFunSuite {
     assert(flat.evaluations == 10 * (1 + 7), "the initial swarm plus 7 iterations")
   }
 
+  test("the stagnation tolerance is relative to fitnessRange, and absolute when fitnessRange is not usable") {
+    def evaluationsFor(fitnessRange: Double): Int = {
+      val problem = new PsoFunctionOptimizee(SphereProblem(dimensions = 2).evaluateFitness)
+      val strategy = new ParticleSwarmStrategy(problem, new Random(19))
+      strategy.setConfig(ParticleSwarmConfig(swarmSize = 10, maxIterations = 200, stagnationIterations = 3))
+      strategy.doOptimization(SphereProblem(dimensions = 2).getInitialGuess, fitnessRange)
+      problem.evaluations
+    }
+
+    val hugeRange = evaluationsFor(1.0e12) // tolerance 100: almost every improvement counts as stagnation
+    val tinyRange = evaluationsFor(1.0)    // tolerance 1e-10
+    assert(hugeRange == 10 * (1 + 3), s"expected an early stop after 3 stagnant iterations, got $hugeRange")
+    assert(tinyRange > hugeRange)
+    for (unusable <- Seq(0.0, -5.0, Double.NaN, Double.PositiveInfinity))
+      assert(evaluationsFor(unusable) == tinyRange, s"fitnessRange $unusable should fall back to the absolute tolerance 1e-10")
+  }
+
   test("returns best-so-far when the evaluation budget runs out") {
     val problem = SphereProblem(dimensions = 2)
     val budgeted = new BudgetedOptimizee(problem, maxEvaluations = 50)
