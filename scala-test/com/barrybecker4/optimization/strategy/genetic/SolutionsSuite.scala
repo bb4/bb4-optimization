@@ -11,11 +11,11 @@ import scala.util.Random
   * A permutation whose parameters are only an encoding: the candidate it stands for is `tag` as well as the order,
   * like a puzzle path whose ids are ranks within that particular path.
   */
-private final class TaggedPermutation(params: IndexedSeq[Parameter], val tag: Int, rnd: Random)
-    extends PermutedParameterArray(params, rnd) {
+private final class TaggedPermutation(values: IndexedSeq[Parameter], val tag: Int, rnd: Random)
+    extends PermutedParameterArray(values, rnd) {
 
   override def getRandomNeighbor(radius: Double): TaggedPermutation =
-    new TaggedPermutation(params, rnd.nextInt(1000000), rnd)
+    new TaggedPermutation(this.params, rnd.nextInt(1000000), rnd)
 
   override def candidateIdentity: Any = (tag, super.candidateIdentity)
 }
