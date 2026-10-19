@@ -48,7 +48,7 @@ class Logger(val sLogFile: String) {
     val parentDir = new File(parentDirName)
     if (!parentDir.exists()) {
       try {
-        val success = parentDir.mkdir()
+        val success = parentDir.mkdirs()
         println(s"Creation of $parentDir was success = $success")
       }
       catch {

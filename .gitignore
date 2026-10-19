@@ -15,3 +15,4 @@ test/temp.txt
 .vscode/settings.json
 .bloop/
 .metals/
+scala-test/performance/

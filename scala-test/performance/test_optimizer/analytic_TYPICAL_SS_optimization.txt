@@ -1,1 +1,0 @@
-iteration,	fitness,	jumpSize,	dotprod,	p-7,	p213,	p-17,	comment 
