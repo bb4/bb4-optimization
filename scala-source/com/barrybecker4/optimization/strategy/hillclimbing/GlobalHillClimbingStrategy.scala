@@ -31,15 +31,13 @@ class GlobalHillClimbingStrategy(optimizee: Optimizee) extends OptimizationStrat
 
   def getConfig: GlobalHillClimbingConfig = config
 
-  /** How many top global samples seed local hill climbing (clamped to at least 1 at runtime). */
+  /** How many top global samples seed local hill climbing. */
   def setMultistartCount(k: Int): Unit = {
-    assert(k >= 1, "multistart count must be positive")
     config = config.copy(multistartCount = k)
   }
 
   /** Budget for [[GlobalSampleStrategy]] before local hill climbs (larger = more exploration in high-D spaces). */
   def setGlobalSampleBudget(samples: Int): Unit = {
-    assert(samples > 0, "global sample budget must be positive")
     config = config.copy(globalSampleBudget = samples)
   }
 
@@ -50,66 +48,71 @@ class GlobalHillClimbingStrategy(optimizee: Optimizee) extends OptimizationStrat
     * @return optimized params
     */
   override def doOptimization(params: ParameterArray,
-                              fitnessRange: Double): ParameterArrayWithFitness = {
-    var overallBest: Option[ParameterArrayWithFitness] = None
+                              fitnessRange: Double): ParameterArrayWithFitness =
+    new MultistartRun(params, fitnessRange).execute()
 
-    def consider(candidate: ParameterArrayWithFitness): Unit = {
-      updateRunBest(candidate)
-      if (overallBest.forall(_.fitness > candidate.fitness)) overallBest = Some(candidate)
+  /**
+    * One multistart run: sample globally, then climb from each seed, keeping the best result.
+    *
+    * In comparison mode every fitness handled here (seeds, climbs and the result) is measured against `params`, the
+    * initial guess, so results from different seeds can be compared with each other.
+    * If the evaluation budget runs out, the best point evaluated so far is returned.
+    */
+  private final class MultistartRun(params: ParameterArray, fitnessRange: Double) {
+
+    private var best: Option[ParameterArrayWithFitness] = None
+
+    /** Evaluated at most once; if even that exceeds the budget the result is the worst possible fitness. */
+    private lazy val initialGuess: ParameterArrayWithFitness = {
+      val fitness =
+        if (optimizee.evaluateByComparison) 0.0 // it is the baseline, so no better or worse than itself
+        else withinBudget(optimizee.evaluateFitness(params)).getOrElse(Double.MaxValue)
+      ParameterArrayWithFitness(params, fitness)
     }
 
-    def runPhase[T](f: => T): Option[T] =
+    def execute(): ParameterArrayWithFitness = {
+      val seeds = sampleSeeds()
+      seeds.foreach(consider)
+      // lazily forked, so that each fork happens after the previous climb, as it always has
+      startingPoints(seeds).foreach(start => withinBudget(climbFrom(start)).foreach(consider))
+      best.getOrElse(initialGuess)
+    }
+
+    private def consider(candidate: ParameterArrayWithFitness): Unit = {
+      updateRunBest(candidate)
+      if (best.forall(_.fitness > candidate.fitness)) best = Some(candidate)
+    }
+
+    private def withinBudget[T](f: => T): Option[T] =
       try Some(f)
       catch {
         case _: EvaluationBudgetExceededException => None
       }
 
-    // Evaluated at most once; if even that exceeds the budget the result is the worst possible fitness.
-    lazy val initialGuess: ParameterArrayWithFitness = {
-      val fitness =
-        if (optimizee.evaluateByComparison) Double.MaxValue
-        else runPhase(optimizee.evaluateFitness(params)).getOrElse(Double.MaxValue)
-      ParameterArrayWithFitness(params, fitness)
-    }
-
-    val gsStrategy = new GlobalSampleStrategy(optimizee)
-    copyRunConfigurationTo(gsStrategy)
-    gsStrategy.setSamplingRate(config.globalSampleBudget)
-
-    val seeds = runPhase {
-      gsStrategy.doOptimizationTopK(
-        params,
-        fitnessRange,
-        config.multistartCount,
-        config.effectiveSeedSelection
-      )
-    } match {
-      case Some(s) => s
-      case None =>
-        gsStrategy.bestSoFar.foreach(consider)
-        IndexedSeq.empty
-    }
-    seeds.foreach(consider)
-
-    if (seeds.isEmpty) {
-      runPhase(runHillClimbingFrom(initialGuess, fitnessRange)).foreach(consider)
-    } else {
-      seeds.zipWithIndex.foreach { case (seed, idx) =>
-        val start = if (idx == 0) seed else SeedForking.fork(seed, idx)
-        runPhase(runHillClimbingFrom(start, fitnessRange)).foreach(consider)
+    private def sampleSeeds(): Seq[ParameterArrayWithFitness] = {
+      val sampler = new GlobalSampleStrategy(optimizee)
+      copyRunConfigurationTo(sampler)
+      sampler.setSamplingRate(config.globalSampleBudget)
+      withinBudget(
+        sampler.doOptimizationTopK(params, fitnessRange, config.multistartCount, config.effectiveSeedSelection)
+      ).getOrElse {
+        sampler.bestSoFar.foreach(consider)
+        Seq.empty
       }
     }
 
-    overallBest.getOrElse(initialGuess)
-  }
+    /** The first seed is used as is; later ones get their own random number generator. */
+    private def startingPoints(seeds: Seq[ParameterArrayWithFitness]): Iterator[ParameterArrayWithFitness] =
+      if (seeds.isEmpty) Iterator.single(initialGuess)
+      else seeds.iterator.zipWithIndex.map { case (seed, idx) => if (idx == 0) seed else SeedForking.fork(seed, idx) }
 
-  private def runHillClimbingFrom(seed: ParameterArrayWithFitness, fitnessRange: Double): ParameterArrayWithFitness = {
-    val strategy = new HillClimbingStrategy(optimizee)
-    copyRunConfigurationTo(strategy)
-    try strategy.doOptimization(seed.pa, fitnessRange)
-    catch {
-      case _: EvaluationBudgetExceededException =>
-        strategy.bestSoFar.getOrElse(seed)
+    private def climbFrom(start: ParameterArrayWithFitness): ParameterArrayWithFitness = {
+      val climber = new HillClimbingStrategy(optimizee)
+      copyRunConfigurationTo(climber)
+      try climber.climb(start, params)
+      catch {
+        case _: EvaluationBudgetExceededException => climber.bestSoFar.getOrElse(start)
+      }
     }
   }
 }
