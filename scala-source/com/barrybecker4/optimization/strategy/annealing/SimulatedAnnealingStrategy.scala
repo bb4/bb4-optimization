@@ -38,7 +38,12 @@ object SimulatedAnnealingStepMode {
       growFactor: Double = 1.1,
       shrinkFactor: Double = 0.9,
       initialScale: Double = 1.0
-  ) extends SimulatedAnnealingStepMode
+  ) extends SimulatedAnnealingStepMode {
+    require(targetRate > 0.0 && targetRate < 1.0, s"targetRate must be in (0, 1), got $targetRate")
+    require(scaleMin > 0.0 && scaleMin <= scaleMax, s"need 0 < scaleMin <= scaleMax, got $scaleMin, $scaleMax")
+    require(growFactor > 0.0 && shrinkFactor > 0.0, s"grow/shrink factors must be positive, got $growFactor, $shrinkFactor")
+    require(initialScale > 0.0, s"initialScale must be positive, got $initialScale")
+  }
 }
 
 /**
@@ -58,13 +63,26 @@ case class SimulatedAnnealingConfig(
     defaultTempMax: Double = 1000.0,
     radiusMultiplier: Double = 8.0,
     stepMode: SimulatedAnnealingStepMode = SimulatedAnnealingStepMode.AdaptiveAcceptance()
-)
+) {
+  // A tempDropFactor >= 1 never cools, so the outer loop would never terminate.
+  require(innerIterationsPerDimension > 0, s"innerIterationsPerDimension must be positive, got $innerIterationsPerDimension")
+  require(numTempIterations > 0, s"numTempIterations must be positive, got $numTempIterations")
+  require(tempDropFactor > 0.0 && tempDropFactor < 1.0, s"tempDropFactor must be in (0, 1), got $tempDropFactor")
+  require(defaultTempMax > 0.0 && defaultTempMax.isFinite, s"defaultTempMax must be finite and > 0, got $defaultTempMax")
+  require(radiusMultiplier > 0.0 && radiusMultiplier.isFinite, s"radiusMultiplier must be finite and > 0, got $radiusMultiplier")
+}
 
 object SimulatedAnnealingStrategy {
   val DefaultConfig: SimulatedAnnealingConfig = SimulatedAnnealingConfig()
 
   /** [[com.barrybecker4.optimization.parameter.types.AbstractParameter.tweakNumericValue]] requires |r| <= 1.5. */
   private[strategy] val MAX_PROPOSAL_RADIUS: Double = 1.5
+
+  /** The initial temperature is the objective's fitness range divided by this. */
+  private val FITNESS_RANGE_PER_TEMPERATURE: Double = 10.0
+
+  /** Sensible `tempMax` for [[SimulatedAnnealingStrategy.setMaxTemperature]] given the approximate fitness range. */
+  def defaultMaxTemperature(fitnessRange: Double): Double = fitnessRange / FITNESS_RANGE_PER_TEMPERATURE
 }
 
 /**
@@ -105,6 +123,7 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
 
   /** @param tempMax the initial temperature at the start of the simulated annealing process (before cooling) */
   def setMaxTemperature(tempMax: Double): Unit = {
+    require(tempMax > 0.0 && tempMax.isFinite, s"max temperature must be finite and > 0, got $tempMax")
     this.tempMax = tempMax
   }
 
@@ -136,95 +155,35 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
       fitnessRange > 0.0 && fitnessRange.isFinite,
       s"fitnessRange must be finite and > 0 for Metropolis scaling, got $fitnessRange"
     )
-    val initialParams = params
-    val n = config.innerIterationsPerDimension
-    val numTempIterations = config.numTempIterations
-    val tempDrop = config.tempDropFactor
-    val radiusMul = config.radiusMultiplier
-    // Adaptive radius scaling helps continuous landscapes; on discrete spaces it tends to
-    // overshoot — prefer Fixed there when the config still says AdaptiveAcceptance.
-    val stepMode =
-      if (isDiscreteProblem(params) &&
-          config.stepMode.isInstanceOf[SimulatedAnnealingStepMode.AdaptiveAcceptance])
-        SimulatedAnnealingStepMode.Fixed
-      else config.stepMode
-
-    var ct = 0
-    var temperature = tempMax
-    val tempMin = tempMax / math.pow(2.0, numTempIterations)
-    var bestParams =
-      try {
-        if (!optimizee.evaluateByComparison)
-          ParameterArrayWithFitness(params, optimizee.evaluateFitness(params))
-        else ParameterArrayWithFitness(params, optimizee.compareFitness(params, initialParams))
-      } catch {
-        case _: EvaluationBudgetExceededException =>
-          return ParameterArrayWithFitness(params, Double.MaxValue)
-      }
-
-    notifyOfChange(bestParams)
-
-    var currentParams: ParameterArrayWithFitness = bestParams
-    var firstTemperaturePass = true
-
-    try {
-      while (firstTemperaturePass || (temperature > tempMin && !isOptimalFitnessReached(currentParams))) {
-        firstTemperaturePass = false
-        currentParams = bestParams
-        var stepScale = initialStepScale(stepMode)
-        var windowProposals = 0
-        var windowAccepts = 0
-
-        while (ct < n * currentParams.pa.size && !isOptimalFitnessReached(currentParams)) {
-          val rBase = radiusMul * temperature / ((n + ct) * tempMax)
-          val rEffective = clampProposalRadius(stepScale * rBase)
-          val (next, accepted) =
-            neighborStep(currentParams, ct, temperature, fitnessRange, rEffective, initialParams)
-          currentParams = next
-
-          stepMode match {
-            case SimulatedAnnealingStepMode.Fixed => ()
-            case a: SimulatedAnnealingStepMode.AdaptiveAcceptance if a.windowProposals > 0 =>
-              windowProposals += 1
-              if (accepted) windowAccepts += 1
-              if (windowProposals >= a.windowProposals) {
-                val rate = windowAccepts.toDouble / windowProposals
-                if (rate > a.targetRate + 1e-12)
-                  stepScale = math.min(a.scaleMax, stepScale * a.growFactor)
-                else if (rate < a.targetRate - 1e-12)
-                  stepScale = math.max(a.scaleMin, stepScale * a.shrinkFactor)
-                windowProposals = 0
-                windowAccepts = 0
-              }
-            case _: SimulatedAnnealingStepMode.AdaptiveAcceptance => ()
-          }
-
-          if (currentParams.fitness < bestParams.fitness) {
-            bestParams = currentParams
-            notifyOfChange(bestParams)
-          }
-          ct += 1
-        }
-        ct = 0
-        temperature *= tempDrop
-        trace("temp = " + temperature + " tempMin = " + tempMin + "\n bestParams = " + bestParams)
-      }
-    } catch {
-      case _: EvaluationBudgetExceededException =>
-        () // return bestParams below
+    evaluateStart(params) match {
+      case None => ParameterArrayWithFitness(params, Double.MaxValue) // no budget left for even one evaluation
+      case Some(start) =>
+        notifyOfChange(start)
+        new AnnealingRun(params, fitnessRange, effectiveStepMode(params), start).run()
     }
-    log(ct, bestParams, 0, 0, FormatUtil.formatNumber(temperature))
-    bestParams
   }
 
-  private def initialStepScale(stepMode: SimulatedAnnealingStepMode): Double =
-    stepMode match {
-      case SimulatedAnnealingStepMode.Fixed                         => 1.0
-      case a: SimulatedAnnealingStepMode.AdaptiveAcceptance => a.initialScale
+  /** @return the initial point with its fitness, or None if the evaluation budget was already spent. */
+  private def evaluateStart(params: ParameterArray): Option[ParameterArrayWithFitness] =
+    try {
+      val fitness =
+        if (optimizee.evaluateByComparison) optimizee.compareFitness(params, params)
+        else optimizee.evaluateFitness(params)
+      Some(ParameterArrayWithFitness(params, fitness))
+    } catch {
+      case _: EvaluationBudgetExceededException => None
     }
 
-  private def clampProposalRadius(rEffective: Double): Double =
-    math.min(SimulatedAnnealingStrategy.MAX_PROPOSAL_RADIUS, rEffective)
+  /**
+    * Adaptive radius scaling helps continuous landscapes; on discrete spaces it tends to overshoot,
+    * so prefer Fixed there even when the config says AdaptiveAcceptance.
+    */
+  private def effectiveStepMode(params: ParameterArray): SimulatedAnnealingStepMode =
+    config.stepMode match {
+      case _: SimulatedAnnealingStepMode.AdaptiveAcceptance if isDiscreteProblem(params) =>
+        SimulatedAnnealingStepMode.Fixed
+      case mode => mode
+    }
 
   private def isDiscreteProblem(params: ParameterArray): Boolean = params match {
     case _: PermutedParameterArray | _: VariableLengthIntSet => true
@@ -232,53 +191,117 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
     case _ => false
   }
 
-  /** @return (next state, whether the proposal was accepted for adaptive statistics) */
-  private def neighborStep(
-      params: ParameterArrayWithFitness,
-      ct: Int,
-      temperature: Double,
+  /**
+    * State of one annealing run: the geometric cooling loop, with the chain restarted from the best point
+    * at every temperature level ("reheat to best").
+    *
+    * @param baseline the starting point; in comparison mode fitness is always stored relative to it.
+    */
+  private final class AnnealingRun(
+      baseline: ParameterArray,
       fitnessRange: Double,
-      rEffective: Double,
-      baseline: ParameterArray
-  ): (ParameterArrayWithFitness, Boolean) = {
-    val curParams = params
-    val newParams = params.pa.getRandomNeighbor(rEffective)
-    val dist =
-      if (isLoggingToFile) curParams.pa.distance(newParams)
-      else 0.0
-    val (deltaFitness, newFitness) = deltaAndAbsoluteFitness(newParams, curParams)
-    val useWorseSolution = metropolisAcceptWorse(deltaFitness, temperature, fitnessRange)
-    val accepted = deltaFitness < 0 || useWorseSolution
-    val newParamsWithFitness =
-      if (accepted) acceptedState(newParams, newFitness, baseline)
-      else curParams
-    log(ct, newParamsWithFitness, rEffective, dist, FormatUtil.formatNumber(temperature))
-    (newParamsWithFitness, accepted)
-  }
+      stepMode: SimulatedAnnealingStepMode,
+      start: ParameterArrayWithFitness
+  ) {
+    private val innerIterationsPerDimension = config.innerIterationsPerDimension
+    private val tempMin = tempMax / math.pow(2.0, config.numTempIterations)
+    private var best = start
+    private var current = start
+    private var step = 0
+    private var temperature = tempMax
 
-  /** @return (delta for Metropolis, absolute fitness of newParams when not comparison mode; 0.0 if comparison) */
-  private def deltaAndAbsoluteFitness(newParams: ParameterArray, curParams: ParameterArrayWithFitness): (Double, Double) =
-    if (optimizee.evaluateByComparison) {
-      val d = optimizee.compareFitness(newParams, curParams.pa)
-      (d, 0.0)
-    } else {
-      val nf = optimizee.evaluateFitness(newParams)
-      (nf - curParams.fitness, nf)
+    /** @return the best point found; if the budget runs out part way, the best found so far. */
+    def run(): ParameterArrayWithFitness = {
+      try coolUntilFrozen()
+      catch {
+        case _: EvaluationBudgetExceededException => () // fall through and return best so far
+      }
+      logFinal()
+      best
     }
+
+    /** The first temperature level always runs, even if the starting point already satisfies the stop test. */
+    private def coolUntilFrozen(): Unit = {
+      runTemperatureLevel()
+      coolDown()
+      while (shouldKeepCooling) {
+        runTemperatureLevel()
+        coolDown()
+      }
+    }
+
+    private def shouldKeepCooling: Boolean = temperature > tempMin && !isOptimalFitnessReached(current)
+
+    private def coolDown(): Unit = {
+      temperature *= config.tempDropFactor
+      trace("temp = " + temperature + " tempMin = " + tempMin + "\n bestParams = " + best)
+    }
+
+    private def runTemperatureLevel(): Unit = {
+      current = best
+      val scaler = new StepScaler(stepMode)
+      while (step < innerIterationsPerDimension * current.pa.size && !isOptimalFitnessReached(current)) {
+        val (next, accepted) = proposeAndMaybeAccept(scaler)
+        current = next
+        scaler.record(accepted)
+        keepIfBest()
+        step += 1
+      }
+      step = 0
+    }
+
+    private def keepIfBest(): Unit =
+      if (current.fitness < best.fitness) {
+        best = current
+        notifyOfChange(best)
+      }
+
+    /** Radius shrinks with temperature and with the step count, then is scaled by the step mode. */
+    private def proposalRadius(scaler: StepScaler): Double = {
+      val base = config.radiusMultiplier * temperature / ((innerIterationsPerDimension + step) * tempMax)
+      math.min(SimulatedAnnealingStrategy.MAX_PROPOSAL_RADIUS, scaler.scale * base)
+    }
+
+    /** @return (next state, whether the proposal was accepted for adaptive statistics) */
+    private def proposeAndMaybeAccept(scaler: StepScaler): (ParameterArrayWithFitness, Boolean) = {
+      val radius = proposalRadius(scaler)
+      val candidate = current.pa.getRandomNeighbor(radius)
+      val dist = if (isLoggingToFile) current.pa.distance(candidate) else 0.0
+      val (delta, candidateFitness) = deltaAndAbsoluteFitness(candidate, current)
+      // The Metropolis draw is made even for improving moves to keep the random stream stable.
+      val metropolisAccepts = metropolisAcceptWorse(delta, temperature, fitnessRange)
+      val accepted = delta < 0 || metropolisAccepts
+      val next = if (accepted) acceptedState(candidate, candidateFitness) else current
+      logStep(next, radius, dist)
+      (next, accepted)
+    }
+
+    /** @return (delta for Metropolis, absolute fitness of candidate when not comparison mode; 0.0 if comparison) */
+    private def deltaAndAbsoluteFitness(candidate: ParameterArray,
+                                        cur: ParameterArrayWithFitness): (Double, Double) =
+      if (optimizee.evaluateByComparison) (optimizee.compareFitness(candidate, cur.pa), 0.0)
+      else {
+        val fitness = optimizee.evaluateFitness(candidate)
+        (fitness - cur.fitness, fitness)
+      }
+
+    private def acceptedState(candidate: ParameterArray, candidateFitness: Double): ParameterArrayWithFitness = {
+      val stored =
+        if (optimizee.evaluateByComparison) optimizee.compareFitness(candidate, baseline)
+        else candidateFitness
+      ParameterArrayWithFitness(candidate, stored)
+    }
+
+    // Formatting the temperature is only worth doing when someone is listening.
+    private def logStep(state: ParameterArrayWithFitness, radius: Double, dist: Double): Unit =
+      if (isLoggingToFile) log(step, state, radius, dist, FormatUtil.formatNumber(temperature))
+
+    private def logFinal(): Unit =
+      if (isLoggingToFile) log(step, best, 0, 0, FormatUtil.formatNumber(temperature))
+  }
 
   private def metropolisAcceptWorse(deltaFitness: Double, temperature: Double, fitnessRange: Double): Boolean = {
     val probability = math.exp(tempMax * -deltaFitness / (fitnessRange * temperature))
     rnd.nextDouble() < probability
-  }
-
-  private def acceptedState(
-      newParams: ParameterArray,
-      newFitness: Double,
-      baseline: ParameterArray
-  ): ParameterArrayWithFitness = {
-    val storedFitness =
-      if (optimizee.evaluateByComparison) optimizee.compareFitness(newParams, baseline)
-      else newFitness
-    ParameterArrayWithFitness(newParams, storedFitness)
   }
 }

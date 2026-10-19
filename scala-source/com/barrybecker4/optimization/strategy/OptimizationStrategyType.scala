@@ -99,7 +99,7 @@ enum OptimizationStrategyType {
       case SIMULATED_ANNEALING =>
         val strategy = new SimulatedAnnealingStrategy(optimizee, rnd)
         strategy.setConfig(SimulatedAnnealingConfig())
-        strategy.setMaxTemperature(fitnessRange / 10.0)
+        strategy.setMaxTemperature(SimulatedAnnealingStrategy.defaultMaxTemperature(fitnessRange))
         strategy
       case GENETIC_SEARCH =>
         val strategy = new GeneticSearchStrategy(optimizee, rnd)
