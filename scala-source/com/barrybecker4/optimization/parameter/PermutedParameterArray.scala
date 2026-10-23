@@ -76,6 +76,47 @@ case class PermutedParameterArray(params: IndexedSeq[Parameter], rnd: Random)
     *       local search on permutations), rather than always reading endpoint values from the initial
     *       [[params]] snapshot.
     */
+  override def supportsMoves: Boolean = true
+
+  /**
+    * The swaps that [[getRandomNeighbor]] would make, as a move. That is one [[Swap]] for the usual small radius,
+    * the swaps in order for a larger one, and the swaps of a Fisher-Yates shuffle once the radius is so large that
+    * a shuffle is used instead.
+    */
+  override def proposeMove(radius: Double): Move = {
+    val swaps = if (size <= 1) IndexedSeq.empty[Swap] else proposeSwaps(numSwapsFor(radius))
+    if (swaps.size == 1) swaps.head else SwapSequence(swaps)
+  }
+
+  private def proposeSwaps(numToSwap: Int): IndexedSeq[Swap] =
+    if (numToSwap > PermutedParameterArray.MAX_SWAPS_PER_PARAMETER * size) shuffleSwaps
+    else IndexedSeq.fill(numToSwap) {
+      val index = rnd.nextInt(size)
+      Swap(index, randomIndexOtherThan(index))
+    }
+
+  /** Fisher-Yates written as swaps, drawing exactly what [[shuffleValues]] draws. */
+  private def shuffleSwaps: IndexedSeq[Swap] =
+    (size - 1 until 0 by -1).map(i => Swap(i, rnd.nextInt(i + 1)))
+
+  override def applyMove(move: Move): PermutedParameterArray = move match {
+    case Swap(first, second) => swapPositions(IndexedSeq(Swap(first, second)))
+    case SwapSequence(swaps) => swapPositions(swaps)
+    case other => throw new UnsupportedOperationException("A permutation does not understand the move " + other)
+  }
+
+  /** Replace only the parameters that change when a few positions are swapped, or work on the values if there are many. */
+  private def swapPositions(swaps: IndexedSeq[Swap]): PermutedParameterArray =
+    if (swaps.size * PermutedParameterArray.FEW_SWAPS_DIVISOR <= size) {
+      val revised = params.toArray
+      swaps.foreach(s => swapValuesAt(revised, s.first, s.second))
+      PermutedParameterArray(ArraySeq.unsafeWrapArray(revised), rnd)
+    } else {
+      val values = currentValues
+      swaps.foreach(s => swapAt(values, s.first, s.second))
+      withValues(values)
+    }
+
   override def getRandomNeighbor(radius: Double): PermutedParameterArray = {
     if (size <= 1) return this
     val numToSwap = numSwapsFor(radius)
