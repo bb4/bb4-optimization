@@ -1,6 +1,6 @@
 # Plan: faster, more reliable local search in bb4-optimization
 
-Status: Phase 0 (baseline and benchmark) is done. Later phases are not started.
+Status: Phases 0 (baseline and benchmark) and 1 (fewer allocations) are done. Later phases are not started.
 
 Decisions: new APIs are added in 2.1-SNAPSHOT (additive, defaults keep today's behavior). The first user of the
 changes is the Red puzzle in bb4-puzzles, then Tantrix.
@@ -40,14 +40,46 @@ What the code does today:
 - Policy on seeds: neighbor generation will change in later phases, so a given seed may follow a different path.
   Treat results as statistics over several seeds, not exact values.
 
-## Phase 1: fewer allocations (no API change)
+## Phase 1: fewer allocations (done, no API change)
 
-- `PermutedParameterArray.getRandomNeighbor`: copy once into a primitive array and swap in place. Swap `Parameter`
-  references if the parameters carry nothing but their value (to be checked).
-- `candidateIdentity`: cache it lazily, or use a primitive-array hash and equals. Same for the hill-climbing cache.
-- Order crossover with a boolean "used" array instead of sets and filters.
-- Audit the `compareFitness` double evaluation.
-- Expected gain: a few times faster on permutation problems, with the same behavior statistically.
+What the profile showed, and what was done. The numbers are from [benchmark-results.md](benchmark-results.md) against
+[benchmarks-baseline.md](benchmarks-baseline.md) (the baseline used 1000 ms per run, the results 5000 ms).
+
+- **Hill climbing spent its time on huge neighbors.** It widens the radius by 1% on every failed try, so after a few
+  hundred tries a neighbor was tens of thousands of random swaps, each allocating two parameters (3 MB per
+  evaluation). Past 4 swaps per parameter the result is as good as random, so `getRandomNeighbor` now shuffles
+  instead. A few swaps copy the parameter references once. Many swaps work on a `double[]` and replace each changed
+  parameter once. The swap count is clamped before it becomes an Int, since a radius that keeps growing otherwise
+  overflows it. Parameters are not swapped by reference, because each position has its own name and range.
+- **Iterated local search and state space search keyed visited states on `toCSVString`**, which formats every number
+  through a synchronized global formatter (75% of allocation on `tour-200`), loses precision, and ignores
+  `candidateIdentity` overrides. They now use the candidate identity. Its default is a `ValuesKey`, one `double[]`
+  with array hash and equals, instead of a boxed `Seq[Double]`. This also makes the genetic search duplicate checks
+  cheaper. A small behavior change: for continuous parameters, states that differed only beyond the printed digits
+  used to count as the same state, and no longer do.
+- **The hill climbing cache** is a `CandidateSet`, a `mutable.Set[ParameterArray]` keyed by candidate identity,
+  instead of a `HashSet` that hashed every parameter object.
+- **Order crossover** is its own class, `OrderCrossover`, with a boolean array for the slice membership when the values
+  are whole numbers below n, and the old set for anything else. For the same random numbers it gives the same children.
+- **`compareFitness` audit: no change needed.** `AbsoluteOptimizee.compareFitness` evaluates twice, but every strategy
+  calls it only when `evaluateByComparison` is true, which is false for an `AbsoluteOptimizee`. Comparison optimizees
+  need both the delta against the current point and the fitness against the baseline, so discrete hill climbing keeps
+  its two calls. Noted for later: the sign convention in the `Optimizee.compareFitness` doc ("amount params1 are better")
+  is the opposite of how the strategies read it (negative means the candidate is better). It matters only to someone
+  who writes an optimizee that evaluates by comparison.
+
+Results on the 2-core VM, medians of 5 seeds (5000 ms limit; baseline 1000 ms):
+
+| tour-200 | Evals/sec before | after | Bytes/eval before | after | Median fitness before | after |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| HILL_CLIMBING | 920 | 25,827 | 2,812,167 | 25,853 | 91.1 | 91.1 |
+| ITERATED_LOCAL_SEARCH | 9,654 | 171,915 | 49,316 | 4,720 | 77.7 | 76.8 |
+| GENETIC_SEARCH | 60,488 | 181,947 | 16,094 | 4,556 | 79.4 | 33.8 |
+
+Hill climbing and iterated local search now stop on their own in well under a second, with the same fitness as
+before. Genetic search is limited by time, so it gets much further in the same time. Simulated annealing is
+unchanged in speed and uses less memory. What is left is mostly the cost of building a new immutable array and new
+parameter objects for every neighbor, which Phase 2 removes.
 
 ## Phase 2: delta evaluation (additive API)
 
@@ -84,7 +116,7 @@ What the code does today:
 ## Suggested PR sequence
 
 1. Phase 0: benchmark harness, baseline numbers, this plan (done).
-2. Phase 1 in small PRs: neighbor, identity and cache, crossover, `compareFitness` audit.
+2. Phase 1: neighbor, identity and cache, crossover, `compareFitness` audit (done, one PR).
 3. Phase 2: Move API and the permutation swap; then simulated annealing; then iterated local search and hill climbing;
    then genetic mutation.
 4. Phase 3: crossover hook; then repair; then guided moves.
