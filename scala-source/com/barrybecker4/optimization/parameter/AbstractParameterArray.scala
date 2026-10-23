@@ -20,10 +20,13 @@ abstract class AbstractParameterArray(params: IndexedSeq[Parameter] = IndexedSeq
     extends ParameterArray {
 
   override def getSamplePopulationSize: Int = {
-    val pop = params.foldLeft(1) { (acc, param) =>
-      acc * (if (param.isIntegerOnly) 4 else 12)
+    // Each parameter multiplies the size. The product is capped at every step, since it would overflow an Int
+    // (and come out as 0 or negative) for 16 or more integer parameters.
+    val max = AbstractParameterArray.POPULATION_MAX.toLong
+    val pop = params.foldLeft(1L) { (acc, param) =>
+      Math.min(max, acc * (if (param.isIntegerOnly) 4 else 12))
     }
-    Math.min(AbstractParameterArray.POPULATION_MAX, pop)
+    pop.toInt
   }
 
   /** @return the number of parameters in the array. */
