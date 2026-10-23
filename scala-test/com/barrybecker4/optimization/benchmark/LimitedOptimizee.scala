@@ -2,7 +2,7 @@
 package com.barrybecker4.optimization.benchmark
 
 import com.barrybecker4.optimization.optimizee.{EvaluationBudgetExceededException, Optimizee}
-import com.barrybecker4.optimization.parameter.ParameterArray
+import com.barrybecker4.optimization.parameter.{Move, ParameterArray}
 
 import java.util.concurrent.atomic.AtomicLong
 
@@ -43,6 +43,12 @@ class LimitedOptimizee(delegate: Optimizee, maxEvaluations: Long, deadlineNanos:
   override def compareFitness(params1: ParameterArray, params2: ParameterArray): Double = {
     checkLimits()
     delegate.compareFitness(params1, params2)
+  }
+
+  /** A move evaluation counts as one evaluation, the same as a full one. */
+  override def evaluateMove(current: ParameterArray, currentFitness: Double, move: Move): Double = {
+    checkLimits()
+    delegate.evaluateMove(current, currentFitness, move)
   }
 
   private def checkLimits(): Unit = {

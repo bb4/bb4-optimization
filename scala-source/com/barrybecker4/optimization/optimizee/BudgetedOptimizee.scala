@@ -1,7 +1,7 @@
 // Copyright by Barry G. Becker, 2000-2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.optimizee
 
-import com.barrybecker4.optimization.parameter.ParameterArray
+import com.barrybecker4.optimization.parameter.{Move, ParameterArray}
 import com.barrybecker4.optimization.strategy.statespace.StateSpaceSearchStrategy
 
 /**
@@ -9,7 +9,7 @@ import com.barrybecker4.optimization.strategy.statespace.StateSpaceSearchStrateg
   * @param maxEvaluations the budget that was configured
   */
 class EvaluationBudgetExceededException(val maxEvaluations: Int)
-  extends RuntimeException(s"Evaluation budget exceeded: $maxEvaluations calls to evaluateFitness/compareFitness")
+  extends RuntimeException(s"Evaluation budget exceeded: $maxEvaluations calls to evaluateFitness/compareFitness/evaluateMove")
 
 /**
   * Wraps an [[Optimizee]] and counts each call to `evaluateFitness` or `compareFitness` toward a fixed budget.
@@ -38,6 +38,12 @@ class BudgetedOptimizee(delegate: Optimizee, val maxEvaluations: Int) extends Op
   override def compareFitness(params1: ParameterArray, params2: ParameterArray): Double = {
     bump()
     delegate.compareFitness(params1, params2)
+  }
+
+  /** Counts as one evaluation, the same as a full one, and lets the delegate use its own faster way to work it out. */
+  override def evaluateMove(current: ParameterArray, currentFitness: Double, move: Move): Double = {
+    bump()
+    delegate.evaluateMove(current, currentFitness, move)
   }
 
   override def getOptimalFitness: Double = delegate.getOptimalFitness
