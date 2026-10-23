@@ -8,7 +8,7 @@ import org.scalatest.funsuite.AnyFunSuite
 class OptimizationBenchmarkSuite extends AnyFunSuite {
 
   private val quick = BenchmarkConfig(timeLimitMillis = 150, maxEvaluations = 200_000, numSeeds = 2,
-    problemNames = Seq("tour-50"), strategies = Seq(SIMULATED_ANNEALING, GENETIC_SEARCH), outputFile = None)
+    problemNames = Seq("tour-50"), strategies = Seq(SIMULATED_ANNEALING, GENETIC_SEARCH), outputFile = None, reportFile = None)
 
   test("every problem is a different name") {
     assertResult(BenchmarkProblems.ALL.size)(BenchmarkProblems.ALL.map(_.name).distinct.size)

@@ -69,4 +69,13 @@ class BenchmarkReportSuite extends AnyFunSuite {
     assertResult(3)(lines.length)
     assertResult(lines(0).split("\t").length)(lines(1).split("\t").length)
   }
+
+  test("the document has the settings and the table, and nothing that changes from one run to the next but the numbers") {
+    val summaries = BenchmarkReport.summarize(Seq(result("p", SIMULATED_ANNEALING, 100, 10.0, 5.0)))
+    val document = BenchmarkReport.document("Java 21, 2 processors", summaries)
+    assert(document.startsWith("# Benchmark results"))
+    assert(document.contains("Java 21, 2 processors"))
+    assert(document.contains(BenchmarkReport.markdown(summaries)))
+    assertResult(document)(BenchmarkReport.document("Java 21, 2 processors", summaries))
+  }
 }

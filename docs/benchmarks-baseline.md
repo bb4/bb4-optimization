@@ -1,8 +1,9 @@
 # Benchmark baseline (before the improvements in the plan)
 
-These are the numbers to beat. See [improvement-plan.md](improvement-plan.md) for what is planned and why.
+These are the numbers to beat, recorded at 1000 ms per run before the default became 5000 ms. The current numbers, which the benchmark rewrites
+on every full run, are in [benchmark-results.md](benchmark-results.md). See [improvement-plan.md](improvement-plan.md) for what is planned and why.
 
-Reproduce with `./gradlew benchmark -Pargs="--time-ms=1000 --seeds=5"`, on the version of the library you want to measure.
+Reproduce with `./gradlew benchmark -Pargs="--time-ms=1000 --seeds=5 --report=none"`, on the version of the library you want to measure.
 Each run is stopped after 1000 ms or 5,000,000 evaluations, whichever comes first. Every row is the median of seeds 1 to 5,
 after one unmeasured warm-up run. Numbers depend on the machine, so only compare runs made on the same one.
 

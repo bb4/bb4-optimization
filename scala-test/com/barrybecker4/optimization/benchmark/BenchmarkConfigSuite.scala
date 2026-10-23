@@ -14,6 +14,24 @@ class BenchmarkConfigSuite extends AnyFunSuite {
     assert(config.problemNames.isEmpty && config.outputFile.isEmpty)
   }
 
+  test("a run takes 5 seconds per search unless told otherwise") {
+    assertResult(5000L)(BenchmarkConfig.parse(Seq.empty).timeLimitMillis)
+  }
+
+  test("a full run writes the summary to the file in docs") {
+    assertResult(Some("docs/benchmark-results.md"))(BenchmarkConfig.parse(Seq("--seeds=2")).reportFile)
+  }
+
+  test("a run of some problems or some strategies writes no summary, so it cannot replace the full one") {
+    assertResult(None)(BenchmarkConfig.parse(Seq("--problems=tour-50")).reportFile)
+    assertResult(None)(BenchmarkConfig.parse(Seq("--strategies=HILL_CLIMBING")).reportFile)
+  }
+
+  test("the summary file can be chosen, or turned off") {
+    assertResult(Some("mine.md"))(BenchmarkConfig.parse(Seq("--problems=tour-50", "--report=mine.md")).reportFile)
+    assertResult(None)(BenchmarkConfig.parse(Seq("--report=none")).reportFile)
+  }
+
   test("each option is read") {
     val config = BenchmarkConfig.parse(Seq("--time-ms=250", "--max-evals=77", "--seeds=3", "--problems=tour-50,subset-sum",
       "--strategies=HILL_CLIMBING,GENETIC_SEARCH", "--out=results.tsv"))
