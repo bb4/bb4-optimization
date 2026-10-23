@@ -45,16 +45,22 @@ class RandomTourProblem(numCities: Int, seed: Long) extends OptimizeeProblem {
     case _ => super.evaluateMove(tour, tourLength, move)
   }
 
-  private def lengthChangeOfSwap(tour: ParameterArray, first: Int, second: Int): Double = {
-    if (first == second) return 0.0
-    val legs = legsAround(first, second)
-    legs.map(leg => legLength(tour, leg, first, second, swapped = true)).sum -
-      legs.map(leg => legLength(tour, leg, first, second, swapped = false)).sum
-  }
+  private def lengthChangeOfSwap(tour: ParameterArray, first: Int, second: Int): Double =
+    if (first == second) 0.0
+    else legsLength(tour, first, second, swapped = true) - legsLength(tour, first, second, swapped = false)
 
-  /** The legs, each named by the position it starts at, that start or end at either position. Each leg is listed once. */
-  private def legsAround(first: Int, second: Int): Array[Int] =
-    Array(before(first), first, before(second), second).distinct
+  /**
+    * The total length of the legs that start or end at either position (the leg from a position goes to the next one),
+    * in the tour as it is or with the two positions swapped. There are four such legs, but next to each other the
+    * positions share one, which must be counted once. This allocates nothing, because it runs once per proposal.
+    */
+  private def legsLength(tour: ParameterArray, first: Int, second: Int, swapped: Boolean): Double = {
+    def leg(start: Int) = legLength(tour, start, first, second, swapped)
+    var total = leg(first) + leg(second)
+    if (before(first) != second) total += leg(before(first))
+    if (before(second) != first) total += leg(before(second))
+    total
+  }
 
   private def before(position: Int): Int = (position + numCities - 1) % numCities
 
