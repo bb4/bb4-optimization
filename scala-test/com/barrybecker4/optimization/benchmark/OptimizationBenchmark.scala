@@ -13,7 +13,8 @@ import java.nio.file.{Files, Paths}
   * evaluation limit ended the search.
   *
   * Run it with `./gradlew benchmark`. Options are given as `-Pargs="--time-ms=2000 --seeds=3 --problems=tour-50"`.
-  * See [[BenchmarkConfig]] for the options. Each problem and strategy is run once first, and not counted, to warm up the JIT.
+  * See [[BenchmarkConfig]] for the options. A full run writes `docs/benchmark-results.md`, which is committed so that
+  * `git diff` shows how a change moved the numbers. Each problem and strategy is run once first, and not counted, to warm up the JIT.
   * @author Barry Becker
   */
 object OptimizationBenchmark {
@@ -24,9 +25,17 @@ object OptimizationBenchmark {
   def main(args: Array[String]): Unit = {
     val config = BenchmarkConfig.parse(args.toSeq)
     val results = runAll(config)
-    println(machineDescription(config))
-    println(BenchmarkReport.markdown(BenchmarkReport.summarize(results)))
-    config.outputFile.foreach(file => Files.writeString(Paths.get(file), BenchmarkReport.tabSeparated(results)))
+    val report = BenchmarkReport.document(machineDescription(config), BenchmarkReport.summarize(results))
+    println(report)
+    config.reportFile.foreach(file => write(file, report))
+    config.outputFile.foreach(file => write(file, BenchmarkReport.tabSeparated(results)))
+  }
+
+  private def write(file: String, text: String): Unit = {
+    val path = Paths.get(file)
+    Option(path.getParent).foreach(Files.createDirectories(_))
+    Files.writeString(path, text)
+    println(s"Wrote $file")
   }
 
   def runAll(config: BenchmarkConfig): Seq[RunResult] =
@@ -44,5 +53,5 @@ object OptimizationBenchmark {
 
   def machineDescription(config: BenchmarkConfig): String =
     s"Java ${System.getProperty("java.version")}, ${Runtime.getRuntime.availableProcessors} processors, " +
-      s"${config.numSeeds} seeds, ${config.timeLimitMillis} ms or ${config.maxEvaluations} evaluations per run\n"
+      s"${config.numSeeds} seeds, ${config.timeLimitMillis} ms or ${config.maxEvaluations} evaluations per run"
 }

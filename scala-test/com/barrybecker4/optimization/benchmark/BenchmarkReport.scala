@@ -9,6 +9,11 @@ case class Summary(problem: String, strategy: String, runs: Int, evaluationsPerS
 /** Turns the results of runs into tables. */
 object BenchmarkReport {
 
+  private val DOCUMENT_TITLE = "# Benchmark results"
+  private val DOCUMENT_INTRO =
+    "Written by `./gradlew benchmark`; see [improvement-plan.md](improvement-plan.md). Use `git diff` to see what\n" +
+      "a change did, and only compare runs made on the same machine."
+
   def median(values: Seq[Double]): Double = {
     val sorted = values.sorted
     if (sorted.isEmpty) Double.NaN
@@ -47,6 +52,13 @@ object BenchmarkReport {
     }
     (header +: rows).mkString("\n")
   }
+
+  /**
+    * The summary as a document to keep in git. It has no date, so that a run only shows up as a change in the numbers.
+    * @param settings a description of the machine and limits, see [[OptimizationBenchmark.machineDescription]]
+    */
+  def document(settings: String, summaries: Seq[Summary]): String =
+    Seq(DOCUMENT_TITLE, DOCUMENT_INTRO, settings, markdown(summaries)).mkString("\n\n") + "\n"
 
   private def bytes(value: Option[Double]): String = value.map(v => f"$v%,.0f").getOrElse("n/a")
 

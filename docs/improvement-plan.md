@@ -31,8 +31,10 @@ What the code does today:
 
 - `OptimizationBenchmark` (in `scala-test/.../benchmark`) measures evaluations per second, bytes allocated per
   evaluation (single threaded strategies only) and the fitness reached in a fixed time, as the median over several
-  seeds. Run it with `./gradlew benchmark`. See [benchmarks-baseline.md](benchmarks-baseline.md) for the numbers
-  before any of the changes below.
+  seeds. Run it with `./gradlew benchmark` (5 seconds per search, about 10 minutes in all). A full run rewrites
+  [benchmark-results.md](benchmark-results.md), which is committed, so `git diff` shows what a change did to the
+  numbers. Commit it with each phase, from the same machine. [benchmarks-baseline.md](benchmarks-baseline.md) has
+  the numbers before any of the changes below.
 - Fixed a bug found while building it: `getSamplePopulationSize` overflowed for 16 or more integer parameters, so
   genetic search could not run on a permutation of that length at all.
 - Policy on seeds: neighbor generation will change in later phases, so a given seed may follow a different path.
