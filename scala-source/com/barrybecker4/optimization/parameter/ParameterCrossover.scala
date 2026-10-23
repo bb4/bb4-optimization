@@ -20,7 +20,7 @@ object ParameterCrossover {
       case (n1: NumericParameterArray, n2: NumericParameterArray) =>
         crossNumeric(n1, n2, rnd)
       case (p1: PermutedParameterArray, p2: PermutedParameterArray) =>
-        crossPermuted(p1, p2, rnd)
+        OrderCrossover.cross(p1, p2, rnd)
       case (v1: VariableLengthIntSet, v2: VariableLengthIntSet) =>
         crossVariableLength(v1, v2, rnd)
       case _ =>
@@ -34,20 +34,6 @@ object ParameterCrossover {
       if (rnd.nextBoolean()) n1.get(i) else n2.get(i)
     }
     NumericParameterArray(newParams, n1.numSteps, rnd)
-  }
-
-  /** Order crossover (OX): preserve a slice from parent1, fill from parent2 in order. */
-  private def crossPermuted(p1: PermutedParameterArray, p2: PermutedParameterArray, rnd: Random): PermutedParameterArray = {
-    val n = p1.size
-    if (n <= 1) return p1
-    val i0 = rnd.nextInt(n)
-    val i1 = rnd.nextInt(n)
-    val lo = math.min(i0, i1)
-    val hi = math.max(i0, i1)
-    val slice = (lo to hi).map(p1.get).toIndexedSeq
-    val sliceVals = slice.map(_.getValue).toSet
-    val restInOrder = p2.params.filter(p => !sliceVals.contains(p.getValue))
-    p1.rebuildAfterOrderCrossover(slice ++ restInOrder, rnd)
   }
 
   private def crossVariableLength(v1: VariableLengthIntSet, v2: VariableLengthIntSet, rnd: Random): VariableLengthIntSet = {
