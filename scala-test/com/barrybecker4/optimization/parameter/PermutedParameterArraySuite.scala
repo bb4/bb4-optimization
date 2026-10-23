@@ -20,6 +20,16 @@ class PermutedParameterArraySuite extends AnyFunSuite {
   implicit val doubleEq: Equality[Double] =
     TolerantNumerics.tolerantDoubleEquality(PermutedParameterArraySuite.TOL)
 
+  test("the sample population size grows with the number of parameters up to a cap") {
+    assertResult(4 * 4 * 4 * 4 * 4)(createPermParameterArray(Array[Int](0, 1, 2, 3, 4), RND).getSamplePopulationSize)
+    assertResult(4000)(createPermParameterArray((0 until 7).toArray, RND).getSamplePopulationSize)
+  }
+
+  test("the sample population size does not overflow for many parameters") {
+    for (size <- Seq(15, 16, 17, 32, 33, 50, 200))
+      assertResult(4000, s"for $size parameters")(createPermParameterArray((0 until size).toArray, RND).getSamplePopulationSize)
+  }
+
   test("PermutedNeighbor") {
     val params = createPermParameterArray(Array[Int](0, 1, 2, 3, 4), RND)
     val nbrParams = params.getRandomNeighbor(1.0)
