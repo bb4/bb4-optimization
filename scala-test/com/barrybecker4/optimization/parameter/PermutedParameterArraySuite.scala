@@ -46,6 +46,49 @@ class PermutedParameterArraySuite extends AnyFunSuite {
     assertResult(expNbr) { nbrParams }
   }
 
+  private def valuesOf(pa: PermutedParameterArray): Seq[Int] = (0 until pa.size).map(i => pa.get(i).getValue.toInt)
+
+  test("a neighbor is still a permutation, and the original is not changed") {
+    val original = createPermParameterArray((0 until 20).toArray, new Random(7))
+    for (radius <- Seq(0.5, 1.0, 3.0, 50.0, 100000.0)) {
+      val nbr = original.getRandomNeighbor(radius)
+      assertResult((0 until 20))(valuesOf(nbr).sorted)
+      assertResult((0 until 20))(valuesOf(original))
+    }
+  }
+
+  test("a neighbor keeps the name and range of the parameter at each position") {
+    val original = createPermParameterArray((0 until 10).toArray, new Random(3))
+    val nbr = original.getRandomNeighbor(4.0)
+    for (i <- 0 until 10) {
+      assertResult("param" + i)(nbr.get(i).name)
+      assertResult(9.0)(nbr.get(i).maxValue)
+    }
+  }
+
+  test("a neighbor at a small radius changes only a few positions") {
+    val original = createPermParameterArray((0 until 100).toArray, new Random(5))
+    val changed = (0 until 100).count(i => original.getRandomNeighbor(1.0).get(i).getValue != i)
+    assert(changed < 100)
+    val nbrValues = valuesOf(original.getRandomNeighbor(1.0))
+    assert((0 until 100).count(i => nbrValues(i) != i) <= 20, "radius 1 on 100 params is 10 swaps")
+  }
+
+  test("an enormous radius gives a well mixed permutation without doing millions of swaps") {
+    val original = createPermParameterArray((0 until 50).toArray, new Random(11))
+    val start = System.nanoTime()
+    val nbr = (1 to 200).map(_ => original.getRandomNeighbor(20000.0)).last
+    assert((System.nanoTime() - start) / 1e9 < 2.0, "should take milliseconds, not seconds")
+    val unmoved = (0 until 50).count(i => nbr.get(i).getValue == i)
+    assert(unmoved <= 8, s"$unmoved of 50 are still in place")
+  }
+
+  test("a radius that gives more swaps than are useful behaves like a shuffle: every position can change") {
+    val original = createPermParameterArray((0 until 6).toArray, new Random(13))
+    val seen = (1 to 300).flatMap(_ => valuesOf(original.getRandomNeighbor(1000.0)).zipWithIndex.collect { case (v, i) if v != i => i })
+    assertResult((0 until 6).toSet)(seen.toSet)
+  }
+
   /** The two param arrays are not the same, but they are equidistant if they differ only
     * in the cyclic offset.
     */

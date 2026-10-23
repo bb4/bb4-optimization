@@ -5,7 +5,16 @@ import com.barrybecker4.math.MathUtil
 import com.barrybecker4.optimization.parameter.distancecalculators.PermutedDistanceCalculator
 import com.barrybecker4.optimization.parameter.sampling.PermutedGlobalSampler
 import com.barrybecker4.optimization.parameter.types.Parameter
+import scala.collection.immutable.ArraySeq
 import scala.util.Random
+
+object PermutedParameterArray {
+  /**
+    * Random transpositions touch about every position after 2 swaps per parameter, and 4 per parameter leave about 2%
+    * in place, which is as good as random for local search. Beyond that, swapping more is wasted work.
+    */
+  val MAX_SWAPS_PER_PARAMETER = 4
+}
 
 /**
   * Represents a 1 dimensional array of unique permuted parameters.
@@ -55,6 +64,9 @@ case class PermutedParameterArray(params: IndexedSeq[Parameter], rnd: Random)
     * @param radius an indication of the amount of variation to use. 0 is none, 3 is a lot.
     *               Applies this many random transpositions (pairwise value swaps), in sequence:
     *               `max(1, (10 * radius * N / 100).toInt)` where `N` is [[size]].
+    *               Strategies widen the radius when they are stuck, and it can get very large. Once there would be
+    *               more than [[PermutedParameterArray.MAX_SWAPS_PER_PARAMETER]] swaps per parameter the result is
+    *               already as good as random, so a uniform shuffle is used instead of doing all of them.
     * @return a new [[PermutedParameterArray]].
     * @note Each transposition exchanges the values at two random indices in the permutation as updated
     *       so far. Successive swaps compose like ordinary transpositions on the current state (standard for
@@ -64,27 +76,43 @@ case class PermutedParameterArray(params: IndexedSeq[Parameter], rnd: Random)
   override def getRandomNeighbor(radius: Double): PermutedParameterArray = {
     if (size <= 1) return this
     val numToSwap = Math.max(1, (10.0 * radius * size / 100.0).toInt)
+    val values = currentValues
+    if (numToSwap > PermutedParameterArray.MAX_SWAPS_PER_PARAMETER * size) shuffleValues(values)
+    else swapRandomPairs(values, numToSwap)
+    withValues(values)
+  }
 
-    val revisedParams = params.toArray
+  /** @return the value of each parameter, in order. Work on these primitives instead of on parameter objects. */
+  private def currentValues: Array[Double] = Array.tabulate(size)(i => params(i).getValue)
 
-    for (k <- 0 until numToSwap) {
+  private def swapRandomPairs(values: Array[Double], numToSwap: Int): Unit =
+    for (_ <- 0 until numToSwap) {
       val index1 = rnd.nextInt(size)
       var index2 = rnd.nextInt(size)
       while (index2 == index1)
         index2 = rnd.nextInt(size)
-      swapValuesAt(revisedParams, index1, index2)
+      swapAt(values, index1, index2)
     }
-    PermutedParameterArray(revisedParams.toIndexedSeq, rnd)
+
+  /** Fisher-Yates: every ordering is equally likely. */
+  private def shuffleValues(values: Array[Double]): Unit =
+    for (i <- values.length - 1 until 0 by -1) swapAt(values, i, rnd.nextInt(i + 1))
+
+  private def swapAt(values: Array[Double], i: Int, j: Int): Unit = {
+    val saved = values(i)
+    values(i) = values(j)
+    values(j) = saved
   }
 
-  /** Swap parameter values at `i` and `j` in the working array (mutates `buf`). */
-  private def swapValuesAt(buf: Array[Parameter], i: Int, j: Int): Unit = {
-    val pi = buf(i)
-    val pj = buf(j)
-    val vi = pi.getValue
-    val vj = pj.getValue
-    buf(i) = pi.setValue(vj)
-    buf(j) = pj.setValue(vi)
+  /**
+    * A new array with these values at each position. A parameter keeps its name and range, and is only replaced if its
+    * value changed, so a small neighbor allocates a few parameters rather than copying all of them.
+    */
+  private def withValues(values: Array[Double]): PermutedParameterArray = {
+    val revised = Array.tabulate[Parameter](size) { i =>
+      if (params(i).getValue == values(i)) params(i) else params(i).setValue(values(i))
+    }
+    PermutedParameterArray(ArraySeq.unsafeWrapArray(revised), rnd)
   }
 
   /** Globally sample the parameter space.
