@@ -83,7 +83,15 @@ case class PermutedParameterArray(params: IndexedSeq[Parameter], rnd: Random)
   }
 
   /** @return the value of each parameter, in order. Work on these primitives instead of on parameter objects. */
-  private def currentValues: Array[Double] = Array.tabulate(size)(i => params(i).getValue)
+  private def currentValues: Array[Double] = {
+    val values = new Array[Double](size)
+    var i = 0
+    while (i < values.length) {
+      values(i) = params(i).getValue
+      i += 1
+    }
+    values
+  }
 
   private def swapRandomPairs(values: Array[Double], numToSwap: Int): Unit =
     for (_ <- 0 until numToSwap) {

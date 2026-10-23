@@ -4,13 +4,17 @@ package com.barrybecker4.optimization.strategy.statespace
 import com.barrybecker4.optimization.optimizee.{DiscreteStateSpace, EvaluationBudgetExceededException, Optimizee}
 import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 import com.barrybecker4.optimization.strategy.OptimizationStrategy
+import com.barrybecker4.optimization.strategy.genetic.Solutions
 
 import scala.collection.mutable
 
 object StateSpaceSearchStrategy {
 
-  /** Canonical key for visited-set dedup (`ParameterArray` often lacks value equality). */
-  private[strategy] def stateKey(pa: ParameterArray): String = pa.toCSVString
+  /**
+    * Canonical key for visited-set dedup (`ParameterArray` often lacks value equality). It is the array's
+    * [[ParameterArray.candidateIdentity]], so a state is the same exactly when genetic search would call it the same.
+    */
+  private[strategy] def stateKey(pa: ParameterArray): Any = Solutions.key(pa)
 }
 
 /**
@@ -18,7 +22,7 @@ object StateSpaceSearchStrategy {
   * [[com.barrybecker4.optimization.optimizee.DiscreteStateSpace]] and its `successors` method.
   * Intended for small or structured state spaces with low branching factor.
   *
-  * Visited states are keyed by [[stateKey]] (`toCSVString`) so newly allocated successors that
+  * Visited states are keyed by [[stateKey]] (the candidate identity) so newly allocated successors that
   * represent the same logical state are not re-evaluated.
   *
   * Budget: catches [[EvaluationBudgetExceededException]] and returns best-so-far
@@ -78,7 +82,7 @@ class StateSpaceSearchStrategy(optimizee: Optimizee)
     // Min-heap by priority (Scala PriorityQueue is max-heap)
     implicit val ord: Ordering[FrontierNode] = Ordering.by((n: FrontierNode) => -n.priority)
     val pq = mutable.PriorityQueue.empty[FrontierNode]
-    val visited = mutable.HashSet[String]()
+    val visited = mutable.HashSet[Any]()
 
     def priorityOf(wf: ParameterArrayWithFitness): Double =
       if (useAStar) wf.fitness + stateSpace.heuristic(wf.pa)

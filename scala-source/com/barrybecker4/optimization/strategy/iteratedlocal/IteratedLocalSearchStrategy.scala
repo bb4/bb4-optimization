@@ -85,7 +85,7 @@ class IteratedLocalSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.R
     val cfg = config
     val temperatureScale = if (fitnessRange > 0.0 && fitnessRange.isFinite) fitnessRange else 1.0
     val baseline = params
-    val visited = mutable.HashSet[String]()
+    val visited = mutable.HashSet[Any]()
     var best: Option[ParameterArrayWithFitness] = None
 
     /** Absolute fitness, or in comparison mode the fitness relative to the initial guess. */
