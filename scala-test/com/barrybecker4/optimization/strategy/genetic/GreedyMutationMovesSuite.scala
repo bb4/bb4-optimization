@@ -3,7 +3,7 @@ package com.barrybecker4.optimization.strategy.genetic
 
 import com.barrybecker4.optimization.benchmark.RandomTourProblem
 import com.barrybecker4.optimization.optimizee.DeltaCheckingOptimizee
-import com.barrybecker4.optimization.parameter.{Move, ParameterArray, ParameterArrayWithFitness, PermutedParameterArray, PuzzleLikePath}
+import com.barrybecker4.optimization.parameter.{Move, ParameterArray, ParameterArrayWithFitness, PermutedParameterArray, PuzzleLikePath, Swap}
 import org.scalatest.funsuite.AnyFunSuite
 
 import scala.collection.mutable.ArrayBuffer
@@ -63,11 +63,51 @@ class GreedyMutationMovesSuite extends AnyFunSuite {
     assert(added.nonEmpty)
   }
 
-  test("with moves, neighbors that are not kept are never built or evaluated in full") {
-    val problem = new CountingTour(200, 7)
-    val added = mutants(problem, 200, useMoves = true, 1)
-    assert(added.nonEmpty && problem.moveEvaluations > added.size, s"${problem.moveEvaluations} tries for ${added.size} mutants")
-    assert(problem.fullEvaluations <= 3 + 0, s"${problem.fullEvaluations} full evaluations (3 are for the starting tours)")
+  /** Opts in to moves and counts how often a neighbor is built, whichever way it is asked for. */
+  private class BuildCounting(values: IndexedSeq[com.barrybecker4.optimization.parameter.types.Parameter], rnd: Random,
+                              val built: java.util.concurrent.atomic.AtomicInteger)
+    extends PermutedParameterArray(values, rnd) {
+    override def supportsMoves: Boolean = true
+    override def getRandomNeighbor(radius: Double): PermutedParameterArray = {
+      built.incrementAndGet()
+      new BuildCounting(super.getRandomNeighbor(radius).params, rnd, built)
+    }
+    override def applyMove(move: Move): PermutedParameterArray = {
+      built.incrementAndGet()
+      new BuildCounting(super.applyMove(move).params, rnd, built)
+    }
+  }
+
+  /** A tour that has had many improving swaps, so that most neighbors of it are worse and a greedy search has to retry. */
+  private def improvedTour(problem: RandomTourProblem): PermutedParameterArray = {
+    val rnd = new Random(1)
+    var tour = problem.getInitialGuess.asInstanceOf[PermutedParameterArray]
+    var length = problem.evaluateFitness(tour)
+    for (_ <- 1 to 5000) {
+      val move = Swap(rnd.nextInt(tour.size), rnd.nextInt(tour.size))
+      val after = problem.evaluateMove(tour, length, move)
+      if (after < length - 1e-12) { tour = tour.applyMove(move); length = after }
+    }
+    tour
+  }
+
+  private def buildsFor(useMoves: Boolean): (Int, Int) = {
+    val problem = new RandomTourProblem(60, 7)
+    val built = new java.util.concurrent.atomic.AtomicInteger(0)
+    val tour = new BuildCounting(improvedTour(problem).params, new Random(3), built)
+    val added = ArrayBuffer[ParameterArrayWithFitness]()
+    val refiller = new PopulationRefiller(problem, GeneticSearchConfig(crossoverEnabled = false, useMoves = useMoves),
+      new Random(3), (_, _) => Seq.empty, added += _)
+    refiller.refill(ArrayBuffer(ParameterArrayWithFitness(tour, problem.evaluateFitness(tour))), 1, 30, tour, 0.1)
+    (built.get, added.size)
+  }
+
+  test("with moves, a neighbor is built only for a mutant that comes back, which is far fewer than are tried") {
+    val (builtWithMoves, kept) = buildsFor(useMoves = true)
+    val (builtWithout, _) = buildsFor(useMoves = false)
+    assert(kept > 0 && builtWithMoves >= kept)
+    assert(builtWithMoves <= kept + 3, s"$builtWithMoves built for $kept kept (a few mutants repeat a tour already seen)")
+    assert(builtWithout > 2 * builtWithMoves, s"$builtWithout built without moves, $builtWithMoves with")
   }
 
   test("without moves every try is a full evaluation") {
