@@ -78,11 +78,30 @@ class RandomTourProblemSuite extends AnyFunSuite {
     assert(Math.abs(length - problem.evaluateFitness(tour)) < 1e-9, "rounding error did not pile up")
   }
 
-  test("a sequence of swaps is evaluated in full, which gives the same answer") {
-    val problem = new RandomTourProblem(12, 6)
+  test("a sequence of swaps gives the length of the tour after all of them, including swaps that overlap") {
+    val rnd = new Random(4)
+    for (cities <- Seq(3, 4, 5, 8, 30); _ <- 1 to 200) {
+      val problem = new RandomTourProblem(cities, rnd.nextInt(1000))
+      val tour = problem.getInitialGuess
+      val move = SwapSequence((1 to 1 + rnd.nextInt(6)).map(_ => Swap(rnd.nextInt(cities), rnd.nextInt(cities))))
+      val expected = problem.evaluateFitness(tour.applyMove(move))
+      assert(Math.abs(problem.evaluateMove(tour, problem.evaluateFitness(tour), move) - expected) < 1e-9, s"$cities cities: $move")
+    }
+  }
+
+  test("a long sequence of swaps, such as a shuffle, is also right") {
+    val problem = new RandomTourProblem(60, 3)
     val tour = problem.getInitialGuess
-    val move = SwapSequence(Vector(Swap(0, 5), Swap(5, 9), Swap(2, 3)))
-    assertResult(problem.evaluateFitness(tour.applyMove(move)))(problem.evaluateMove(tour, problem.evaluateFitness(tour), move))
+    val rnd = new Random(8)
+    val move = SwapSequence((1 to 59).map(i => Swap(i, rnd.nextInt(i + 1))))
+    assert(Math.abs(problem.evaluateMove(tour, problem.evaluateFitness(tour), move) - problem.evaluateFitness(tour.applyMove(move))) < 1e-9)
+  }
+
+  test("an empty sequence of swaps changes nothing") {
+    val problem = new RandomTourProblem(9, 2)
+    val tour = problem.getInitialGuess
+    val length = problem.evaluateFitness(tour)
+    assertResult(length)(problem.evaluateMove(tour, length, SwapSequence(Vector.empty)))
   }
 
   test("a move evaluation does not look at every city of the tour") {

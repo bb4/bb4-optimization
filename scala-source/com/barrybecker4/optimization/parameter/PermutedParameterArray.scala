@@ -76,7 +76,12 @@ case class PermutedParameterArray(params: IndexedSeq[Parameter], rnd: Random)
     *       local search on permutations), rather than always reading endpoint values from the initial
     *       [[params]] snapshot.
     */
-  override def supportsMoves: Boolean = true
+  /**
+    * True only for a plain [[PermutedParameterArray]]. A subclass usually picks its own neighbors (a puzzle path that
+    * keeps its tiles legal, say) and carries more than its parameters, and these moves would bypass that and build
+    * plain arrays. A subclass that wants moves overrides this, and [[applyMove]] to build its own type.
+    */
+  override def supportsMoves: Boolean = getClass == classOf[PermutedParameterArray]
 
   /**
     * The swaps that [[getRandomNeighbor]] would make, as a move. That is one [[Swap]] for the usual small radius,

@@ -52,7 +52,8 @@ case class GeneticSearchConfig(
     maxNeighborRetries: Int = 8,
     neighborSelection: NeighborSelection = NeighborSelection.GreedyImproveAbsolute,
     improvementEpsilon: Double = GeneticSearchConfig.DEFAULT_IMPROVEMENT_EPS,
-    elitismEnabled: Boolean = true
+    elitismEnabled: Boolean = true,
+    useMoves: Boolean = true
 ) {
   require(cullFactor >= 0.0 && cullFactor <= 1.0, s"cullFactor must be in [0, 1], got $cullFactor")
   require(crossoverProbability >= 0.0 && crossoverProbability <= 1.0,

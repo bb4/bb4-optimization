@@ -134,7 +134,11 @@ private[genetic] final class PopulationRefiller(
     * Absolute-fitness greedy neighbor search: up to `maxNeighborRetries + 1` evaluations, stopping at the first
     * neighbor that beats the parent. The parent's fitness is already known, so it is not evaluated again.
     */
-  private def greedyNeighbor(parent: ParameterArrayWithFitness, radius: Double): ParameterArrayWithFitness = {
+  private def greedyNeighbor(parent: ParameterArrayWithFitness, radius: Double): ParameterArrayWithFitness =
+    if (config.useMoves && parent.pa.supportsMoves) greedyNeighborByMoves(parent, radius)
+    else greedyNeighborByBuilding(parent, radius)
+
+  private def greedyNeighborByBuilding(parent: ParameterArrayWithFitness, radius: Double): ParameterArrayWithFitness = {
     var nbr = scoreAbsolute(parent.pa.getRandomNeighbor(radius))
     var retries = 0
     while (nbr.fitness >= parent.fitness && retries < config.maxNeighborRetries) {
@@ -142,6 +146,19 @@ private[genetic] final class PopulationRefiller(
       retries += 1
     }
     nbr
+  }
+
+  /** The same tries, with the same random numbers, but only the neighbor that is returned is ever built. */
+  private def greedyNeighborByMoves(parent: ParameterArrayWithFitness, radius: Double): ParameterArrayWithFitness = {
+    var move = parent.pa.proposeMove(radius)
+    var fitness = optimizee.evaluateMove(parent.pa, parent.fitness, move)
+    var retries = 0
+    while (fitness >= parent.fitness && retries < config.maxNeighborRetries) {
+      move = parent.pa.proposeMove(radius)
+      fitness = optimizee.evaluateMove(parent.pa, parent.fitness, move)
+      retries += 1
+    }
+    ParameterArrayWithFitness(parent.pa.applyMove(move), fitness)
   }
 
   private def scoreAbsolute(pa: ParameterArray): ParameterArrayWithFitness =

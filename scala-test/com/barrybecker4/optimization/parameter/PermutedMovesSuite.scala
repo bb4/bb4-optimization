@@ -25,6 +25,18 @@ class PermutedMovesSuite extends AnyFunSuite {
     intercept[UnsupportedOperationException](numeric.applyMove(Swap(0, 0)))
   }
 
+  test("a subclass does not support moves unless it says so, since its own neighbors are not the base class neighbors") {
+    val path = new PuzzleLikePath(permutation(5, 1).params, "path")
+    assert(!path.supportsMoves)
+  }
+
+  test("a subclass can opt in to moves") {
+    class OptedIn(values: IndexedSeq[Parameter]) extends PermutedParameterArray(values, new Random(1)) {
+      override def supportsMoves: Boolean = true
+    }
+    assert(new OptedIn(permutation(5, 1).params).supportsMoves)
+  }
+
   test("applying a move gives the neighbor that getRandomNeighbor gives for the same random numbers") {
     for (size <- Seq(2, 3, 5, 12, 40, 200); radius <- Seq(0.1, 0.5, 1.0, 3.0, 20.0, 400.0, 1e6, 1e300); seed <- 1 to 4) {
       val viaNeighbor = permutation(size, seed).getRandomNeighbor(radius)

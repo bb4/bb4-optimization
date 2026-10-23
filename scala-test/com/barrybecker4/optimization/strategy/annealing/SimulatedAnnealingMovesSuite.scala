@@ -3,7 +3,7 @@ package com.barrybecker4.optimization.strategy.annealing
 
 import com.barrybecker4.optimization.benchmark.RandomTourProblem
 import com.barrybecker4.optimization.optimizee.{BudgetedOptimizee, DeltaCheckingOptimizee, Optimizee}
-import com.barrybecker4.optimization.parameter.{Move, ParameterArray, ParameterArrayWithFitness, PermutedParameterArray}
+import com.barrybecker4.optimization.parameter.{Move, ParameterArray, ParameterArrayWithFitness, PermutedParameterArray, PuzzleLikePath}
 import org.scalatest.funsuite.AnyFunSuite
 
 import scala.util.Random
@@ -82,6 +82,14 @@ class SimulatedAnnealingMovesSuite extends AnyFunSuite {
     val problem = new RandomTourProblem(50, 2)
     val result = anneal(problem, startFor(problem, 2), useMoves = true, 2, problem.getFitnessRange)
     assert(Math.abs(result.fitness - problem.evaluateFitness(result.pa)) < 1e-9)
+  }
+
+  test("an array that picks its own neighbors keeps doing so, and keeps its type") {
+    val problem = new RandomTourProblem(20, 4)
+    val path = new PuzzleLikePath(problem.getInitialGuess.asInstanceOf[PermutedParameterArray].params, "route", new Random(4))
+    val result = anneal(problem, path, useMoves = true, 4, problem.getFitnessRange)
+    assert(path.neighborsAsked > 100, "the array's own getRandomNeighbor was used")
+    assert(result.pa.isInstanceOf[PuzzleLikePath] && result.pa.asInstanceOf[PuzzleLikePath].label == "route")
   }
 
   test("moves are on by default") {

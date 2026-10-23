@@ -3,9 +3,14 @@ package com.barrybecker4.optimization.benchmark
 
 import com.barrybecker4.optimization.optimizee.optimizees.OptimizeeProblem
 import com.barrybecker4.optimization.parameter.types.IntegerParameter
-import com.barrybecker4.optimization.parameter.{Move, ParameterArray, ParameterArrayWithFitness, PermutedParameterArray, Swap}
+import com.barrybecker4.optimization.parameter.{Move, ParameterArray, ParameterArrayWithFitness, PermutedParameterArray, Swap, SwapSequence}
 
 import scala.util.Random
+
+object RandomTourProblem {
+  /** Past this many swaps, finding the touched positions costs more than evaluating the whole tour. */
+  val MAX_SWAPS_FOR_DELTA = 8
+}
 
 /**
   * A traveling salesman problem on cities placed at random in the unit square, with as many cities as are asked for.
@@ -16,6 +21,8 @@ import scala.util.Random
   * @param seed decides where the cities are and the order in the initial guess
   */
 class RandomTourProblem(numCities: Int, seed: Long) extends OptimizeeProblem {
+  import RandomTourProblem.MAX_SWAPS_FOR_DELTA
+
 
   require(numCities >= 3, s"A tour needs at least 3 cities, but got $numCities")
 
@@ -39,9 +46,10 @@ class RandomTourProblem(numCities: Int, seed: Long) extends OptimizeeProblem {
     total
   }
 
-  /** A swap changes at most four legs of the tour, so its new length is worked out from those. Other moves use the default. */
+  /** A swap changes at most four legs of the tour, and a few swaps only a few more, so the new length is worked out from those. */
   override def evaluateMove(tour: ParameterArray, tourLength: Double, move: Move): Double = move match {
     case Swap(first, second) => tourLength + lengthChangeOfSwap(tour, first, second)
+    case SwapSequence(swaps) if swaps.size <= MAX_SWAPS_FOR_DELTA => tourLength + lengthChangeOfSwaps(tour, swaps)
     case _ => super.evaluateMove(tour, tourLength, move)
   }
 
@@ -60,6 +68,36 @@ class RandomTourProblem(numCities: Int, seed: Long) extends OptimizeeProblem {
     if (before(first) != second) total += leg(before(first))
     if (before(second) != first) total += leg(before(second))
     total
+  }
+
+  /** A few swaps: only the legs at the positions they touch can change. */
+  private def lengthChangeOfSwaps(tour: ParameterArray, swaps: IndexedSeq[Swap]): Double = {
+    val swapped = new SwappedTour(tour, swaps)
+    val starts = swapped.positions.flatMap(p => Array(p, before(p))).distinct
+    starts.map(start => swapped.legLength(start)).sum - starts.map(start => unswappedLegLength(tour, start)).sum
+  }
+
+  private def unswappedLegLength(tour: ParameterArray, start: Int): Double =
+    distances(tour.get(start).getValue.toInt)(tour.get((start + 1) % numCities).getValue.toInt)
+
+  /** The tour after some swaps, which remembers only the cities at the positions that the swaps touch. */
+  private final class SwappedTour(tour: ParameterArray, swaps: IndexedSeq[Swap]) {
+    val positions: Array[Int] = swaps.flatMap(s => Array(s.first, s.second)).distinct.toArray
+    private val cities: Array[Int] = positions.map(p => tour.get(p).getValue.toInt)
+    swaps.foreach(s => swapCities(positions.indexOf(s.first), positions.indexOf(s.second)))
+
+    private def swapCities(a: Int, b: Int): Unit = {
+      val saved = cities(a)
+      cities(a) = cities(b)
+      cities(b) = saved
+    }
+
+    private def cityAt(position: Int): Int = {
+      val k = positions.indexOf(position)
+      if (k >= 0) cities(k) else tour.get(position).getValue.toInt
+    }
+
+    def legLength(start: Int): Double = distances(cityAt(start))(cityAt((start + 1) % numCities))
   }
 
   private def before(position: Int): Int = (position + numCities - 1) % numCities
