@@ -3,7 +3,7 @@ package com.barrybecker4.optimization.strategy.hillclimbing
 
 import com.barrybecker4.optimization.optimizee.Optimizee
 import com.barrybecker4.optimization.parameter.*
-import com.barrybecker4.optimization.strategy.OptimizationStrategy
+import com.barrybecker4.optimization.strategy.{CandidateSet, OptimizationStrategy}
 import com.barrybecker4.optimization.strategy.gradient.{DiscreteImprovementFinder, Improvement, ImprovementFinder, NumericImprovementFinder}
 
 import scala.collection.mutable
@@ -56,8 +56,8 @@ class HillClimbingStrategy(optimizee: Optimizee) extends OptimizationStrategy(op
   private def startingPoint(params: ParameterArray): ParameterArrayWithFitness =
     ParameterArrayWithFitness(params, if (optimizee.evaluateByComparison) 0.0 else optimizee.evaluateFitness(params))
 
-  private def newCache(start: ParameterArray, useCache: Boolean): mutable.HashSet[ParameterArray] = {
-    val cache = mutable.HashSet[ParameterArray]()
+  private def newCache(start: ParameterArray, useCache: Boolean): mutable.Set[ParameterArray] = {
+    val cache = new CandidateSet()
     if (useCache) cache += start
     cache
   }

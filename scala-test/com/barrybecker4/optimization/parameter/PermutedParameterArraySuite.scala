@@ -83,6 +83,15 @@ class PermutedParameterArraySuite extends AnyFunSuite {
     assert(unmoved <= 8, s"$unmoved of 50 are still in place")
   }
 
+  test("a radius so large that the swap count would overflow an Int still gives a neighbor at once") {
+    val original = createPermParameterArray((0 until 30).toArray, new Random(17))
+    val start = System.nanoTime()
+    for (radius <- Seq(1e8, 1e10, 1e15, 1e300, Double.MaxValue, Double.PositiveInfinity)) {
+      assertResult((0 until 30), s"radius $radius")(valuesOf(original.getRandomNeighbor(radius)).sorted)
+    }
+    assert((System.nanoTime() - start) / 1e9 < 2.0, "should take milliseconds, not seconds")
+  }
+
   test("a radius that gives more swaps than are useful behaves like a shuffle: every position can change") {
     val original = createPermParameterArray((0 until 6).toArray, new Random(13))
     val seen = (1 to 300).flatMap(_ => valuesOf(original.getRandomNeighbor(1000.0)).zipWithIndex.collect { case (v, i) if v != i => i })

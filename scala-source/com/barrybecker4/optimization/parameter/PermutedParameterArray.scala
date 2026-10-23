@@ -14,6 +14,9 @@ object PermutedParameterArray {
     * in place, which is as good as random for local search. Beyond that, swapping more is wasted work.
     */
   val MAX_SWAPS_PER_PARAMETER = 4
+
+  /** Up to one swap for every this many parameters is a "few", cheapest done by replacing just those parameters. */
+  val FEW_SWAPS_DIVISOR = 4
 }
 
 /**
@@ -75,11 +78,51 @@ case class PermutedParameterArray(params: IndexedSeq[Parameter], rnd: Random)
     */
   override def getRandomNeighbor(radius: Double): PermutedParameterArray = {
     if (size <= 1) return this
-    val numToSwap = Math.max(1, (10.0 * radius * size / 100.0).toInt)
+    val numToSwap = numSwapsFor(radius)
+    if (numToSwap * PermutedParameterArray.FEW_SWAPS_DIVISOR <= size) swapFew(numToSwap)
+    else remixMany(numToSwap)
+  }
+
+  /**
+    * @return the swaps the radius asks for, but never more than one past the most that are worth doing. The radius can
+    *         be astronomically large when a strategy keeps widening it, so this is clamped before it becomes an Int.
+    */
+  private def numSwapsFor(radius: Double): Int = {
+    val wanted = 10.0 * radius * size / 100.0
+    val mostWorthDoing = PermutedParameterArray.MAX_SWAPS_PER_PARAMETER * size
+    Math.max(1, Math.min(wanted, mostWorthDoing + 1.0).toInt)
+  }
+
+  /** The usual case, a handful of swaps: copy the parameter references once and replace only the swapped ones. */
+  private def swapFew(numToSwap: Int): PermutedParameterArray = {
+    val revised = params.toArray
+    for (_ <- 0 until numToSwap) {
+      val index = rnd.nextInt(size)
+      swapValuesAt(revised, index, randomIndexOtherThan(index))
+    }
+    PermutedParameterArray(ArraySeq.unsafeWrapArray(revised), rnd)
+  }
+
+  /** Many swaps would replace most parameters several times over, so work on the plain values and replace each once. */
+  private def remixMany(numToSwap: Int): PermutedParameterArray = {
     val values = currentValues
     if (numToSwap > PermutedParameterArray.MAX_SWAPS_PER_PARAMETER * size) shuffleValues(values)
     else swapRandomPairs(values, numToSwap)
     withValues(values)
+  }
+
+  private def randomIndexOtherThan(index: Int): Int = {
+    var other = rnd.nextInt(size)
+    while (other == index) other = rnd.nextInt(size)
+    other
+  }
+
+  /** Swap parameter values at `i` and `j` in the working array (mutates `buf`). Each parameter keeps its name and range. */
+  private def swapValuesAt(buf: Array[Parameter], i: Int, j: Int): Unit = {
+    val (pi, pj) = (buf(i), buf(j))
+    val (vi, vj) = (pi.getValue, pj.getValue)
+    buf(i) = pi.setValue(vj)
+    buf(j) = pj.setValue(vi)
   }
 
   /** @return the value of each parameter, in order. Work on these primitives instead of on parameter objects. */
@@ -95,11 +138,8 @@ case class PermutedParameterArray(params: IndexedSeq[Parameter], rnd: Random)
 
   private def swapRandomPairs(values: Array[Double], numToSwap: Int): Unit =
     for (_ <- 0 until numToSwap) {
-      val index1 = rnd.nextInt(size)
-      var index2 = rnd.nextInt(size)
-      while (index2 == index1)
-        index2 = rnd.nextInt(size)
-      swapAt(values, index1, index2)
+      val index = rnd.nextInt(size)
+      swapAt(values, index, randomIndexOtherThan(index))
     }
 
   /** Fisher-Yates: every ordering is equally likely. */
