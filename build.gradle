@@ -46,3 +46,13 @@ tasks.register('slowTest', Test) {
         includeTestsMatching '*SlowIntegrationSuite*'
     }
 }
+
+// Measures how fast each strategy is and how good a solution it finds in a fixed time, for comparing versions.
+// Options are passed like: ./gradlew benchmark -Pargs="--time-ms=2000 --seeds=3 --problems=tour-50"
+tasks.register('benchmark', JavaExec) {
+    group = 'verification'
+    description = 'Runs the strategy benchmark (see docs/improvement-plan.md for why).'
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.barrybecker4.optimization.benchmark.OptimizationBenchmark'
+    args = (project.findProperty('args') ?: '').toString().split(' ').findAll { !it.isEmpty() }
+}
