@@ -2,7 +2,7 @@
 package com.barrybecker4.optimization.strategy.genetic
 
 import com.barrybecker4.optimization.optimizee.Optimizee
-import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness, ParameterCrossover}
+import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 import com.barrybecker4.optimization.strategy.annealing.SimulatedAnnealingStrategy
 
 import scala.collection.mutable
@@ -91,7 +91,7 @@ private[genetic] final class PopulationRefiller(
     private def biasedKeeperIndex(): Int = (rnd.nextDouble() * rnd.nextDouble() * keepSize).toInt
 
     private def crossIntoPending(p1: ParameterArray, p2: ParameterArray): Boolean =
-      try queueIfNew(ParameterCrossover.cross(p1, p2, rnd))
+      try queueIfNew(p1.crossWith(p2, rnd))
       catch {
         case _: IllegalArgumentException => false // parents that cannot be crossed
       }
