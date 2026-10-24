@@ -6,6 +6,16 @@ case class Summary(problem: String, strategy: String, runs: Int, evaluationsPerS
                    bytesPerEvaluation: Option[Double], medianFitness: Double, bestFitness: Double,
                    medianEvaluations: Double, stoppedBy: String)
 
+/**
+  * How often one strategy solved one constraint problem.
+  * @param solved the number of runs that reached the optimal fitness
+  * @param medianMillis the median time of the runs that solved it, or NaN if none did
+  * @param medianEvaluations the median number of evaluations of the runs that solved it, or NaN if none did
+  * @param medianUnsolvedFitness the median best fitness of the runs that did not, or NaN if all did
+  */
+case class SolveSummary(problem: String, strategy: String, runs: Int, solved: Int, medianMillis: Double,
+                        medianEvaluations: Double, medianUnsolvedFitness: Double)
+
 /** Turns the results of runs into tables. */
 object BenchmarkReport {
 
@@ -29,6 +39,16 @@ object BenchmarkReport {
       Summary(key._1, key._2, runs.size, median(runs.map(_.evaluationsPerSecond)),
         bytesPerEvaluation(runs), median(runs.map(_.fitness)), runs.map(_.fitness).min,
         median(runs.map(_.evaluations.toDouble)), stoppedBy(runs))
+    }
+  }
+
+  /** One summary for each problem and strategy, in the order they first appear. */
+  def summarizeSolves(results: Seq[RunResult]): Seq[SolveSummary] = {
+    val groups = results.groupBy(r => (r.problem, r.strategy.toString))
+    results.map(r => (r.problem, r.strategy.toString)).distinct.map { key =>
+      val (solved, unsolved) = groups(key).partition(_.solved)
+      SolveSummary(key._1, key._2, solved.size + unsolved.size, solved.size, median(solved.map(_.millis)),
+        median(solved.map(_.evaluations.toDouble)), median(unsolved.map(_.fitness)))
     }
   }
 
@@ -60,14 +80,36 @@ object BenchmarkReport {
   def document(settings: String, summaries: Seq[Summary]): String =
     Seq(DOCUMENT_TITLE, DOCUMENT_INTRO, settings, markdown(summaries)).mkString("\n\n") + "\n"
 
+  private val SOLVE_TITLE = "# Solve rate results"
+  private val SOLVE_INTRO =
+    "Written by `./gradlew benchmark -Pargs=\"--solve-rate=true\"`; see [new-strategies-plan.md](new-strategies-plan.md).\n" +
+      "Each run stops when it solves the problem, so the time is the time to a solution. The unsolved fitness is the\n" +
+      "median number of constraints still broken in the runs that did not. Only compare runs made on the same machine."
+
+  /** The solve rates as a document to keep in git, with no date, like [[document]]. */
+  def solveDocument(settings: String, summaries: Seq[SolveSummary]): String =
+    Seq(SOLVE_TITLE, SOLVE_INTRO, settings, solveMarkdown(summaries)).mkString("\n\n") + "\n"
+
+  def solveMarkdown(summaries: Seq[SolveSummary]): String = {
+    val header = "| Problem | Strategy | Solved | Median ms (solved) | Median evals (solved) | Median broken (unsolved) |\n" +
+      "| --- | --- | ---: | ---: | ---: | ---: |"
+    val rows = summaries.map { s =>
+      s"| ${s.problem} | ${s.strategy} | ${s.solved}/${s.runs} | ${number(s.medianMillis, "%,.0f")} | " +
+        s"${number(s.medianEvaluations, "%,.0f")} | ${number(s.medianUnsolvedFitness, "%.1f")} |"
+    }
+    (header +: rows).mkString("\n")
+  }
+
+  private def number(value: Double, format: String): String = if (value.isNaN) "-" else format.format(value)
+
   private def bytes(value: Option[Double]): String = value.map(v => f"$v%,.0f").getOrElse("n/a")
 
   /** One line for every run, so results can be compared with a spreadsheet or a script. */
   def tabSeparated(results: Seq[RunResult]): String = {
-    val header = Seq("problem", "strategy", "seed", "evaluations", "millis", "fitness", "allocatedBytes", "stoppedBy")
+    val header = Seq("problem", "strategy", "seed", "evaluations", "millis", "fitness", "allocatedBytes", "stoppedBy", "solved")
     val rows = results.map { r =>
       Seq(r.problem, r.strategy, r.seed, r.evaluations, f"${r.millis}%.1f", r.fitness,
-        r.allocatedBytes.getOrElse(""), r.stoppedBy).mkString("\t")
+        r.allocatedBytes.getOrElse(""), r.stoppedBy, r.solved).mkString("\t")
     }
     (header.mkString("\t") +: rows).mkString("\n")
   }
