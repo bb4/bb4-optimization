@@ -29,7 +29,10 @@ See the [releases page](https://github.com/bb4/bb4-optimization/releases) or [Ma
   **global simulated annealing** (same multistart pattern with SA locals via `GlobalSimulatedAnnealingConfig`), 
   simulated annealing (`SimulatedAnnealingConfig`: adaptive acceptance by default, budget-safe best-so-far), 
   **genetic / concurrent genetic** (`GeneticSearchConfig`: elitism, cull/crossover, neighbor modes, budget-safe evolve), 
-  **state-space search**, and brute force
+  **state-space search**, and brute force,
+  and for constraint problems **min-conflicts** (`MinConflictsConfig`; fixes a conflicted position by its best move, using `Optimizee.conflictedPositions`)
+  and **tabu search** (`TabuSearchConfig`; takes the best move that is not tabu). `RestartingStrategy` (`RestartingConfig`) re-runs any strategy with Luby budgets.
+  See [docs/solve-rate-results.md](docs/solve-rate-results.md) for how often each strategy solves the constraint benchmark problems.
 - **`SimulatedAnnealingConfig` / `SimulatedAnnealingStepMode`** — cooling schedule and proposal radius; 
   default `AdaptiveAcceptance` scales steps from Metropolis acceptance rate on continuous problems (discrete spaces automatically use Fixed radius); proposal radius is clamped to 1.5
 - **`GlobalSimulatedAnnealingConfig`** — global sample budget + multistart SA from diverse / top-fitness seeds (prefer over single-chain SA on multimodal discrete problems; 
