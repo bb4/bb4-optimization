@@ -28,13 +28,22 @@ object BenchmarkRun {
   /** Strategies that use several threads, where the allocations of the calling thread are not the whole story. */
   private val MULTI_THREADED = Set(OptimizationStrategyType.CONCURRENT_GENETIC_SEARCH)
 
-  /** @return the result, or none if the strategy cannot be used on the problem. */
+  /**
+    * @return the result, or none if the strategy cannot be used on the problem, either because it says so up front
+    *         or because it rejects the problem when it starts (global sampling cannot sample 200 integer parameters)
+    */
   def run(problem: BenchmarkProblem, strategy: OptimizationStrategyType, seed: Long, config: BenchmarkConfig): Option[RunResult] = {
     MathUtil.RANDOM.setSeed(seed)
     val optimizee = problem.create(seed)
     val initialGuess = optimizee.getInitialGuess
     if (!strategy.appliesTo(optimizee, initialGuess)) None
-    else Some(search(problem, optimizee, initialGuess, strategy, seed, config))
+    else
+      try Some(search(problem, optimizee, initialGuess, strategy, seed, config))
+      catch {
+        case e: IllegalArgumentException =>
+          Console.err.println(s"Skipping $strategy on ${problem.name}: ${e.getMessage}")
+          None
+      }
   }
 
   private def search(benchmarkProblem: BenchmarkProblem, problem: com.barrybecker4.optimization.optimizee.optimizees.OptimizeeProblem,

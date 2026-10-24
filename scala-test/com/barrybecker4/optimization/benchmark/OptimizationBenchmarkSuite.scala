@@ -68,4 +68,9 @@ class OptimizationBenchmarkSuite extends AnyFunSuite {
   test("an ordinary problem is never marked solved") {
     assert(OptimizationBenchmark.runAll(quick).forall(!_.solved))
   }
+
+  test("a strategy that rejects the problem when it starts is left out, not a failure of the whole benchmark") {
+    val config = quick.copy(problemNames = Seq("coloring-200"), strategies = Seq(GLOBAL_SIMULATED_ANNEALING), solveRate = true)
+    assert(OptimizationBenchmark.runAll(config).isEmpty)
+  }
 }
