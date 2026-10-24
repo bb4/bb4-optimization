@@ -36,4 +36,33 @@ class LimitedOptimizeeSuite extends AnyFunSuite {
     assertResult((problem.evaluateByComparison, problem.getOptimalFitness, problem.getName))(
       (limited.evaluateByComparison, limited.getOptimalFitness, limited.getName))
   }
+
+  private val queens = new NQueensProblem(10, 1)
+
+  test("it carries on after the problem is solved unless it is asked to stop") {
+    val limited = new LimitedOptimizee(queens, 100, farFuture)
+    limited.evaluateFitness(queens.getExactSolution.pa)
+    limited.evaluateFitness(queens.getInitialGuess)
+    assert(limited.reachedOptimal)
+    assertResult(LimitedOptimizee.FINISHED)(limited.stoppedBy)
+  }
+
+  test("when asked to, it stops at the evaluation after the one that solved the problem") {
+    val limited = new LimitedOptimizee(queens, 100, farFuture, stopWhenSolved = true)
+    limited.evaluateFitness(queens.getInitialGuess)
+    assert(!limited.reachedOptimal)
+    limited.evaluateFitness(queens.getExactSolution.pa)
+    assert(limited.reachedOptimal)
+    intercept[EvaluationBudgetExceededException](limited.evaluateFitness(queens.getInitialGuess))
+    assertResult(LimitedOptimizee.SOLVED)(limited.stoppedBy)
+  }
+
+  test("a move that reaches the optimal fitness counts as solving it") {
+    val limited = new LimitedOptimizee(queens, 100, farFuture)
+    val almost = queens.getExactSolution.pa.applyMove(com.barrybecker4.optimization.parameter.Swap(0, 1))
+    val broken = queens.evaluateFitness(almost)
+    assert(broken > 0)
+    limited.evaluateMove(almost, broken, com.barrybecker4.optimization.parameter.Swap(0, 1))
+    assert(limited.reachedOptimal)
+  }
 }

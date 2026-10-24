@@ -25,11 +25,15 @@ object OptimizationBenchmark {
   def main(args: Array[String]): Unit = {
     val config = BenchmarkConfig.parse(args.toSeq)
     val results = runAll(config)
-    val report = BenchmarkReport.document(machineDescription(config), BenchmarkReport.summarize(results))
+    val report = document(config, results)
     println(report)
     config.reportFile.foreach(file => write(file, report))
     config.outputFile.foreach(file => write(file, BenchmarkReport.tabSeparated(results)))
   }
+
+  private def document(config: BenchmarkConfig, results: Seq[RunResult]): String =
+    if (config.solveRate) BenchmarkReport.solveDocument(machineDescription(config), BenchmarkReport.summarizeSolves(results))
+    else BenchmarkReport.document(machineDescription(config), BenchmarkReport.summarize(results))
 
   private def write(file: String, text: String): Unit = {
     val path = Paths.get(file)
