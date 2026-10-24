@@ -3,7 +3,7 @@ package com.barrybecker4.optimization.strategy.annealing
 
 import com.barrybecker4.common.format.FormatUtil
 import com.barrybecker4.math.MathUtil
-import com.barrybecker4.optimization.optimizee.{EvaluationBudgetExceededException, Optimizee}
+import com.barrybecker4.optimization.optimizee.{EvaluationBudgetExceededException, MoveChoice, Optimizee}
 import com.barrybecker4.optimization.parameter.*
 import com.barrybecker4.optimization.strategy.OptimizationStrategy
 
@@ -55,6 +55,9 @@ object SimulatedAnnealingStepMode {
   * @param defaultTempMax              initial `tempMax` until [[SimulatedAnnealingStrategy.setMaxTemperature]]
   * @param radiusMultiplier            multiplier in `r_base = radiusMultiplier * temperature / ((N + ct) * tempMax)`
   * @param stepMode                    fixed base radius or adaptive acceptance scaling
+  * @param guidedMoveProbability       chance that a proposal is the problem's own suggestion
+  *                                    ([[com.barrybecker4.optimization.optimizee.Optimizee.proposeGuidedMove]]) rather than a
+  *                                    random move; only used when moves are, and 0 means never
   */
 case class SimulatedAnnealingConfig(
     innerIterationsPerDimension: Int = 10,
@@ -63,8 +66,11 @@ case class SimulatedAnnealingConfig(
     defaultTempMax: Double = 1000.0,
     radiusMultiplier: Double = 8.0,
     stepMode: SimulatedAnnealingStepMode = SimulatedAnnealingStepMode.AdaptiveAcceptance(),
-    useMoves: Boolean = true
+    useMoves: Boolean = true,
+    guidedMoveProbability: Double = 0.0
 ) {
+  require(guidedMoveProbability >= 0.0 && guidedMoveProbability <= 1.0,
+    s"guidedMoveProbability must be in [0, 1], got $guidedMoveProbability")
   // A tempDropFactor >= 1 never cools, so the outer loop would never terminate.
   require(innerIterationsPerDimension > 0, s"innerIterationsPerDimension must be positive, got $innerIterationsPerDimension")
   require(numTempIterations > 0, s"numTempIterations must be positive, got $numTempIterations")
@@ -274,7 +280,7 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
 
     /** The neighbor is only built if the move is kept, so a rejected proposal costs a delta and no allocation. */
     private def proposeMoveAndMaybeAccept(radius: Double): (ParameterArrayWithFitness, Boolean) = {
-      val move = current.pa.proposeMove(radius)
+      val move = MoveChoice.propose(optimizee, current.pa, radius, config.guidedMoveProbability, rnd)
       val candidateFitness = optimizee.evaluateMove(current.pa, current.fitness, move)
       val delta = candidateFitness - current.fitness
       val accepted = delta < 0 || metropolisAcceptWorse(delta, temperature, fitnessRange)

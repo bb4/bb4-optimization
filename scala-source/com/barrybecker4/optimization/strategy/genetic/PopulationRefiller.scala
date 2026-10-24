@@ -1,8 +1,8 @@
 // Copyright by Barry G. Becker, 2000-2026. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.strategy.genetic
 
-import com.barrybecker4.optimization.optimizee.Optimizee
-import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
+import com.barrybecker4.optimization.optimizee.{MoveChoice, Optimizee}
+import com.barrybecker4.optimization.parameter.{Move, ParameterArray, ParameterArrayWithFitness}
 import com.barrybecker4.optimization.strategy.annealing.SimulatedAnnealingStrategy
 
 import scala.collection.mutable
@@ -150,16 +150,19 @@ private[genetic] final class PopulationRefiller(
 
   /** The same tries, with the same random numbers, but only the neighbor that is returned is ever built. */
   private def greedyNeighborByMoves(parent: ParameterArrayWithFitness, radius: Double): ParameterArrayWithFitness = {
-    var move = parent.pa.proposeMove(radius)
+    var move = proposeMove(parent, radius)
     var fitness = optimizee.evaluateMove(parent.pa, parent.fitness, move)
     var retries = 0
     while (fitness >= parent.fitness && retries < config.maxNeighborRetries) {
-      move = parent.pa.proposeMove(radius)
+      move = proposeMove(parent, radius)
       fitness = optimizee.evaluateMove(parent.pa, parent.fitness, move)
       retries += 1
     }
     keepIfAcceptable(parent.pa.applyMove(move), fitness)
   }
+
+  private def proposeMove(parent: ParameterArrayWithFitness, radius: Double): Move =
+    MoveChoice.propose(optimizee, parent.pa, radius, config.guidedMoveProbability, rnd)
 
   /** The fitness came from the move, so it is for the array as built. If the problem repairs it into something else, score that. */
   private def keepIfAcceptable(built: ParameterArray, fitness: Double): ParameterArrayWithFitness = {
