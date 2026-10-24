@@ -1,8 +1,11 @@
 # Plan: strategies for constraint problems (tabu search, min-conflicts, adaptive restarts)
 
-Status: proposal, nothing built yet.
+Status: phase A (the constraint benchmark) is done; see [solve-rate-results.md](solve-rate-results.md). Phases B to F
+are not started.
 
-Decisions already made: new APIs are additive in 2.1-SNAPSHOT, and defaults keep today's behavior. A new strategy is
+Decisions already made: new APIs are additive in 2.1-SNAPSHOT, and defaults keep today's behavior. Tabu search and
+min-conflicts are separate enum entries. A 20 seed solve rate is acceptable. N-queens, graph coloring and all-interval
+series are the starting set of problems. A new strategy is
 judged on the benchmark, with solve rate first and time second (see "Does it earn its place?").
 
 ## Why
@@ -74,9 +77,33 @@ does not get worse on the others by more than the noise. A strategy that fails t
 and off the default benchmark list, and the plan says so. This is the same discipline as the guided moves for
 Tantrix, which did not pass and were left off.
 
+## What phase A found, and other problems worth adding
+
+The baseline (20 seeds, 2 s each, two processors) says that annealing is already good at permutation problems with a
+swap delta: it solves both N-queens sizes every time, in 60 ms and 0.8 s. Genetic search, hill climbing and iterated
+local search solve none of them. Nothing solves the 200 node coloring, where the best result still has about 108 of
+roughly 700 edges clashing, because a neighbor of an integer array changes every variable at once. That is the gap that
+single variable moves and min-conflicts should close. The all-interval series of 14 is the one problem that genetic
+search wins (10 of 20, against 1 for annealing), so it is the check that a new strategy is not tuned to queens.
+Two strategies cannot run on integer arrays at all: global annealing and global hill climbing refuse 200 parameters,
+because the sampling grid would be too large, so the benchmark skips them there.
+
+Problems I would add once the boolean and integer moves of phase B exist, because they cover cases the three do not:
+
+- **Random 3-SAT with a planted solution** (boolean variables, a few hundred of them, clauses at a ratio near 4.2). The
+  problem WalkSAT and min-conflicts were made for, and the one that tests boolean arrays.
+- **Costas array or Langford pairing** (permutations with a very different constraint structure from queens, no easy
+  local repair). A second all-interval-like check against tuning.
+- **A Latin square or Sudoku completion** (several permutations at once, with some cells fixed). It needs a way to
+  say that cells are fixed, so it waits until a use for that comes up; the Red puzzle in bb4-puzzles is the practical
+  stand-in for it.
+
+I did not add magic squares or the Golomb ruler: the first is well solved by the same methods as queens and the second is
+an optimization problem, so neither adds information.
+
 ## Phases
 
-### Phase A: a way to measure (first, because everything else is judged by it)
+### Phase A: a way to measure (done)
 
 - Constraint problems in `BenchmarkProblems`, each with a known solution and `getOptimalFitness` of 0:
   - N-queens as a permutation of 100 and 400 queens (conflicts counted on the diagonals; with an allocation free swap
