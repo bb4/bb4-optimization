@@ -121,13 +121,39 @@ Choices worth knowing about:
   evaluation at 50 and 200 cities (it made genetic search about half as fast at 50), so it was removed. A
   `SwapSequence` falls back to the default. A problem with an expensive full evaluation may well want one.
 
+Opt-in for iterated local search and hill climbing (`useMoves`, off by default):
+
+Iterated local search promises to evaluate every distinct solution at most once, which needs the neighbor's key, and
+building the key costs as much as building the neighbor. Hill climbing has the same kind of cache. So these are
+opt-in: `IteratedLocalSearchConfig.useMoves`, `HillClimbingConfig.useMoves` and `GlobalHillClimbingConfig.useMoves`.
+With them on, a try is a move scored with `evaluateMove`, and a neighbor is built (and remembered) only when it
+improves. Rejected neighbors are not remembered, so one can be evaluated again. On the benchmark tours that almost never
+happened: the median fitness and the median evaluation count are the same with and without. The benchmark takes
+`--moves=true` for this, and then writes no summary unless `--report` is given.
+
+Medians of 5 seeds, 5000 ms, evals/sec (fitness reached is the same in every pair):
+
+| Problem | Strategy | default | with moves |
+| --- | --- | ---: | ---: |
+| tour-50 | ITERATED_LOCAL_SEARCH | 529,391 | 949,426 |
+| tour-50 | VARIABLE_NEIGHBORHOOD_SEARCH | 518,843 | 1,183,965 |
+| tour-200 | ITERATED_LOCAL_SEARCH | 234,729 | 373,412 |
+| tour-200 | VARIABLE_NEIGHBORHOOD_SEARCH | 254,829 | 338,822 |
+| tour-50 | HILL_CLIMBING | 89,957 | 50,621 |
+| tour-50 | GLOBAL_HILL_CLIMBING | 142,903 | 96,506 |
+| tour-200 | HILL_CLIMBING | 34,072 | 34,627 |
+| tour-200 | GLOBAL_HILL_CLIMBING | 46,735 | 53,741 |
+
+Iterated local search gains, even though its neighbors are about n/20 swaps and the tour problem has no delta for several
+swaps: it skips the visited-key work and does not build neighbors it rejects. Hill climbing does not gain, and is slower on the
+short tour. After the first few tries it widens its radius until each try is a shuffle, which as a move is a list of
+n-1 swaps, more expensive to propose and apply than the direct shuffle, and no optimizee has a cheap delta for it. Turn
+it on for hill climbing only if the optimizee has a delta for large moves. The benefit for iterated local search also
+grows with how cheap the optimizee's delta for a few swaps is, which is where the Red puzzle should do better than
+this tour.
+
 Not done, and why:
 
-- **Iterated local search and hill climbing.** Iterated local search promises to evaluate every distinct solution at
-  most once, which needs the neighbor's key, and building the key costs as much as building the neighbor. Hill climbing
-  has the same kind of cache, and most of its time is spent on huge-radius neighbors, which are shuffles rather than
-  swaps. Taking this on means choosing between that promise and speed (an opt-in setting that allows re-evaluation, or an
-  incrementally updated hash of the permutation). Left for a decision.
 - **Non-greedy genetic mutation and crossover.** These need the child array to remove duplicates, and crossover has no
   small move.
 - **Numeric and subset moves.** The `Move` trait allows them; only permutations are implemented.
@@ -169,8 +195,8 @@ evaluations are crossover children, which have no delta.
 
 1. Phase 0: benchmark harness, baseline numbers, this plan (done).
 2. Phase 1: neighbor, identity and cache, crossover, `compareFitness` audit (done, one PR).
-3. Phase 2: Move API and the permutation swap; simulated annealing; genetic greedy mutation (done, one PR).
-   Iterated local search and hill climbing are waiting on a decision, see Phase 2.
+3. Phase 2: Move API and the permutation swap; simulated annealing; genetic greedy mutation (done, one PR);
+   opt-in moves for iterated local search and hill climbing (done, a second PR).
 4. Phase 3: crossover hook; then repair; then guided moves.
 5. Release, then the bb4-puzzles adoption PRs.
 

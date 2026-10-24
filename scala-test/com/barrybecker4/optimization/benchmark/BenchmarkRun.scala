@@ -3,7 +3,9 @@ package com.barrybecker4.optimization.benchmark
 
 import com.barrybecker4.math.MathUtil
 import com.barrybecker4.optimization.optimizee.EvaluationBudgetExceededException
-import com.barrybecker4.optimization.strategy.OptimizationStrategyType
+import com.barrybecker4.optimization.strategy.{OptimizationStrategy, OptimizationStrategyType}
+import com.barrybecker4.optimization.strategy.hillclimbing.{GlobalHillClimbingStrategy, HillClimbingConfig, HillClimbingStrategy}
+import com.barrybecker4.optimization.strategy.iteratedlocal.IteratedLocalSearchStrategy
 
 import scala.util.Random
 
@@ -40,13 +42,24 @@ object BenchmarkRun {
                      strategyType: OptimizationStrategyType, seed: Long, config: BenchmarkConfig): RunResult = {
     val start = System.nanoTime()
     val limited = new LimitedOptimizee(problem, config.maxEvaluations, start + config.timeLimitMillis * NANOS_PER_MILLI)
-    val strategy = strategyType.getStrategy(limited, problem.getFitnessRange, new Random(seed))
+    val strategy = withMovesIfAsked(strategyType.getStrategy(limited, problem.getFitnessRange, new Random(seed)), config)
     val allocatedBefore = AllocationMeter.bytesAllocatedSoFar
     val fitness = bestFitness(strategy, initialGuess, problem.getFitnessRange)
     val millis = (System.nanoTime() - start) / NANOS_PER_MILLI.toDouble
     val allocated = for (before <- allocatedBefore; after <- AllocationMeter.bytesAllocatedSoFar) yield after - before
     RunResult(name, strategyType, seed, limited.evaluations, millis, fitness,
       allocated.filter(_ => !MULTI_THREADED.contains(strategyType)), limited.stoppedBy)
+  }
+
+  /** Turns on the opt-in moves of the strategies that have that setting, when the benchmark is asked to. */
+  private def withMovesIfAsked(strategy: OptimizationStrategy, config: BenchmarkConfig): OptimizationStrategy = {
+    if (config.useMoves) strategy match {
+      case s: IteratedLocalSearchStrategy => s.setConfig(s.getConfig.copy(useMoves = true))
+      case s: GlobalHillClimbingStrategy => s.setConfig(s.getConfig.copy(useMoves = true))
+      case s: HillClimbingStrategy => s.setConfig(HillClimbingConfig(useMoves = true))
+      case _ => ()
+    }
+    strategy
   }
 
   /** The best fitness found, even when the search was stopped before it finished. */

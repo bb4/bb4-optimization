@@ -20,7 +20,8 @@ object BenchmarkConfig {
 
   /**
     * Reads options of the form `--name=value`. The names are time-ms, max-evals, seeds, problems, strategies
-    * (the last two are comma separated lists), report (the Markdown summary file, or `none`) and out (a file to
+    * (the last two are comma separated lists), moves (true to turn on the opt-in moves of iterated local search and hill
+    * climbing, which also stops the summary being written unless `report` is given), report (the Markdown summary file, or `none`) and out (a file to
     * write the tab separated results of every run to).
     *
     * A full run (all problems and the default strategies) writes the summary to [[DEFAULT_REPORT_FILE]]. A run
@@ -32,6 +33,7 @@ object BenchmarkConfig {
     val problemNames = options.get("problems").map(_.split(",").toSeq).getOrElse(Seq.empty)
     val strategies = options.get("strategies").map(_.split(",").toSeq.map(OptimizationStrategyType.valueOf))
       .getOrElse(DEFAULT_STRATEGIES)
+    val useMoves = options.get("moves").exists(_.toBoolean)
     BenchmarkConfig(
       timeLimitMillis = options.get("time-ms").map(_.toLong).getOrElse(DEFAULT_TIME_LIMIT_MILLIS),
       maxEvaluations = options.get("max-evals").map(_.toLong).getOrElse(DEFAULT_MAX_EVALUATIONS),
@@ -39,7 +41,8 @@ object BenchmarkConfig {
       problemNames = problemNames,
       strategies = strategies,
       outputFile = options.get("out"),
-      reportFile = reportFile(options.get("report"), isFullRun = problemNames.isEmpty && strategies == DEFAULT_STRATEGIES))
+      reportFile = reportFile(options.get("report"), isFullRun = problemNames.isEmpty && strategies == DEFAULT_STRATEGIES && !useMoves),
+      useMoves = useMoves)
   }
 
   private def reportFile(requested: Option[String], isFullRun: Boolean): Option[String] = requested match {
@@ -57,7 +60,9 @@ object BenchmarkConfig {
   * @param strategies the strategies to run
   * @param outputFile where to write the results of every run as tab separated values, if anywhere
   * @param reportFile where to write the summary as a Markdown document, if anywhere
+  * @param useMoves turn on the opt-in `useMoves` setting of iterated local search, hill climbing and global hill
+  *                 climbing (the other strategies use moves already, or do not support them)
   */
 case class BenchmarkConfig(timeLimitMillis: Long, maxEvaluations: Long, numSeeds: Int,
                            problemNames: Seq[String], strategies: Seq[OptimizationStrategyType],
-                           outputFile: Option[String], reportFile: Option[String])
+                           outputFile: Option[String], reportFile: Option[String], useMoves: Boolean)

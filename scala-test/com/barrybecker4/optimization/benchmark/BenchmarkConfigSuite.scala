@@ -41,6 +41,13 @@ class BenchmarkConfigSuite extends AnyFunSuite {
     assertResult(Some("results.tsv"))(config.outputFile)
   }
 
+  test("moves are off unless asked for, and a run with them on writes no summary unless told to") {
+    assert(!BenchmarkConfig.parse(Seq.empty).useMoves)
+    val config = BenchmarkConfig.parse(Seq("--moves=true"))
+    assert(config.useMoves && config.reportFile.isEmpty)
+    assertResult(Some("moves.md"))(BenchmarkConfig.parse(Seq("--moves=true", "--report=moves.md")).reportFile)
+  }
+
   test("anything that is not an option is ignored") {
     assertResult(BenchmarkConfig.DEFAULT_NUM_SEEDS)(BenchmarkConfig.parse(Seq("extra", "--unknown")).numSeeds)
   }
