@@ -3,6 +3,8 @@ package com.barrybecker4.optimization.parameter
 
 import com.barrybecker4.optimization.parameter.types.Parameter
 
+import scala.util.Random
+
 
 /**
   * Represents an array of parameters.
@@ -44,6 +46,19 @@ trait ParameterArray {
 
   /** @return get a completely random solution in the parameter space.*/
   def getRandomSample: ParameterArray
+
+  /**
+    * A child of this array and `other`, for strategies that combine good solutions (genetic search).
+    *
+    * The default is [[ParameterCrossover.cross]]: uniform crossover for numeric arrays, order crossover for
+    * permutations, a set merge for variable length sets. Override it when the array knows a better way to combine
+    * two of itself, for example a puzzle path that can keep the pieces that already fit. The child must be the same
+    * kind of array as its parents. Throw an [[IllegalArgumentException]] if the two cannot be crossed, and the
+    * strategy will pick another pair.
+    * @param other the second parent, usually the same class as this one
+    * @param rnd the source of randomness to use
+    */
+  def crossWith(other: ParameterArray, rnd: Random): ParameterArray = ParameterCrossover.cross(this, other, rnd)
 
   /**
     * Whether [[proposeMove]] and [[applyMove]] work for this array. A strategy that finds out the fitness of a neighbor

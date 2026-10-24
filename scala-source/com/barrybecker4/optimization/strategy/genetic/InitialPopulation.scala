@@ -15,14 +15,16 @@ private[genetic] object InitialPopulation {
   /**
     * Distinct random neighbors of the seed, enough to bring the population (seed included) up to `desiredSize`.
     * Fewer are returned when the space is too small to find that many distinct neighbors.
+    * @param repair what the problem does to put right a neighbor that is not acceptable as it is; none by default
     */
-  def proposeNeighbors(seed: ParameterArray, desiredSize: Int, radius: Double): Seq[ParameterArray] = {
+  def proposeNeighbors(seed: ParameterArray, desiredSize: Int, radius: Double,
+                       repair: ParameterArray => ParameterArray = identity): Seq[ParameterArray] = {
     val seen = mutable.HashSet(Solutions.key(seed))
     val neighbors = ArrayBuffer[ParameterArray]()
     val maxAttempts = ATTEMPTS_PER_MEMBER * desiredSize
     var attempts = 0
     while (1 + neighbors.size < desiredSize && attempts < maxAttempts) {
-      val nbr = seed.getRandomNeighbor(radius)
+      val nbr = repair(seed.getRandomNeighbor(radius))
       if (seen.add(Solutions.key(nbr))) neighbors += nbr
       attempts += 1
     }

@@ -65,6 +65,16 @@ class RandomTourProblem(numCities: Int, seed: Long) extends OptimizeeProblem {
     total
   }
 
+  /**
+    * Long legs are what a good tour lacks, so find one by sampling a few legs and taking the longest, and swap the city
+    * at its end with the city at a random position. That is a better bet than a swap of two random positions.
+    */
+  override def proposeGuidedMove(tour: ParameterArray, radius: Double, rnd: Random): Option[Move] = {
+    val longest = Seq.fill(RandomTourProblem.GUIDED_SAMPLE_SIZE)(rnd.nextInt(numCities))
+      .maxBy(legLength(tour, _, 0, 0, swapped = false))
+    Some(Swap((longest + 1) % numCities, rnd.nextInt(numCities)))
+  }
+
   private def before(position: Int): Int = (position + numCities - 1) % numCities
 
   /** The length of the leg from `start` to the next position, in the tour as it is or with the two positions swapped. */
@@ -94,4 +104,9 @@ class RandomTourProblem(numCities: Int, seed: Long) extends OptimizeeProblem {
 
   /** A random tour is about half as long as it would be if every hop crossed the square. */
   override def getFitnessRange: Double = numCities * 0.5
+}
+
+object RandomTourProblem {
+  /** How many legs a guided move looks at to find a long one. */
+  val GUIDED_SAMPLE_SIZE = 3
 }

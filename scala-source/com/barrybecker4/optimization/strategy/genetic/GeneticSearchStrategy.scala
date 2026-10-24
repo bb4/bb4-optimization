@@ -89,7 +89,7 @@ class GeneticSearchStrategy(
     champions.consider(seedMember)
     val population = ArrayBuffer(seedMember)
 
-    val neighbors = InitialPopulation.proposeNeighbors(params, desiredPopulationSize, searchConfig.initialNeighborRadius)
+    val neighbors = InitialPopulation.proposeNeighbors(params, desiredPopulationSize, searchConfig.initialNeighborRadius, optimizee.repair)
     evaluateOffspring(neighbors, params).foreach { member =>
       population += member
       champions.considerMember(member)

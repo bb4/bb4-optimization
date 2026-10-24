@@ -3,6 +3,8 @@ package com.barrybecker4.optimization.optimizee
 
 import com.barrybecker4.optimization.parameter.{Move, ParameterArray}
 
+import scala.util.Random
+
 
 /**
   * This interface needs to be implemented for any object you wish to have optimized.
@@ -53,6 +55,30 @@ trait Optimizee {
     */
   def evaluateMove(current: ParameterArray, currentFitness: Double, move: Move): Double =
     evaluateFitness(current.applyMove(move))
+
+  /**
+    * Lets the problem put right a candidate that a strategy made by crossover or mutation, when it is not acceptable
+    * as it is: a piece used twice, the wrong number of tiles of some color. Genetic search calls this on every child
+    * and mutant before it scores it. The default accepts every candidate as it is.
+    *
+    * Return the same instance when there is nothing to fix. A strategy that scored the candidate from a move without
+    * building it has to build and score it again if a different array comes back. The result must be the same kind of
+    * array as the candidate.
+    */
+  def repair(candidate: ParameterArray): ParameterArray = candidate
+
+  /**
+    * Lets the problem suggest a move that it expects to be more useful than a random one, because it knows something
+    * about its own structure, for example a swap that involves a cell whose edges do not match. A strategy that is
+    * configured with a guided move probability asks this now and then in place of proposing a random move, and uses a
+    * random move when this returns `None`, as the default does. Only used for absolute fitness, with an array that
+    * [[com.barrybecker4.optimization.parameter.ParameterArray.supportsMoves]].
+    *
+    * @param current the array the move starts from
+    * @param radius how big a random move would be, a hint for how big to make this one
+    * @param rnd the random numbers to use, so that a seeded run stays repeatable
+    */
+  def proposeGuidedMove(current: ParameterArray, radius: Double, rnd: Random): Option[Move] = None
 
   /** if non-0, then we terminate when the fitness reaches this value.
     * @return the best (largest) expected fitness value.

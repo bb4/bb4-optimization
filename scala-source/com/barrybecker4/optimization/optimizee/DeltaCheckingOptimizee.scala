@@ -3,6 +3,8 @@ package com.barrybecker4.optimization.optimizee
 
 import com.barrybecker4.optimization.parameter.{Move, ParameterArray}
 
+import scala.util.Random
+
 /**
   * Wraps an optimizee and checks every [[evaluateMove]] against a full evaluation of the array after the move. A wrong
   * delta would silently steer a search the wrong way, so use this in tests, and while writing a delta, but not in
@@ -21,6 +23,9 @@ class DeltaCheckingOptimizee(delegate: Optimizee, tolerance: Double = 1e-9) exte
   override def compareFitness(params1: ParameterArray, params2: ParameterArray): Double =
     delegate.compareFitness(params1, params2)
   override def getOptimalFitness: Double = delegate.getOptimalFitness
+  override def repair(candidate: ParameterArray): ParameterArray = delegate.repair(candidate)
+  override def proposeGuidedMove(current: ParameterArray, radius: Double, rnd: Random): Option[Move] =
+    delegate.proposeGuidedMove(current, radius, rnd)
 
   override def evaluateMove(current: ParameterArray, currentFitness: Double, move: Move): Double = {
     checkCurrentFitness(current, currentFitness, move)
