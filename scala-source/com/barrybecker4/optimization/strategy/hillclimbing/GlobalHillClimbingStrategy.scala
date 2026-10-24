@@ -108,6 +108,7 @@ class GlobalHillClimbingStrategy(optimizee: Optimizee) extends OptimizationStrat
 
     private def climbFrom(start: ParameterArrayWithFitness): ParameterArrayWithFitness = {
       val climber = new HillClimbingStrategy(optimizee)
+      climber.setConfig(HillClimbingConfig(useMoves = config.useMoves))
       copyRunConfigurationTo(climber)
       try climber.climb(start, params)
       catch {

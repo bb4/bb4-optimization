@@ -45,6 +45,14 @@ enum LocalSearchAcceptance {
  * @param acceptance                     whether to move to a local optimum that is not strictly better.
  * @param restartAfterStagnantIterations after this many rounds without a new best solution, jump to a random
  *                                       solution and run a local search from there (the best is kept); 0 disables.
+ * @param useMoves                       ask the optimizee for the fitness after a move
+ *                                       ([[com.barrybecker4.optimization.optimizee.Optimizee.evaluateMove]]) and build a
+ *                                       neighbor only if it is better, instead of building and evaluating every neighbor.
+ *                                       This is faster when the optimizee works out the new fitness without a full
+ *                                       evaluation, and the array supports moves. It has a price: the search no longer
+ *                                       remembers the neighbors it rejected, so one may be evaluated more than once, which
+ *                                       the default promises not to do. Solutions that are accepted, shaken to or restarted
+ *                                       from are still remembered. Off by default.
  */
 final case class IteratedLocalSearchConfig(
                                             maxIterations: Int = 200,
@@ -53,7 +61,8 @@ final case class IteratedLocalSearchConfig(
                                             minShakeLevel: Int = 3,
                                             maxShakeLevel: Int = 3,
                                             acceptance: LocalSearchAcceptance = LocalSearchAcceptance.BetterOrEqual,
-                                            restartAfterStagnantIterations: Int = 50
+                                            restartAfterStagnantIterations: Int = 50,
+                                            useMoves: Boolean = false
                                           ) {
   require(maxIterations >= 0, s"maxIterations must not be negative, got $maxIterations")
   require(localRadius > 0.0 && localRadius <= 1.5,

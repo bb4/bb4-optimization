@@ -13,7 +13,8 @@ case class GlobalHillClimbingConfig(
     globalSampleBudget: Int = GlobalHillClimbingStrategy.DEFAULT_GLOBAL_SAMPLE_BUDGET,
     seedSelection: SeedSelection = SeedSelection.defaultDiverseForMultistart(
       GlobalHillClimbingStrategy.DEFAULT_MULTISTART_COUNT
-    )
+    ),
+    useMoves: Boolean = false
 ) {
 
   require(multistartCount >= 1, s"multistartCount must be at least 1, got $multistartCount")
