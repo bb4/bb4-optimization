@@ -20,7 +20,7 @@ import scala.util.{Failure, Random, Success, Try}
   * [[NeighborSelection.GreedyImproveAbsolute]] each mutation is a short sequential chain of retries, so it is not
   * parallelized; choose [[NeighborSelection.SingleSample]] to get parallel speed-up for absolute fitness.
   *
-  * '''Thread safety:''' the [[Optimizee]] must be safe for concurrent `evaluateFitness` /
+  * '''Thread safety:''' the [[com.barrybecker4.optimization.optimizee.Optimizee]] must be safe for concurrent `evaluateFitness` /
   * `compareFitness` calls (typical for immutable puzzle/sim objectives). If the optimizee
   * mutates shared state, use [[GeneticSearchStrategy]] instead or synchronize externally.
   *

@@ -6,7 +6,7 @@ import com.barrybecker4.optimization.strategy.statespace.{StateSpaceSearchMode, 
 
 /**
   * Mix in with an [[Optimizee]] when the search space is a discrete graph, and you can enumerate
-  * one-step transitions. Used by [[StateSpaceSearchStrategy]].
+  * one-step transitions. Used by [[com.barrybecker4.optimization.strategy.statespace.StateSpaceSearchStrategy]].
   * Successor lists should stay small; this API is for structured, low-branching problems—not huge graphs.
   */
 trait DiscreteStateSpace {
@@ -18,7 +18,7 @@ trait DiscreteStateSpace {
     * Optional A* heuristic: lower means closer to the goal.
     * Default `0` keeps uninformed best-first behavior.
     * Must be admissible (never overestimate remaining cost) when using
-    * [[StateSpaceSearchMode.AStar]].
+    * [[com.barrybecker4.optimization.strategy.statespace.StateSpaceSearchMode.AStar]].
     */
   def heuristic(state: ParameterArray): Double = 0.0
 }

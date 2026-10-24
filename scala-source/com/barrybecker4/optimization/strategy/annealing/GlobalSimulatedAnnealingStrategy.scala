@@ -23,7 +23,7 @@ object GlobalSimulatedAnnealingStrategy {
   * Prefer this over [[GLOBAL_HILL_CLIMBING]] when local optima are deep and annealing can escape them;
   * prefer [[SIMULATED_ANNEALING]] alone when a single chain with the evaluation budget is enough.
   *
-  * Extra multistart seeds often share the same [[Random]] as the initial guess; annealing mutates that RNG.
+  * Extra multistart seeds often share the same [[scala.util.Random]] as the initial guess; annealing mutates that RNG.
   * Fork per seed (after the primary) so the first local run matches single-start behavior and later starts
   * do not depend on how many draws earlier seeds consumed.
   *

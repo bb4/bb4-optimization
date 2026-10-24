@@ -69,7 +69,7 @@ object BudgetedOptimizee {
 
   /**
     * Wrap `delegate` with an evaluation budget. When `delegate` mixes in [[DiscreteStateSpace]],
-    * the wrapper also does so (needed for [[StateSpaceSearchStrategy]]).
+    * the wrapper also does so (needed for [[com.barrybecker4.optimization.strategy.statespace.StateSpaceSearchStrategy]]).
     */
   def wrap(delegate: Optimizee, maxEvaluations: Int): BudgetedOptimizee =
     delegate match {
