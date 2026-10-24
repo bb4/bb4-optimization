@@ -15,6 +15,8 @@ class OptimizeeHooksSuite extends AnyFunSuite {
   private class Opinionated extends RandomTourProblem(8, 1) {
     var repairs = 0
     var guided = 0
+    var conflicts = 0
+    override def conflictedPositions(current: ParameterArray): Seq[Int] = { conflicts += 1; Seq(3, 4) }
     override def repair(candidate: ParameterArray): ParameterArray = { repairs += 1; candidate }
     override def proposeGuidedMove(current: ParameterArray, radius: Double, rnd: Random): Option[Move] = {
       guided += 1
@@ -60,5 +62,17 @@ class OptimizeeHooksSuite extends AnyFunSuite {
     checked.repair(tour)
     checked.proposeGuidedMove(tour, 0.5, new Random(1))
     assertResult((1, 1))((inner.repairs, inner.guided))
+  }
+
+  test("by default no position is reported as conflicted, which means the problem does not know") {
+    assertResult(Seq.empty)(plain.conflictedPositions(plainTour))
+  }
+
+  test("the wrappers pass the conflicted positions on, without counting an evaluation") {
+    val budgeted = new BudgetedOptimizee(new Opinionated(), maxEvaluations = 1)
+    assertResult(Seq(3, 4))(budgeted.conflictedPositions(tour))
+    assertResult(0)(budgeted.evaluationsUsed)
+    assertResult(Seq(3, 4))(new LimitedOptimizee(new Opinionated(), 1, Long.MaxValue).conflictedPositions(tour))
+    assertResult(Seq(3, 4))(new DeltaCheckingOptimizee(new Opinionated()).conflictedPositions(tour))
   }
 }

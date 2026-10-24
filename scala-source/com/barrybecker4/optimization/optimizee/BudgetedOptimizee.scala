@@ -56,6 +56,8 @@ class BudgetedOptimizee(delegate: Optimizee, val maxEvaluations: Int) extends Op
   override def proposeGuidedMove(current: ParameterArray, radius: Double, rnd: Random): Option[Move] =
     delegate.proposeGuidedMove(current, radius, rnd)
 
+  override def conflictedPositions(current: ParameterArray): Seq[Int] = delegate.conflictedPositions(current)
+
   private def bump(): Unit = synchronized {
     if (count >= maxEvaluations) {
       budgetExhausted = true

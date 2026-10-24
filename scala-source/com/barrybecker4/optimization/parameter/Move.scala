@@ -17,3 +17,12 @@ final case class Swap(first: Int, second: Int) extends Move
 
 /** Several swaps, applied one after the other (a later swap sees the result of the earlier ones). */
 final case class SwapSequence(swaps: IndexedSeq[Swap]) extends Move
+
+/** Set the parameter at `index` to `value`, for an array of integers (or booleans, which are 0 and 1). */
+final case class SetValue(index: Int, value: Double) extends Move
+
+/**
+  * A value at a position. It is what a move creates or destroys, as far as tabu search is concerned: after a swap,
+  * two values are in new positions, and putting either back would undo it. See [[ParameterArray.createdAttributes]].
+  */
+final case class Placement(position: Int, value: Double)

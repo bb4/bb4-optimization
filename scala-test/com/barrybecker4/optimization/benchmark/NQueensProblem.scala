@@ -43,6 +43,17 @@ class NQueensProblem(size: Int, seed: Long) extends OptimizeeProblem {
 
   private def columnOf(board: ParameterArray, row: Int): Int = board.get(row).getValue.toInt
 
+  /** The rows of the queens that another queen attacks. */
+  override def conflictedPositions(board: ParameterArray): Seq[Int] = {
+    val rising = new Array[Int](2 * size)
+    val falling = new Array[Int](2 * size)
+    (0 until size).foreach { row =>
+      rising(row + columnOf(board, row)) += 1
+      falling(row - columnOf(board, row) + size) += 1
+    }
+    (0 until size).filter(row => rising(row + columnOf(board, row)) > 1 || falling(row - columnOf(board, row) + size) > 1)
+  }
+
   /** Only the two swapped queens change which diagonals they are on, so only their conflicts are worked out again. */
   override def evaluateMove(board: ParameterArray, conflicts: Double, move: Move): Double = move match {
     case Swap(first, second) if first != second => conflicts + conflictChangeOfSwap(board, first, second)
