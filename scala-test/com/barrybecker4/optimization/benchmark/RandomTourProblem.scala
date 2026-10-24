@@ -3,7 +3,7 @@ package com.barrybecker4.optimization.benchmark
 
 import com.barrybecker4.optimization.optimizee.optimizees.OptimizeeProblem
 import com.barrybecker4.optimization.parameter.types.IntegerParameter
-import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness, PermutedParameterArray}
+import com.barrybecker4.optimization.parameter.{Move, ParameterArray, ParameterArrayWithFitness, PermutedParameterArray, Swap}
 
 import scala.util.Random
 
@@ -38,6 +38,45 @@ class RandomTourProblem(numCities: Int, seed: Long) extends OptimizeeProblem {
     }
     total
   }
+
+  /**
+    * A swap changes at most four legs of the tour, so its new length is worked out from those. A longer move uses the
+    * default, a full evaluation: for tours of this size, working out which legs several swaps touch costs more than that.
+    */
+  override def evaluateMove(tour: ParameterArray, tourLength: Double, move: Move): Double = move match {
+    case Swap(first, second) => tourLength + lengthChangeOfSwap(tour, first, second)
+    case _ => super.evaluateMove(tour, tourLength, move)
+  }
+
+  private def lengthChangeOfSwap(tour: ParameterArray, first: Int, second: Int): Double =
+    if (first == second) 0.0
+    else legsLength(tour, first, second, swapped = true) - legsLength(tour, first, second, swapped = false)
+
+  /**
+    * The total length of the legs that start or end at either position (the leg from a position goes to the next one),
+    * in the tour as it is or with the two positions swapped. There are four such legs, but next to each other the
+    * positions share one, which must be counted once. This allocates nothing, because it runs once per proposal.
+    */
+  private def legsLength(tour: ParameterArray, first: Int, second: Int, swapped: Boolean): Double = {
+    def leg(start: Int) = legLength(tour, start, first, second, swapped)
+    var total = leg(first) + leg(second)
+    if (before(first) != second) total += leg(before(first))
+    if (before(second) != first) total += leg(before(second))
+    total
+  }
+
+  private def before(position: Int): Int = (position + numCities - 1) % numCities
+
+  /** The length of the leg from `start` to the next position, in the tour as it is or with the two positions swapped. */
+  private def legLength(tour: ParameterArray, start: Int, first: Int, second: Int, swapped: Boolean): Double = {
+    val next = (start + 1) % numCities
+    distances(cityAt(tour, start, first, second, swapped))(cityAt(tour, next, first, second, swapped))
+  }
+
+  private def cityAt(tour: ParameterArray, position: Int, first: Int, second: Int, swapped: Boolean): Int =
+    if (swapped && position == first) tour.get(second).getValue.toInt
+    else if (swapped && position == second) tour.get(first).getValue.toInt
+    else tour.get(position).getValue.toInt
 
   /** The cities in a random order that depends on the seed. */
   override def getInitialGuess: ParameterArray = {

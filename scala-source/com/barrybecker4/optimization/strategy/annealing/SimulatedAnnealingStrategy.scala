@@ -62,7 +62,8 @@ case class SimulatedAnnealingConfig(
     tempDropFactor: Double = 0.6,
     defaultTempMax: Double = 1000.0,
     radiusMultiplier: Double = 8.0,
-    stepMode: SimulatedAnnealingStepMode = SimulatedAnnealingStepMode.AdaptiveAcceptance()
+    stepMode: SimulatedAnnealingStepMode = SimulatedAnnealingStepMode.AdaptiveAcceptance(),
+    useMoves: Boolean = true
 ) {
   // A tempDropFactor >= 1 never cools, so the outer loop would never terminate.
   require(innerIterationsPerDimension > 0, s"innerIterationsPerDimension must be positive, got $innerIterationsPerDimension")
@@ -209,6 +210,8 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
     private var current = start
     private var step = 0
     private var temperature = tempMax
+    /** Ask for the fitness after a move rather than build each neighbor, when the array and the fitness allow it. */
+    private val useMoves = config.useMoves && !optimizee.evaluateByComparison && !isLoggingToFile && start.pa.supportsMoves
 
     /** @return the best point found; if the budget runs out part way, the best found so far. */
     def run(): ParameterArrayWithFitness = {
@@ -266,6 +269,20 @@ class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RA
     /** @return (next state, whether the proposal was accepted for adaptive statistics) */
     private def proposeAndMaybeAccept(scaler: StepScaler): (ParameterArrayWithFitness, Boolean) = {
       val radius = proposalRadius(scaler)
+      if (useMoves) proposeMoveAndMaybeAccept(radius) else proposeNeighborAndMaybeAccept(radius)
+    }
+
+    /** The neighbor is only built if the move is kept, so a rejected proposal costs a delta and no allocation. */
+    private def proposeMoveAndMaybeAccept(radius: Double): (ParameterArrayWithFitness, Boolean) = {
+      val move = current.pa.proposeMove(radius)
+      val candidateFitness = optimizee.evaluateMove(current.pa, current.fitness, move)
+      val delta = candidateFitness - current.fitness
+      val accepted = delta < 0 || metropolisAcceptWorse(delta, temperature, fitnessRange)
+      val next = if (accepted) ParameterArrayWithFitness(current.pa.applyMove(move), candidateFitness) else current
+      (next, accepted)
+    }
+
+    private def proposeNeighborAndMaybeAccept(radius: Double): (ParameterArrayWithFitness, Boolean) = {
       val candidate = current.pa.getRandomNeighbor(radius)
       val dist = if (isLoggingToFile) current.pa.distance(candidate) else 0.0
       val (delta, candidateFitness) = deltaAndAbsoluteFitness(candidate, current)

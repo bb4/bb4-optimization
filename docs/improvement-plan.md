@@ -1,6 +1,6 @@
 # Plan: faster, more reliable local search in bb4-optimization
 
-Status: Phases 0 (baseline and benchmark) and 1 (fewer allocations) are done. Later phases are not started.
+Status: Phases 0 (baseline and benchmark), 1 (fewer allocations) and 2 (delta evaluation, for permutations) are done. Phases 3 and 4 are not started.
 
 Decisions: new APIs are added in 2.1-SNAPSHOT (additive, defaults keep today's behavior). The first user of the
 changes is the Red puzzle in bb4-puzzles, then Tantrix.
@@ -81,19 +81,71 @@ before. Genetic search is limited by time, so it gets much further in the same t
 unchanged in speed and uses less memory. What is left is mostly the cost of building a new immutable array and new
 parameter objects for every neighbor, which Phase 2 removes.
 
-## Phase 2: delta evaluation (additive API)
+## Phase 2: delta evaluation (done for permutations, simulated annealing and genetic greedy mutation)
 
-- A small `Move` type. A permutation move is `Swap(i, j)` (segment reverse and insert later), a numeric move changes
-  one coordinate, a subset move flips a membership bit.
-- `ParameterArray.proposeMove(radius)` and `applyMove(move)`.
-- `IncrementalOptimizee` with `evaluateMove(current, currentFitness, move): Double`. The default implementation applies
-  the move and calls `evaluateFitness`, so every existing optimizee keeps working.
-- Simulated annealing, iterated local search, hill climbing and genetic mutation hold the current fitness, ask for the
-  delta, and build the new array only when the move is accepted. That also removes most neighbor allocations.
-- Start with stateless deltas (safe for the concurrent genetic search). Consider an optional stateful `accept(move)`
-  protocol later.
-- `BudgetedOptimizee` counts move evaluations too, and documents how.
-- A debug mode checks every delta against a full recompute, and is used in property tests.
+What was built, all additive:
+
+- **`Move`** (`parameter/Move.scala`) is a trait, with `Swap(first, second)` and `SwapSequence(swaps)` for permutations.
+  A `ParameterArray` has `supportsMoves` (false by default), `proposeMove(radius)` and `applyMove(move)`.
+  `PermutedParameterArray.proposeMove` draws exactly the random numbers `getRandomNeighbor` draws, so
+  `applyMove(proposeMove(r))` is the neighbor `getRandomNeighbor(r)` would have been, at every radius, including the
+  shuffle used for huge radii. A test checks this. That is what lets a strategy switch to moves without changing its
+  search path.
+- **`Optimizee.evaluateMove(current, currentFitness, move)`** defaults to applying the move and evaluating in full, so
+  every existing optimizee keeps working. An optimizee overrides it to work out the new fitness from the move alone.
+  This is on `Optimizee` itself, not on a separate `IncrementalOptimizee` trait as first sketched, because strategies
+  must be able to call it on any optimizee. Delta evaluation is for absolute fitness only; comparison mode is unchanged.
+- **`BudgetedOptimizee`** (and the benchmark's `LimitedOptimizee`) count a move evaluation as one evaluation, share the
+  budget with full evaluations, and pass the call to the delegate so its own delta is used.
+- **`DeltaCheckingOptimizee`** is the debug wrapper from the plan. It checks every `evaluateMove` against a full
+  evaluation of the moved array, and checks that the fitness the strategy passed for the current array is the true one.
+  Use it in tests of any new delta.
+- **Simulated annealing** proposes a move, asks `evaluateMove`, and builds the neighbor only if it keeps it
+  (`SimulatedAnnealingConfig.useMoves`, default true; off when logging to a file or evaluating by comparison).
+  It follows the same path as before: the same tours come out (compared as cycles), tested on 8, 25 and 60 cities with
+  every delta checked.
+- **Genetic greedy mutation** tries up to `maxNeighborRetries + 1` moves and builds only the mutant it returns
+  (`GeneticSearchConfig.useMoves`, default true). The mutants are identical to the old ones for the same random numbers.
+- **The random tour benchmark problem** has a swap delta that changes four legs and allocates nothing.
+
+Choices worth knowing about:
+
+- **Only a plain `PermutedParameterArray` supports moves.** `TantrixPath` and the Red puzzle's `PieceParameterArray`
+  extend it, override `getRandomNeighbor` and carry more than their parameters. If they inherited moves, a strategy
+  would bypass their neighbors and build plain arrays. A subclass opts in by overriding `supportsMoves` and
+  `applyMove`. Tests check that annealing and genetic mutation keep calling a subclass's own `getRandomNeighbor`.
+- **Fitness carried through many moves picks up rounding error** (about 1e-16 per move). Two tours that are rotations of
+  each other tie in exact arithmetic and can break differently, so a run can end on a different rotation of the same
+  cycle. The fitness agrees to well under 1e-9.
+- **A multi-swap delta did not pay.** An overlay that works out the legs touched by 2 to 8 swaps was slower than a full
+  evaluation at 50 and 200 cities (it made genetic search about half as fast at 50), so it was removed. A
+  `SwapSequence` falls back to the default. A problem with an expensive full evaluation may well want one.
+
+Not done, and why:
+
+- **Iterated local search and hill climbing.** Iterated local search promises to evaluate every distinct solution at
+  most once, which needs the neighbor's key, and building the key costs as much as building the neighbor. Hill climbing
+  has the same kind of cache, and most of its time is spent on huge-radius neighbors, which are shuffles rather than
+  swaps. Taking this on means choosing between that promise and speed (an opt-in setting that allows re-evaluation, or an
+  incrementally updated hash of the permutation). Left for a decision.
+- **Non-greedy genetic mutation and crossover.** These need the child array to remove duplicates, and crossover has no
+  small move.
+- **Numeric and subset moves.** The `Move` trait allows them; only permutations are implemented.
+
+Results on the 2-core VM, medians of 5 seeds, 5000 ms, from [benchmark-results.md](benchmark-results.md) (the "before"
+column is the Phase 1 run). The fitness reached is the same:
+
+| Problem | Strategy | Evals/sec before | after | Bytes/eval before | after |
+| --- | --- | ---: | ---: | ---: | ---: |
+| tour-200 | SIMULATED_ANNEALING | 556,680 | 1,365,343 | 1,123 | 654 |
+| tour-200 | GLOBAL_SIMULATED_ANNEALING | 399,867 | 797,559 | 1,135 | 666 |
+| tour-200 | GENETIC_SEARCH | 181,947 | 218,529 | 4,556 | 4,529 |
+| tour-50 | SIMULATED_ANNEALING | 1,085,876 | 1,155,608 | 592 | 343 |
+
+Isolated runs with nothing else on the machine measured simulated annealing on `tour-200` at about 2.7 million evals/sec,
+so the full run understates it. The gain grows with the tour length, since the full evaluation is O(n) and the delta
+is O(1). A tour of 50 is short enough that other costs dominate. Genetic search gains little because most of its
+evaluations are crossover children, which have no delta.
 
 ## Phase 3: structure hooks (limited, additive)
 
@@ -117,8 +169,8 @@ parameter objects for every neighbor, which Phase 2 removes.
 
 1. Phase 0: benchmark harness, baseline numbers, this plan (done).
 2. Phase 1: neighbor, identity and cache, crossover, `compareFitness` audit (done, one PR).
-3. Phase 2: Move API and the permutation swap; then simulated annealing; then iterated local search and hill climbing;
-   then genetic mutation.
+3. Phase 2: Move API and the permutation swap; simulated annealing; genetic greedy mutation (done, one PR).
+   Iterated local search and hill climbing are waiting on a decision, see Phase 2.
 4. Phase 3: crossover hook; then repair; then guided moves.
 5. Release, then the bb4-puzzles adoption PRs.
 

@@ -46,6 +46,24 @@ trait ParameterArray {
   def getRandomSample: ParameterArray
 
   /**
+    * Whether [[proposeMove]] and [[applyMove]] work for this array. A strategy that finds out the fitness of a neighbor
+    * from a move, rather than from the neighbor itself, only does so when this is true. False by default.
+    */
+  def supportsMoves: Boolean = false
+
+  /**
+    * A random move to a neighbor, drawing the same random numbers as [[getRandomNeighbor]] for the same radius, so that
+    * `applyMove(proposeMove(r))` is the neighbor `getRandomNeighbor(r)` would have been.
+    * @param radius the size of the move, as for [[getRandomNeighbor]]
+    */
+  def proposeMove(radius: Double): Move =
+    throw new UnsupportedOperationException(getClass.getName + " does not support moves")
+
+  /** @return the array after the move; this array is not changed. */
+  def applyMove(move: Move): ParameterArray =
+    throw new UnsupportedOperationException(getClass.getName + " does not support moves")
+
+  /**
     * What makes two arrays of the same class the same candidate solution. Strategies that avoid evaluating or keeping
     * duplicates (such as genetic search) compare this, so equal identities must mean equal candidates.
     *
