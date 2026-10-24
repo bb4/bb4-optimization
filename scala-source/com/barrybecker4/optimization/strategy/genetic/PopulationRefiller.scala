@@ -91,7 +91,7 @@ private[genetic] final class PopulationRefiller(
     private def biasedKeeperIndex(): Int = (rnd.nextDouble() * rnd.nextDouble() * keepSize).toInt
 
     private def crossIntoPending(p1: ParameterArray, p2: ParameterArray): Boolean =
-      try queueIfNew(p1.crossWith(p2, rnd))
+      try queueIfNew(optimizee.repair(p1.crossWith(p2, rnd)))
       catch {
         case _: IllegalArgumentException => false // parents that cannot be crossed
       }
@@ -108,7 +108,7 @@ private[genetic] final class PopulationRefiller(
       val parent = population(keeperIndex)
       val radius = mutationRadius(keeperIndex, nbrRadius)
       if (useGreedy) addGreedyMutant(parent, radius)
-      else queueIfNew(parent.pa.getRandomNeighbor(radius))
+      else queueIfNew(optimizee.repair(parent.pa.getRandomNeighbor(radius)))
     }
 
     private def addGreedyMutant(parent: ParameterArrayWithFitness, radius: Double): Unit = {
@@ -139,10 +139,10 @@ private[genetic] final class PopulationRefiller(
     else greedyNeighborByBuilding(parent, radius)
 
   private def greedyNeighborByBuilding(parent: ParameterArrayWithFitness, radius: Double): ParameterArrayWithFitness = {
-    var nbr = scoreAbsolute(parent.pa.getRandomNeighbor(radius))
+    var nbr = scoreAbsolute(optimizee.repair(parent.pa.getRandomNeighbor(radius)))
     var retries = 0
     while (nbr.fitness >= parent.fitness && retries < config.maxNeighborRetries) {
-      nbr = scoreAbsolute(parent.pa.getRandomNeighbor(radius))
+      nbr = scoreAbsolute(optimizee.repair(parent.pa.getRandomNeighbor(radius)))
       retries += 1
     }
     nbr
@@ -158,7 +158,13 @@ private[genetic] final class PopulationRefiller(
       fitness = optimizee.evaluateMove(parent.pa, parent.fitness, move)
       retries += 1
     }
-    ParameterArrayWithFitness(parent.pa.applyMove(move), fitness)
+    keepIfAcceptable(parent.pa.applyMove(move), fitness)
+  }
+
+  /** The fitness came from the move, so it is for the array as built. If the problem repairs it into something else, score that. */
+  private def keepIfAcceptable(built: ParameterArray, fitness: Double): ParameterArrayWithFitness = {
+    val repaired = optimizee.repair(built)
+    if (repaired eq built) ParameterArrayWithFitness(built, fitness) else scoreAbsolute(repaired)
   }
 
   private def scoreAbsolute(pa: ParameterArray): ParameterArrayWithFitness =

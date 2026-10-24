@@ -2,6 +2,8 @@
 package com.barrybecker4.optimization.optimizee
 
 import com.barrybecker4.optimization.parameter.{Move, ParameterArray}
+
+import scala.util.Random
 import com.barrybecker4.optimization.strategy.statespace.StateSpaceSearchStrategy
 
 /**
@@ -47,6 +49,12 @@ class BudgetedOptimizee(delegate: Optimizee, val maxEvaluations: Int) extends Op
   }
 
   override def getOptimalFitness: Double = delegate.getOptimalFitness
+
+  /** Not an evaluation, so it does not use up the budget. */
+  override def repair(candidate: ParameterArray): ParameterArray = delegate.repair(candidate)
+
+  override def proposeGuidedMove(current: ParameterArray, radius: Double, rnd: Random): Option[Move] =
+    delegate.proposeGuidedMove(current, radius, rnd)
 
   private def bump(): Unit = synchronized {
     if (count >= maxEvaluations) {

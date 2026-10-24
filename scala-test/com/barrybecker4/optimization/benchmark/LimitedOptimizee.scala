@@ -5,6 +5,7 @@ import com.barrybecker4.optimization.optimizee.{EvaluationBudgetExceededExceptio
 import com.barrybecker4.optimization.parameter.{Move, ParameterArray}
 
 import java.util.concurrent.atomic.AtomicLong
+import scala.util.Random
 
 object LimitedOptimizee {
   val FINISHED = "finished"
@@ -34,6 +35,9 @@ class LimitedOptimizee(delegate: Optimizee, maxEvaluations: Long, deadlineNanos:
   override def getName: String = delegate.getName
   override def evaluateByComparison: Boolean = delegate.evaluateByComparison
   override def getOptimalFitness: Double = delegate.getOptimalFitness
+  override def repair(candidate: ParameterArray): ParameterArray = delegate.repair(candidate)
+  override def proposeGuidedMove(current: ParameterArray, radius: Double, rnd: Random): Option[Move] =
+    delegate.proposeGuidedMove(current, radius, rnd)
 
   override def evaluateFitness(params: ParameterArray): Double = {
     checkLimits()
