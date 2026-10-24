@@ -25,8 +25,8 @@ object IteratedLocalSearchStrategy {
 /**
  * Iterated local search (ILS) and variable neighborhood search (VNS) for discrete problems such as permutations
  * ([[com.barrybecker4.optimization.parameter.PermutedParameterArray]]) and variable length integer sets
- * ([[com.barrybecker4.optimization.parameter.VariableLengthIntSet]]). It works with any [[ParameterArray]],
- * but for continuous parameters [[ParticleSwarmStrategy]] or [[DifferentialEvolutionStrategy]] are better choices.
+ * ([[com.barrybecker4.optimization.parameter.VariableLengthIntSet]]). It works with any [[com.barrybecker4.optimization.parameter.ParameterArray]],
+ * but for continuous parameters [[com.barrybecker4.optimization.strategy.particleswarm.ParticleSwarmStrategy]] or [[com.barrybecker4.optimization.strategy.DifferentialEvolutionStrategy]] are better choices.
  *
  * One round of the search:
  *  1. ''Shake'': from the current solution make `k` successive random neighbor moves (the shake level `k`).
@@ -37,30 +37,30 @@ object IteratedLocalSearchStrategy {
  *
  * With a fixed shake level this is iterated local search. With the level rising after each failed round and
  * resetting after an improvement it is variable neighborhood search. See [[IteratedLocalSearchConfig]] for the two
- * presets that [[OptimizationStrategyType.ITERATED_LOCAL_SEARCH]] and
- * [[OptimizationStrategyType.VARIABLE_NEIGHBORHOOD_SEARCH]] use. If no new best solution has been found for a while,
+ * presets that [[com.barrybecker4.optimization.strategy.OptimizationStrategyType.ITERATED_LOCAL_SEARCH]] and
+ * [[com.barrybecker4.optimization.strategy.OptimizationStrategyType.VARIABLE_NEIGHBORHOOD_SEARCH]] use. If no new best solution has been found for a while,
  * the search restarts from a random solution (the best found is never lost).
  *
  * How it relates to the other strategies for discrete problems: the local search is the same random neighbor,
- * first improvement descent with a cache of tried solutions that [[HillClimbingStrategy]] uses; what is added is
+ * first improvement descent with a cache of tried solutions that [[com.barrybecker4.optimization.strategy.hillclimbing.HillClimbingStrategy]] uses; what is added is
  * the shake and accept loop, which keeps exploring around good solutions instead of stopping at the first local
- * optimum (like [[SimulatedAnnealingStrategy]], it can escape local optima, but it decides per local optimum, not per
- * move) and instead of restarting from unrelated samples (like [[GlobalHillClimbingStrategy]]).
+ * optimum (like [[com.barrybecker4.optimization.strategy.annealing.SimulatedAnnealingStrategy]], it can escape local optima, but it decides per local optimum, not per
+ * move) and instead of restarting from unrelated samples (like [[com.barrybecker4.optimization.strategy.hillclimbing.GlobalHillClimbingStrategy]]).
  *
  * The parameter array only offers random neighbors, not an enumeration of all neighbors, so "local optimum" means
  * `maxStaleNeighbors` failed tries in a row; for a very large neighborhood, raise it. Every distinct solution is
  * evaluated at most once: a shake or neighbor that was already visited is skipped (which also stops a local search
  * from walking back into a local optimum that was already explored).
  *
- * '''Comparison mode (`evaluateByComparison == true`):''' like [[HillClimbingStrategy]], a neighbor is an improvement
+ * '''Comparison mode (`evaluateByComparison == true`):''' like [[com.barrybecker4.optimization.strategy.hillclimbing.HillClimbingStrategy]], a neighbor is an improvement
  * when `compareFitness(neighbor, current) < 0`, and the reported fitness of a solution is
  * `compareFitness(solution, initialGuess)`.
  *
- * The [[rnd]] parameter is used for the Metropolis acceptance coin flips; neighbors and random samples come from the
- * [[scala.util.Random]] embedded in the [[ParameterArray]] (as for [[SimulatedAnnealingStrategy]]).
+ * The `rnd` parameter is used for the Metropolis acceptance coin flips; neighbors and random samples come from the
+ * [[scala.util.Random]] embedded in the [[com.barrybecker4.optimization.parameter.ParameterArray]] (as for [[com.barrybecker4.optimization.strategy.annealing.SimulatedAnnealingStrategy]]).
  *
  * Budget: when the optimizee is wrapped with an evaluation budget, this strategy catches
- * [[EvaluationBudgetExceededException]] and returns the best solution found so far.
+ * [[com.barrybecker4.optimization.optimizee.EvaluationBudgetExceededException]] and returns the best solution found so far.
  *
  * @param optimizee the thing to be optimized.
  * @param rnd       random source for the Metropolis acceptance decisions.

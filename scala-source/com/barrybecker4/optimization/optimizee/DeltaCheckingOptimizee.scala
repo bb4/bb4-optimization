@@ -11,7 +11,7 @@ import scala.util.Random
   * production: it does the full evaluations that the delta exists to avoid.
   *
   * It also checks that the fitness the strategy passes in for the current array is the true one.
-  * Any mismatch throws an [[IllegalStateException]] that names the move.
+  * Any mismatch throws an `IllegalStateException` that names the move.
   * @param delegate the optimizee with the delta to check
   * @param tolerance how far apart, relative to the size of the fitness, two values may be and still count as equal
   */

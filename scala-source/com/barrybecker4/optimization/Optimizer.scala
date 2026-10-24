@@ -41,9 +41,9 @@ class Optimizer(val optimizee: Optimizee, optimizationLogFile: Option[String] = 
     * @param params           the initial guess at the solution; also defines the bounds of the search space
     * @param fitnessRange approximate scale of the objective (e.g. max − min fitness over the domain of interest).
     *                     Used by strategies that need a temperature or stopping threshold in the same units as
-    *                     fitness: e.g. [[SimulatedAnnealingStrategy]]
+    *                     fitness: e.g. [[com.barrybecker4.optimization.strategy.annealing.SimulatedAnnealingStrategy]]
     *                     scales initial temperature from `fitnessRange / 10`, and
-    *                     [[GeneticSearchStrategy]] derives improvement
+    *                     [[com.barrybecker4.optimization.strategy.genetic.GeneticSearchStrategy]] derives improvement
     *                     epsilon from `fitnessRange / 100_000_000`. It need not be exact; order-of-magnitude is enough.
     * @param rnd          random source for stochastic strategies
     * @param maxEvaluations   if set, wraps the optimizee so each call to `evaluateFitness` or `compareFitness`

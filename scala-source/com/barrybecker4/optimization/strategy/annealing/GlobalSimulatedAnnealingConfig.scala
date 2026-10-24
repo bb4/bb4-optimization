@@ -22,7 +22,7 @@ case class GlobalSimulatedAnnealingConfig(
   require(multistartCount >= 1, s"multistartCount must be at least 1, got $multistartCount")
   require(globalSampleBudget > 0, s"globalSampleBudget must be positive, got $globalSampleBudget")
 
-  /** [[SeedSelection.DiverseFromTopM.topM]] uses `max(10 * multistartCount, 50)` when `topM <= 0`. */
+  /** `SeedSelection.DiverseFromTopM.topM` uses `max(10 * multistartCount, 50)` when `topM <= 0`. */
   def effectiveSeedSelection: SeedSelection =
     seedSelection match {
       case SeedSelection.TopFitness =>

@@ -37,11 +37,11 @@ import scala.util.Random
  *    meaningfully for `stagnationIterations` iterations (see [[ParticleSwarmConfig]]).
  *
  * Limitations: the fitness must be absolute (`evaluateByComparison == false`) and the parameters must be a
- * [[NumericParameterArray]]; permutations and variable-length sets are not supported (use a genetic or annealing
+ * [[com.barrybecker4.optimization.parameter.NumericParameterArray]]; permutations and variable-length sets are not supported (use a genetic or annealing
  * strategy for those). Violations are reported with an `IllegalArgumentException`.
  *
  * Budget: when the optimizee is wrapped with an evaluation budget, this strategy catches
- * [[EvaluationBudgetExceededException]] and returns the best position found so far.
+ * [[com.barrybecker4.optimization.optimizee.EvaluationBudgetExceededException]] and returns the best position found so far.
  *
  * @param optimizee the thing to be optimized.
  * @param rnd       source of randomness for the initial swarm and the stochastic velocity updates.

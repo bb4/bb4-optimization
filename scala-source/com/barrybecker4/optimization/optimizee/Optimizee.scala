@@ -39,7 +39,7 @@ trait Optimizee {
 
   /**
     * The fitness that `current` would have after `move`, for an optimizee that does not evaluate by comparison.
-    * A strategy that can describe a neighbor as a [[Move]] asks this instead of building the neighbor and calling
+    * A strategy that can describe a neighbor as a [[com.barrybecker4.optimization.parameter.Move]] asks this instead of building the neighbor and calling
     * [[evaluateFitness]] on it, and builds the neighbor only if it keeps the move.
     *
     * The default builds the neighbor and evaluates it all over, so no optimizee has to change. Override it when the

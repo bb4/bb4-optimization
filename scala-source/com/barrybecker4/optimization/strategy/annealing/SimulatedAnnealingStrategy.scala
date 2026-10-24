@@ -106,7 +106,7 @@ object SimulatedAnnealingStrategy {
   * in the [[com.barrybecker4.optimization.parameter.ParameterArray]] (e.g. [[com.barrybecker4.optimization.parameter.NumericParameterArray]]).
   *
   * Budget: when the optimizee is wrapped with an evaluation budget, this strategy catches
-  * [[EvaluationBudgetExceededException]] and returns best-so-far (seeded via [[notifyOfChange]] after the initial eval).
+  * [[com.barrybecker4.optimization.optimizee.EvaluationBudgetExceededException]] and returns best-so-far (seeded via [[notifyOfChange]] after the initial eval).
   *
   * @param optimizee the thing to be optimized.
   * @author Barry Becker

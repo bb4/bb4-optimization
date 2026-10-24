@@ -8,7 +8,7 @@ import scala.collection.mutable
 
 /**
   * A set of parameter arrays where two are the same member when they are the same candidate, as told by
-  * [[ParameterArray.candidateIdentity]]. A strategy uses it to skip candidates it has already tried.
+  * [[com.barrybecker4.optimization.parameter.ParameterArray.candidateIdentity]]. A strategy uses it to skip candidates it has already tried.
   *
   * A plain hash set of arrays would hash and compare every parameter object of the case class for each lookup. This one
   * hashes the primitive values of the identity once per candidate, which is much cheaper on long arrays.

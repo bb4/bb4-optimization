@@ -12,7 +12,7 @@ object StateSpaceSearchStrategy {
 
   /**
     * Canonical key for visited-set dedup (`ParameterArray` often lacks value equality). It is the array's
-    * [[ParameterArray.candidateIdentity]], so a state is the same exactly when genetic search would call it the same.
+    * [[com.barrybecker4.optimization.parameter.ParameterArray.candidateIdentity]], so a state is the same exactly when genetic search would call it the same.
     */
   private[strategy] def stateKey(pa: ParameterArray): Any = Solutions.key(pa)
 }
@@ -22,10 +22,10 @@ object StateSpaceSearchStrategy {
   * [[com.barrybecker4.optimization.optimizee.DiscreteStateSpace]] and its `successors` method.
   * Intended for small or structured state spaces with low branching factor.
   *
-  * Visited states are keyed by [[stateKey]] (the candidate identity) so newly allocated successors that
+  * Visited states are keyed by `stateKey` (the candidate identity) so newly allocated successors that
   * represent the same logical state are not re-evaluated.
   *
-  * Budget: catches [[EvaluationBudgetExceededException]] and returns best-so-far
+  * Budget: catches [[com.barrybecker4.optimization.optimizee.EvaluationBudgetExceededException]] and returns best-so-far
   * (seeded via [[notifyOfChange]] after the initial evaluation).
   *
   * A*: when [[StateSpaceSearchMode.AStar]] is selected and fitness is absolute,
