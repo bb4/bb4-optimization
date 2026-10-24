@@ -50,7 +50,8 @@ object IteratedLocalSearchStrategy {
  * The parameter array only offers random neighbors, not an enumeration of all neighbors, so "local optimum" means
  * `maxStaleNeighbors` failed tries in a row; for a very large neighborhood, raise it. Every distinct solution is
  * evaluated at most once: a shake or neighbor that was already visited is skipped (which also stops a local search
- * from walking back into a local optimum that was already explored).
+ * from walking back into a local optimum that was already explored). That promise is dropped when
+ * [[IteratedLocalSearchConfig.useMoves]] is on, which is off by default.
  *
  * '''Comparison mode (`evaluateByComparison == true`):''' like [[HillClimbingStrategy]], a neighbor is an improvement
  * when `compareFitness(neighbor, current) < 0`, and the reported fitness of a solution is
@@ -108,7 +109,12 @@ class IteratedLocalSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.R
       }
 
     /** First improvement descent over random neighbors; stops after `maxStaleNeighbors` failed tries in a row. */
-    def localSearch(start: ParameterArrayWithFitness): ParameterArrayWithFitness = {
+    def localSearch(start: ParameterArrayWithFitness): ParameterArrayWithFitness =
+      if (cfg.useMoves && canUseMoves(start.pa)) localSearchByMoves(start) else localSearchByBuilding(start)
+
+    def canUseMoves(pa: ParameterArray): Boolean = !optimizee.evaluateByComparison && pa.supportsMoves
+
+    def localSearchByBuilding(start: ParameterArrayWithFitness): ParameterArrayWithFitness = {
       var current = start
       var staleNeighbors = 0
       while (staleNeighbors < cfg.maxStaleNeighbors && !isOptimalFitnessReached(current)) {
@@ -123,6 +129,31 @@ class IteratedLocalSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.R
         } else staleNeighbors += 1
       }
       current
+    }
+
+    /** The same descent, trying moves. A neighbor is built, and remembered, only when it improves on the current one. */
+    def localSearchByMoves(start: ParameterArrayWithFitness): ParameterArrayWithFitness = {
+      var current = start
+      var staleNeighbors = 0
+      while (staleNeighbors < cfg.maxStaleNeighbors && !isOptimalFitnessReached(current)) {
+        val move = current.pa.proposeMove(cfg.localRadius)
+        val fitness = noNaN(optimizee.evaluateMove(current.pa, current.fitness, move))
+        if (fitness < current.fitness) {
+          current = keepNeighbor(current.pa.applyMove(move), fitness)
+          staleNeighbors = 0
+        } else staleNeighbors += 1
+      }
+      current
+    }
+
+    /** A NaN must never look like an improvement. */
+    def noNaN(fitness: Double): Double = if (fitness.isNaN) Double.PositiveInfinity else fitness
+
+    def keepNeighbor(neighbor: ParameterArray, fitness: Double): ParameterArrayWithFitness = {
+      visited += StateSpaceSearchStrategy.stateKey(neighbor)
+      val scored = ParameterArrayWithFitness(neighbor, fitness)
+      recordBest(scored)
+      scored
     }
 
     /** @return the evaluated shaken solution, or None if the shake landed on a solution that was already visited. */

@@ -53,5 +53,6 @@ object OptimizationBenchmark {
 
   def machineDescription(config: BenchmarkConfig): String =
     s"Java ${System.getProperty("java.version")}, ${Runtime.getRuntime.availableProcessors} processors, " +
-      s"${config.numSeeds} seeds, ${config.timeLimitMillis} ms or ${config.maxEvaluations} evaluations per run"
+      s"${config.numSeeds} seeds, ${config.timeLimitMillis} ms or ${config.maxEvaluations} evaluations per run" +
+      (if (config.useMoves) ", opt-in moves on" else "")
 }

@@ -19,7 +19,8 @@ object DiscreteImprovementFinder {
   */
 class DiscreteImprovementFinder(var startingParams: ParameterArrayWithFitness,
                                 baselineParams: ParameterArray,
-                                trace: String => Unit = _ => ()) extends ImprovementFinder {
+                                trace: String => Unit = _ => (),
+                                useMoves: Boolean = false) extends ImprovementFinder {
 
   /** Try to find a parameterArray that is better than what we have now by evaluating using the optimizee passed in.
     * Try swapping parameters randomly until we find an improvement (if we can).
@@ -31,6 +32,39 @@ class DiscreteImprovementFinder(var startingParams: ParameterArrayWithFitness,
   def findIncrementalImprovement(optimizee: Optimizee,
                                  lastImprovement: Option[Improvement],
                                  cache: mutable.Set[ParameterArray]): Improvement = {
+    val current = lastImprovement.map(_.parameters).getOrElse(startingParams)
+    if (useMoves && !optimizee.evaluateByComparison && current.pa.supportsMoves)
+      findImprovementByMoves(optimizee, lastImprovement, current)
+    else findImprovementByBuilding(optimizee, lastImprovement, cache)
+  }
+
+  /**
+    * The same search with moves: each try is a move, and a neighbor is built only for the one that improves. The cache is
+    * not consulted, so a move that was tried before is tried again, which costs a delta and not a neighbor.
+    */
+  private def findImprovementByMoves(optimizee: Optimizee,
+                                     lastImprovement: Option[Improvement],
+                                     current: ParameterArrayWithFitness): Improvement = {
+    var numTries = 0
+    var fitnessDelta = 1.0
+    var jumpSize = lastImprovement.map(_.jumpSize * JUMP_SIZE_DECREASE).getOrElse(INITIAL_JUMP_SIZE)
+    var improvement = Improvement(current, 0, jumpSize)
+    while (fitnessDelta >= 0 && numTries < DISCRETE_MAX_TRIES) {
+      val move = current.pa.proposeMove(jumpSize)
+      val fitness = optimizee.evaluateMove(current.pa, current.fitness, move)
+      fitnessDelta = fitness - current.fitness
+      if (fitnessDelta < 0)
+        improvement = Improvement(ParameterArrayWithFitness(current.pa.applyMove(move), fitness), fitnessDelta, jumpSize)
+      numTries += 1
+      jumpSize *= JUMP_SIZE_INCREASE
+    }
+    trace("incremental improvement = " + improvement + " numTries=" + numTries)
+    improvement
+  }
+
+  private def findImprovementByBuilding(optimizee: Optimizee,
+                                        lastImprovement: Option[Improvement],
+                                        cache: mutable.Set[ParameterArray]): Improvement = {
     var numTries = 0
     var fitnessDelta = 1.0
     var jumpSize = lastImprovement.map(_.jumpSize * JUMP_SIZE_DECREASE).getOrElse(INITIAL_JUMP_SIZE)

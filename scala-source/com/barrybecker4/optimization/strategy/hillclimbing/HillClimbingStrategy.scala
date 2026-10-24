@@ -17,6 +17,14 @@ import scala.collection.mutable
   */
 class HillClimbingStrategy(optimizee: Optimizee) extends OptimizationStrategy(optimizee) {
 
+  private var config: HillClimbingConfig = HillClimbingConfig()
+
+  def getConfig: HillClimbingConfig = config
+
+  def setConfig(newConfig: HillClimbingConfig): Unit = {
+    config = newConfig
+  }
+
   /** Finds a local minimum.
     * It is a bit like Newton's method, but in n dimensions.
     * If we make a jump and find that we are worse off than before, we will backtrack and reduce the stepsize so
@@ -85,7 +93,7 @@ class HillClimbingStrategy(optimizee: Optimizee) extends OptimizationStrategy(op
       case _: NumericParameterArray =>
         new NumericImprovementFinder(params, baseline, useCache, msg => trace(msg))
       case _: PermutedParameterArray | _: VariableLengthIntSet =>
-        new DiscreteImprovementFinder(params, baseline, msg => trace(msg))
+        new DiscreteImprovementFinder(params, baseline, msg => trace(msg), config.useMoves)
       case _ => throw new IllegalArgumentException("Unexpected params type: " + params.pa.getClass.getName)
     }
   }
