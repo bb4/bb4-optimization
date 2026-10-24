@@ -2,6 +2,7 @@
 package com.barrybecker4.optimization.optimizee
 
 import com.barrybecker4.optimization.benchmark.{LimitedOptimizee, RandomTourProblem}
+import com.barrybecker4.optimization.optimizee.optimizees.problems.TravelingSalesmanProblem
 import com.barrybecker4.optimization.parameter.{Move, ParameterArray, PermutedParameterArray, Swap}
 import org.scalatest.funsuite.AnyFunSuite
 
@@ -23,12 +24,16 @@ class OptimizeeHooksSuite extends AnyFunSuite {
 
   private val tour = new RandomTourProblem(8, 1).getInitialGuess
 
+  // a problem that does not override either hook
+  private val plain = new TravelingSalesmanProblem()
+  private val plainTour = plain.getInitialGuess
+
   test("by default a candidate needs no repair, and the same array comes back") {
-    assert(new RandomTourProblem(8, 1).repair(tour) eq tour)
+    assert(plain.repair(plainTour) eq plainTour)
   }
 
   test("by default a problem has no guided move to suggest") {
-    assertResult(None)(new RandomTourProblem(8, 1).proposeGuidedMove(tour, 0.5, new Random(1)))
+    assertResult(None)(plain.proposeGuidedMove(plainTour, 0.5, new Random(1)))
   }
 
   test("a budget passes repair and guided moves to the optimizee it wraps, and they do not use up the budget") {

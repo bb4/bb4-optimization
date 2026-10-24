@@ -1,6 +1,6 @@
 # Plan: faster, more reliable local search in bb4-optimization
 
-Status: Phases 0 (baseline and benchmark), 1 (fewer allocations) and 2 (delta evaluation, for permutations) are done. Phases 3 and 4 are not started.
+Status: Phases 0 (baseline and benchmark), 1 (fewer allocations), 2 (delta evaluation, for permutations) and 3 (structure hooks) are done. Phase 4 is not started.
 
 Decisions: new APIs are added in 2.1-SNAPSHOT (additive, defaults keep today's behavior). The first user of the
 changes is the Red puzzle in bb4-puzzles, then Tantrix.
@@ -147,7 +147,7 @@ so the full run understates it. The gain grows with the tour length, since the f
 is O(1). A tour of 50 is short enough that other costs dominate. Genetic search gains little because most of its
 evaluations are crossover children, which have no delta.
 
-## Phase 3: structure hooks (limited, additive)
+## Phase 3: structure hooks (done, additive)
 
 - Replace the closed crossover match with `ParameterArray.crossWith(other, rnd)`. The default keeps today's behavior.
   A subclass can override it for type-aware crossover, as discussed for Tantrix.
@@ -157,6 +157,48 @@ evaluations are crossover children, which have no delta.
   with mismatched edges). Strategies mix them with random moves with a configurable probability.
 - Scope: this makes the metaheuristic smarter. It is not constraint propagation or backtracking, which stay in the
   exact solvers.
+
+### What Phase 3 added
+
+All three hooks default to today's behavior, so a problem that overrides nothing runs exactly as before.
+
+- `ParameterArray.crossWith(other, rnd)`. The default calls the old crossover. Genetic search calls it for every pair.
+- `Optimizee.repair(candidate)`. The default returns the same instance, which is the contract for "nothing to fix".
+  Genetic search repairs crossover children, non-greedy mutants, greedy mutants (built or from a move) and the
+  initial population. A greedy mutant found by a move has a fitness for the array as built, so when `repair` returns
+  a different instance the repaired array is scored again, in full. The wrappers (`BudgetedOptimizee`,
+  `DeltaCheckingOptimizee`, the benchmark's `LimitedOptimizee`) forward it and do not count it as an evaluation.
+- `Optimizee.proposeGuidedMove(current, radius, rnd)`, returning an `Option[Move]`, and
+  `guidedMoveProbability` (default 0, validated to [0, 1]) in `SimulatedAnnealingConfig` and `GeneticSearchConfig`.
+  `MoveChoice.propose` asks the problem with that probability and uses a random move when it has nothing to
+  suggest. With a probability of 0 it draws no random number, so seeded runs are unchanged. It applies only on the
+  move paths, so it needs `supportsMoves` and absolute fitness.
+
+### Does guiding help? A first look
+
+`RandomTourProblem` suggests a long-leg move: sample 3 legs, take the longest, and swap the city at its end with a
+random position. Median best tour length over 7 seeds, 4 s or 3M evaluations per run, lower is better, 2-core VM
+(a scratch run, not part of the committed benchmark):
+
+| Strategy, cities | p = 0 | 0.1 | 0.3 | 0.5 | 0.8 |
+|---|---|---|---|---|---|
+| Annealing, 100 | 12.9 | 13.3 | 13.4 | 13.6 | 13.3 |
+| Annealing, 200 | 26.5 | 25.8 | 24.3 | 24.3 | 23.4 |
+| Genetic, 100 | 12.5 | 11.8 | 12.0 | 12.1 | 12.0 |
+| Genetic, 200 | 35.4 | 33.0 | 34.4 | 32.5 | 32.6 |
+
+The effect is real but modest and depends on the problem: about 5 to 12 percent better for annealing on 200 cities,
+3 to 8 percent for genetic search, and no gain (within the noise) for annealing on 100 cities, where the run already
+finishes its schedule. The hook is a way to put a problem's knowledge to use. The numbers say that a guide is worth
+writing when it targets real defects (like the long leg here), and that it should be tried with a probability around
+0.5 rather than assumed to help.
+
+### Not done
+
+- Iterated local search, hill climbing and the variable neighborhood search do not use guided moves or repair. They
+  would need the same plumbing as `useMoves` (see Phase 2), and are best added with the real puzzles in Phase 4.
+- Repair is not applied by simulated annealing, which has no crossover and moves from a feasible state by small steps.
+  A problem whose moves can leave the feasible set should keep them feasible in `getRandomNeighbor`.
 
 ## Phase 4: adopt in bb4-puzzles (after a release)
 
@@ -171,7 +213,7 @@ evaluations are crossover children, which have no delta.
 2. Phase 1: neighbor, identity and cache, crossover, `compareFitness` audit (done, one PR).
 3. Phase 2: Move API and the permutation swap; simulated annealing; genetic greedy mutation (done, one PR).
    Iterated local search and hill climbing are waiting on a decision, see Phase 2.
-4. Phase 3: crossover hook; then repair; then guided moves.
+4. Phase 3: crossover hook; then repair; then guided moves (done, one PR, three commits).
 5. Release, then the bb4-puzzles adoption PRs.
 
 ## Risks
