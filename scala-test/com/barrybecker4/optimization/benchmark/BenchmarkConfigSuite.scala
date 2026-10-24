@@ -70,4 +70,11 @@ class BenchmarkConfigSuite extends AnyFunSuite {
   test("an ordinary run is not a solve rate run") {
     assert(!BenchmarkConfig.parse(Seq.empty).solveRate)
   }
+
+  test("the solve rate run includes the strategies for constraint problems, and a full one writes its report") {
+    val config = BenchmarkConfig.parse(Seq("--solve-rate=true"))
+    assertResult(BenchmarkConfig.CONSTRAINT_STRATEGIES)(config.strategies)
+    assert(config.strategies.containsSlice(Seq(TABU_SEARCH, MIN_CONFLICTS)))
+    assertResult(Some(BenchmarkConfig.DEFAULT_SOLVE_RATE_REPORT_FILE))(config.reportFile)
+  }
 }
