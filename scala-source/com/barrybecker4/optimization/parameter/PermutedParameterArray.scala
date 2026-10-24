@@ -110,6 +110,41 @@ case class PermutedParameterArray(params: IndexedSeq[Parameter], rnd: Random)
     case other => throw new UnsupportedOperationException("A permutation does not understand the move " + other)
   }
 
+  /** Local moves are swaps, for the same arrays that have moves: a subclass that builds its own neighbors has not opted in. */
+  override def supportsLocalMoves: Boolean = supportsMoves
+
+  override def movesAt(position: Int): Iterator[Move] = {
+    requireLocalMoves()
+    (0 until size).iterator.filter(_ != position).map(other => Swap(position, other))
+  }
+
+  private def requireLocalMoves(): Unit =
+    if (!supportsLocalMoves) throw new UnsupportedOperationException("This array makes its own neighbors, so it has no local moves")
+
+  /** A swap of two different positions (of the same one, if there is only one position). */
+  override def proposeLocalMove(rnd: Random): Move = {
+    requireLocalMoves()
+    if (size < 2) Swap(0, 0)
+    else {
+      val first = rnd.nextInt(size)
+      Swap(first, (first + 1 + rnd.nextInt(size - 1)) % size)
+    }
+  }
+
+  /** A swap puts each value where the other was. */
+  override def createdAttributes(move: Move): Seq[Any] = move match {
+    case Swap(first, second) => Seq(Placement(first, valueAt(second)), Placement(second, valueAt(first)))
+    case other => super.createdAttributes(other)
+  }
+
+  /** A swap takes each value from where it was. */
+  override def destroyedAttributes(move: Move): Seq[Any] = move match {
+    case Swap(first, second) => Seq(Placement(first, valueAt(first)), Placement(second, valueAt(second)))
+    case other => super.destroyedAttributes(other)
+  }
+
+  private def valueAt(position: Int): Double = get(position).getValue
+
   /** Replace only the parameters that change when a few positions are swapped, or work on the values if there are many. */
   private def swapPositions(swaps: IndexedSeq[Swap]): PermutedParameterArray =
     if (swaps.size * PermutedParameterArray.FEW_SWAPS_DIVISOR <= size) {

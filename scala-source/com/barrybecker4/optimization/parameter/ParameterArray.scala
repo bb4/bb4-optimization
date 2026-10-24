@@ -79,6 +79,41 @@ trait ParameterArray {
     throw new UnsupportedOperationException(getClass.getName + " does not support moves")
 
   /**
+    * Whether this array can describe moves that each change one position, so that [[movesAt]], [[proposeLocalMove]]
+    * and [[applyMove]] work for them. Strategies that look at many such moves (tabu search, min-conflicts) need this.
+    * False by default.
+    *
+    * It is separate from [[supportsMoves]], which promises that a move is the neighbor that [[getRandomNeighbor]] would
+    * have made. For an array of integers the random neighbor changes every position, and a local move only one.
+    */
+  def supportsLocalMoves: Boolean = false
+
+  /**
+    * Every move that changes the given position: a swap with each other position for a permutation, or setting the
+    * position to each other value for integers. When there are too many values to list, a sample of them.
+    * @param position the index of the parameter to change
+    */
+  def movesAt(position: Int): Iterator[Move] =
+    throw new UnsupportedOperationException(getClass.getName + " does not support local moves")
+
+  /**
+    * A random move that changes one position, which the move that [[proposeMove]] gives does not necessarily do.
+    * @param rnd the source of randomness, so that a seeded search repeats
+    */
+  def proposeLocalMove(rnd: Random): Move =
+    throw new UnsupportedOperationException(getClass.getName + " does not support local moves")
+
+  /**
+    * What taking the move creates, for the tabu list: the values it puts at positions, as [[Placement]]s. A move
+    * that creates something that was recently destroyed is tabu. The default is the move itself, which makes only
+    * repeating the same move tabu.
+    */
+  def createdAttributes(move: Move): Seq[Any] = Seq(move)
+
+  /** What taking the move destroys, which is what the tabu list holds once the move is made. See [[createdAttributes]]. */
+  def destroyedAttributes(move: Move): Seq[Any] = Seq(move)
+
+  /**
     * What makes two arrays of the same class the same candidate solution. Strategies that avoid evaluating or keeping
     * duplicates (such as genetic search) compare this, so equal identities must mean equal candidates.
     *

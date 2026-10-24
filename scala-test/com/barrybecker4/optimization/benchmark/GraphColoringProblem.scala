@@ -3,7 +3,7 @@ package com.barrybecker4.optimization.benchmark
 
 import com.barrybecker4.optimization.optimizee.optimizees.OptimizeeProblem
 import com.barrybecker4.optimization.parameter.types.{IntegerParameter, Parameter}
-import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray, ParameterArrayWithFitness}
+import com.barrybecker4.optimization.parameter.{Move, NumericParameterArray, ParameterArray, ParameterArrayWithFitness, SetValue}
 
 import scala.util.Random
 
@@ -28,6 +28,7 @@ class GraphColoringProblem(numNodes: Int, numColors: Int, averageDegree: Double,
   private val random = new Random(seed)
   private val hiddenColoring: IndexedSeq[Int] = IndexedSeq.fill(numNodes)(random.nextInt(numColors))
   private val edges: IndexedSeq[(Int, Int)] = createEdges()
+  private val neighbors: IndexedSeq[Array[Int]] = neighborsOfEachNode()
 
   override def getName: String = s"Coloring $numNodes nodes with $numColors colors"
 
@@ -36,6 +37,17 @@ class GraphColoringProblem(numNodes: Int, numColors: Int, averageDegree: Double,
   /** The number of edges that join two nodes of the same color. */
   override def evaluateFitness(coloring: ParameterArray): Double =
     edges.count { case (a, b) => colorOf(coloring, a) == colorOf(coloring, b) }.toDouble
+
+  /** The nodes that share a color with a node they are joined to. */
+  override def conflictedPositions(coloring: ParameterArray): Seq[Int] =
+    (0 until numNodes).filter(node => neighbors(node).exists(colorOf(coloring, _) == colorOf(coloring, node)))
+
+  /** Giving a node another color only changes its own edges: the ones that now clash less the ones that clashed. */
+  override def evaluateMove(coloring: ParameterArray, clashes: Double, move: Move): Double = move match {
+    case SetValue(node, color) =>
+      clashes + neighbors(node).count(colorOf(coloring, _) == color.toInt) - neighbors(node).count(colorOf(coloring, _) == colorOf(coloring, node))
+    case _ => super.evaluateMove(coloring, clashes, move)
+  }
 
   private def colorOf(coloring: ParameterArray, node: Int): Int = coloring.get(node).getValue.toInt
 
@@ -58,6 +70,11 @@ class GraphColoringProblem(numNodes: Int, numColors: Int, averageDegree: Double,
     val params: IndexedSeq[Parameter] = colors.indices.map(node => IntegerParameter(colors(node), 0, numColors - 1, "n" + node))
     NumericParameterArray(params, rnd = new Random(randomSeed))
   }
+
+  private def neighborsOfEachNode(): IndexedSeq[Array[Int]] =
+    (0 until numNodes).map { node =>
+      edges.collect { case (a, b) if a == node => b; case (a, b) if b == node => a }.toArray
+    }
 
   /** Random pairs of nodes with different hidden colors, until there are enough edges; the same edge is added once. */
   private def createEdges(): IndexedSeq[(Int, Int)] = {
