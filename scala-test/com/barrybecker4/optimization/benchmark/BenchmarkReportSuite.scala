@@ -78,4 +78,34 @@ class BenchmarkReportSuite extends AnyFunSuite {
     assert(document.contains(BenchmarkReport.markdown(summaries)))
     assertResult(document)(BenchmarkReport.document("Java 21, 2 processors", summaries))
   }
+
+  private def solveResult(solved: Boolean, millis: Double, evaluations: Long, fitness: Double) =
+    RunResult("queens", SIMULATED_ANNEALING, 1, evaluations, millis, fitness, None,
+      if (solved) LimitedOptimizee.SOLVED else LimitedOptimizee.TIME_LIMIT, solved)
+
+  test("a solve summary counts the runs that solved, and takes the medians of those, and of the fitness of the others") {
+    val summary = BenchmarkReport.summarizeSolves(Seq(
+      solveResult(solved = true, 10.0, 100, 0.0), solveResult(solved = true, 30.0, 300, 0.0),
+      solveResult(solved = false, 2000.0, 9000, 4.0), solveResult(solved = false, 2000.0, 9000, 2.0))).head
+    assertResult((4, 2))((summary.runs, summary.solved))
+    assertResult((20.0, 200.0, 3.0))((summary.medianMillis, summary.medianEvaluations, summary.medianUnsolvedFitness))
+  }
+
+  test("a strategy that never solved has no time, and one that always did has no unsolved fitness") {
+    val never = BenchmarkReport.summarizeSolves(Seq(solveResult(solved = false, 2000.0, 10, 3.0))).head
+    assert(never.medianMillis.isNaN && never.solved == 0)
+    val always = BenchmarkReport.summarizeSolves(Seq(solveResult(solved = true, 5.0, 10, 0.0))).head
+    assert(always.medianUnsolvedFitness.isNaN)
+  }
+
+  test("the solve table shows solved of runs, and a dash where there is nothing to show") {
+    val table = BenchmarkReport.solveMarkdown(BenchmarkReport.summarizeSolves(Seq(
+      solveResult(solved = true, 12.0, 1500, 0.0), solveResult(solved = false, 2000.0, 9000, 4.0))))
+    assert(table.contains("| queens | SIMULATED_ANNEALING | 1/2 | 12 | 1,500 | 4.0 |"), table)
+  }
+
+  test("the solve document has a title, the settings and the table, and no date") {
+    val document = BenchmarkReport.solveDocument("settings here", Seq.empty)
+    assert(document.startsWith("# Solve rate results") && document.contains("settings here") && document.endsWith("\n"))
+  }
 }

@@ -11,6 +11,7 @@ object LimitedOptimizee {
   val FINISHED = "finished"
   val TIME_LIMIT = "time"
   val EVALUATION_LIMIT = "evals"
+  val SOLVED = "solved"
 }
 
 /**
@@ -20,14 +21,21 @@ object LimitedOptimizee {
   * @param delegate the problem being optimized
   * @param maxEvaluations stop after this many evaluations
   * @param deadlineNanos stop at this time (as in `System.nanoTime`)
+  * @param stopWhenSolved stop at the next evaluation after one reached the optimal fitness, for a problem where
+  *                       that is the goal and the strategy might otherwise carry on
   */
-class LimitedOptimizee(delegate: Optimizee, maxEvaluations: Long, deadlineNanos: Long) extends Optimizee {
+class LimitedOptimizee(delegate: Optimizee, maxEvaluations: Long, deadlineNanos: Long, stopWhenSolved: Boolean = false)
+    extends Optimizee {
   import LimitedOptimizee.*
 
   private val count = new AtomicLong(0)
   @volatile private var reason = FINISHED
+  @volatile private var solved = false
 
   def evaluations: Long = count.get
+
+  /** True once an evaluation returned the optimal fitness of the problem. */
+  def reachedOptimal: Boolean = solved
 
   /** Why the search ended: FINISHED if the strategy decided to stop by itself. */
   def stoppedBy: String = reason
@@ -41,7 +49,7 @@ class LimitedOptimizee(delegate: Optimizee, maxEvaluations: Long, deadlineNanos:
 
   override def evaluateFitness(params: ParameterArray): Double = {
     checkLimits()
-    delegate.evaluateFitness(params)
+    noteIfSolved(delegate.evaluateFitness(params))
   }
 
   override def compareFitness(params1: ParameterArray, params2: ParameterArray): Double = {
@@ -52,12 +60,18 @@ class LimitedOptimizee(delegate: Optimizee, maxEvaluations: Long, deadlineNanos:
   /** A move evaluation counts as one evaluation, the same as a full one. */
   override def evaluateMove(current: ParameterArray, currentFitness: Double, move: Move): Double = {
     checkLimits()
-    delegate.evaluateMove(current, currentFitness, move)
+    noteIfSolved(delegate.evaluateMove(current, currentFitness, move))
+  }
+
+  private def noteIfSolved(fitness: Double): Double = {
+    if (fitness <= delegate.getOptimalFitness) solved = true
+    fitness
   }
 
   private def checkLimits(): Unit = {
     if (count.incrementAndGet() > maxEvaluations) stop(EVALUATION_LIMIT)
     if (System.nanoTime() > deadlineNanos) stop(TIME_LIMIT)
+    if (stopWhenSolved && solved) stop(SOLVED)
   }
 
   private def stop(why: String): Nothing = {

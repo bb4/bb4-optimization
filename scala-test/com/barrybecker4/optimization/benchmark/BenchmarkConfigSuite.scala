@@ -53,4 +53,21 @@ class BenchmarkConfigSuite extends AnyFunSuite {
     val error = intercept[IllegalArgumentException](BenchmarkProblems.named(Seq("nope")))
     assert(error.getMessage.contains("tour-50"))
   }
+
+  test("a solve rate run is of the constraint problems, with more seeds and a shorter limit") {
+    val config = BenchmarkConfig.parse(Seq("--solve-rate=true"))
+    assert(config.solveRate)
+    assertResult(BenchmarkProblems.CONSTRAINT.map(_.name))(config.problemNames)
+    assertResult((20, 2000L))((config.numSeeds, config.timeLimitMillis))
+    assertResult(Some("docs/solve-rate-results.md"))(config.reportFile)
+  }
+
+  test("the solve rate defaults can be overridden, and some problems can be chosen") {
+    val config = BenchmarkConfig.parse(Seq("--solve-rate=true", "--seeds=3", "--time-ms=100", "--problems=queens-100"))
+    assertResult((3, 100L, Seq("queens-100"), None))((config.numSeeds, config.timeLimitMillis, config.problemNames, config.reportFile))
+  }
+
+  test("an ordinary run is not a solve rate run") {
+    assert(!BenchmarkConfig.parse(Seq.empty).solveRate)
+  }
 }

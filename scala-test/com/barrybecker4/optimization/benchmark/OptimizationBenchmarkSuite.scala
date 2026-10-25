@@ -43,4 +43,34 @@ class OptimizationBenchmarkSuite extends AnyFunSuite {
     val b = BenchmarkProblems.named(Seq("tour-50")).head.create(3)
     assertResult(a.evaluateFitness(a.getInitialGuess))(b.evaluateFitness(b.getInitialGuess))
   }
+
+  test("the constraint problems have their own names, are marked, and are not in the ordinary list") {
+    assertResult(BenchmarkProblems.CONSTRAINT.size)(BenchmarkProblems.CONSTRAINT.map(_.name).distinct.size)
+    assert(BenchmarkProblems.CONSTRAINT.forall(_.isConstraint) && BenchmarkProblems.ALL.forall(!_.isConstraint))
+    assert(BenchmarkProblems.CONSTRAINT.forall(p => !BenchmarkProblems.ALL.exists(_.name == p.name)))
+  }
+
+  test("every constraint problem has a known solution that has the optimal fitness") {
+    BenchmarkProblems.CONSTRAINT.foreach { p =>
+      val problem = p.create(1)
+      assertResult(problem.getOptimalFitness, p.name)(problem.getExactSolution.fitness)
+    }
+  }
+
+  test("a run on a constraint problem that finds a solution is solved and stops there") {
+    val config = quick.copy(problemNames = Seq("queens-100"), strategies = Seq(SIMULATED_ANNEALING), timeLimitMillis = 3000,
+      numSeeds = 3, solveRate = true)
+    val results = OptimizationBenchmark.runAll(config)
+    assertResult(3)(results.size)
+    results.filter(_.solved).foreach(r => assert(r.stoppedBy == LimitedOptimizee.SOLVED || r.fitness == 0.0, r.toString))
+  }
+
+  test("an ordinary problem is never marked solved") {
+    assert(OptimizationBenchmark.runAll(quick).forall(!_.solved))
+  }
+
+  test("a strategy that rejects the problem when it starts is left out, not a failure of the whole benchmark") {
+    val config = quick.copy(problemNames = Seq("coloring-200"), strategies = Seq(GLOBAL_SIMULATED_ANNEALING), solveRate = true)
+    assert(OptimizationBenchmark.runAll(config).isEmpty)
+  }
 }
