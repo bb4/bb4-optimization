@@ -80,6 +80,16 @@ trait Optimizee {
     */
   def proposeGuidedMove(current: ParameterArray, radius: Double, rnd: Random): Option[Move] = None
 
+  /**
+    * The positions of the array (indices of its parameters) that take part in a violated constraint: the queens that
+    * are attacked, the nodes with a neighbor of the same color. Min-conflicts picks the position to change from these,
+    * and so does any strategy that wants to focus on what is wrong. An empty result means "not known", not "nothing is
+    * wrong", so a strategy then picks a position at random, which is the default. Only used for absolute fitness.
+    *
+    * @param current the array to look at
+    */
+  def conflictedPositions(current: ParameterArray): Seq[Int] = Seq.empty
+
   /** if non-0, then we terminate when the fitness reaches this value.
     * @return the best (largest) expected fitness value.
     */

@@ -13,6 +13,9 @@ object NumericParameterArray {
   /** default number of steps to go from the min to the max */
   private val DEFAULT_NUM_STEPS = 10
 
+  /** The most values that [[NumericParameterArray.movesAt]] offers for one position; a bigger range is sampled. */
+  val MAX_VALUES_PER_POSITION = 64
+
   def createParams(vals: IndexedSeq[Double], minVals: IndexedSeq[Double], maxVals: IndexedSeq[Double],
                    names: IndexedSeq[String]): IndexedSeq[Parameter] = {
     val len = vals.length
@@ -119,6 +122,44 @@ case class NumericParameterArray(params: IndexedSeq[Parameter],
     */
   override def getRandomNeighbor(radius: Double): NumericParameterArray =
     NumericParameterArray(this.params.map(p => p.tweakValue(radius, rnd)), numSteps, rnd)
+
+  /** Local moves set one integer parameter to another value. Arrays with real numbers do not have them. */
+  override def supportsLocalMoves: Boolean = params.forall(_.isIntegerOnly)
+
+  /** Setting the parameter to each other value in its range, or to a sample of them when the range is large. */
+  override def movesAt(position: Int): Iterator[Move] =
+    otherValues(position, rnd).iterator.map(SetValue(position, _))
+
+  /** Set one random parameter to a different value in its range, if it has one. */
+  override def proposeLocalMove(random: Random): Move = {
+    val position = random.nextInt(size)
+    val values = otherValues(position, random)
+    SetValue(position, if (values.isEmpty) get(position).getValue else values(random.nextInt(values.size)))
+  }
+
+  override def applyMove(move: Move): NumericParameterArray = move match {
+    case SetValue(index, value) => NumericParameterArray(params.updated(index, params(index).setValue(value)), numSteps, rnd)
+    case other => throw new UnsupportedOperationException("A numeric array does not understand the move " + other)
+  }
+
+  override def createdAttributes(move: Move): Seq[Any] = move match {
+    case SetValue(index, value) => Seq(Placement(index, value))
+    case other => super.createdAttributes(other)
+  }
+
+  override def destroyedAttributes(move: Move): Seq[Any] = move match {
+    case SetValue(index, _) => Seq(Placement(index, get(index).getValue))
+    case other => super.destroyedAttributes(other)
+  }
+
+  /** The integer values in the range of the parameter other than its own, or at most `MAX_VALUES_PER_POSITION` of them. */
+  private def otherValues(position: Int, random: Random): IndexedSeq[Double] = {
+    val parameter = get(position)
+    val (low, high, current) = (parameter.minValue.round.toInt, parameter.maxValue.round.toInt, parameter.getValue.round.toInt)
+    val all = (low to high).filter(_ != current)
+    val sampled = if (all.size <= NumericParameterArray.MAX_VALUES_PER_POSITION) all else random.shuffle(all).take(NumericParameterArray.MAX_VALUES_PER_POSITION)
+    sampled.map(_.toDouble)
+  }
 
   /** @return get a completely random solution in the parameter space.*/
   override def getRandomSample: NumericParameterArray = {

@@ -28,9 +28,18 @@ class AllIntervalProblem(size: Int, seed: Long) extends OptimizeeProblem {
   /** The number of differences from 1 to n - 1 that are missing. */
   override def evaluateFitness(series: ParameterArray): Double = {
     val present = new Array[Boolean](size)
-    (1 until size).foreach(i => present(Math.abs(numberAt(series, i) - numberAt(series, i - 1))) = true)
+    (1 until size).foreach(i => present(difference(series, i)) = true)
     (1 until size).count(!present(_)).toDouble
   }
+
+  /** The neighbors whose difference is also the difference of another pair of neighbors, both of them. */
+  override def conflictedPositions(series: ParameterArray): Seq[Int] = {
+    val timesSeen = new Array[Int](size)
+    (1 until size).foreach(i => timesSeen(difference(series, i)) += 1)
+    (1 until size).filter(i => timesSeen(difference(series, i)) > 1).flatMap(i => Seq(i - 1, i)).distinct
+  }
+
+  private def difference(series: ParameterArray, position: Int): Int = Math.abs(numberAt(series, position) - numberAt(series, position - 1))
 
   private def numberAt(series: ParameterArray, position: Int): Int = series.get(position).getValue.toInt
 

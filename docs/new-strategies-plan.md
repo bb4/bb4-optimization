@@ -119,13 +119,13 @@ an optimization problem, so neither adds information.
 
 ### Phase B: shared pieces (additive, no behavior change)
 
-- `Move.attributes` and a `SetValue(index, value)` move.
+- `SetValue(index, value)` and `Placement(position, value)` moves. Instead of `Move.attributes`, `ParameterArray.createdAttributes(move)` and `destroyedAttributes(move)` return the placements a move makes and undoes (Phase B).
 - Moves for `NumericParameterArray` when every parameter is an integer (and for boolean parameters), with
   `proposeMove`, `applyMove` and `supportsMoves`, consistent with `getRandomNeighbor`: applying the proposed move
   gives the same array as `getRandomNeighbor` for the same random numbers (the rule used for permutations).
 - `Optimizee.conflictedPositions` with a default of empty, forwarded by the wrappers (`BudgetedOptimizee`,
   `DeltaCheckingOptimizee`, `LimitedOptimizee`) as `repair` and `proposeGuidedMove` are.
-- `ParameterArray.enumerateMoves(limit)` for permutations, with a default of "unsupported".
+- `ParameterArray.supportsLocalMoves`, `movesAt(position)` and `proposeLocalMove(rnd)` (swaps for permutations, `SetValue` for integer arrays; capped at 64 sampled values per position), replacing `enumerateMoves`.
 - `DeltaCheckingOptimizee` already checks any move against a full evaluation, so the new move types are covered by it.
 
 ### Phase C: adaptive restarts
