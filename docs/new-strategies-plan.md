@@ -216,3 +216,17 @@ These have defaults, so the plan can proceed without answers:
    bb4-puzzles later if one is needed.
 3. Is a 20 seed solve rate section acceptable for the length of a full benchmark run (about 10 minutes now)? Default:
    yes, with the section as its own `--solve-rate` run if it makes the full run too long.
+
+## Outcome (phases A to F, bb4-optimization)
+
+Measured with the 20 seed solve rate in [solve-rate-results.md](solve-rate-results.md):
+
+- **MIN_CONFLICTS** solves all 80 runs of the four problems, including coloring-200, which no earlier strategy solved,
+  and queens-400 in about 0.35 s against 0.76 s for annealing. It joins the enum. It needs `conflictedPositions` to be at
+  its best.
+- **TABU_SEARCH** solves all-interval-14 20/20 (the best earlier strategy: 10/20) and coloring-200 5/20 (earlier: 0/20),
+  but only 5/20 on queens-100 where annealing solves everything. It meets the rule on two problems, so it joins the enum,
+  with the note that it is not the first choice for queens.
+- **RestartingStrategy** stays off the enum: no combination was shown to beat the strategies above, and it can be built in
+  code for any strategy. It is available for the puzzles to try.
+- Not yet done: try min-conflicts and tabu on the Red puzzle in bb4-puzzles, and add planted 3-SAT and a Costas array.

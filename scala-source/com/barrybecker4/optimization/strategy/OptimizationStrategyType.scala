@@ -7,6 +7,8 @@ import com.barrybecker4.optimization.strategy.annealing.{GlobalSimulatedAnnealin
 import com.barrybecker4.optimization.strategy.genetic.{ConcurrentGeneticSearchStrategy, GeneticSearchStrategy}
 import com.barrybecker4.optimization.strategy.hillclimbing.{GlobalHillClimbingStrategy, HillClimbingStrategy}
 import com.barrybecker4.optimization.strategy.iteratedlocal.{IteratedLocalSearchConfig, IteratedLocalSearchStrategy}
+import com.barrybecker4.optimization.strategy.minconflicts.{MinConflictsConfig, MinConflictsStrategy}
+import com.barrybecker4.optimization.strategy.tabu.{TabuSearchConfig, TabuSearchStrategy}
 import com.barrybecker4.optimization.strategy.particleswarm.ParticleSwarmStrategy
 import com.barrybecker4.optimization.strategy.statespace.{StateSpaceSearchConfig, StateSpaceSearchStrategy}
 
@@ -33,7 +35,9 @@ enum OptimizationStrategyType {
        DIFFERENTIAL_EVOLUTION,
        PARTICLE_SWARM,
        ITERATED_LOCAL_SEARCH,
-       VARIABLE_NEIGHBORHOOD_SEARCH
+       VARIABLE_NEIGHBORHOOD_SEARCH,
+       TABU_SEARCH,
+       MIN_CONFLICTS
 
   def getDescription: String = this match
     case GLOBAL_SAMPLING =>
@@ -64,6 +68,11 @@ enum OptimizationStrategyType {
       "Iterated local search (ILS) for discrete problems such as permutations."
     case VARIABLE_NEIGHBORHOOD_SEARCH =>
       "Variable neighborhood search (VNS) for discrete problems such as permutations."
+    case TABU_SEARCH =>
+      "Tabu search for discrete problems: takes the best allowed move even when it is worse, and forbids undoing recent moves."
+    case MIN_CONFLICTS =>
+      "Min-conflicts for constraint problems: repeatedly fixes a conflicted position by its best move. " +
+        "Needs an optimizee that reports conflictedPositions to work well."
 
   /**
     * True when this strategy can run on `optimizee` with `params`.
@@ -81,6 +90,10 @@ enum OptimizationStrategyType {
         !optimizee.evaluateByComparison && params.isInstanceOf[NumericParameterArray]
       case HILL_CLIMBING | GLOBAL_HILL_CLIMBING =>
         locallySearchable(params)
+      case TABU_SEARCH =>
+        !optimizee.evaluateByComparison
+      case MIN_CONFLICTS =>
+        !optimizee.evaluateByComparison && params.supportsLocalMoves
       case _ =>
         true
 
@@ -123,6 +136,14 @@ enum OptimizationStrategyType {
         IteratedLocalSearchStrategy.strategyFor(optimizee, IteratedLocalSearchConfig.IteratedLocalSearch, rnd)
       case VARIABLE_NEIGHBORHOOD_SEARCH =>
         IteratedLocalSearchStrategy.strategyFor(optimizee, IteratedLocalSearchConfig.VariableNeighborhoodSearch, rnd)
+      case TABU_SEARCH =>
+        val strategy = new TabuSearchStrategy(optimizee, rnd)
+        strategy.setConfig(TabuSearchConfig.Default)
+        strategy
+      case MIN_CONFLICTS =>
+        val strategy = new MinConflictsStrategy(optimizee, rnd)
+        strategy.setConfig(MinConflictsConfig.Default)
+        strategy
 
   private def hasContinuousParameter(params: ParameterArray): Boolean =
     params match
@@ -153,7 +174,9 @@ object OptimizationStrategyType {
     DIFFERENTIAL_EVOLUTION,
     PARTICLE_SWARM,
     ITERATED_LOCAL_SEARCH, 
-    VARIABLE_NEIGHBORHOOD_SEARCH
+    VARIABLE_NEIGHBORHOOD_SEARCH,
+    TABU_SEARCH,
+    MIN_CONFLICTS
   )
 
   /** @deprecated use [[valuesForUi]] */

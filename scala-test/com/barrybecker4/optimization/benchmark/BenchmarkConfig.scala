@@ -23,6 +23,9 @@ object BenchmarkConfig {
     SIMULATED_ANNEALING, GLOBAL_SIMULATED_ANNEALING, HILL_CLIMBING, GLOBAL_HILL_CLIMBING,
     GENETIC_SEARCH, CONCURRENT_GENETIC_SEARCH, ITERATED_LOCAL_SEARCH, VARIABLE_NEIGHBORHOOD_SEARCH)
 
+  /** The solve rate run adds the strategies made for constraint problems. */
+  val CONSTRAINT_STRATEGIES: Seq[OptimizationStrategyType] = DEFAULT_STRATEGIES ++ Seq(TABU_SEARCH, MIN_CONFLICTS)
+
   /**
     * Reads options of the form `--name=value`. The names are time-ms, max-evals, seeds, problems, strategies
     * (the last two are comma separated lists), report (the Markdown summary file, or `none`) and out (a file to
@@ -41,8 +44,8 @@ object BenchmarkConfig {
     val solveRate = options.get("solve-rate").contains("true")
     val problemNames = options.get("problems").map(_.split(",").toSeq).getOrElse(Seq.empty)
     val strategies = options.get("strategies").map(_.split(",").toSeq.map(OptimizationStrategyType.valueOf))
-      .getOrElse(DEFAULT_STRATEGIES)
-    val isFullRun = problemNames.isEmpty && strategies == DEFAULT_STRATEGIES
+      .getOrElse(if (solveRate) CONSTRAINT_STRATEGIES else DEFAULT_STRATEGIES)
+    val isFullRun = problemNames.isEmpty && strategies == (if (solveRate) CONSTRAINT_STRATEGIES else DEFAULT_STRATEGIES)
     BenchmarkConfig(
       timeLimitMillis = options.get("time-ms").map(_.toLong).getOrElse(defaultTimeLimit(solveRate)),
       maxEvaluations = options.get("max-evals").map(_.toLong).getOrElse(DEFAULT_MAX_EVALUATIONS),
