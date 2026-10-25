@@ -8,7 +8,7 @@ enum StateSpaceSearchMode {
   case BestFirstFitness
 
   /**
-    * Expand lowest `fitness + heuristic(state)` first.
+    * Expand the lowest `fitness + heuristic(state)` first.
     * Requires an admissible [[com.barrybecker4.optimization.optimizee.DiscreteStateSpace.heuristic]]
     * for correctness guarantees; ignored (falls back to [[BestFirstFitness]]) in compare mode.
     */

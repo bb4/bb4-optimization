@@ -5,11 +5,13 @@ import com.barrybecker4.optimization.optimizee.{BudgetedOptimizee, EvaluationBud
 import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 import com.barrybecker4.optimization.strategy.OptimizationStrategy
 
+import scala.annotation.tailrec
 import scala.util.Random
 
 object RestartingStrategy {
 
   /** The i'th term (counting from 1) of the Luby sequence 1 1 2 1 1 2 4 1 1 2 1 1 2 4 8 ... */
+  @tailrec
   def luby(i: Int): Int = {
     require(i >= 1, s"The Luby sequence starts at 1, got $i")
     var k = 1
