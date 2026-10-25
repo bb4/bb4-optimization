@@ -83,8 +83,7 @@ class OptimizationStrategyTypeSuite extends AnyFunSuite {
       "DIFFERENTIAL_EVOLUTION",
       "PARTICLE_SWARM",
       "ITERATED_LOCAL_SEARCH",
-      "VARIABLE_NEIGHBORHOOD_SEARCH",
-      "TABU_SEARCH"
+      "VARIABLE_NEIGHBORHOOD_SEARCH"
     ))
   }
 
