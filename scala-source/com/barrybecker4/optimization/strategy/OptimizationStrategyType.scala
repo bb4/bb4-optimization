@@ -91,7 +91,7 @@ enum OptimizationStrategyType {
       case HILL_CLIMBING | GLOBAL_HILL_CLIMBING =>
         locallySearchable(params)
       case TABU_SEARCH =>
-        !optimizee.evaluateByComparison
+        !optimizee.evaluateByComparison && !hasContinuousParameter(params)
       case MIN_CONFLICTS =>
         !optimizee.evaluateByComparison && params.supportsLocalMoves
       case _ =>

@@ -98,6 +98,11 @@ class TabuSearchStrategySuite extends AnyFunSuite {
     intercept[IllegalArgumentException](strategyFor(problem, TabuSearchConfig()).doOptimization(problem.getInitialGuess, 1.0))
   }
 
+  test("an array with a real number is refused") {
+    val problem = new com.barrybecker4.optimization.optimizee.optimizees.SphereProblem(2)
+    intercept[IllegalArgumentException](strategyFor(problem, TabuSearchConfig()).doOptimization(problem.getInitialGuess, 1.0))
+  }
+
   test("the configuration refuses values that make no sense") {
     intercept[IllegalArgumentException](TabuSearchConfig(candidateMoves = 0))
     intercept[IllegalArgumentException](TabuSearchConfig(tenureMin = 5, tenureMax = 4))

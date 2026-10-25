@@ -160,6 +160,10 @@ class StrategyScoreboardSuite extends AnyFunSuite with TimeLimitedTests {
       case (VARIABLE_NEIGHBORHOOD_SEARCH, "ackley") => Reach(3.0)
       case (VARIABLE_NEIGHBORHOOD_SEARCH, "rastrigin") => Reach(2.0)
 
+      case (TABU_SEARCH, _) if continuous => Refuse("discrete")
+      case (MIN_CONFLICTS, _) if continuous => Refuse("local moves")
+      case (TABU_SEARCH | MIN_CONFLICTS, _) => Reach(Exact, Some(500))
+
       case _ =>
         throw new IllegalStateException(s"No scoreboard bar for $strategy on $problem")
     }

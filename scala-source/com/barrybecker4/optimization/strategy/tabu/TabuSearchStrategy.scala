@@ -3,7 +3,7 @@ package com.barrybecker4.optimization.strategy.tabu
 
 import com.barrybecker4.math.MathUtil
 import com.barrybecker4.optimization.optimizee.{EvaluationBudgetExceededException, Optimizee}
-import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
+import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray, ParameterArrayWithFitness}
 import com.barrybecker4.optimization.strategy.OptimizationStrategy
 import com.barrybecker4.optimization.strategy.statespace.StateSpaceSearchStrategy
 
@@ -22,7 +22,7 @@ import scala.util.Random
   * scores random neighbors instead and forbids returning to a solution it has just left; that works but evaluates a
   * whole solution per candidate, so it is slow.
   *
-  * Works with absolute fitness only. When the optimizee is wrapped with an evaluation budget the best solution found
+  * Works with absolute fitness and discrete parameters only. When the optimizee is wrapped with an evaluation budget the best solution found
   * so far is returned when the budget is used up.
   *
   * @param optimizee the thing to be optimized.
@@ -41,6 +41,7 @@ class TabuSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM) ex
 
   override def doOptimization(params: ParameterArray, fitnessRange: Double): ParameterArrayWithFitness = {
     require(!optimizee.evaluateByComparison, "Tabu search needs absolute fitness, not comparison")
+    require(!hasContinuousParameter(params), "Tabu search needs discrete parameters, but this array has a continuous one")
     var best = ParameterArrayWithFitness(params, Double.PositiveInfinity)
     try best = search(params)
     catch { case _: EvaluationBudgetExceededException => best = bestSoFar.getOrElse(best) }
@@ -62,6 +63,11 @@ class TabuSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM) ex
       trace("iteration " + iteration + " current = " + current.fitness + " best = " + best.fitness)
     }
     best
+  }
+
+  private def hasContinuousParameter(params: ParameterArray): Boolean = params match {
+    case numeric: NumericParameterArray => !numeric.supportsLocalMoves
+    case _ => false
   }
 
   private def shouldRestart(stagnantIterations: Int): Boolean =
