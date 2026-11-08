@@ -1,9 +1,9 @@
 // Copyright by Barry G. Becker, 2013. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 
 plugins {
-    id 'com.barrybecker4.bb4.scala-library' version '2.0.0'
-    id 'com.barrybecker4.bb4.publish' version '2.0.0'
-    id 'com.barrybecker4.bb4.application' version '2.0.0'
+    id 'com.barrybecker4.bb4.scala-library' version '2.1-SNAPSHOT'
+    id 'com.barrybecker4.bb4.publish' version '2.1-SNAPSHOT'
+    id 'com.barrybecker4.bb4.application' version '2.1-SNAPSHOT'
 }
 
 description = 'A Scala library project containing a collection of heuristic optimization algorithms.'
