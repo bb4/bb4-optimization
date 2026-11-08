@@ -5,6 +5,8 @@ import com.barrybecker4.math.MathUtil
 import com.barrybecker4.math.function.{InvertibleFunction, PiecewiseFunction}
 import RedistributionFunction.verifyInRange
 
+import scala.collection.mutable.ArrayBuffer
+
 
 /**
   * The default is a completely uniform distribution (all values having equal probability).
@@ -30,33 +32,44 @@ class UniformRedistribution(
 
   protected val redistributionFunction: InvertibleFunction = buildPiecewiseFunction()
 
+  /**
+    * Build a piecewise CDF map for the special-value spikes.
+    * bb4-math 2.1 requires [[PiecewiseFunction]] x samples to be strictly increasing, so
+    * coincident endpoint / plateau samples are omitted (or nudged by EPS) instead of duplicated.
+    */
   private def buildPiecewiseFunction(): PiecewiseFunction = {
-    val xValues = new Array[Double](2 * len + 2)
-    val yValues = new Array[Double](2 * len + 2)
-    var specialProbabilityTotal: Double = getSpecialProbTotal
+    val specialProbabilityTotal = getSpecialProbTotal
     val ratio = 1.0 - specialProbabilityTotal
-    // now compute the piecewise function values
-    specialProbabilityTotal = 0
-    xValues(0) = 0.0
-    yValues(0) = 0.0
+    val xValues = ArrayBuffer.empty[Double]
+    val yValues = ArrayBuffer.empty[Double]
+
+    def appendPoint(x: Double, y: Double): Unit = {
+      if (xValues.isEmpty || x > xValues.last) {
+        xValues += x
+        yValues += y
+      } else if (x < xValues.last || y != yValues.last) {
+        // Keep a distinct sample when the computed x would not advance (e.g. special value at 0).
+        xValues += xValues.last + MathUtil.EPS
+        yValues += y
+      }
+      // else: exact duplicate of the previous sample — drop it
+    }
+
+    appendPoint(0.0, 0.0)
     var lastX = 0.0
     for (i <- 0 until len) {
       verifyInRange(specialValueProbabilities(i))
-      specialProbabilityTotal += specialValueProbabilities(i)
-      val i2 = 2 * i
-      val specialValuesm1 = if (i == 0) 0.0
-      else specialValues(i - 1)
-      xValues(i2 + 1) = lastX + (specialValues(i) - specialValuesm1) * ratio
-      yValues(i2 + 1) = specialValues(i)
-      xValues(i2 + 2) = xValues(i2 + 1) + specialValueProbabilities(i)
-      yValues(i2 + 2) = specialValues(i)
-      if (i > 0) xValues(i2 + 1) += MathUtil.EPS
-      lastX = xValues(i2 + 2)
+      val specialValuesm1 = if (i == 0) 0.0 else specialValues(i - 1)
+      val xBase = lastX + (specialValues(i) - specialValuesm1) * ratio
+      val xStart = if (i > 0) xBase + MathUtil.EPS else xBase
+      val xEnd = xBase + specialValueProbabilities(i)
+      appendPoint(xStart, specialValues(i))
+      appendPoint(xEnd, specialValues(i))
+      lastX = xEnd
     }
-    if (len == 2) xValues(2 * len - 2) -= MathUtil.EPS_MEDIUM
-    xValues(2 * len + 1) = 1.0
-    yValues(2 * len + 1) = 1.0
-    new PiecewiseFunction(xValues, yValues)
+    appendPoint(1.0, 1.0)
+
+    new PiecewiseFunction(xValues.toArray, yValues.toArray)
   }
 
   private def getSpecialProbTotal = {
