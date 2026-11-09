@@ -34,7 +34,7 @@ class BruteForceStrategySuite extends AnyFunSuite {
   }
 
   test("brute force refuses a continuous parameter space") {
-    val problem = SphereProblem(dimensions = 2)
+    val problem = SphereProblem()
     val strategy = new BruteForceStrategy(problem)
     intercept[IllegalArgumentException] {
       strategy.doOptimization(problem.getInitialGuess, problem.getFitnessRange)
@@ -53,7 +53,7 @@ class BruteForceStrategySuite extends AnyFunSuite {
     assert(counting.evaluations == 4 * 3)
     val expected = for (a <- -1 to 2; b <- 3 to 5) yield Seq(a.toDouble, b.toDouble)
     assert(counting.seen.map(_.toSeq).toSet == expected.toSet)
-    assert(result.fitness == 10.0 + (-1) * 5, s"the minimum is at (-1, 5), got ${result.fitness}")
+    assert(result.fitness == 10.0 + -1 * 5, s"the minimum is at (-1, 5), got ${result.fitness}")
   }
 
   test("stops enumerating as soon as the optimal fitness is reached") {

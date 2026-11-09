@@ -39,8 +39,7 @@ class ConcurrentGeneticSearchStrategySuite extends AnyFunSuite {
       rnd,
       GeneticSearchConfig(
         neighborSelection = NeighborSelection.SingleSample,
-        maxIterations = 8,
-        maxStagnantGenerations = 3
+        maxIterations = 8
       )
     )
     strategy.setImprovementEpsilon(1e-4)
@@ -54,8 +53,7 @@ class ConcurrentGeneticSearchStrategySuite extends AnyFunSuite {
     val cfg = GeneticSearchConfig(
       neighborSelection = NeighborSelection.SingleSample,
       maxIterations = 12,
-      maxStagnantGenerations = 4,
-      elitismEnabled = true
+      maxStagnantGenerations = 4
     )
 
     val seqRnd = new Random(41)

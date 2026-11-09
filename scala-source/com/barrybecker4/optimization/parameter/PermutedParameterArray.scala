@@ -63,22 +63,14 @@ case class PermutedParameterArray(params: IndexedSeq[Parameter], rnd: Random)
 
   /** Create a new permutation that is not too distant from what we have now.
     *
-    * @param radius an indication of the amount of variation to use. 0 is none, 3 is a lot.
-    *               Applies this many random transpositions (pairwise value swaps), in sequence:
-    *               `max(1, (10 * radius * N / 100).toInt)` where `N` is [[size]].
-    *               Strategies widen the radius when they are stuck, and it can get very large. Once there would be
-    *               more than [[PermutedParameterArray.MAX_SWAPS_PER_PARAMETER]] swaps per parameter the result is
-    *               already as good as random, so a uniform shuffle is used instead of doing all of them.
     * @return a new [[PermutedParameterArray]].
     * @note Each transposition exchanges the values at two random indices in the permutation as updated
     *       so far. Successive swaps compose like ordinary transpositions on the current state (standard for
     *       local search on permutations), rather than always reading endpoint values from the initial
     *       [[params]] snapshot.
-    */
-  /**
-    * True only for a plain [[PermutedParameterArray]]. A subclass usually picks its own neighbors (a puzzle path that
-    * keeps its tiles legal, say) and carries more than its parameters, and these moves would bypass that and build
-    * plain arrays. A subclass that wants moves overrides this, and [[applyMove]] to build its own type.
+    *  True only for a plain [[PermutedParameterArray]]. A subclass usually picks its own neighbors (a puzzle path that
+    *  keeps its tiles legal, say) and carries more than its parameters, and these moves would bypass that and build
+    *  plain arrays. A subclass that wants moves overrides this, and [[applyMove]] to build its own type.
     */
   override def supportsMoves: Boolean = getClass == classOf[PermutedParameterArray]
 
@@ -86,6 +78,13 @@ case class PermutedParameterArray(params: IndexedSeq[Parameter], rnd: Random)
     * The swaps that [[getRandomNeighbor]] would make, as a move. That is one [[Swap]] for the usual small radius,
     * the swaps in order for a larger one, and the swaps of a Fisher-Yates shuffle once the radius is so large that
     * a shuffle is used instead.
+    *
+    * @param radius an indication of the amount of variation to use. 0 is none, 3 is a lot.
+    *   Applies this many random transpositions (pairwise value swaps), in sequence:
+    *   `max(1, (10 * radius * N / 100).toInt)` where `N` is [[size]].
+    *   Strategies widen the radius when they are stuck, and it can get very large. Once there would be
+    *   more than [[PermutedParameterArray.MAX_SWAPS_PER_PARAMETER]] swaps per parameter the result is
+    *   already as good as random, so a uniform shuffle is used instead of doing all of them.
     */
   override def proposeMove(radius: Double): Move = {
     val swaps = if (size <= 1) IndexedSeq.empty[Swap] else proposeSwaps(numSwapsFor(radius))
