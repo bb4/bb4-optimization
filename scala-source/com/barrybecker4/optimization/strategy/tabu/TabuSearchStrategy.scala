@@ -17,7 +17,8 @@ import scala.util.Random
   * the things a move takes away stay forbidden for a tenure drawn from [[TabuSearchConfig]]. A tabu move is still
   * allowed when it gives a new best solution (aspiration), and when every candidate is tabu the best of them is taken.
   *
-  * It uses [[com.barrybecker4.optimization.parameter.ParameterArray.proposeLocalMove]] and [[Optimizee.evaluateMove]],
+  * It uses [[com.barrybecker4.optimization.parameter.ParameterArray.proposeLocalMove]] and
+  * [[com.barrybecker4.optimization.optimizee.Optimizee.evaluateMove]],
   * so a problem that scores a move by a delta (as the N-queens benchmark does) makes it cheap. For an array without local moves it
   * scores random neighbors instead and forbids returning to a solution it has just left; that works but evaluates a
   * whole solution per candidate, so it is slow.

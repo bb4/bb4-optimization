@@ -28,7 +28,7 @@ object RestartingStrategy {
   * The first run starts from the initial guess. After that a run starts from a random sample, or, with a chance that
   * grows while restarts keep failing to beat the best, from a perturbed copy of the best solution.
   * The search stops when the goal fitness is reached, when the restarts or the total budget are used up, or when an
-  * evaluation limit set outside this strategy (a [[BudgetedOptimizee]] around it) is reached.
+  * evaluation limit set outside this strategy (a [[com.barrybecker4.optimization.optimizee.BudgetedOptimizee]] around it) is reached.
   *
   * Works with absolute fitness only: the results of separate runs cannot be compared when fitness is relative to each
   * run's own starting point. The inner strategy must report its progress with `notifyOfChange`, as the built-in

@@ -10,7 +10,8 @@ import scala.util.Random
 
 /**
   * The min-conflicts heuristic for constraint problems whose fitness is the number of broken constraints (so that 0 is
-  * a solution). Each step takes a position at random from [[Optimizee.conflictedPositions]], scores every move of
+  * a solution). Each step takes a position at random from
+  * [[com.barrybecker4.optimization.optimizee.Optimizee.conflictedPositions]], scores every move of
   * that position ([[com.barrybecker4.optimization.parameter.ParameterArray.movesAt]]), and takes the one with the fewest
   * conflicts left, or, with the noise probability, a random one. Unlike hill climbing it moves even when no move improves,
   * which walks across plateaus.
