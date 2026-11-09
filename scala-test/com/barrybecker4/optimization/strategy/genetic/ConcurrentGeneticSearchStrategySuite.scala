@@ -1,6 +1,5 @@
 package com.barrybecker4.optimization.strategy.genetic
 
-import com.barrybecker4.math.MathUtil
 import com.barrybecker4.optimization.optimizee.{BudgetedOptimizee, Optimizee}
 import com.barrybecker4.optimization.parameter.types.{DoubleParameter, IntegerParameter}
 import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray, PermutedParameterArray}
@@ -15,7 +14,6 @@ import scala.util.Random
 class ConcurrentGeneticSearchStrategySuite extends AnyFunSuite {
 
   test("concurrent genetic completes in compare mode on tiny permutation space") {
-    MathUtil.RANDOM.setSeed(42)
     val rnd = new Random(42)
     val optimizee = new CompareModeTestOptimizee
     val seed = PermutedParameterArray(IndexedSeq(

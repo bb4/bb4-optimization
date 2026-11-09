@@ -1,8 +1,8 @@
 // Copyright by Barry G. Becker, 2026. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.benchmark
 
-import com.barrybecker4.math.MathUtil
 import com.barrybecker4.optimization.optimizee.EvaluationBudgetExceededException
+import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray, PermutedParameterArray}
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType
 
 import scala.util.Random
@@ -25,6 +25,12 @@ object BenchmarkRun {
 
   private val NANOS_PER_MILLI = 1_000_000L
 
+  private def guessWithRnd(pa: ParameterArray, rnd: Random): ParameterArray = pa match {
+    case n: NumericParameterArray => n.copy(rnd = rnd)
+    case p: PermutedParameterArray => p.forkWithRnd(rnd)
+    case other => other
+  }
+
   /** Strategies that use several threads, where the allocations of the calling thread are not the whole story. */
   private val MULTI_THREADED = Set(OptimizationStrategyType.CONCURRENT_GENETIC_SEARCH)
 
@@ -33,12 +39,12 @@ object BenchmarkRun {
     *         or because it rejects the problem when it starts (global sampling cannot sample 200 integer parameters)
     */
   def run(problem: BenchmarkProblem, strategy: OptimizationStrategyType, seed: Long, config: BenchmarkConfig): Option[RunResult] = {
-    MathUtil.RANDOM.setSeed(seed)
+    val rnd = new Random(seed)
     val optimizee = problem.create(seed)
-    val initialGuess = optimizee.getInitialGuess
+    val initialGuess = guessWithRnd(optimizee.getInitialGuess, rnd)
     if (!strategy.appliesTo(optimizee, initialGuess)) None
     else
-      try Some(search(problem, optimizee, initialGuess, strategy, seed, config))
+      try Some(search(problem, optimizee, initialGuess, strategy, rnd, seed, config))
       catch {
         case e: IllegalArgumentException =>
           Console.err.println(s"Skipping $strategy on ${problem.name}: ${e.getMessage}")
@@ -48,11 +54,11 @@ object BenchmarkRun {
 
   private def search(benchmarkProblem: BenchmarkProblem, problem: com.barrybecker4.optimization.optimizee.optimizees.OptimizeeProblem,
                      initialGuess: com.barrybecker4.optimization.parameter.ParameterArray,
-                     strategyType: OptimizationStrategyType, seed: Long, config: BenchmarkConfig): RunResult = {
+                     strategyType: OptimizationStrategyType, rnd: Random, seed: Long, config: BenchmarkConfig): RunResult = {
     val start = System.nanoTime()
     val limited = new LimitedOptimizee(problem, config.maxEvaluations, start + config.timeLimitMillis * NANOS_PER_MILLI,
       stopWhenSolved = benchmarkProblem.isConstraint)
-    val strategy = strategyType.getStrategy(limited, problem.getFitnessRange, new Random(seed))
+    val strategy = strategyType.getStrategy(limited, problem.getFitnessRange, rnd)
     val allocatedBefore = AllocationMeter.bytesAllocatedSoFar
     val fitness = bestFitness(strategy, initialGuess, problem.getFitnessRange)
     val millis = (System.nanoTime() - start) / NANOS_PER_MILLI.toDouble

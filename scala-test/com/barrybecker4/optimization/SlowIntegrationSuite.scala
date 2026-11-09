@@ -1,6 +1,5 @@
 package com.barrybecker4.optimization
 
-import com.barrybecker4.math.MathUtil
 import com.barrybecker4.optimization.optimizee.OptimizerTestSuite
 import com.barrybecker4.optimization.optimizee.optimizees.problems.{
   DominatingSetProblem,
@@ -31,17 +30,14 @@ class SlowIntegrationSuite extends OptimizerTestSuite {
 
   override protected def doTest(optimizationType: OptimizationStrategyType): Unit = {
     for (variation <- Seq(TSP_STANDARD)) {
-      MathUtil.RANDOM.setSeed(0)
       val problem = new TravelingSalesmanProblem(variation)
       verifyProblem(problem, variation, optimizationType)
     }
     for (variation <- Seq(SIMPLE_SS, NO_SOLUTION)) {
-      MathUtil.RANDOM.setSeed(0)
       val problem = new SubsetSumProblem(variation)
       verifyProblem(problem, variation, optimizationType)
     }
     if (optimizationType == BRUTE_FORCE) {
-      MathUtil.RANDOM.setSeed(0)
       val problem = new DominatingSetProblem(TYPICAL_DS)
       verifyProblem(problem, TYPICAL_DS, optimizationType)
     }

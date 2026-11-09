@@ -1,6 +1,5 @@
 package com.barrybecker4.optimization.strategy
 
-import com.barrybecker4.math.MathUtil
 import com.barrybecker4.optimization.optimizee.optimizees.{LineGraphDemoProblem, SphereProblem}
 import com.barrybecker4.optimization.optimizee.{BudgetedOptimizee, EvaluationBudgetExceededException}
 import com.barrybecker4.optimization.parameter.{NumericParameterArray, PermutedParameterArray}
@@ -15,7 +14,6 @@ import scala.util.Random
 class BruteForceStrategySuite extends AnyFunSuite {
 
   test("brute force finds identity permutation under compareFitness") {
-    MathUtil.RANDOM.setSeed(7)
     val rnd = new Random(7)
     val optimizee = new CompareModeTestOptimizee
     val seed = PermutedParameterArray(IndexedSeq(

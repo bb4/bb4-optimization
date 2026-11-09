@@ -1,6 +1,5 @@
 package com.barrybecker4.optimization.strategy.genetic
 
-import com.barrybecker4.math.MathUtil
 import com.barrybecker4.optimization.parameter.types.DoubleParameter
 import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray, ParameterArrayWithFitness}
 import com.barrybecker4.optimization.strategy.genetic.optimizees.{BaselineRelativeQuadraticGeneticTestOptimizee, RecordingCompareBaselineOptimizee, RecordingOptimizee}
@@ -17,10 +16,10 @@ import scala.util.Random
 class GeneticSearchStrategySuite extends AnyFunSuite {
 
   test("findInitialPopulation evaluates fitness of each neighbor candidate") {
-    MathUtil.RANDOM.setSeed(42)
+    val rnd = new Random(42)
     val seed = NumericParameterArraySuiteLike.twoDoubleParams(0.1, 0.2)
     val optimizee = new RecordingOptimizee
-    val strategy = new GeneticSearchStrategy(optimizee, MathUtil.RANDOM)
+    val strategy = new GeneticSearchStrategy(optimizee, rnd)
 
     val pop = strategy.findInitialPopulation(seed)
     assert(pop.nonEmpty)
@@ -172,6 +171,6 @@ private[strategy] object NumericParameterArraySuiteLike {
       min,
       max,
       Array[String]("A", "B"),
-      MathUtil.RANDOM)
+      new Random(1))
   }
 }

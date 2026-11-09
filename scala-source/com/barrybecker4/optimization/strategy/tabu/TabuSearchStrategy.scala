@@ -1,7 +1,6 @@
 // Copyright by Barry G. Becker, 2026. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.strategy.tabu
 
-import com.barrybecker4.math.MathUtil
 import com.barrybecker4.optimization.optimizee.{EvaluationBudgetExceededException, Optimizee}
 import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray, ParameterArrayWithFitness}
 import com.barrybecker4.optimization.strategy.OptimizationStrategy
@@ -29,7 +28,7 @@ import scala.util.Random
   * @param optimizee the thing to be optimized.
   * @param rnd       chooses the moves and the tenures.
   */
-class TabuSearchStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM) extends OptimizationStrategy(optimizee) {
+class TabuSearchStrategy(optimizee: Optimizee, rnd: Random = new Random(1)) extends OptimizationStrategy(optimizee) {
 
   private var config: TabuSearchConfig = TabuSearchConfig.Default
 

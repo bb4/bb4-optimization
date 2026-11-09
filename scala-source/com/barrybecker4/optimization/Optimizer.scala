@@ -1,7 +1,6 @@
 // Copyright by Barry G. Becker, 2000-2026. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization
 
-import com.barrybecker4.math.MathUtil
 import com.barrybecker4.optimization.optimizee.{BudgetedOptimizee, EvaluationBudgetExceededException, Optimizee}
 import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType
@@ -54,7 +53,7 @@ class Optimizer(val optimizee: Optimizee, optimizationLogFile: Option[String] = 
     */
   def doOptimization(optimizationType: OptimizationStrategyType,
                      params: ParameterArray, fitnessRange: Double,
-                     rnd: Random = MathUtil.RANDOM,
+                     rnd: Random = new Random(1),
                      maxEvaluations: Option[Int] = None,
                      verbose: Boolean = false): OptimizationResult = {
 

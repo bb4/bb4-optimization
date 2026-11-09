@@ -1,7 +1,6 @@
 // Copyright by Barry G. Becker, 2001-2026. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.strategy.genetic
 
-import com.barrybecker4.math.MathUtil
 import com.barrybecker4.optimization.optimizee.Optimizee
 import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
 
@@ -29,7 +28,7 @@ import scala.util.{Failure, Random, Success, Try}
   */
 class ConcurrentGeneticSearchStrategy(
     optimizee: Optimizee,
-    rnd: Random = MathUtil.RANDOM,
+    rnd: Random = new Random(1),
     config: GeneticSearchConfig = GeneticSearchConfig.default
 ) extends GeneticSearchStrategy(optimizee, rnd, config) {
 

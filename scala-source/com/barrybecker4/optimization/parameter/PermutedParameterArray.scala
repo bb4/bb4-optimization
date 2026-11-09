@@ -1,7 +1,6 @@
 // Copyright by Barry G. Becker, 2000-2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.parameter
 
-import com.barrybecker4.math.MathUtil
 import com.barrybecker4.optimization.parameter.distancecalculators.PermutedDistanceCalculator
 import com.barrybecker4.optimization.parameter.sampling.PermutedGlobalSampler
 import com.barrybecker4.optimization.parameter.types.Parameter
@@ -31,7 +30,7 @@ case class PermutedParameterArray(params: IndexedSeq[Parameter], rnd: Random)
 
   private val distanceCalculator: PermutedDistanceCalculator = new PermutedDistanceCalculator()
 
-  def this(rnd: Random = MathUtil.RANDOM) = { this(IndexedSeq.empty[Parameter], rnd)}
+  def this(rnd: Random = new Random(1)) = { this(IndexedSeq.empty[Parameter], rnd)}
 
   /** Permute the parameters according to the specified permutation
     * of 0 based indices.

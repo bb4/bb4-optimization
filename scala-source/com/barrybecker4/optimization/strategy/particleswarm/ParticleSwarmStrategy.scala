@@ -1,7 +1,6 @@
 // Copyright by Barry G. Becker, 2000-2026. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.strategy.particleswarm
 
-import com.barrybecker4.math.MathUtil
 import com.barrybecker4.optimization.optimizee.{EvaluationBudgetExceededException, Optimizee}
 import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray, ParameterArrayWithFitness}
 import com.barrybecker4.optimization.strategy.OptimizationStrategy
@@ -46,7 +45,7 @@ import scala.util.Random
  * @param optimizee the thing to be optimized.
  * @param rnd       source of randomness for the initial swarm and the stochastic velocity updates.
  */
-class ParticleSwarmStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM)
+class ParticleSwarmStrategy(optimizee: Optimizee, rnd: Random = new Random(1))
   extends OptimizationStrategy(optimizee) {
 
   private var config: ParticleSwarmConfig = ParticleSwarmConfig.Default

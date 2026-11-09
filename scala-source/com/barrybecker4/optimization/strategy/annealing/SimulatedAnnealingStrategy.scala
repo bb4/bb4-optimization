@@ -2,7 +2,6 @@
 package com.barrybecker4.optimization.strategy.annealing
 
 import com.barrybecker4.common.format.FormatUtil
-import com.barrybecker4.math.MathUtil
 import com.barrybecker4.optimization.optimizee.{EvaluationBudgetExceededException, MoveChoice, Optimizee}
 import com.barrybecker4.optimization.parameter.*
 import com.barrybecker4.optimization.strategy.OptimizationStrategy
@@ -111,7 +110,7 @@ object SimulatedAnnealingStrategy {
   * @param optimizee the thing to be optimized.
   * @author Barry Becker
   */
-class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = MathUtil.RANDOM)
+class SimulatedAnnealingStrategy(optimizee: Optimizee, rnd: Random = new Random(1))
     extends OptimizationStrategy(optimizee) {
 
   private var config: SimulatedAnnealingConfig = SimulatedAnnealingStrategy.DefaultConfig

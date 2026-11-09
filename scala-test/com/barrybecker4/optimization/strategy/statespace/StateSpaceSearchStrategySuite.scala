@@ -1,6 +1,5 @@
 package com.barrybecker4.optimization.strategy.statespace
 
-import com.barrybecker4.math.MathUtil
 import com.barrybecker4.optimization.Optimizer
 import com.barrybecker4.optimization.optimizee.optimizees.DiscreteGrid2DDemoProblem
 import com.barrybecker4.optimization.optimizee.LineGraphTestProblem
@@ -16,7 +15,6 @@ class StateSpaceSearchStrategySuite extends AnyFunSuite {
 
   test("state space search reaches optimal on small line graph") {
     val rnd = new Random(1)
-    MathUtil.RANDOM.setSeed(0)
     val problem = new LineGraphTestProblem(target = 7, lo = 0, hi = 20, rnd = rnd)
     val opt = new Optimizer(problem)
     val guess = new NumericParameterArray(IndexedSeq(new IntegerParameter(0, 0, 20, "x")), rnd = rnd)
@@ -27,7 +25,6 @@ class StateSpaceSearchStrategySuite extends AnyFunSuite {
 
   test("state space search reaches optimal on 2D discrete grid demo") {
     val rnd = new Random(1)
-    MathUtil.RANDOM.setSeed(0)
     val problem = new DiscreteGrid2DDemoProblem()
     val opt = new Optimizer(problem)
     val guess = problem.getInitialGuess
@@ -99,7 +96,6 @@ class StateSpaceSearchStrategySuite extends AnyFunSuite {
 
   test("AStar reaches optimal on 2D grid demo") {
     val rnd = new Random(11)
-    MathUtil.RANDOM.setSeed(0)
     val problem = new DiscreteGrid2DDemoProblem()
     val strategy = new StateSpaceSearchStrategy(problem)
     strategy.setConfig(StateSpaceSearchConfig(searchMode = StateSpaceSearchMode.AStar))

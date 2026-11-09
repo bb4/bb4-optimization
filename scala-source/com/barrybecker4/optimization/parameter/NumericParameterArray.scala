@@ -1,7 +1,6 @@
 // Copyright by Barry G. Becker, 2000-2018. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization.parameter
 
-import com.barrybecker4.math.MathUtil
 import com.barrybecker4.math.linear.Vector
 import com.barrybecker4.optimization.parameter.sampling.NumericGlobalSampler
 import com.barrybecker4.optimization.parameter.types.{DoubleParameter, Parameter}
@@ -33,7 +32,7 @@ object NumericParameterArray {
   */
 case class NumericParameterArray(params: IndexedSeq[Parameter],
                                  numSteps: Int = DEFAULT_NUM_STEPS,
-                                 rnd: Random = MathUtil.RANDOM)
+                                 rnd: Random = new Random(1))
   extends AbstractParameterArray(params, rnd) {
 
   /** Constructor if all the parameters are DoubleParameters

@@ -1,9 +1,7 @@
 package com.barrybecker4.optimization.parameter
 
-import com.barrybecker4.math.MathUtil
 import com.barrybecker4.math.linear.Vector
 import com.barrybecker4.optimization.parameter.types.IntegerParameter
-import org.scalatest.BeforeAndAfter
 import NumericParameterArraySuite.createParamArray
 import org.scalatest.funsuite.AnyFunSuite
 
@@ -31,13 +29,9 @@ object NumericParameterArraySuite {
   }
 }
 
-class NumericParameterArraySuite extends AnyFunSuite with BeforeAndAfter {
+class NumericParameterArraySuite extends AnyFunSuite {
 
   private var params: NumericParameterArray = uninitialized
-
-  before {
-    MathUtil.RANDOM.setSeed(0)
-  }
 
   test("GetNumSteps") {
     params = createParamArray(.2, .3)

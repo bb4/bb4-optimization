@@ -2,7 +2,6 @@
 package com.barrybecker4.optimization.strategy.genetic
 
 import com.barrybecker4.common.format.FormatUtil
-import com.barrybecker4.math.MathUtil
 import com.barrybecker4.optimization.optimizee.{EvaluationBudgetExceededException, Optimizee}
 import com.barrybecker4.optimization.parameter.ParameterArrayWithFitness.given
 import com.barrybecker4.optimization.parameter.{ParameterArray, ParameterArrayWithFitness}
@@ -33,7 +32,7 @@ import scala.util.Random
   */
 class GeneticSearchStrategy(
     optimizee: Optimizee,
-    rnd: Random = MathUtil.RANDOM,
+    rnd: Random = new Random(1),
     private var searchConfig: GeneticSearchConfig = GeneticSearchConfig.default
 ) extends OptimizationStrategy(optimizee) {
 

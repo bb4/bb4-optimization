@@ -1,12 +1,10 @@
 package com.barrybecker4.optimization.optimizee
 
-import com.barrybecker4.math.MathUtil
 import com.barrybecker4.common.util.FileUtil
 import com.barrybecker4.optimization.Optimizer
 import com.barrybecker4.optimization.optimizee.optimizees.{OptimizeeProblem, ProblemVariation}
 import com.barrybecker4.optimization.parameter.ParameterArray
 import com.barrybecker4.optimization.strategy._
-import org.scalatest.BeforeAndAfter
 import org.scalatest.funsuite.AnyFunSuite
 
 import scala.util.Random
@@ -53,10 +51,7 @@ object OptimizerTestSuite {
   }
 }
 
-abstract class OptimizerTestSuite extends AnyFunSuite with BeforeAndAfter {
-  before {
-    MathUtil.RANDOM.setSeed(0)
-  }
+abstract class OptimizerTestSuite extends AnyFunSuite {
 
   test("GlobalSampling") {
     doTest(GLOBAL_SAMPLING)

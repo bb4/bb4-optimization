@@ -1,11 +1,11 @@
 // Copyright by Barry G. Becker, 2026. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 package com.barrybecker4.optimization
 
-import com.barrybecker4.math.MathUtil
 import com.barrybecker4.optimization.optimizee.optimizees.{
   AckleyProblem, DiscreteGrid2DDemoProblem, LineGraphDemoProblem, OptimizeeProblem,
   RastriginProblem, RosenbrockProblem, SphereProblem
 }
+import com.barrybecker4.optimization.parameter.{NumericParameterArray, ParameterArray, PermutedParameterArray}
 import com.barrybecker4.optimization.strategy.OptimizationStrategyType
 import OptimizationStrategyType.*
 import org.scalatest.concurrent.TimeLimitedTests
@@ -67,17 +67,24 @@ class StrategyScoreboardSuite extends AnyFunSuite with TimeLimitedTests {
     assert(failures.isEmpty, "\n" + table + "\n" + failures.mkString("\n"))
   }
 
+  /** Neighbor sampling uses the RNG stored on the guess, not only the optimizer's `rnd`. */
+  private def guessWithRnd(pa: ParameterArray, rnd: Random): ParameterArray = pa match {
+    case n: NumericParameterArray => n.copy(rnd = rnd)
+    case p: PermutedParameterArray => p.forkWithRnd(rnd)
+    case other => other
+  }
+
   private def runOne(strategy: OptimizationStrategyType, problemName: String,
                      factory: () => OptimizeeProblem, seed: Int): Row = {
-    MathUtil.RANDOM.setSeed(seed.toLong)
+    val rnd = new Random(seed)
     val problem = factory()
-    val guess = problem.getInitialGuess
+    val guess = guessWithRnd(problem.getInitialGuess, rnd)
     val initial = problem.evaluateFitness(guess)
     val optimizer = new Optimizer(problem)
     val started = System.nanoTime()
     try {
       val result = optimizer.doOptimization(
-        strategy, guess, problem.getFitnessRange, new Random(seed), Some(EvaluationBudget))
+        strategy, guess, problem.getFitnessRange, rnd, Some(EvaluationBudget))
       val ms = (System.nanoTime() - started) / 1000000L
       Row(strategy, problemName, seed, result.status.toString, result.best.fitness, initial,
         result.evaluationsUsed.getOrElse(-1), ms, None)
