@@ -1,9 +1,9 @@
 // Copyright by Barry G. Becker, 2013. Licensed under MIT License: http://www.opensource.org/licenses/MIT
 
 plugins {
-    id 'com.barrybecker4.bb4.scala-library' version '3.0-SNAPSHOT'
-    id 'com.barrybecker4.bb4.publish' version '3.0-SNAPSHOT'
-    id 'com.barrybecker4.bb4.application' version '3.0-SNAPSHOT'
+    alias(bb4Libs.plugins.scala.library)
+    alias(bb4Libs.plugins.publish)
+    alias(bb4Libs.plugins.application)
 }
 
 description = 'A Scala library project containing a collection of heuristic optimization algorithms.'
@@ -18,9 +18,9 @@ bb4 {
 dependencies {
     // starting in scala 2.13, parallel collections must be included separately
     implementation 'org.scala-lang.modules:scala-parallel-collections_3:1.3.0'
-    implementation 'com.barrybecker4:bb4-ui:3.0-SNAPSHOT'
-    implementation 'com.barrybecker4:bb4-math:3.0-SNAPSHOT'
-    implementation 'com.barrybecker4:bb4-common:3.0-SNAPSHOT'
+    implementation bb4Libs.ui
+    implementation bb4Libs.math
+    implementation bb4Libs.common
 }
 
 // Without this, the build failed in jenkins with the error:
