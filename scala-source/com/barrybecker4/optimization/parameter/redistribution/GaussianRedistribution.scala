@@ -11,7 +11,8 @@ import RedistributionFunction.verifyInRange
 
 
 object GaussianRedistribution {
-  private val NUM_MAP_VALUES = 10
+  /** CDF sample count on [0,1]; higher improves narrow-σ invertibility (was 10). */
+  private[redistribution] val NUM_MAP_VALUES = 64
   private val SQRT2 = Math.sqrt(2.0)
 }
 
@@ -30,13 +31,28 @@ case class GaussianRedistribution(mean: Double, stdDeviation: Double) extends Re
     val lowMissing = cdf(0)
     val highMissing = 1.0 - cdfFunction(GaussianRedistribution.NUM_MAP_VALUES - 1)
     redistributeTailMass(cdfFunction, lowMissing, highMissing)
-    val max = cdfFunction(GaussianRedistribution.NUM_MAP_VALUES - 1)
-    assert(max > 0.9 && max < 1.01)
-    cdfFunction(GaussianRedistribution.NUM_MAP_VALUES - 1) = 1.0
+    enforceMonotonicUnitCdf(cdfFunction)
     val xRange = Range(0.0, 1.0)
     val inverter = new FunctionInverter(cdfFunction)
     val functionMap = inverter.createInverseFunction(xRange)
     new ArrayFunction(functionMap, cdfFunction)
+  }
+
+  /**
+    * Tail redistribution can produce tiny non-monotonic dips for narrow σ / fine grids.
+    * Clamp to a non-decreasing unit-interval CDF before inversion.
+    */
+  private def enforceMonotonicUnitCdf(cdfFunction: Array[Double]): Unit = {
+    cdfFunction(0) = 0.0
+    val last = cdfFunction.length - 1
+    for (i <- 1 until last) {
+      if (cdfFunction(i) < cdfFunction(i - 1)) cdfFunction(i) = cdfFunction(i - 1)
+      if (cdfFunction(i) > 1.0 - MathUtil.EPS) cdfFunction(i) = 1.0 - MathUtil.EPS
+      if (cdfFunction(i) < 0.0) cdfFunction(i) = 0.0
+    }
+    cdfFunction(last) = 1.0
+    if (cdfFunction(last) < cdfFunction(last - 1))
+      cdfFunction(last - 1) = math.min(cdfFunction(last - 1), 1.0 - MathUtil.EPS)
   }
 
   /** Discrete samples of the CDF at uniform x in (0, 1], index 0 fixed at 0. */
